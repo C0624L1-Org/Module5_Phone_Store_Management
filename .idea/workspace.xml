@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b7349c70-aeec-4a5d-b171-278b81c5ccae" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/era.mwb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/controller/EmployeeController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/repository/IEmployeeRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/service/EmployeeService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/resources/templates/employeesList.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sql_mobie_store.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/table.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/anh.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/md5_phone_store_management/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/md5_phone_store_management/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/model/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/model/Role.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/md5_phone_store_management/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/resources/application.properties" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$/md5_phone_store_management">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="2twfWdkmK3anFDtsaPD1sX6Q7W8" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Gradle.Build md5_phone_store_management.executor": "Run",
+    "Gradle.Download Sources.executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.Md5PhoneStoreManagementApplication.executor": "Run",
+    "git-widget-placeholder": "anh",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Codegym/module_4/finalExam/src/main/java/com/example/finalExam/controller/ProductController.java",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Md5PhoneStoreManagementApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="md5_phone_store_management.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.md5_phone_store_management.Md5PhoneStoreManagementApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.21565.193" />
+        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-IU-243.21565.193" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b7349c70-aeec-4a5d-b171-278b81c5ccae" name="Changes" comment="" />
+      <created>1741268090573</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1741268090573</updated>
+      <workItem from="1741268091853" duration="16354000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
