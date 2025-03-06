@@ -37,6 +37,22 @@ public class Employee {
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
+    // Constructor
+    public Employee() {
+    }
+
+    public Employee(Integer employeeID, String fullName, LocalDate dob, String address, String phone, String username, String password, Role role, String email) {
+        this.employeeID = employeeID;
+        this.fullName = fullName;
+        this.dob = dob;
+        this.address = address;
+        this.phone = phone;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.email = email;
+    }
+
     // Getters and Setters
     public Integer getEmployeeID() {
         return employeeID;
