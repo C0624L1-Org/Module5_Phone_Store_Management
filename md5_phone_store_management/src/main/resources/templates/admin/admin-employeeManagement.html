@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Nhân viên</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body>
+<div class="wrapper">
+    <!-- Sidebar (giữ nguyên như các trang khác) -->
+
+    <!-- Page Content -->
+    <div id="content">
+        <!-- Top Navbar (giữ nguyên như các trang khác) -->
+
+        <!-- Main Content -->
+        <div class="container-fluid">
+            <h2 class="mb-4">Quản lý Nhân viên</h2>
+
+            <div class="card">
+                <div class="card-body">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                        <i class="fas fa-plus"></i> Thêm nhân viên mới
+                    </button>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Mã NV</th>
+                                <th>Họ và tên</th>
+                                <th>Chức vụ</th>
+                                <th>Số điện thoại</th>
+                                <th>Email</th>
+                                <th>Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody id="employeeTableBody">
+                            <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa Nhân viên -->
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="employeeModalTitle">Thêm Nhân viên mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm">
+                    <input type="hidden" id="employeeId">
+                    <div class="mb-3">
+                        <label for="employeeName" class="form-label">Họ và tên</label>
+                        <input type="text" class="form-control" id="employeeName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="employeePosition" class="form-label">Chức vụ</label>
+                        <select class="form-select" id="employeePosition" required>
+                            <option value="">-- Chọn chức vụ --</option>
+                            <option value="Nhân viên bán hàng">Nhân viên bán hàng</option>
+                            <option value="Nhân viên kho">Nhân viên kho</option>
+                            <option value="Quản lý">Quản lý</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="employeePhone" class="form-label">Số điện thoại</label>
+                        <input type="tel" class="form-control" id="employeePhone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="employeeEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="employeeEmail" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="saveEmployee()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script>
+    // Dữ liệu mẫu nhân viên
+    let employees = [
+        { id: 'NV001', name: 'Nguyễn Văn A', position: 'Nhân viên bán hàng', phone: '0901234567', email: 'nguyenvana@email.com' },
+        { id: 'NV002', name: 'Trần Thị B', position: 'Nhân viên kho', phone: '0912345678', email: 'tranthib@email.com' },
+        { id: 'NV003', name: 'Lê Văn C', position: 'Quản lý', phone: '0923456789', email: 'levanc@email.com' },
+    ];
+
+    function renderEmployees() {
+        const tbody = document.getElementById('employeeTableBody');
+        tbody.innerHTML = '';
+        employees.forEach(employee => {
+            tbody.innerHTML += `
+                    <tr>
+                        <td>${employee.id}</td>
+                        <td>${employee.name}</td>
+                        <td>${employee.position}</td>
+                        <td>${employee.phone}</td>
+                        <td>${employee.email}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editEmployee('${employee.id}')">
+                                <i class="fas fa-edit"></i> Sửa
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${employee.id}')">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>
+                `;
+        });
+    }
+
+    function showEmployeeModal(mode, employeeId = null) {
+        const modal = new bootstrap.Modal(document.getElementById('employeeModal'));
+        const title = document.getElementById('employeeModalTitle');
+        const form = document.getElementById('employeeForm');
+
+        if (mode === 'add') {
+            title.textContent = 'Thêm Nhân viên mới';
+            form.reset();
+        } else {
+            title.textContent = 'Sửa thông tin Nhân viên';
+            const employee = employees.find(e => e.id === employeeId);
+            document.getElementById('employeeId').value = employee.id;
+            document.getElementById('employeeName').value = employee.name;
+            document.getElementById('employeePosition').value = employee.position;
+            document.getElementById('employeePhone').value = employee.phone;
+            document.getElementById('employeeEmail').value = employee.email;
+        }
+
+        modal.show();
+    }
+
+    function saveEmployee() {
+        const id = document.getElementById('employeeId').value;
+        const name = document.getElementById('employeeName').value;
+        const position = document.getElementById('employeePosition').value;
+        const phone = document.getElementById('employeePhone').value;
+        const email = document.getElementById('employeeEmail').value;
+
+        if (id) {
+            // Cập nhật nhân viên hiện có
+            const index = employees.findIndex(e => e.id === id);
+            employees[index] = { id, name, position, phone, email };
+        } else {
+            // Thêm nhân viên mới
+            const newId = 'NV' + (employees.length + 1).toString().padStart(3, '0');
+            employees.push({ id: newId, name, position, phone, email });
+        }
+
+        renderEmployees();
+        bootstrap.Modal.getInstance(document.getElementById('employeeModal')).hide();
+    }
+
+    function editEmployee(employeeId) {
+        showEmployeeModal('edit', employeeId);
+    }
+
+    function deleteEmployee(employeeId) {
+        if (confirm('Bạn có chắc chắn muốn xóa nhân viên này?')) {
+            employees = employees.filter(e => e.id !== employeeId);
+            renderEmployees();
+        }
+    }
+
+    // Khởi tạo danh sách nhân viên
+    renderEmployees();
+
+    // Xử lý sự kiện mở modal thêm nhân viên mới
+    document.querySelector('[data-bs-target="#addEmployeeModal"]').addEventListener('click', () => showEmployeeModal('add'));
+</script>
+</body>
+</html>
