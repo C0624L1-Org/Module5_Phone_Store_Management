@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sửa Thông tin Nhân viên - Hệ thống Quản lý Bán Điện thoại</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">
+      <h1>PhoneShop</h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="admin-index.html">Trang chủ</a></li>
+        <li><a href="employees.html" class="active">Quản lý nhân viên</a></li>
+        <li><a href="#">Quản lý sản phẩm</a></li>
+        <li><a href="#">Quản lý đơn hàng</a></li>
+        <li><a href="#">Báo cáo</a></li>
+      </ul>
+    </nav>
+    <div class="user-info">
+      <span>Admin</span>
+      <img src="https://via.placeholder.com/40" alt="Avatar">
+    </div>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h2>Sửa Thông tin Nhân viên</h2>
+      <a href="employees.html" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Quay lại
+      </a>
+    </div>
+
+    <div class="form-container">
+      <form id="editEmployeeForm">
+        <div class="form-group">
+          <label for="employeeId">Mã nhân viên</label>
+          <input type="text" id="employeeId" name="employeeId" value="NV001" readonly>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">Họ</label>
+            <input type="text" id="firstName" name="firstName" value="Nguyễn Văn" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Tên</label>
+            <input type="text" id="lastName" name="lastName" value="A" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Số điện thoại</label>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" value="0912345678" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="nguyenvana@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="department">Phòng ban</label>
+            <select id="department" name="department" required>
+              <option value="">Chọn phòng ban</option>
+              <option value="sales" selected>Nhân viên kinh doanh</option>
+              <option value="retail">Nhân viên bán hàng</option>
+              <option value="warehouse">Nhân viên thủ kho</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="joinDate">Ngày vào làm</label>
+            <input type="date" id="joinDate" name="joinDate" value="2023-01-01" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Địa chỉ</label>
+          <textarea id="address" name="address" rows="3">123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="status">Trạng thái</label>
+          <select id="status" name="status" required>
+            <option value="active" selected>Đang làm việc</option>
+            <option value="inactive">Nghỉ việc</option>
+            <option value="leave">Nghỉ phép</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="avatar">Ảnh đại diện</label>
+          <div class="avatar-preview">
+            <img src="https://via.placeholder.com/100" alt="Avatar hiện tại">
+          </div>
+          <input type="file" id="avatar" name="avatar" accept="image/*">
+          <small>Để trống nếu không muốn thay đổi ảnh đại diện</small>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="changePassword" name="changePassword">
+            Đổi mật khẩu
+          </label>
+        </div>
+
+        <div id="passwordFields" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Mật khẩu mới</label>
+              <input type="password" id="password" name="password">
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+              <input type="password" id="confirmPassword" name="confirmPassword">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="reset" class="btn btn-secondary">Hủy thay đổi</button>
+          <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Hệ thống Quản lý Bán Điện thoại. Đã đăng ký bản quyền.</p>
+  </footer>
+</div>
+
+<script>
+  // Xử lý hiển thị trường mật khẩu
+  const changePasswordCheckbox = document.getElementById('changePassword');
+  const passwordFields = document.getElementById('passwordFields');
+
+  changePasswordCheckbox.addEventListener('change', function() {
+    passwordFields.style.display = this.checked ? 'block' : 'none';
+  });
+
+  // Xử lý form
+  const form = document.getElementById('editEmployeeForm');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Kiểm tra mật khẩu trùng khớp nếu đổi mật khẩu
+    if (changePasswordCheckbox.checked) {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password !== confirmPassword) {
+        alert('Mật khẩu xác nhận không khớp!');
+        return;
+      }
+    }
+
+    // Giả lập cập nhật thông tin thành công
+    alert('Cập nhật thông tin nhân viên thành công!');
+    window.location.href = 'employees.html';
+  });
+</script>
+</body>
+</html>

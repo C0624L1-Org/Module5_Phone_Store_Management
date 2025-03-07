@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Kinh doanh</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body>
+<div class="wrapper">
+  <!-- Sidebar (giữ nguyên như các trang khác) -->
+
+  <!-- Page Content -->
+  <div id="content">
+    <!-- Top Navbar (giữ nguyên như các trang khác) -->
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+      <h2 class="mb-4">Quản lý Kinh doanh</h2>
+
+      <!-- Tabs for different management sections -->
+      <ul class="nav nav-tabs mb-4" id="businessTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="retail-price-tab" data-bs-toggle="tab" data-bs-target="#retail-price" type="button" role="tab">Quản lý Giá bán lẻ</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="sales-history-tab" data-bs-toggle="tab" data-bs-target="#sales-history" type="button" role="tab">Quản lý Lịch sử Kinh doanh</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="customer-management-tab" data-bs-toggle="tab" data-bs-target="#customer-management" type="button" role="tab">Quản lý Khách hàng</button>
+        </li>
+      </ul>
+
+      <!-- Tab Content -->
+      <div class="tab-content" id="businessTabsContent">
+        <!-- Quản lý Giá bán lẻ -->
+        <div class="tab-pane fade show active" id="retail-price" role="tabpanel">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Cập nhật Giá bán lẻ</h5>
+              <form id="retailPriceForm">
+                <div class="mb-3">
+                  <label for="productSelect" class="form-label">Chọn sản phẩm</label>
+                  <select class="form-select" id="productSelect" required>
+                    <option value="">-- Chọn sản phẩm --</option>
+                    <option value="1">iPhone 15 Pro Max</option>
+                    <option value="2">Samsung Galaxy S24 Ultra</option>
+                    <option value="3">Xiaomi 14 Pro</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="retailPrice" class="form-label">Giá bán lẻ mới</label>
+                  <input type="number" class="form-control" id="retailPrice" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Cập nhật giá bán lẻ</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quản lý Lịch sử Kinh doanh -->
+        <div class="tab-pane fade" id="sales-history" role="tabpanel">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Lịch sử Kinh doanh</h5>
+              <div class="mb-3">
+                <label for="sortSelect" class="form-label">Sắp xếp theo:</label>
+                <select class="form-select" id="sortSelect">
+                  <option value="date">Thời gian</option>
+                  <option value="customer">Tên khách hàng</option>
+                  <option value="product">Tên sản phẩm</option>
+                  <option value="quantity">Số lượng</option>
+                  <option value="total">Tổng tiền</option>
+                </select>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                  <tr>
+                    <th>Thời gian</th>
+                    <th>Khách hàng</th>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Tổng tiền</th>
+                  </tr>
+                  </thead>
+                  <tbody id="salesHistoryBody">
+                  <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quản lý Khách hàng -->
+        <div class="tab-pane fade" id="customer-management" role="tabpanel">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Quản lý Khách hàng</h5>
+              <div class="mb-3">
+                <input type="text" class="form-control" id="customerSearch" placeholder="Tìm kiếm khách hàng...">
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                  <tr>
+                    <th>Tên</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ</th>
+                    <th>Tuổi</th>
+                    <th>Email</th>
+                    <th>Thao tác</th>
+                  </tr>
+                  </thead>
+                  <tbody id="customerTableBody">
+                  <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Chỉnh sửa Khách hàng -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Chỉnh sửa Thông tin Khách hàng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editCustomerForm">
+          <div class="mb-3">
+            <label for="editName" class="form-label">Tên</label>
+            <input type="text" class="form-control" id="editName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editPhone" class="form-label">Số điện thoại</label>
+            <input type="tel" class="form-control" id="editPhone" required>
+          </div>
+          <div class="mb-3">
+            <label for="editAddress" class="form-label">Địa chỉ</label>
+            <input type="text" class="form-control" id="editAddress" required>
+          </div>
+          <div class="mb-3">
+            <label for="editAge" class="form-label">Tuổi</label>
+            <input type="number" class="form-control" id="editAge" required>
+          </div>
+          <div class="mb-3">
+            <label for="editEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="editEmail" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
+        <button type="button" class="btn btn-primary" onclick="saveCustomerEdit()">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script>
+  // Quản lý Giá bán lẻ
+  document.getElementById('retailPriceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const product = document.getElementById('productSelect').value;
+    const price = document.getElementById('retailPrice').value;
+    alert(`Đã cập nhật giá bán lẻ cho sản phẩm ID ${product}: ${price} VNĐ`);
+  });
+
+  // Quản lý Lịch sử Kinh doanh
+  const salesHistory = [
+    { time: '2024-03-06 14:30', customer: 'Nguyễn Văn A', product: 'iPhone 15 Pro', quantity: 1, total: 28000000 },
+    { time: '2024-03-06 15:45', customer: 'Trần Thị B', product: 'Samsung Galaxy S24', quantity: 2, total: 45000000 },
+    { time: '2024-03-05 10:15', customer: 'Lê Văn C', product: 'Xiaomi 14 Pro', quantity: 1, total: 18000000 },
+  ];
+
+  function renderSalesHistory() {
+    const tbody = document.getElementById('salesHistoryBody');
+    tbody.innerHTML = '';
+    salesHistory.forEach(sale => {
+      tbody.innerHTML += `
+                    <tr>
+                        <td>${sale.time}</td>
+                        <td>${sale.customer}</td>
+                        <td>${sale.product}</td>
+                        <td>${sale.quantity}</td>
+                        <td>${sale.total.toLocaleString()} VNĐ</td>
+                    </tr>
+                `;
+    });
+  }
+
+  document.getElementById('sortSelect').addEventListener('change', function() {
+    const sortBy = this.value;
+    salesHistory.sort((a, b) => {
+      if (sortBy === 'date') return new Date(b.time) - new Date(a.time);
+      if (sortBy === 'customer') return a.customer.localeCompare(b.customer);
+      if (sortBy === 'product') return a.product.localeCompare(b.product);
+      if (sortBy === 'quantity') return b.quantity - a.quantity;
+      if (sortBy === 'total') return b.total - a.total;
+    });
+    renderSalesHistory();
+  });
+
+  renderSalesHistory();
+
+  // Quản lý Khách hàng
+  const customers = [
+    { id: 1, name: 'Nguyễn Văn A', phone: '0901234567', address: 'Hà Nội', age: 30, email: 'nguyenvana@email.com' },
+    { id: 2, name: 'Trần Thị B', phone: '0912345678', address: 'TP.HCM', age: 25, email: 'tranthib@email.com' },
+    { id: 3, name: 'Lê Văn C', phone: '0923456789', address: 'Đà Nẵng', age: 35, email: 'levanc@email.com' },
+  ];
+
+  function renderCustomers() {
+    const tbody = document.getElementById('customerTableBody');
+    tbody.innerHTML = '';
+    customers.forEach(customer => {
+      tbody.innerHTML += `
+                    <tr>
+                        <td>${customer.name}</td>
+                        <td>${customer.phone}</td>
+                        <td>${customer.address}</td>
+                        <td>${customer.age}</td>
+                        <td>${customer.email}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editCustomer(${customer.id})">
+                                <i class="fas fa-edit"></i> Sửa
+                            </button>
+                        </td>
+                    </tr>
+                `;
+    });
+  }
+
+  document.getElementById('customerSearch').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    const filteredCustomers = customers.filter(customer =>
+            customer.name.toLowerCase().includes(searchTerm) ||
+            customer.phone.includes(searchTerm) ||
+            customer.address.toLowerCase().includes(searchTerm) ||
+            customer.age.toString().includes(searchTerm) ||
+            customer.email.toLowerCase().includes(searchTerm)
+    );
+    renderFilteredCustomers(filteredCustomers);
+  });
+
+  function renderFilteredCustomers(filteredCustomers) {
+    const tbody = document.getElementById('customerTableBody');
+    tbody.innerHTML = '';
+    filteredCustomers.forEach(customer => {
+      tbody.innerHTML += `
+                    <tr>
+                        <td>${customer.name}</td>
+                        <td>${customer.phone}</td>
+                        <td>${customer.address}</td>
+                        <td>${customer.age}</td>
+                        <td>${customer.email}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editCustomer(${customer.id})">
+                                <i class="fas fa-edit"></i> Sửa
+                            </button>
+                        </td>
+                    </tr>
+                `;
+    });
+  }
+
+  function editCustomer(customerId) {
+    const customer = customers.find(c => c.id === customerId);
+    document.getElementById('editName').value = customer.name;
+    document.getElementById('editPhone').value = customer.phone;
+    document.getElementById('editAddress').value = customer.address;
+    document.getElementById('editAge').value = customer.age;
+    document.getElementById('editEmail').value = customer.email;
+
+    const editModal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
+    editModal.show();
+  }
+
+  function saveCustomerEdit() {
+    // Ở đây bạn sẽ cập nhật thông tin khách hàng trong cơ sở dữ liệu
+    alert('Đã cập nhật thông tin khách hàng');
+    const editModal = bootstrap.Modal.getInstance(document.getElementById('editCustomerModal'));
+    editModal.hide();
+    renderCustomers();
+  }
+
+  renderCustomers();
+</script>
+</body>
+</html>

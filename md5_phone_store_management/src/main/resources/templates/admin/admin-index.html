@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Bán Điện thoại</title>
+    <link rel="stylesheet" href="/css/styles.css">
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <h1>PhoneShop</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="admin-index.html" class="active">Trang chủ</a></li>
+                <li><a href="#">Quản lý thông tin cá nhân</a></li>
+                <li><a href="admin/employees.html">Quản lý nhân viên</a></li>
+                <li><a href="#">Quản lý nhà cung cấp</a></li>
+                <li><a href="#">Quản lý xuất nhập kho</a></li>
+                <li><a href="#">Quản lý kinh doanh</a></li>
+                <li><a href="#">Quản lý bán hàng</a></li>
+                <li><a href="#">Xem thông tin hàng hóa</a></li>
+                <li><a href="#">Quản lý Báo cáo</a></li>
+            </ul>
+        </nav>
+        <div class="user-info">
+            <span>Admin</span>
+            <img src="https://via.placeholder.com/40" alt="Avatar">
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard">
+            <h2>Bảng điều khiển</h2>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Nhân viên</h3>
+                        <p>24</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Sản phẩm</h3>
+                        <p>156</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Đơn hàng</h3>
+                        <p>38</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Doanh thu</h3>
+                        <p>458.5M</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-access">
+                <h3>Truy cập nhanh</h3>
+                <div class="quick-links">
+                    <a href="admin/add-employee.html" class="quick-link-card">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Thêm nhân viên</span>
+                    </a>
+                    <a href="admin/employees.html" class="quick-link-card">
+                        <i class="fas fa-users"></i>
+                        <span>Danh sách nhân viên</span>
+                    </a>
+                    <a href="#" class="quick-link-card">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Thêm sản phẩm</span>
+                    </a>
+                    <a href="#" class="quick-link-card">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Báo cáo bán hàng</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="recent-activities">
+                <h3>Hoạt động gần đây</h3>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>Nguyễn Văn A đã thêm nhân viên mới</p>
+                            <span class="activity-time">15 phút trước</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>Đơn hàng #12345 đã được tạo</p>
+                            <span class="activity-time">1 giờ trước</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>Trần Thị B đã cập nhật thông tin nhân viên</p>
+                            <span class="activity-time">3 giờ trước</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>Đã thêm 5 sản phẩm mới vào kho</p>
+                            <span class="activity-time">Hôm qua</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Hệ thống Quản lý Bán Điện thoại. Đã đăng ký bản quyền.</p>
+    </footer>
+</div>
+</body>
+</html>
