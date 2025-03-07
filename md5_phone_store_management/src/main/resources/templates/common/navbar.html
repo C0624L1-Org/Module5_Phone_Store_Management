@@ -1,0 +1,53 @@
+<div th:fragment="navbar" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/home}">
+                <img th:src="@{#}" alt="logo" width="50" height="50" class="nav_logo rounded-circle">
+                <span class="nav_logo-name">Phone Store</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <!-- Hiển thị nếu người dùng đã đăng nhập -->
+<!--                    <li sec:authorize="isAuthenticated()" class="nav-item">-->
+<!--                        <span class="nav-link text-white">Xin chào, <span sec:authentication="name"></span>!</span>-->
+<!--                    </li>-->
+<!--                    <li sec:authorize="isAuthenticated()" class="nav-item dropdown">-->
+<!--                        <a class="nav-link dropdown-toggle" href="#" id="navbarAvatarDropdown" role="button"-->
+<!--                           data-bs-toggle="dropdown" aria-expanded="false">-->
+<!--                            <img th:if="${currentUser != null}"-->
+<!--                                 th:src="${currentUser.avatar}"-->
+<!--                                 alt="avatar"-->
+<!--                                 class="user-avatar"-->
+<!--                                 style="width:40px; height:40px; border-radius:50%;">-->
+<!--                        </a>-->
+<!--                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarAvatarDropdown">-->
+<!--                            <li><a class="dropdown-item" th:href="@{#}">Thông tin cá nhân</a></li>-->
+<!--                            <li><a class="dropdown-item" th:href="@{#}">Giỏ hàng</a></li>-->
+<!--                            <li><a class="dropdown-item" th:href="@{#}">Lịch sử đơn hàng</a></li>-->
+<!--                            <li><a class="dropdown-item" th:href="@{#}">Đổi mật khẩu</a></li>-->
+<!--                            <li><hr class="dropdown-divider"></li>-->
+<!--                            <li><a class="dropdown-item" th:href="@{#}">Đăng xuất</a></li>-->
+<!--                        </ul>-->
+<!--                    </li>-->
+<!--                    <li sec:authorize="isAuthenticated()" class="nav-item">-->
+<!--                        <a class="nav-link" href="/logout">Đăng xuất <i class="fas fa-sign-out-alt ms-1"></i></a>-->
+<!--                    </li>-->
+
+                    <!-- Hiển thị nếu người dùng chưa đăng nhập -->
+                    <li sec:authorize="isAnonymous()" class="nav-item">
+                        <a class="nav-link" href="/login">Đăng Nhập</a>
+                    </li>
+                    <li sec:authorize="isAnonymous()" class="nav-item">
+                        <a class="nav-link" href="/register">Đăng Ký</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>

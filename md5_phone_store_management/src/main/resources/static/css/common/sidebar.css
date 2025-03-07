@@ -1,0 +1,36 @@
+/* Sidebar nằm bên trái */
+.sidebar {
+    width: 250px;
+    height: calc(100vh - 70px);
+    position: fixed;
+    top: 70px;
+    left: 0;
+    background-color: #343a40;
+    color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.user-image-back {
+    padding: 20px 0;
+}
+
+.avatar-user {
+    border: 3px solid white;
+}
+
+.nav .nav-item {
+    margin-bottom: 10px;
+}
+
+.nav .nav-link {
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
