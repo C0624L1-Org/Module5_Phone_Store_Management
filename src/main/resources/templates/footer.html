@@ -1,0 +1,72 @@
+<footer class="bg-gray-900 text-white py-8">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+            <div class="mb-4 md:mb-0">
+                <h2 class="text-lg font-bold">Hệ thống FPT Shop trên toàn quốc</h2>
+                <p class="text-sm">Bao gồm Cửa hàng FPT Shop, Trung tâm Laptop, F.Studio, S.Studio, Garmin Brand Store</p>
+            </div>
+            <button id="show-store-list" class="bg-red-600 text-white py-2 px-4 rounded hover-effect">Xem danh sách cửa hàng</button>
+
+            <div id="store-list-form" class="hidden">
+                <h2 class="text-lg font-bold">Danh sách cửa hàng</h2>
+                <div class="store-item">
+                    <h3 class="font-bold">Cửa hàng 1</h3>
+                    <p>Địa chỉ: 123 Đường ABC, Quận 1, TP.HCM</p>
+                    <p>Số điện thoại: 0901234567</p>
+                    <button class="bg-green-600 text-white py-1 px-2 rounded">Đường đi</button>
+                    <button class="bg-blue-600 text-white py-1 px-2 rounded">Gọi</button>
+                </div>
+                <div class="store-item">
+                    <h3 class="font-bold">Cửa hàng 2</h3>
+                    <p>Địa chỉ: 456 Đường DEF, Quận 2, TP.HCM</p>
+                    <p>Số điện thoại: 0912345678</p>
+                    <button class="bg-green-600 text-white py-1 px-2 rounded">Đường đi</button>
+                    <button class="bg-blue-600 text-white py-1 px-2 rounded">Gọi</button>
+                </div>
+                <div class="store-item">
+                    <h3 class="font-bold">Cửa hàng 3</h3>
+                    <p>Địa chỉ: 789 Đường GHI, Quận 3, TP.HCM</p>
+                    <p>Số điện thoại: 0923456789</p>
+                    <button class="bg-green-600 text-white py-1 px-2 rounded">Đường đi</button>
+                    <button class="bg-blue-600 text-white py-1 px-2 rounded">Gọi</button>
+                </div>
+            </div>
+        </div>
+        <hr class="border-gray-700 mb-8"/>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <a>
+                logo thanh toán vv
+            </a>
+        </div>
+        <hr class="border-gray-700 mb-8"/>
+        <div class="text-center mb-8">
+            <h3 class="text-lg font-bold mb-4">WEBSITE CÙNG FPT RETAIL</h3>
+            <div class="flex justify-center space-x-8">
+                <!-- Các logo khác -->
+            </div>
+        </div>
+        <div class="text-center text-sm">
+
+            <a>
+                # lặp các danh mục sản phẩm
+            </a>
+
+            <p class="mb-4">© 2007 - 2024 Công Ty Cổ Phần Bán Lẻ Kỹ Thuật Số FPT</p>
+        </div>
+    </div>
+
+
+
+</footer>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#show-store-list").click(function() {
+            $("#store-list-form").toggle();
+        });
+    });
+
+//     cần cải thiện cho nó nhảy lên form ở giữa
+</script>
+
+

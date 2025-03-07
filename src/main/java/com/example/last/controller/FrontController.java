@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class FrontController {
     @RequestMapping({"", "/home", "/index"})
     public String home() {
-        return "index";
+        return "testIndex";
     }
 }

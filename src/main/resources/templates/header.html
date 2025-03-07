@@ -1,0 +1,67 @@
+<header class="bg-red-600 shadow-effect">
+    <div class="container mx-auto flex items-center justify-between py-2 px-4">
+        <div class="flex items-center">
+            <img alt="FPT Shop logo" class="h-10" height="40" src="https://storage.googleapis.com/a1aa/image/_DnrG2agcom7C6J491WfQqChZ5rJqr9sQNqU0Bb_6eE.jpg" width="100"/>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button class="bg-red-700 text-white px-4 py-2 rounded-full hover-effect">
+                Danh mục
+                drop down list
+
+            </button>
+            <div class="relative">
+                <input class="w-96 px-4 py-2 rounded-full border border-gray-300 focus:border-blue-200" placeholder="Nhập tên điện thoại, máy tính, phụ kiện... cần tìm" type="text"/>
+                <button class="absolute right-0 top-0 mt-2 mr-2 text-red-600">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button class="text-white">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+<!--                cần cho nó thành form ở trên nữa chứ ko phải chèn -->
+
+                <div id="login-options" class="hidden">
+                    <button id="login-button" class="bg-blue-600 text-white py-1 px-2 rounded">Đăng nhập</button>
+                    <button id="register-button" class="bg-green-600 text-white py-1 px-2 rounded">Đăng ký</button>
+                </div>
+
+
+                <button class="bg-black text-white px-4 py-2 rounded-full hover-effect">
+                    Giỏ hàng
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="bg-red-700 text-white py-2">
+        <div class="container mx-auto flex space-x-4 px-4">
+            <a>
+                lặp các danh mục sản phẩm
+            </a>
+        </div>
+    </div>
+</header>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const userButton = document.querySelector(".fa-user-circle");
+        const optionsDiv = document.getElementById("login-options");
+
+        userButton.addEventListener("click", function() {
+            optionsDiv.classList.toggle("hidden");
+        });
+
+        document.getElementById("login-button").addEventListener("click", function() {
+            alert("hiển thị form đăng nhập");
+        });
+
+        document.getElementById("register-button").addEventListener("click", function() {
+            alert("hiển thị form đăng ký ");
+        });
+    });
+</script>
+
+<style>
+    .hidden {
+        display: none;
+    }
+</style>

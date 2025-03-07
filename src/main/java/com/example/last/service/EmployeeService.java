@@ -1,5 +1,16 @@
 package com.example.last.service;
 
-public interface EmployeeService {
-    void deleteEmployeeById(Long id);
+import com.example.last.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    public void deleteEmployeeById(Long id) {
+        employeeRepository.deleteById(id);
+    }
 }
