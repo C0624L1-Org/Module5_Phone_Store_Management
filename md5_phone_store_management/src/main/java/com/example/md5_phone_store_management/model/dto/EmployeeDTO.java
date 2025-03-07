@@ -2,6 +2,7 @@ package com.example.md5_phone_store_management.model.dto;
 
 import com.example.md5_phone_store_management.model.Role;
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 public class EmployeeDTO implements Validator {
     private Integer employeeID;
     private String fullName;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dob;
     private String address;
     private String phone;
@@ -136,12 +138,33 @@ public class EmployeeDTO implements Validator {
             errors.rejectValue("fullName", "", "Họ và tên phải từ 3 đến 50 ký tự!");
         }
 
-        // Validate fullName
         // Validate dob
-        // Validate address
-        // Validate phone
-        // Validate role
-        // Validate email
+        if (employee.getDob().isAfter(LocalDate.now())) {
+            errors.rejectValue("dob", "", "Ngày sinh không thể sau ngày hiện tại!");
+        }
 
+        // Validate address
+        String address = employee.getAddress();
+        if (address.length() < 5 || address.length() > 200) {
+            errors.rejectValue("address", "", "Địa chỉ phải từ 5 đến 200 ký tự!");
+        }
+
+        // Validate phone
+        else if (!phone.matches("^\\d{10,15}$")) {
+            errors.rejectValue("phone", "", "Số điện thoại phải không hợp lệ!");
+        }
+
+        // Validate role
+        if (employee.getRole() == null) {
+            errors.rejectValue("role", "input.null");
+        }
+
+        // Validate email
+        String email = employee.getEmail();
+        if (email == null || email.trim().isEmpty()) {
+            errors.rejectValue("email", "input.null", "Email không được để trống!");
+        } else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            errors.rejectValue("email", "", "Email không hợp lệ!");
+        }
     }
 }

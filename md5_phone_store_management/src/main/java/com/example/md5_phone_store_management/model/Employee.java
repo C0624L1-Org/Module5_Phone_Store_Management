@@ -1,6 +1,7 @@
 package com.example.md5_phone_store_management.model;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -15,7 +16,7 @@ public class Employee {
     private String fullName;
 
     @Column(name = "dob")
-    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dob;
 
     @Column(name = "address", length = 200)

@@ -1,6 +1,9 @@
 package com.example.md5_phone_store_management.repository;
 
 import com.example.md5_phone_store_management.model.Employee;
+import com.example.md5_phone_store_management.model.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,16 +16,38 @@ import java.time.LocalDate;
 @Repository
 public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
 
+    //Read and search (a Đình Anh)
+    @Query(value = "SELECT * FROM employee", nativeQuery = true)
+    Page<Employee> getAllEmployees(Pageable pageable);
+    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1%", nativeQuery = true)
+    Page<Employee> findAllEmployeesByName(String name, Pageable pageable);
+    @Query(value = "SELECT * FROM employee WHERE phone LIKE %?1%", nativeQuery = true)
+    Page<Employee> findAllEmployeesByPhoneNumber(String phoneNumber, Pageable pageable);
+    @Query(value = "SELECT * FROM employee WHERE role = ?1", nativeQuery = true)
+    Page<Employee> findAllEmployeesByRole(String role, Pageable pageable);
+    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1% AND phone LIKE %?2%", nativeQuery = true)
+    Page<Employee> findAllEmployeesByNameAndPhoneNumber(String name, String phoneNumber, Pageable pageable);
+    @Query(value = "SELECT * FROM employee WHERE phone LIKE %?1% AND role = ?2", nativeQuery = true)
+    Page<Employee> findAllEmployeesByPhoneNumberAndRole(String phoneNumber, String role, Pageable pageable);
+    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1% AND role = ?2", nativeQuery = true)
+    Page<Employee> findAllEmployeesByNameAndRole(String name, String role, Pageable pageable);
+    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1% AND phone LIKE %?2% AND role = ?3", nativeQuery = true)
+    Page<Employee> findAllEmployeesByNameAndPhoneNumberAndRole(String name, String phoneNumber, String role, Pageable pageable);
+
+
+    //Update(Tân)
     @Modifying
     @Transactional
-    @Query(value = "UPDATE employee SET fullName = :fullName, dob = :dob, address = :address, " +
-            "phone = :phone, role = :role, email = :email " +
-            "WHERE employeeID = :employeeID", nativeQuery = true)
+    @Query("UPDATE Employee e SET e.fullName = :fullName, e.dob = :dob, e.address = :address, " +
+            "e.phone = :phone, e.role = :role, e.email = :email " +
+            "WHERE e.employeeID = :employeeID")
     int updateEmployee(@Param("employeeID") Integer employeeID,
                        @Param("fullName") String fullName,
                        @Param("dob") LocalDate dob,
                        @Param("address") String address,
                        @Param("phone") String phone,
-                       @Param("role") String role,
+                       @Param("role") Role role,
                        @Param("email") String email);
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }
