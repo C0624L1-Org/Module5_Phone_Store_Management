@@ -5,17 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b7349c70-aeec-4a5d-b171-278b81c5ccae" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/era.mwb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/controller/EmployeeController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/repository/IEmployeeRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/service/EmployeeService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/resources/templates/employeesList.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sql_mobie_store.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/table.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/anh.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/md5_phone_store_management/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/md5_phone_store_management/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/model/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/java/com/example/md5_phone_store_management/model/Role.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/md5_phone_store_management/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/md5_phone_store_management/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,9 +42,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2twfWdkmK3anFDtsaPD1sX6Q7W8" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -73,7 +64,7 @@
     "Spring Boot.Md5PhoneStoreManagementApplication.executor": "Run",
     "git-widget-placeholder": "anh",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Codegym/module_4/finalExam/src/main/java/com/example/finalExam/controller/ProductController.java",
+    "last_opened_file_path": "D:/Codegym/project_Module5/Module5_Phone_Store_Management/md5_phone_store_management",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -108,6 +99,8 @@
       <option name="presentableId" value="Default" />
       <updated>1741268090573</updated>
       <workItem from="1741268091853" duration="16354000" />
+      <workItem from="1741322258864" duration="112000" />
+      <workItem from="1741322387875" duration="20000" />
     </task>
     <servers />
   </component>

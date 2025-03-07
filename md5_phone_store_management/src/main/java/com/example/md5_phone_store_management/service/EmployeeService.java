@@ -15,19 +15,23 @@ public class EmployeeService {
         return employeeRepository.getAllEmployees(pageable);
     }
     public Page<Employee> searchEmployees(String name, String phone, String role, Pageable pageable) {
-        if (name != null && phone != null && role != null) {
+        boolean hasName = name != null && !name.isEmpty();
+        boolean hasPhone = phone != null && !phone.isEmpty();
+        boolean hasRole = role != null && !role.isEmpty();
+
+        if (hasName && hasPhone && hasRole) {
             return employeeRepository.findAllEmployeesByNameAndPhoneNumberAndRole(name, phone, role, pageable);
-        } else if (name != null && phone != null) {
+        } else if (hasName && hasPhone) {
             return employeeRepository.findAllEmployeesByNameAndPhoneNumber(name, phone, pageable);
-        } else if (phone != null && role != null) {
+        } else if (hasPhone && hasRole) {
             return employeeRepository.findAllEmployeesByPhoneNumberAndRole(phone, role, pageable);
-        } else if (name != null && role != null) {
+        } else if (hasName && hasRole) {
             return employeeRepository.findAllEmployeesByNameAndRole(name, role, pageable);
-        } else if (name != null) {
+        } else if (hasName) {
             return employeeRepository.findAllEmployeesByName(name, pageable);
-        } else if (phone != null) {
+        } else if (hasPhone) {
             return employeeRepository.findAllEmployeesByPhoneNumber(phone, pageable);
-        } else if (role != null) {
+        } else if (hasRole) {
             return employeeRepository.findAllEmployeesByRole(role, pageable);
         } else {
             return employeeRepository.getAllEmployees(pageable);
