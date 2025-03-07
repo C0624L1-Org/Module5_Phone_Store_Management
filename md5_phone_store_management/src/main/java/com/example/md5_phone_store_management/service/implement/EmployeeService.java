@@ -14,8 +14,8 @@ public class EmployeeService implements IEmployeeService {
     private IEmployeeRepository iEmployeeRepository;
 
     @Override
-    public Employee getEmployeeById(Integer id) {
-        return iEmployeeRepository.getById(id);
+    public Employee getEmployeeById(Integer employeeID) {
+        return iEmployeeRepository.getById(employeeID);
     }
 
     @Override

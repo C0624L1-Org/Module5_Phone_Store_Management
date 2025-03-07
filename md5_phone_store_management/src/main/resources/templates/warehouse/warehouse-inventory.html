@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý xuất nhập kho</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body>
+<div class="wrapper">
+  <!-- Sidebar (giữ nguyên như các trang khác) -->
+
+  <!-- Page Content -->
+  <div id="content">
+    <!-- Top Navbar (giữ nguyên như các trang khác) -->
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+      <h2 class="mb-4">Quản lý xuất nhập kho</h2>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm sản phẩm...">
+            </div>
+            <div class="col-md-6 text-md-end">
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                <i class="fas fa-plus"></i> Nhập sản phẩm mới
+              </button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+              <tr>
+                <th>Mã SP</th>
+                <th>Tên sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá nhập</th>
+                <th>Đơn giá bán</th>
+                <th>Thao tác</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>SP001</td>
+                <td>iPhone 15 Pro Max</td>
+                <td>50</td>
+                <td>25,000,000 đ</td>
+                <td>29,990,000 đ</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="editProduct('SP001')">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteProduct('SP001')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                  <button class="btn btn-sm btn-success" onclick="importProduct('SP001')">
+                    <i class="fas fa-plus"></i> Nhập
+                  </button>
+                </td>
+              </tr>
+              <!-- Thêm các hàng khác tương tự -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nhập sản phẩm mới -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nhập sản phẩm mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addProductForm">
+          <div class="mb-3">
+            <label for="productName" class="form-label">Tên sản phẩm</label>
+            <input type="text" class="form-control" id="productName" required>
+          </div>
+          <div class="mb-3">
+            <label for="productQuantity" class="form-label">Số lượng</label>
+            <input type="number" class="form-control" id="productQuantity" required>
+          </div>
+          <div class="mb-3">
+            <label for="productCost" class="form-label">Đơn giá nhập</label>
+            <input type="number" class="form-control" id="productCost" required>
+          </div>
+          <div class="mb-3">
+            <label for="productPrice" class="form-label">Đơn giá bán</label>
+            <input type="number" class="form-control" id="productPrice" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="addProduct()">Thêm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nhập thêm sản phẩm -->
+<div class="modal fade" id="importProductModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nhập thêm sản phẩm</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="importProductForm">
+          <div class="mb-3">
+            <label for="importQuantity" class="form-label">Số lượng nhập</label>
+            <input type="number" class="form-control" id="importQuantity" required>
+          </div>
+          <div class="mb-3">
+            <label for="importCost" class="form-label">Đơn giá nhập</label>
+            <input type="number" class="form-control" id="importCost" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="saveImport()">Lưu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script>
+  function addProduct() {
+    // Xử lý thêm sản phẩm mới
+    alert('Đã thêm sản phẩm mới!');
+    $('#addProductModal').modal('hide');
+  }
+
+  function editProduct(productId) {
+    // Xử lý chỉnh sửa sản phẩm
+    alert('Chỉnh sửa sản phẩm có mã: ' + productId);
+  }
+
+  function deleteProduct(productId) {
+    // Xử lý xóa sản phẩm
+    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+      alert('Đã xóa sản phẩm có mã: ' + productId);
+    }
+  }
+
+  function importProduct(productId) {
+    // Hiển thị modal nhập thêm sản phẩm
+    $('#importProductModal').modal('show');
+  }
+
+  function saveImport() {
+    // Xử lý lưu thông tin nhập thêm sản phẩm
+    alert('Đã nhập thêm sản phẩm thành công!');
+    $('#importProductModal').modal('hide');
+  }
+
+  // Xử lý tìm kiếm
+  document.getElementById('searchInput').addEventListener('keyup', function() {
+    // Thực hiện tìm kiếm và lọc dữ liệu
+    var keyword = this.value.toLowerCase();
+    var rows = document.querySelectorAll('tbody tr');
+    rows.forEach(function(row) {
+      var text = row.textContent.toLowerCase();
+      if (text.indexOf(keyword) > -1) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>

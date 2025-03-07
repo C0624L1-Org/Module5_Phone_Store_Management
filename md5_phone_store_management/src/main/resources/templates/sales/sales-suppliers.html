@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý nhà cung cấp</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body>
+<div class="wrapper">
+  <!-- Sidebar (giữ nguyên như các trang khác) -->
+
+  <!-- Page Content -->
+  <div id="content">
+    <!-- Top Navbar (giữ nguyên như các trang khác) -->
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+      <h2 class="mb-4">Quản lý nhà cung cấp</h2>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+            <i class="fas fa-plus"></i> Thêm nhà cung cấp
+          </button>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+              <tr>
+                <th>Mã NCC</th>
+                <th>Tên nhà cung cấp</th>
+                <th>Địa chỉ</th>
+                <th>Số điện thoại</th>
+                <th>Email</th>
+                <th>Thao tác</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>NCC001</td>
+                <td>Công ty TNHH ABC</td>
+                <td>123 Đường XYZ, Quận 1, TP.HCM</td>
+                <td>0123456789</td>
+                <td>contact@abc.com</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="editSupplier('NCC001')">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteSupplier('NCC001')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <!-- Thêm các hàng khác tương tự -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Thêm nhà cung cấp -->
+<div class="modal fade" id="addSupplierModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Thêm nhà cung cấp mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addSupplierForm">
+          <div class="mb-3">
+            <label for="supplierName" class="form-label">Tên nhà cung cấp</label>
+            <input type="text" class="form-control" id="supplierName" required>
+          </div>
+          <div class="mb-3">
+            <label for="supplierAddress" class="form-label">Địa chỉ</label>
+            <input type="text" class="form-control" id="supplierAddress" required>
+          </div>
+          <div class="mb-3">
+            <label for="supplierPhone" class="form-label">Số điện thoại</label>
+            <input type="tel" class="form-control" id="supplierPhone" required>
+          </div>
+          <div class="mb-3">
+            <label for="supplierEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="supplierEmail" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="addSupplier()">Thêm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script>
+  function addSupplier() {
+    // Xử lý thêm nhà cung cấp
+    alert('Đã thêm nhà cung cấp mới!');
+    $('#addSupplierModal').modal('hide');
+  }
+
+  function editSupplier(supplierId) {
+    // Xử lý chỉnh sửa nhà cung cấp
+    alert('Chỉnh sửa nhà cung cấp có mã: ' + supplierId);
+  }
+
+  function deleteSupplier(supplierId) {
+    // Xử lý xóa nhà cung cấp
+    if (confirm('Bạn có chắc chắn muốn xóa nhà cung cấp này?')) {
+      alert('Đã xóa nhà cung cấp có mã: ' + supplierId);
+    }
+  }
+</script>
+</body>
+</html>

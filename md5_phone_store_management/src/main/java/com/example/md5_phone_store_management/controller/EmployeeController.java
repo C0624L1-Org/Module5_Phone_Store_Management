@@ -22,7 +22,7 @@ public class EmployeeController {
     private IEmployeeService iEmployeeService;
 
     // UPDATE
-    @GetMapping("")
+    @GetMapping("/admin/employee/edit/{employeeID}")
     public String showUpdateForm(@PathVariable("employeeID") Integer employeeID,
                                  Model model) {
         Employee employee = iEmployeeService.getEmployeeById(employeeID);
@@ -33,7 +33,7 @@ public class EmployeeController {
         model.addAttribute("employee", employeeDTO);
         model.addAttribute("roles", Role.values());
 
-        return "employee/updateForm";
+        return "admin/edit-employees";
     }
 
     @PostMapping("")
@@ -46,8 +46,8 @@ public class EmployeeController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("employee", employeeDTO);
             model.addAttribute("roles", Role.values());
-            return "employee/updateForm";
+            return "admin/edit-employees";
         }
-        return "employee/updateForm";
+        return "admin/edit-employees";
     }
 }
