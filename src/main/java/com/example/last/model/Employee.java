@@ -1,7 +1,10 @@
 package com.example.last.model;
 
+import com.example.last.model.Role;
 import jakarta.persistence.*;
 import java.util.Date;
+
+// dtb này chưa có unique
 
 @Entity
 @Table(name = "employee")
@@ -31,7 +34,8 @@ public class Employee {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private Role role;
+    private
+    Role role;
 
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
@@ -108,12 +112,20 @@ public class Employee {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "employeeID=" + employeeID +
+                ", fullName='" + fullName + '\'' +
+                ", dob=" + dob +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", username='" + username + '\'' +
+                ", role=" + role +
+                ", email='" + email + '\'' +
+                '}';
+    }
+
 }
 
-// Enum for Role
-enum Role {
-    Admin,
-    SalesStaff,
-    SalesPerson,
-    WarehouseStaff
-}

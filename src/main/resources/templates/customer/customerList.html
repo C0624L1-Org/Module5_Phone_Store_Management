@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>FPT Shop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="path/to/your/styles.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="bg-gray-100">
+<div th:replace="header.html"></div>
+
+<div class="bg-gray-200 py-2">
+    <h2 class="text-lg font-bold">Danh sách Khách hàng</h2>
+
+    <form action="/customers/search" method="get" id="search-form">
+        <input type="text" id="search-name" name="name" placeholder="Tìm theo tên"
+               class="border border-gray-300 rounded px-2 py-1"/>
+        <input type="text" id="search-phone" name="phone" placeholder="Tìm theo số điện thoại"
+               class="border border-gray-300 rounded px-2 py-1"/>
+        <input type="text" id="search-email" name="email" placeholder="Tìm theo email"
+               class="border border-gray-300 rounded px-2 py-1"/>
+        <button type="submit" id="search-button" class="bg-blue-600 text-white py-1 px-2 rounded">Tìm</button>
+    </form>
+
+    <div class="mb-4">
+        <div th:if="${message}" class="alert alert-success">
+            <p th:text="${message}"></p>
+        </div>
+        <div th:if="${error}" class="alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
+    </div>
+
+    <form action="/customers/delete" method="post" id="delete-form" onsubmit="return validateDelete()">
+        <div class="mb-4">
+            <button type="button" class="bg-green-600 text-white py-1 px-2 rounded" id="add-button" onclick="window.location.href='/customers/add'">Thêm mới</button>
+            <button type="submit" class="bg-red-600 text-white py-1 px-2 rounded" id="delete-button">Xóa</button>
+        </div>
+
+        <table class="min-w-full bg-white border border-gray-300">
+            <thead>
+            <tr>
+                <th class="border border-gray-300 px-4 py-2">Chọn</th>
+                <th class="border border-gray-300 px-4 py-2">ID</th>
+                <th class="border border-gray-300 px-4 py-2">Họ tên</th>
+                <th class="border border-gray-300 px-4 py-2">Ngày sinh</th>
+                <th class="border border-gray-300 px-4 py-2">Địa chỉ</th>
+                <th class="border border-gray-300 px-4 py-2">Số điện thoại</th>
+                <th class="border border-gray-300 px-4 py-2">Email</th>
+                <th class="border border-gray-300 px-4 py-2">Giới Tính</th>
+                <th class="border border-gray-300 px-4 py-2">Hành động</th>
+            </tr>
+            </thead>
+            <tbody id="customer-table-body">
+            <tr th:each="customer : ${customers}">
+                <td class="border border-gray-300 px-4 py-2">
+                    <input type="checkbox" name="ids" th:value="${customer.customerID}" class="customer-checkbox" th:data-name="${customer.fullName}"/>
+                </td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${customer.customerID}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${customer.fullName}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${#dates.format(customer.dob, 'yyyy-MM-dd')}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${customer.address}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${customer.phone}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${customer.email}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${customer.gender}"></td>
+                <td class="border border-gray-300 px-4 py-2">
+                    <a th:href="@{/customers/edit/{id}(id=${customer.customerID})}" class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+
+
+</div>
+
+<div th:replace="footer.html"></div>
+
+<script>
+    function validateDelete() {
+        const checkboxes = document.querySelectorAll('input[name="ids"]:checked');
+        if (checkboxes.length === 0) {
+            alert('Vui lòng chọn khách hàng cần xóa');
+            return false; // Ngăn form gửi yêu cầu
+        }
+
+        const customerDetails = Array.from(checkboxes).map(checkbox => {
+            const name = checkbox.getAttribute('data-name');
+            const phone = checkbox.closest('tr').querySelector('td:nth-child(6)').innerText; // Lấy số điện thoại từ cột thứ 6
+            return `${name} (SĐT: ${phone})`;
+        });
+
+        const customerList = customerDetails.join(', ');
+
+        const confirmationMessage = `Bạn có chắc chắn muốn xóa các khách hàng: ${customerList} không?`;
+        return confirm(confirmationMessage);
+    }
+</script>
+</body>
+</html>
+
+<label>
+
+</label>

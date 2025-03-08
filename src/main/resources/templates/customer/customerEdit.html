@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Sửa Khách Hàng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="path/to/your/styles.css"/>
+</head>
+<body class="bg-gray-100">
+<div th:replace="header.html"></div>
+
+<div class="bg-gray-200 py-2">
+    <h2 class="text-lg font-bold">Sửa Khách Hàng</h2>
+
+    <form action="/customers/update" method="post">
+        <input type="hidden" name="customerID" th:value="${customer.customerID}"/>
+        <div>
+            <label for="full-name">Họ tên:</label>
+            <input type="text" id="full-name" name="fullName" th:value="${customer.fullName}" class="border border-gray-300 rounded px-2 py-1" required/>
+        </div>
+        <div>
+            <label for="dob">Ngày sinh:</label>
+            <input type="date" id="dob" name="dob" th:value="${#dates.format(customer.dob, 'yyyy-MM-dd')}" class="border border-gray-300 rounded px-2 py-1" required/>
+        </div>
+        <div>
+            <label for="phone">Số điện thoại:</label>
+            <input type="text" id="phone" name="phone" th:value="${customer.phone}" class="border border-gray-300 rounded px-2 py-1" required/>
+        </div>
+        <div>
+            <label for="address">Địa chỉ:</label>
+            <input type="text" id="address" name="address" th:value="${customer.address}" class="border border-gray-300 rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" th:value="${customer.email}" class="border border-gray-300 rounded px-2 py-1" required/>
+        </div>
+        <div>
+            <label for="gender">Giới tính:</label>
+            <select id="gender" name="gender" class="border border-gray-300 rounded px-2 py-1">
+                <option value="Male" th:selected="${customer.gender == 'Male'}">Nam</option>
+                <option value="Female" th:selected="${customer.gender == 'Female'}">Nữ</option>
+                <option value="Other" th:selected="${customer.gender == 'Other'}">Khác</option>
+            </select>
+        </div>
+        <button type="submit" class="bg-blue-600 text-white py-1 px-2 rounded">Cập nhật</button>
+    </form>
+</div>
+
+<div th:replace="footer.html"></div>
+</body>
+</html>

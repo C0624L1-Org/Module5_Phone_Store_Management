@@ -19,15 +19,14 @@
         <input type="text" id="search-phone" placeholder="Tìm theo số điện thoại" class="border border-gray-300 rounded px-2 py-1"/>
         <input type="text" id="search-email" placeholder="Tìm theo email" class="border border-gray-300 rounded px-2 py-1"/>
 
-<!--        theo vai trò-->
-            <label for="role-filter" class="mr-2">Vai trò:</label>
-            <select id="role-filter" class="border border-gray-300 rounded px-2 py-1">
-                <option value="">Tất cả</option>
-                <option value="Admin">Admin</option>
-                <option value="SalesStaff">Sales Staff</option>
-                <option value="SalesPerson">Sales Person</option>
-                <option value="WarehouseStaff">Warehouse Staff</option>
-            </select>
+        <label for="role-filter" class="mr-2">Vai trò:</label>
+        <select id="role-filter" class="border border-gray-300 rounded px-2 py-1">
+            <option value="">Tất cả</option>
+            <option value="Admin">Admin</option>
+            <option value="SalesStaff">Sales Staff</option>
+            <option value="SalesPerson">Sales Person</option>
+            <option value="WarehouseStaff">Warehouse Staff</option>
+        </select>
 
         <button class="bg-blue-600 text-white py-1 px-2 rounded">Tìm</button>
     </div>
@@ -40,7 +39,7 @@
     <table class="min-w-full bg-white border border-gray-300">
         <thead>
         <tr>
-            <th class="border border-gray-300 px-4 py-2"><input type="checkbox" id="select-all" /></th>
+            <th class="border border-gray-300 px-4 py-2">Chọn</th>
             <th class="border border-gray-300 px-4 py-2">ID</th>
             <th class="border border-gray-300 px-4 py-2">Họ tên</th>
             <th class="border border-gray-300 px-4 py-2">Ngày sinh</th>
@@ -51,68 +50,26 @@
             <th class="border border-gray-300 px-4 py-2">Hành động</th>
         </tr>
         </thead>
-        <tbody id="employee-list">
-
+        <tbody>
+        <tr th:each="employee : ${employees}">
+            <td class="border border-gray-300 px-4 py-2">
+                <input type="checkbox" class="employee-checkbox" data-id="${employee.employeeID}" />
+            </td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${employee.employeeID}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${employee.fullName}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${#dates.format(employee.dob, 'yyyy-MM-dd')}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${employee.address}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${employee.phone}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${employee.email}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${employee.role}"></td>
+            <td class="border border-gray-300 px-4 py-2">
+                <button class="bg-yellow-600 text-white py-1 px-2 rounded edit-button" data-id="${employee.employeeID}">Sửa</button>
+            </td>
+        </tr>
         </tbody>
     </table>
 </div>
 
 <div th:replace="footer.html"></div>
-
-<script>
-    const employees = [
-        { id: 1, fullName: "Nguyễn Văn A", dob: "1990-01-01", address: "Hà Nội", phone: "0901234567", email: "a@example.com", role: "Admin" },
-        { id: 2, fullName: "Trần Thị B", dob: "1992-02-02", address: "Đà Nẵng", phone: "0912345678", email: "b@example.com", role: "SalesStaff" },
-        { id: 3, fullName: "Lê Văn C", dob: "1995-03-03", address: "Hồ Chí Minh", phone: "0923456789", email: "c@example.com", role: "SalesPerson" },
-    ];
-
-    function displayEmployees() {
-        const employeeList = document.getElementById("employee-list");
-        employeeList.innerHTML = ""; // Xóa danh sách hiện tại
-
-        employees.forEach(emp => {
-            const row = `<tr>
-                    <td class="border border-gray-300 px-4 py-2"><input type="checkbox" class="employee-checkbox" data-id="${emp.id}" /></td>
-                    <td class="border border-gray-300 px-4 py-2">${emp.id}</td>
-                    <td class="border border-gray-300 px-4 py-2">${emp.fullName}</td>
-                    <td class="border border-gray-300 px-4 py-2">${emp.dob}</td>
-                    <td class="border border-gray-300 px-4 py-2">${emp.address}</td>
-                    <td class="border border-gray-300 px-4 py-2">${emp.phone}</td>
-                    <td class="border border-gray-300 px-4 py-2">${emp.email}</td>
-                    <td class="border border-gray-300 px-4 py-2">${emp.role}</td>
-                    <td class="border border-gray-300 px-4 py-2"><button class="bg-yellow-600 text-white py-1 px-2 rounded edit-button" data-id="${emp.id}">Sửa</button></td>
-                </tr>`;
-            employeeList.innerHTML += row;
-        });
-    }
-
-    document.getElementById("delete-button").addEventListener("click", function() {
-        const selectedCheckboxes = document.querySelectorAll(".employee-checkbox:checked");
-        if (selectedCheckboxes.length === 0) {
-            alert("Vui lòng chọn ít nhất một nhân viên để xóa.");
-            return;
-        }
-
-        const selectedEmployees = Array.from(selectedCheckboxes).map(checkbox => {
-            const empId = checkbox.getAttribute("data-id");
-            return employees.find(emp => emp.id == empId);
-        });
-
-        const names = selectedEmployees.map(emp => `${emp.fullName} (${emp.phone})`).join(", ");
-        const confirmation = confirm(`Bạn có chắc chắn muốn xóa các nhân viên sau: ${names}?`);
-        if (confirmation) {
-            // Xóa nhân viên khỏi danh sách
-            selectedEmployees.forEach(emp => {
-                const index = employees.findIndex(e => e.id === emp.id);
-                if (index > -1) {
-                    employees.splice(index, 1);
-                }
-            });
-            displayEmployees(); // Cập nhật danh sách hiển thị
-        }
-    });
-
-    document.addEventListener("DOMContentLoaded", displayEmployees);
-</script>
 </body>
 </html>

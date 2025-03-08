@@ -24,6 +24,7 @@ public class LastApplication {
 	@PostConstruct
 	public void deleteEmployeeOnStartup() {
 		employeeService.deleteEmployeeById(5L);
+		employeeService.findAllEmployees();
 		System.out.println("hi mom");
 	}
 }
