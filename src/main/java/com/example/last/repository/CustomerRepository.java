@@ -24,52 +24,62 @@ public class CustomerRepository {
     private static final String SELECT_CUSTOMER_BY_ID = "SELECT * FROM customer WHERE customerID = ?";
     private static final String INSERT_CUSTOMER = "INSERT INTO customer (full_Name, phone, address, email, dob, gender, purchase_count) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-//    search
-private static final String SEARCH_CUSTOMER_BY_NAME = "SELECT * FROM customer WHERE full_Name LIKE ?";
-    private static final String SEARCH_CUSTOMER_BY_PHONE = "SELECT * FROM customer WHERE phone LIKE ?";
-    private static final String SEARCH_CUSTOMER_BY_EMAIL = "SELECT * FROM customer WHERE email LIKE ?";
+    private static final String SEARCH_CUSTOMER_BY_GENDER = "SELECT * FROM customer WHERE gender = ?";
+    private static final String SEARCH_CUSTOMER_BY_NAME_AND_GENDER = "SELECT * FROM customer WHERE full_Name LIKE ? AND gender = ?";
+    private static final String SEARCH_CUSTOMER_BY_PHONE_AND_GENDER = "SELECT * FROM customer WHERE phone LIKE ? AND gender = ?";
+    private static final String SEARCH_CUSTOMER_BY_EMAIL_AND_GENDER = "SELECT * FROM customer WHERE email LIKE ? AND gender = ?";
+    private static final String SEARCH_CUSTOMER_BY_NAME_AND_PHONE_AND_GENDER = "SELECT * FROM customer WHERE full_Name LIKE ? AND phone LIKE ? AND gender = ?";
+    private static final String SEARCH_CUSTOMER_BY_NAME_AND_EMAIL_AND_GENDER = "SELECT * FROM customer WHERE full_Name LIKE ? AND email LIKE ? AND gender = ?";
+    private static final String SEARCH_CUSTOMER_BY_PHONE_AND_EMAIL_AND_GENDER = "SELECT * FROM customer WHERE phone LIKE ? AND email LIKE ? AND gender = ?";
+    private static final String SEARCH_CUSTOMER_BY_ALL_AND_GENDER = "SELECT * FROM customer WHERE full_Name LIKE ? AND phone LIKE ? AND email LIKE ? AND gender = ?";
 
-    private static final String SEARCH_CUSTOMER_BY_NAME_AND_PHONE = "SELECT * FROM customer WHERE full_Name LIKE ? AND phone LIKE ?";
-    private static final String SEARCH_CUSTOMER_BY_NAME_AND_EMAIL = "SELECT * FROM customer WHERE full_Name LIKE ? AND email LIKE ?";
-    private static final String SEARCH_CUSTOMER_BY_PHONE_AND_EMAIL = "SELECT * FROM customer WHERE phone LIKE ? AND email LIKE ?";
-    private static final String SEARCH_CUSTOMER_BY_ALL = "SELECT * FROM customer WHERE full_Name LIKE ? AND phone LIKE ? AND email LIKE ?";
 
-    public List<Customer> searchCustomers(String name, String phone, String email) {
+    public List<Customer> searchCustomers(String name, String phone, String email, String gender) {
         List<Object> params = new ArrayList<>();
         String sql = "";
 
-        if (name != null && !name.isEmpty() && phone != null && !phone.isEmpty() && email != null && !email.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_ALL;
+        if (name != null && !name.isEmpty() && phone != null && !phone.isEmpty() && email != null && !email.isEmpty() && gender != null) {
+            sql = SEARCH_CUSTOMER_BY_ALL_AND_GENDER;
             params.add("%" + name + "%");
             params.add("%" + phone + "%");
             params.add("%" + email + "%");
-        } else if (name != null && !name.isEmpty() && phone != null && !phone.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME_AND_PHONE;
+            params.add(gender);
+        } else if (name != null && !name.isEmpty() && phone != null && !phone.isEmpty() && gender != null) {
+            sql = SEARCH_CUSTOMER_BY_NAME_AND_PHONE_AND_GENDER;
             params.add("%" + name + "%");
             params.add("%" + phone + "%");
-        } else if (name != null && !name.isEmpty() && email != null && !email.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME_AND_EMAIL;
+            params.add(gender);
+        } else if (name != null && !name.isEmpty() && email != null && !email.isEmpty() && gender != null) {
+            sql = SEARCH_CUSTOMER_BY_NAME_AND_EMAIL_AND_GENDER;
             params.add("%" + name + "%");
             params.add("%" + email + "%");
-        } else if (phone != null && !phone.isEmpty() && email != null && !email.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_PHONE_AND_EMAIL;
+            params.add(gender);
+        } else if (phone != null && !phone.isEmpty() && email != null && !email.isEmpty() && gender != null) {
+            sql = SEARCH_CUSTOMER_BY_PHONE_AND_EMAIL_AND_GENDER;
             params.add("%" + phone + "%");
             params.add("%" + email + "%");
-        } else if (name != null && !name.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME;
+            params.add(gender);
+        } else if (name != null && !name.isEmpty() && gender != null) {
+            sql = SEARCH_CUSTOMER_BY_NAME_AND_GENDER;
             params.add("%" + name + "%");
-        } else if (phone != null && !phone.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_PHONE;
+            params.add(gender);
+        } else if (phone != null && !phone.isEmpty() && gender != null) {
+            sql = SEARCH_CUSTOMER_BY_PHONE_AND_GENDER;
             params.add("%" + phone + "%");
-        } else if (email != null && !email.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_EMAIL;
+            params.add(gender);
+        } else if (email != null && !email.isEmpty() && gender != null) {
+            sql = SEARCH_CUSTOMER_BY_EMAIL_AND_GENDER;
             params.add("%" + email + "%");
+            params.add(gender);
+        } else if (gender != null) {
+            sql = SEARCH_CUSTOMER_BY_GENDER;
+            params.add(gender);
         } else {
             sql = SELECT_ALL_CUSTOMERS;
         }
+
         return jdbcTemplate.query(sql, params.toArray(), new CustomerRowMapper());
     }
-
 
     public void deleteCustomer(List<Integer> customerIDs) {
         jdbcTemplate.batchUpdate(DELETE_CUSTOMERS_BY_IDS, new BatchPreparedStatementSetter() {
@@ -110,7 +120,6 @@ private static final String SEARCH_CUSTOMER_BY_NAME = "SELECT * FROM customer WH
             jdbcTemplate.update(INSERT_CUSTOMER, customer.getFullName(), customer.getPhone(), customer.getAddress(), customer.getEmail(), customer.getDob(), customer.getGender().name(), customer.getPurchaseCount());
         }
     }
-
 
 
     //  ánh xạ kết quả từ ResultSet to obj Customer

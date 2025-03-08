@@ -20,7 +20,6 @@ public class CustomerService {
     }
 
 
-
     public boolean updateCustomer(Customer customer) {
         try {
             Optional<Customer> existingCustomer = Optional.ofNullable(customerRepository.findById(customer.getCustomerID()));
@@ -50,7 +49,7 @@ public class CustomerService {
     }
 
 
-    public List<Customer> searchCustomers(String name, String phone, String email) {
-        return customerRepository.searchCustomers(name, phone, email);
+    public List<Customer> searchCustomers(String name, String phone, String email, String gender) {
+        return customerRepository.searchCustomers(name, phone, email, gender);
     }
 }

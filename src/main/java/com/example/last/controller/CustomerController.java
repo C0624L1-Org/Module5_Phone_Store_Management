@@ -29,12 +29,12 @@ public class CustomerController {
         model.addAttribute("customers", customers);
         return "customer/customerList";
     }
+
     @GetMapping("/add")
     public String showAddCustomerForm(Model model) {
         model.addAttribute("customer", new Customer());
         return "customer/customerAdd";
     }
-
 
 
     @PostMapping("/create")
@@ -45,17 +45,35 @@ public class CustomerController {
     }
 
 
-
     @GetMapping("/search")
     public String searchCustomers(@RequestParam(required = false) String name,
                                   @RequestParam(required = false) String phone,
                                   @RequestParam(required = false) String email,
+                                  @RequestParam(required = false) Integer gender,
                                   Model model) {
-        List<Customer> customers = customerService.searchCustomers(name, phone, email);
+        String genderString = "";
+        switch (gender != null ? gender : -1) {
+            case 0:
+                genderString = null;
+                break;
+            case 1:
+                genderString = "Male";
+                break;
+            case 2:
+                genderString = "Female";
+                break;
+            case 3:
+                genderString = "Other";
+                break;
+            default:
+                genderString = null;
+                break;
+        }
+
+        List<Customer> customers = customerService.searchCustomers(name, phone, email, genderString);
         model.addAttribute("customers", customers);
         return "customer/customerList";
     }
-
 
 
     @GetMapping("/edit/{id}")
@@ -88,8 +106,6 @@ public class CustomerController {
     }
 
 
-
-
     @PostMapping("/delete")
     public String deleteCustomers(@RequestParam List<Integer> ids) {
         for (Integer customerID : ids) {
@@ -97,10 +113,6 @@ public class CustomerController {
         }
         return "redirect:/customers";
     }
-
-
-
-
 
 
 }
