@@ -10,11 +10,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class EmployeeService implements IEmployeeService {
+
     @Autowired
     private IEmployeeRepository iEmployeeRepository;
+
+    @Autowired
+    private IEmployeeRepository employeeRepository;
+
 
     @Override
     public void addEmployee(Employee employee) {
@@ -68,5 +74,10 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public boolean existsByEmail(String email) {
         return iEmployeeRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<Employee> findByUsername(String username) {
+        return employeeRepository.findByUsername(username);
     }
 }
