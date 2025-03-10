@@ -50,13 +50,16 @@
                     </div>
                     <div class="col-md-3">
                         <label for="role">Vai trò:</label>
-                        <select class="form-control" name="role" id="role" >
+                        <select class="form-control" name="role" id="role">
                             <option value="">Chọn vai trò</option>
                             <option th:selected="${param.role == 'Admin'}" th:value="Admin">Admin</option>
-                            <option th:selected="${param.role == 'SalesStaff'}" th:value="SalesStaff">Nhân viên kinh doanh
+                            <option th:selected="${param.role == 'SalesStaff'}" th:value="SalesStaff">Nhân viên kinh
+                                doanh
                             </option>
-                            <option th:selected="${param.role == 'WarehouseStaff'}" th:value="WarehouseStaff">Thủ kho</option>
-                            <option th:selected="${param.role == 'SalesPerson'}" th:value="SalesPerson">Nhân viên bán hàng
+                            <option th:selected="${param.role == 'WarehouseStaff'}" th:value="WarehouseStaff">Thủ kho
+                            </option>
+                            <option th:selected="${param.role == 'SalesPerson'}" th:value="SalesPerson">Nhân viên bán
+                                hàng
                             </option>
                         </select>
                     </div>
@@ -74,24 +77,26 @@
             <div class="table-responsive">
                 <table class="table table-striped table-bordered table-hover">
                     <thead class="table-dark">
-                        <tr>
-                            <th><input id="selectAll" type="checkbox"></th>
-                            <th>Họ và tên</th>
-                            <th>Ngày sinh</th>
-                            <th>Địa chỉ</th>
-                            <th>Công việc</th>
-                            <th>Số điện thoại</th>
-                            <th>Hành Động</th>
-                        </tr>
+                    <tr>
+                        <th><input id="selectAll" type="checkbox"></th>
+                        <th>Họ và tên</th>
+                        <th>Ngày sinh</th>
+                        <th>Địa chỉ</th>
+                        <th>Công việc</th>
+                        <th>Số điện thoại</th>
+                        <th>Hành Động</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="employee:${employeePage}">
-                            <td><input name="selectEmployIds" class="selectEmployee" th:value="${employee.employeeID}"
-                                       type="checkbox"></td>
-                            <td th:text="${employee.fullName}"></td>
-                            <td th:text="${employee.dob}"></td>
-                            <td th:text="${employee.address}"></td>
-                            <td>
+                    <tr th:each="employee:${employeePage}">
+                        <td><input name="selectEmployIds" class="selectEmployee"
+                                   th:value="${employee.employeeID}" th:data-name="${employee.fullName}"
+                                   th:data-address="${employee.address}"
+                                   type="checkbox"></td>
+                        <td th:text="${employee.fullName}"></td>
+                        <td th:text="${employee.dob}"></td>
+                        <td th:text="${employee.address}"></td>
+                        <td>
                                 <span th:switch="${employee.role?.name()}">
                                     <span th:case="'Admin'">Admin</span>
                                     <span th:case="'SalesStaff'">Nhân viên kinh doanh</span>
@@ -99,25 +104,47 @@
                                     <span th:case="'WarehouseStaff'">Thủ kho</span>
                                     <span th:case="*">Không xác định</span>
                                 </span>
-                            </td>
-                            <td th:text="${employee.phone}"></td>
-                            <td>
-                                <a th:href="@{#}" class="btn btn-primary btn-sm me-1">
-                                    <i class="fas fa-eye"></i> Xem
-                                </a>
+                        </td>
+                        <td th:text="${employee.phone}"></td>
+                        <td>
+                            <a th:href="@{#}" class="btn btn-primary btn-sm me-1">
+                                <i class="fas fa-eye"></i> Xem
+                            </a>
 
-                                <a th:href="@{/admin/employee/edit/{employeeID}(employeeID=${employee.employeeID})}" class="btn btn-secondary btn-sm me-1">
-                                    <i class="fas fa-pen"></i> Cập Nhật
-                                </a>
+                            <a th:href="@{/admin/employee/edit/{employeeID}(employeeID=${employee.employeeID})}"
+                               class="btn btn-secondary btn-sm me-1">
+                                <i class="fas fa-pen"></i> Cập Nhật
+                            </a>
 
-                                <button th:href="@{#}" class="btn btn-danger btn-sm me-1" disabled id="deleteSelected">
-                                    <i class="fas fa-trash-alt"></i> Xoá
-                                </button >
-                            </td>
-                        </tr>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
+            <!--Delete Button-->
+            <button th:href="@{#}" class="btn btn-danger btn-sm me-1" disabled id="deleteSelected">
+                <i class="fas fa-trash-alt"></i> Xoá
+            </button>
+            <!-- Bootstrap Modal Xác nhận Xóa -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="deleteMessage"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-danger" id="confirmDelete">Đồng ý</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Phân trang-->
             <nav aria-label="Pagination" class="mt-3">
                 <ul class="pagination justify-content-center">
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
@@ -143,6 +170,7 @@
             </nav>
         </main>
     </div>
+
 </div>
 
 <!-- Footer -->
@@ -168,17 +196,39 @@
         document.getElementById('updateEmployee').disabled = selectedEmployees.length !== 1;
     }
 
-    document.getElementById('deleteSelected').addEventListener('click', function () {
-        let selectedEmployees = document.querySelectorAll('.selectEmployee:checked');
+    // Xử lý khi nhấn nút Xóa
+    document.getElementById("deleteSelected").addEventListener("click", function () {
+        let selectedEmployees = [];
+        let selectedIds = [];
+        document.querySelectorAll(".selectEmployee:checked").forEach((checkbox) => {
+            let id = checkbox.getAttribute("value");
+            let name = checkbox.getAttribute("data-name");
+            let address = checkbox.getAttribute("data-address");
+            console.log(id);
+            console.log(name);
+            console.log(address);
+            selectedEmployees.push({id, name, address});
+            selectedIds.push(id);
+        });
+
         if (selectedEmployees.length === 0) {
-            alert('Vui lòng chọn ít nhất một nhân viên để xóa.');
-        } else {
-            let confirmDelete = confirm('Bạn có chắc chắn muốn xóa các nhân viên đã chọn không?');
-            if (confirmDelete) {
-                selectedEmployees.forEach(emp => emp.closest('tr').remove());
-                updateButtonState();
-            }
+            alert("Vui lòng chọn ít nhất một nhân viên để xóa.");
+            return;
         }
+
+        // Hiển thị danh sách nhân viên cần xóa trong modal
+        let deleteMessage = "Bạn có muốn xóa nhân viên: ";
+        deleteMessage += selectedEmployees.map(emp => `${emp.name} (${emp.address})`).join(", ") + " ?";
+        document.getElementById("deleteMessage").innerText = deleteMessage;
+
+        // Hiển thị modal Bootstrap
+        let deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
+        deleteModal.show();
+
+        // Khi nhấn nút Đồng ý
+        document.getElementById("confirmDelete").onclick = function () {
+            location.href = "/employees/delete/" + selectedIds.join(",");
+        };
     });
 
     document.getElementById('updateEmployee').addEventListener('click', function () {

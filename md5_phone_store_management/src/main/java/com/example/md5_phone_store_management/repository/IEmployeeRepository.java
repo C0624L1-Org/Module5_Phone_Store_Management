@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
@@ -50,4 +52,14 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
                        @Param("email") String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+
+
+
+    //Delete
+    @Query(value = "SELECT * FROM employee WHERE employee.id = id", nativeQuery = true)
+    Employee findOneEmployeeById(@Param("id") Integer id);
+
+    @Query(value = "DELETE * FROM employee WHERE employee.id = id", nativeQuery = true)
+    void deleteEmployeeById(@Param("id") Integer id);
+
 }

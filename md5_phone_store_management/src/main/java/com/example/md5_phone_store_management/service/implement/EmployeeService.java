@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class EmployeeService implements IEmployeeService {
@@ -68,5 +69,13 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public boolean existsByEmail(String email) {
         return iEmployeeRepository.existsByEmail(email);
+    }
+
+    @Override
+    public void deleteEmployeesById(List<Integer> employeeIDs) {
+        for (int i = 0; i < employeeIDs.size(); i++) {
+            iEmployeeRepository.deleteById(employeeIDs.get(i));
+        }
+        //iEmployeeRepository.deleteAllByIdInBatch(employeeIDs);
     }
 }
