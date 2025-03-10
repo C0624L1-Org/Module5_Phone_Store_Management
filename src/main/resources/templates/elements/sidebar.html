@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Sidebar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            align-items: flex-start;
+            height: 100vh;
+            justify-content: flex-start;
+            padding-left: 20px; /* Adds left padding for consistency */
+        }
+
+        /* Profile Section */
+        .profile {
+            width: 150px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            border-top-left-radius: 50px; /* Rounded top-left corners */
+            border-top-right-radius: 50px; /* Rounded top-right corners */
+            border-bottom-left-radius: 50px; /* Rounded bottom-left corners */
+            border-bottom-right-radius: 50px; /* Rounded bottom-right corners */
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3); /* Optional shadow */
+            text-align: center;
+            margin-top: 20px; /* Adds space at the top */
+            margin-bottom: 20px; /* Space between profile and sidebar */
+        }
+
+        .profile img {
+            width: 60px; /* Size of the profile image */
+            height: 60px;
+            border-radius: 50%; /* Make the image round */
+            margin-bottom: 10px;
+        }
+
+        .profile button {
+            background-color: #575757;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .profile button:hover {
+            background-color: #444;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 150px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            border-top-left-radius: 50px; /* Rounded top-left corners */
+            border-top-right-radius: 50px; /* Rounded top-right corners */
+            border-bottom-left-radius: 50px; /* Rounded bottom-left corners */
+            border-bottom-right-radius: 50px; /* Rounded bottom-right corners */
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3); /* Optional shadow */
+            /* Add margin to the left to make space */
+            margin-top: 0; /* Align with profile section */
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #575757;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<!-- Profile Section -->
+<div class="profile">
+    <img src="https://s3.ap-southeast-1.amazonaws.com/cdn.vntre.vn/default/avatar-mac-dinh-12-1724862391.jpg" alt="User Icon">
+    <button>More</button>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>Sidebar</h2>
+    <ul>
+        <li><a href="#">Trang Chủ</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Contact</a></li>
+    </ul>
+</div>
+
+
+</body>
+</html>
