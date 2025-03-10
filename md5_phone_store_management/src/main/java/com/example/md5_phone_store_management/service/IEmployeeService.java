@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface IEmployeeService {
 
@@ -22,6 +23,8 @@ public interface IEmployeeService {
     int updateEmployee(Integer employeeID, String fullName, LocalDate dob, String address, String phone, Role role, String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+    Optional<Employee> findByUsername(String username);
+
 
     //Delete
     void deleteEmployeesById(List<Integer> employeeIDs);

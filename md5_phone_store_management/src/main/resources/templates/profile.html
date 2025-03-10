@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thông tin cá nhân</title>
+</head>
+<body>
+<h1>Thông tin nhân viên</h1>
+<div th:if="${employee}">
+    <p>Họ tên: <span th:text="${employee.fullName}"></span></p>
+    <p>Vai trò: <span th:text="${employee.role.label}"></span></p>
+    <p>Email: <span th:text="${employee.email}"></span></p>
+    <!-- Thêm các thông tin khác -->
+</div>
+<a th:href="@{/logout}">Đăng xuất</a>
+</body>
+</html>

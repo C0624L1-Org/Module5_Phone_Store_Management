@@ -41,10 +41,10 @@
 
                     <!-- Hiển thị nếu người dùng chưa đăng nhập -->
                     <li sec:authorize="isAnonymous()" class="nav-item">
-                        <a class="nav-link" href="/login">Đăng Nhập</a>
+                        <a class="nav-link" href="/auth/login">Đăng Nhập</a>
                     </li>
                     <li sec:authorize="isAnonymous()" class="nav-item">
-                        <a class="nav-link" href="/register">Đăng Ký</a>
+                        <a class="nav-link" href="/auth/register">Đăng Ký</a>
                     </li>
                 </ul>
             </div>

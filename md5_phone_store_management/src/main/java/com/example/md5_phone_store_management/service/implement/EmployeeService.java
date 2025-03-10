@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EmployeeService implements IEmployeeService {
+
     @Autowired
     private IEmployeeRepository iEmployeeRepository;
 
@@ -69,6 +71,11 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public boolean existsByEmail(String email) {
         return iEmployeeRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<Employee> findByUsername(String username) {
+        return iEmployeeRepository.findByUsername(username);
     }
 
     @Override

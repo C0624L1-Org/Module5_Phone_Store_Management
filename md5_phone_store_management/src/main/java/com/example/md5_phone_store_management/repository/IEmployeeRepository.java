@@ -54,6 +54,10 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
     boolean existsByEmail(String email);
 
 
+    Optional<Employee> findByUsername(String username);
+
+
+
 
     //Delete
     @Query(value = "SELECT * FROM employee WHERE employee.id = id", nativeQuery = true)
