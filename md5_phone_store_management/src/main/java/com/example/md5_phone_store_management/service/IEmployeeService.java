@@ -22,8 +22,6 @@ public interface IEmployeeService {
     int updateEmployee(Integer employeeID, String fullName, LocalDate dob, String address, String phone, Role role, String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
-
-
     Optional<Employee> findByUsername(String username);
 
 }
