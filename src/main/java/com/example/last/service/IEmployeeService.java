@@ -1,7 +1,7 @@
 package com.example.last.service;
 
-import com.example.md5_phone_store_management.model1.Employee;
-import com.example.md5_phone_store_management.model1.Role;
+import com.example.last.model.Employee;
+import com.example.last.model.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -9,22 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class LastApplication {
-
-	private final EmployeeService employeeService;
-
-	@Autowired
-	public LastApplication(EmployeeService employeeService) {
-		this.employeeService = employeeService;
-	}
-
 	public static void main(String[] args) {
 		SpringApplication.run(LastApplication.class, args);
 	}
 
-	@PostConstruct
-	public void deleteEmployeeOnStartup() {
-		employeeService.deleteEmployeeById(5L);
-		employeeService.findAllEmployees();
-		System.out.println("hi mom");
-	}
 }

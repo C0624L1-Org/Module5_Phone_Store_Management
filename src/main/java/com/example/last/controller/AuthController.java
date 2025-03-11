@@ -1,9 +1,10 @@
 package com.example.last.controller;
 
-import com.example.md5_phone_store_management.model1.Employee;
-import com.example.md5_phone_store_management.model1.Role;
-import com.example.md5_phone_store_management.model1.dto.EmployeeDTO;
-import com.example.md5_phone_store_management.service1.AuthService;
+import com.example.last.model.Employee;
+import com.example.last.model.EmployeeDTO;
+import com.example.last.model.Role;
+import com.example.last.service.AuthService;
+import com.example.last.model.EmployeeDTO;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
+
+import static com.example.last.model.Role.*;
 
 @Controller
 @RequestMapping("/auth")

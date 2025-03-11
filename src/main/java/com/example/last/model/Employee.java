@@ -1,6 +1,6 @@
 package com.example.last.model;
 
-import com.example.md5_phone_store_management.model1.Role;
+import com.example.last.model.Role;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -13,7 +13,7 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer employeeID;
 
-    @Column(name = "fullName", length = 50, nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
     @Column(name = "dob")

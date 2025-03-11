@@ -1,6 +1,6 @@
 package com.example.last.model;
 
-import com.example.md5_phone_store_management.model1.Role;
+import com.example.last.model.Role;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

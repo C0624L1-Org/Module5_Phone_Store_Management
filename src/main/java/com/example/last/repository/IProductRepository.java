@@ -1,6 +1,6 @@
 package com.example.last.repository;
 
-import com.example.md5_phone_store_management.model1.Product;
+import com.example.last.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

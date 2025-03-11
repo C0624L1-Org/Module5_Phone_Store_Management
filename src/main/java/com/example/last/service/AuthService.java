@@ -1,7 +1,6 @@
 package com.example.last.service;
 
-import com.example.md5_phone_store_management.model1.Employee;
-import com.example.md5_phone_store_management.service1.IEmployeeService;
+import com.example.last.model.Employee;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

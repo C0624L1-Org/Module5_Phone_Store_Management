@@ -298,7 +298,7 @@
         <div class="form-group">
           <label for="role">Vai Trò</label>
           <select id="role" th:field="*{role}">
-            <option th:each="role : ${T(com.example.md5_phone_store_management.model1.Role).values()}"
+            <option th:each="role : ${T(com.example.last.model.Role).values()}"
                     th:value="${role}" th:text="${role.label}"></option>
           </select>
           <span class="error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">Lỗi</span>

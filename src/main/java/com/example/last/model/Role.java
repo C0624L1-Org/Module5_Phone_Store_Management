@@ -1,4 +1,4 @@
-package com.example.last.model1;
+package com.example.last.model;
 
 // Enum for Role
 public enum Role {
@@ -17,3 +17,4 @@ public enum Role {
         return label;
     }
 }
+

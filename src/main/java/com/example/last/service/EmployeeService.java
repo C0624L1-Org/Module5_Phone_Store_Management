@@ -1,9 +1,8 @@
-package com.example.last.service1.implement;
+package com.example.last.service;
 
-import com.example.md5_phone_store_management.model1.Employee;
-import com.example.md5_phone_store_management.model1.Role;
-import com.example.md5_phone_store_management.repository1.IEmployeeRepository;
-import com.example.md5_phone_store_management.service1.IEmployeeService;
+import com.example.last.repository.IEmployeeRepository;
+import com.example.last.model.Employee;
+import com.example.last.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

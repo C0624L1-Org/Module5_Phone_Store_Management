@@ -1,9 +1,10 @@
 package com.example.last.controller;
 
-import com.example.md5_phone_store_management.model1.Employee;
-import com.example.md5_phone_store_management.model1.Role;
-import com.example.md5_phone_store_management.model1.dto.EmployeeDTO;
-import com.example.md5_phone_store_management.service1.IEmployeeService;
+import com.example.last.service.IEmployeeService;
+import com.example.last.model.Employee;
+import com.example.last.model.Role;
+import com.example.last.model.EmployeeDTO;
+import com.example.last.service.IEmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
