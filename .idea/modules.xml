@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Module5_Phone_Store_Management.iml" filepath="$PROJECT_DIR$/.idea/Module5_Phone_Store_Management.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/md5_phone_store_management.main.iml" filepath="$PROJECT_DIR$/.idea/modules/md5_phone_store_management.main.iml" />
     </modules>
   </component>
 </project>
