@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Navbar</title>
+</head>
+<body>
+<!-- Navbar Fragment -->
+<div th:fragment="navbar" class="navbar">
+    <div class="navbar-container">
+        <div class="logo">
+            <img src="/img/fptshop_logo.png" alt="Shop Logo">
+            <div class="menu-container">
+                <div class="menu-button">
+                    <i>☰</i>
+                    <span>Danh mục</span>
+                </div>
+                <!-- Dropdown Menu -->
+                <div class="dropdown-menu">
+                    <div class="menu-item">Danh mục 1</div>
+                    <div class="menu-item">Danh mục 2</div>
+                    <div class="menu-item">Danh mục 3</div>
+                    <div class="menu-item">Danh mục 4</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" placeholder="Nhập tên điện thoại, máy tính, phụ kiện... cần tìm">
+            <button>🔍</button>
+        </div>
+
+        <div class="user-actions">
+
+            <ul>
+                <!-- Hiển thị nếu người dùng đã đăng nhập -->
+                <li sec:authorize="isAuthenticated()" class="nav-item">
+                    <span>Xin chào, <span sec:authentication="name"></span>!</span>
+                </li>
+
+<!--                <li sec:authorize="isAuthenticated()" class="nav-item dropdown">-->
+<!--                    <a class="nav-link dropdown-toggle" href="#" id="navbarAvatarDropdown" role="button"-->
+<!--                       data-bs-toggle="dropdown" aria-expanded="false">-->
+<!--                        <img th:if="${loggedEmployee != null}"-->
+<!--                             th:src="${loggedEmployee.avatar}"-->
+<!--                             alt="avatar"-->
+<!--                             class="user-avatar"-->
+<!--                             style="width:40px; height:40px; border-radius:50%;">-->
+<!--                    </a>-->
+<!--                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarAvatarDropdown">-->
+<!--                        <li><a class="dropdown-item" th:href="@{#}">Thông tin cá nhân</a></li>-->
+<!--                        <li><a class="dropdown-item" th:href="@{#}">Giỏ hàng</a></li>-->
+<!--                        <li><a class="dropdown-item" th:href="@{#}">Lịch sử đơn hàng</a></li>-->
+<!--                        <li><a class="dropdown-item" th:href="@{#}">Đổi mật khẩu</a></li>-->
+<!--                        <li><hr class="dropdown-divider"></li>-->
+<!--                        <li><a class="dropdown-item" th:href="@{#}">Đăng xuất</a></li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+
+                <!-- Hiển thị nếu người dùng chưa đăng nhập -->
+                <li sec:authorize="isAnonymous()"><a th:href="@{/login}">Đăng nhập</a></li>
+                <li sec:authorize="isAnonymous()"><a th:href="@{/register}">Đăng ký</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Navbar Script -->
+<script th:fragment="navbar-script">
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuButton = document.querySelector('.menu-button');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        const overlay = document.querySelector('.overlay');
+
+        menuButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+            overlay.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.menu-container')) {
+                dropdownMenu.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        });
+
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+</script>
+
+</body>
+</html>

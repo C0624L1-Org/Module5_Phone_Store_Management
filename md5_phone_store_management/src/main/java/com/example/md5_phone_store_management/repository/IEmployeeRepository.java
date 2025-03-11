@@ -17,26 +17,32 @@ import java.util.Optional;
 @Repository
 public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
 
-    //Read and search (a Đình Anh)
+    // Read and search
     @Query(value = "SELECT * FROM employee", nativeQuery = true)
     Page<Employee> getAllEmployees(Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1%", nativeQuery = true)
-    Page<Employee> findAllEmployeesByName(String name, Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE phone LIKE %?1%", nativeQuery = true)
-    Page<Employee> findAllEmployeesByPhoneNumber(String phoneNumber, Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE role = ?1", nativeQuery = true)
-    Page<Employee> findAllEmployeesByRole(String role, Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1% AND phone LIKE %?2%", nativeQuery = true)
-    Page<Employee> findAllEmployeesByNameAndPhoneNumber(String name, String phoneNumber, Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE phone LIKE %?1% AND role = ?2", nativeQuery = true)
-    Page<Employee> findAllEmployeesByPhoneNumberAndRole(String phoneNumber, String role, Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1% AND role = ?2", nativeQuery = true)
-    Page<Employee> findAllEmployeesByNameAndRole(String name, String role, Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1% AND phone LIKE %?2% AND role = ?3", nativeQuery = true)
-    Page<Employee> findAllEmployeesByNameAndPhoneNumberAndRole(String name, String phoneNumber, String role, Pageable pageable);
 
+    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %:name%", nativeQuery = true)
+    Page<Employee> findAllEmployeesByName(@Param("name") String name, Pageable pageable);
 
-    //Update(Tân)
+    @Query(value = "SELECT * FROM employee WHERE phone LIKE %:phoneNumber%", nativeQuery = true)
+    Page<Employee> findAllEmployeesByPhoneNumber(@Param("phoneNumber") String phoneNumber, Pageable pageable);
+
+    @Query(value = "SELECT * FROM employee WHERE role = :role", nativeQuery = true)
+    Page<Employee> findAllEmployeesByRole(@Param("role") String role, Pageable pageable);
+
+    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %:name% AND phone LIKE %:phoneNumber%", nativeQuery = true)
+    Page<Employee> findAllEmployeesByNameAndPhoneNumber(@Param("name") String name, @Param("phoneNumber") String phoneNumber, Pageable pageable);
+
+    @Query(value = "SELECT * FROM employee WHERE phone LIKE %:phoneNumber% AND role = :role", nativeQuery = true)
+    Page<Employee> findAllEmployeesByPhoneNumberAndRole(@Param("phoneNumber") String phoneNumber, @Param("role") String role, Pageable pageable);
+
+    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %:name% AND role = :role", nativeQuery = true)
+    Page<Employee> findAllEmployeesByNameAndRole(@Param("name") String name, @Param("role") String role, Pageable pageable);
+
+    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %:name% AND phone LIKE %:phoneNumber% AND role = :role", nativeQuery = true)
+    Page<Employee> findAllEmployeesByNameAndPhoneNumberAndRole(@Param("name") String name, @Param("phoneNumber") String phoneNumber, @Param("role") String role, Pageable pageable);
+
+    // Update
     @Modifying
     @Transactional
     @Query("UPDATE Employee e SET e.fullName = :fullName, e.dob = :dob, e.address = :address, " +
@@ -49,10 +55,18 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
                        @Param("phone") String phone,
                        @Param("role") Role role,
                        @Param("email") String email);
+
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 
-
     Optional<Employee> findByUsername(String username);
 
+    // Delete
+    @Query(value = "SELECT * FROM employee WHERE employeeID = :id", nativeQuery = true)
+    Employee findOneEmployeeById(@Param("id") Integer id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM employee WHERE employeeID = :id", nativeQuery = true)
+    void deleteEmployeeById(@Param("id") Integer id);
 }

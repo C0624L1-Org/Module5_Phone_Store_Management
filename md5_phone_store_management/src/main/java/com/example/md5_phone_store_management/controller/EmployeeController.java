@@ -4,7 +4,6 @@ import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Role;
 import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
 import com.example.md5_phone_store_management.service.IEmployeeService;
-import com.example.md5_phone_store_management.service.implement.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +13,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
+@RequestMapping("/dashboard")
 public class EmployeeController {
     @Autowired
     private IEmployeeService iEmployeeService;
 
+
     //Read(a Đình Anh)
-    @GetMapping("/employees")
+    @GetMapping("/admin/employees/list")
     public ModelAndView getListEmployees(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
         ModelAndView mv = new ModelAndView("/dashboard/admin/list-employee");
         Pageable pageable =  PageRequest.of(page, 9);
@@ -32,7 +36,7 @@ public class EmployeeController {
         mv.addObject("totalPage",iEmployeeService.getAllEmployees(pageable).getTotalPages());
         return mv;
     }
-    @GetMapping("/employees/search")
+    @GetMapping("/admin/employees/search")
     public ModelAndView searchEmployees(@RequestParam (required = false) String name,
                                         @RequestParam(required = false) String phone,
                                         @RequestParam( required = false) String role,
@@ -49,13 +53,13 @@ public class EmployeeController {
     }
 
     //Create(Tuấn Anh)
-    @GetMapping("/employees/create")
+    @GetMapping("/admin/employees/create")
     public String employees(Model model) {
         model.addAttribute("employeeDTO", new EmployeeDTO());
         return "dashboard/admin/create-employee";
     }
 
-    @PostMapping("/employees/create")
+    @PostMapping("/admin/employees/create")
     public String createEmployee(@Valid EmployeeDTO employeeDTO,
                                  BindingResult bindingResult,
                                  RedirectAttributes redirectAttributes,
@@ -70,13 +74,13 @@ public class EmployeeController {
 
             redirectAttributes.addFlashAttribute("messageType", "success");
             redirectAttributes.addFlashAttribute("message", "Tạo thành công!");
-            return "redirect:/employees";
+            return "redirect:/dashboard/admin/employees/list";
         }
     }
 
 
     // UPDATE(Tân)
-    @GetMapping("/admin/employee/edit/{employeeID}")
+    @GetMapping("/admin/employees/edit/{employeeID}")
     public String showUpdateForm(@PathVariable("employeeID") Integer employeeID,
                                  RedirectAttributes redirectAttributes,
                                  Model model) {
@@ -93,9 +97,11 @@ public class EmployeeController {
         return "dashboard/admin/update-employee";
     }
 
-    @PostMapping("/admin/employee/edit")
+    @PostMapping("/admin/employees/edit/{employeeID}")
     public String updateEmployee(@Valid @ModelAttribute("employee") EmployeeDTO employeeDTO,
                                  BindingResult bindingResult,
+                                 @PathVariable("employeeID") Integer employeeID,
+                                 @RequestParam("avatarFile") MultipartFile avatarFile,
                                  RedirectAttributes redirectAttributes,
                                  Model model) {
         Employee employeeToUpdate = iEmployeeService.getEmployeeById(employeeDTO.getEmployeeID());
@@ -137,9 +143,25 @@ public class EmployeeController {
         model.addAttribute("employee", updatedEmployeeDTO);
         model.addAttribute("roles", Role.values());
 
+        Employee updatedAvatar = iEmployeeService.updateAvatar(employeeID, avatarFile);
+
         redirectAttributes.addFlashAttribute("messageType", "success");
         redirectAttributes.addFlashAttribute("message", "Cập nhật người dùng thành công");
 
-        return "redirect:/employees";
+        return "redirect:/dashboard/admin/employees/list";
+    }
+
+    //delete
+    @GetMapping("/admin/employees/delete/{ids}")
+    public String deleteEmployee(@PathVariable List<Integer> ids, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            iEmployeeService.deleteEmployeesById(ids);
+            redirectAttributes.addFlashAttribute("messageType", "success");
+            redirectAttributes.addFlashAttribute("message", "Xóa nhân viên thành công");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            redirectAttributes.addFlashAttribute("message", "Xóa nhân viên không thành công");
+        }
+        return "redirect:/dashboard/admin/employees/list";
     }
 }

@@ -38,11 +38,14 @@ public class Employee {
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
+    @Column(name = "avatar", length = 500)
+    private String avatar;
+
     // Constructor
     public Employee() {
     }
 
-    public Employee(Integer employeeID, String fullName, LocalDate dob, String address, String phone, String username, String password, Role role, String email) {
+    public Employee(Integer employeeID, String fullName, LocalDate dob, String address, String phone, String username, String password, Role role, String email, String avatar) {
         this.employeeID = employeeID;
         this.fullName = fullName;
         this.dob = dob;
@@ -52,6 +55,7 @@ public class Employee {
         this.password = password;
         this.role = role;
         this.email = email;
+        this.avatar = avatar;
     }
 
     // Getters and Setters
@@ -125,6 +129,14 @@ public class Employee {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }
 
