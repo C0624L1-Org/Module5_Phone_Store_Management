@@ -44,11 +44,17 @@
             background: red;
             color: white;
         }
-        .container{
+        .container {
             width: 100%;
-            max-width: 100%;
-
+            max-width: none; /* Remove max-width if it's applying any restriction */
+            margin-left: 0;  /* Ensure there's no left margin */
+            padding: 0;
         }
+
+        header {
+            width: 100%;
+        }
+
     </style>
 </head>
 <body>
@@ -57,12 +63,13 @@
         <div class="flex items-center">
             <img alt="FPT Shop logo" class="h-10" height="40"
                  src="https://storage.googleapis.com/a1aa/image/_DnrG2agcom7C6J491WfQqChZ5rJqr9sQNqU0Bb_6eE.jpg"
-                 width="100"/>
+                 width="100" style="padding-left: 20px;"/>
         </div>
         <div class="flex items-center space-x-4">
-            <button id="open-modal" class="bg-red-700 text-white px-4 py-2 rounded-full hover-effect">
-                Danh mục
-            </button>
+            <select id="suppliersDropdown" style="border-radius: 12px; padding: 8px 12px; border: 1px solid #ccc; font-size: 16px; background-color: rgba(169, 169, 169, 0.2);">
+                <option value="">Supplier Name</option>
+            </select>
+
             <div class="relative">
                 <input class="w-96 px-4 py-2 rounded-full border border-gray-300 focus:border-blue-200"
                        placeholder="Nhập tên điện thoại, máy tính, phụ kiện... cần tìm" type="text"/>
@@ -79,8 +86,40 @@
                 </button>
             </div>
         </div>
+
+
+
+
+
     </div>
 </header>
+
+
+<div class="bg-white py-2">
+    <div class="container mx-auto flex items-center space-x-4 px-4">
+        <a class="flex items-center space-x-2 hover:underline" href="#">
+            <img alt="Notification icon" class="h-5" height="20" src="https://storage.googleapis.com/a1aa/image/Jz3N2b7BfNa-RBH-raSFQ7byyndYOSiaTgNMqC3i5eU.jpg" width="20"/>
+            <span>
+      Ưu đãi siêu rẻ cùng "YEUFPTSHOP"
+     </span>
+        </a>
+        <a class="flex items-center space-x-2 hover:underline" href="#">
+     <span class="text-red-600 font-bold">
+      SỐC
+     </span>
+            <span>
+      Xả kho giá sốc, số lượng có hạn!
+     </span>
+        </a>
+        <a class="flex items-center space-x-2 hover:underline" href="#">
+            <img alt="Product image" class="h-5" height="20" src="https://storage.googleapis.com/a1aa/image/sXwUB1tFv4PYI1jbIXiVVfhSzHRJ50i25EqNXHJQkmM.jpg" width="20"/>
+            <span>
+      Máy lọc nước đỉnh chóp, giá từ 3.290K
+     </span>
+        </a>
+    </div>
+</div>
+
 
 <div id="login-modal" class="modal">
     <div class="modal-content">
@@ -127,7 +166,20 @@
             $("#login-tab").removeClass("active");
             $("#register-tab").addClass("active");
         });
+
+
+
+        // supplier dropdown
+        $.get("/suppliers", function(suppliers) {
+            suppliers.forEach(function(supplier) {
+                $('#suppliersDropdown').append('<option value="' + supplier.supplierID + '">' + supplier.name + '</option>');
+            });
+        });
+
     });
 </script>
+
+
+
 </body>
 </html>
