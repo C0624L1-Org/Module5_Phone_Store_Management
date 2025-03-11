@@ -51,6 +51,8 @@ public class CustomerController {
                                   @RequestParam(required = false) String email,
                                   @RequestParam(required = false) Integer gender,
                                   Model model) {
+
+
         String genderString = "";
         switch (gender != null ? gender : -1) {
             case 0:
@@ -69,6 +71,11 @@ public class CustomerController {
                 genderString = null;
                 break;
         }
+
+        System.out.println("Searching customers with name: " + name + ", phone: " + phone + ", email: " + email + ", gender: " + genderString);
+
+
+
 
         List<Customer> customers = customerService.searchCustomers(name, phone, email, genderString);
         model.addAttribute("customers", customers);
