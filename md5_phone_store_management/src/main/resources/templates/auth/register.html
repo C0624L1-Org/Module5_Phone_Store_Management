@@ -5,248 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary-color: #0066cc;
-      --secondary-color: #ff6600;
-      --dark-color: #222;
-      --light-color: #f8f9fa;
-      --text-color: #333;
-      --error-color: #e74c3c;
-      --success-color: #2ecc71;
-      --border-radius: 8px;
-      --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      --transition: all 0.3s ease;
-    }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: var(--light-color);
-      color: var(--text-color);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    }
-
-    .container {
-      max-width: 1000px;
-      width: 100%;
-      background: white;
-      border-radius: var(--border-radius);
-      overflow: hidden;
-      box-shadow: var(--box-shadow);
-      display: flex;
-    }
-
-    .image-side {
-      flex: 1;
-      background-image: url('/placeholder.svg?height=800&width=400');
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 40px;
-      color: white;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-      background-color: var(--primary-color);
-    }
-
-    .image-side::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7));
-      z-index: 1;
-    }
-
-    .image-content {
-      position: relative;
-      z-index: 2;
-    }
-
-    .image-side h2 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .image-side p {
-      font-size: 16px;
-      margin-bottom: 20px;
-      opacity: 0.9;
-    }
-
-    .form-side {
-      flex: 1.5;
-      padding: 40px;
-      overflow-y: auto;
-      max-height: 90vh;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background-color: var(--primary-color);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 10px;
-      color: white;
-      font-weight: bold;
-      font-size: 20px;
-    }
-
-    .logo-text {
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--dark-color);
-    }
-
-    .logo-text span {
-      color: var(--secondary-color);
-    }
-
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: var(--dark-color);
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group.full-width {
-      grid-column: span 2;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: var(--dark-color);
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      border-radius: var(--border-radius);
-      font-size: 15px;
-      transition: var(--transition);
-      font-family: 'Poppins', sans-serif;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-    }
-
-    .error {
-      color: var(--error-color);
-      font-size: 12px;
-      margin-top: 5px;
-      display: block;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: var(--border-radius);
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-top: 10px;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    button:hover {
-      background-color: #0055b3;
-      transform: translateY(-2px);
-    }
-
-    .login-link {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-    }
-
-    .login-link a {
-      color: var(--primary-color);
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .login-link a:hover {
-      text-decoration: underline;
-    }
-
-    .form-header {
-      margin-bottom: 25px;
-    }
-
-    .form-header p {
-      color: #666;
-      margin-top: 5px;
-    }
-
-    @media (max-width: 900px) {
-      .container {
-        flex-direction: column;
-      }
-
-      .image-side {
-        display: none;
-      }
-
-      .form-side {
-        padding: 30px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-group.full-width {
-        grid-column: span 1;
-      }
-    }
-  </style>
+  <!--Custom-->
+  <link rel="stylesheet" href="/css/common/toast.css">
+  <link rel="stylesheet" href="/css/register.css">
 </head>
 <body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
 <div class="container">
   <div class="image-side">
     <div class="image-content">
@@ -263,31 +30,31 @@
       <h1>Đăng Ký Tài Khoản</h1>
       <p>Điền đầy đủ thông tin bên dưới để tạo tài khoản mới</p>
     </div>
-    <form th:object="${employeeDTO}" method="post">
+    <form th:object="${employeeDTO}" method="post" th:action="@{/register}">
       <div class="form-grid">
         <div class="form-group">
           <label for="fullName">Họ và Tên</label>
-          <input type="text" id="fullName" th:field="*{fullName}" placeholder="Nhập họ và tên" />
+          <input type="text" id="fullName" th:field="*{fullName}" placeholder="Nhập họ và tên">
           <span class="error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Lỗi</span>
         </div>
         <div class="form-group">
           <label for="username">Tài Khoản</label>
-          <input type="text" id="username" th:field="*{username}" placeholder="Nhập tài khoản" />
+          <input type="text" id="username" th:field="*{username}" placeholder="Nhập tài khoản">
           <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Lỗi</span>
         </div>
         <div class="form-group">
           <label for="password">Mật Khẩu</label>
-          <input type="password" id="password" th:field="*{password}" placeholder="Nhập mật khẩu" />
+          <input type="password" id="password" th:field="*{password}" placeholder="Nhập mật khẩu">
           <span class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Lỗi</span>
         </div>
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" th:field="*{email}" placeholder="Nhập email" />
+          <input type="email" id="email" th:field="*{email}" placeholder="Nhập email">
           <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Lỗi</span>
         </div>
         <div class="form-group">
           <label for="phone">Số Điện Thoại</label>
-          <input type="text" id="phone" th:field="*{phone}" placeholder="Nhập số điện thoại" />
+          <input type="tel" id="phone" th:field="*{phone}" placeholder="Nhập số điện thoại">
           <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Lỗi</span>
         </div>
         <div class="form-group">

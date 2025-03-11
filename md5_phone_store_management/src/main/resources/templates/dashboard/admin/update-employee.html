@@ -27,7 +27,7 @@
       <h3 class="mb-0">Cập nhật người dùng: <strong th:text="${employee.fullName}"></strong></h3>
     </div>
     <div class="card-body">
-      <form th:action="@{/admin/employee/edit}" th:object="${employee}" method="post">
+      <form th:action="@{/dashboard/admin/employees/edit/{employeeID}(employeeID=${employee.employeeID})}" th:object="${employee}" method="post" enctype="multipart/form-data">
         <!--Ẩn-->
         <input type="hidden" th:field="*{employeeID}" />
         <input type="hidden" th:field="*{username}" />
@@ -75,6 +75,20 @@
           <label for="email" class="form-label">Email</label>
           <input type="email" th:field="*{email}" class="form-control" id="email" placeholder="Nhập email">
           <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+        </div>
+
+        <!-- Hiển thị avatar hiện tại -->
+        <div class="mb-3">
+          <label class="form-label">Avatar hiện tại</label>
+          <div>
+            <img th:if="${employee.avatar != null}" th:src="${employee.avatar}" alt="Avatar" class="img-thumbnail" width="150">
+          </div>
+        </div>
+
+        <!-- Nút thay đổi avatar -->
+        <div class="mb-3">
+          <label for="avatarFile" class="form-label">Thay đổi Avatar</label>
+          <input type="file" id="avatarFile" name="avatarFile" class="form-control" multiple>
         </div>
 
         <button type="submit" class="btn btn-primary">Cập nhật</button>

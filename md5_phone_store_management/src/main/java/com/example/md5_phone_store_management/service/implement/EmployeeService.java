@@ -1,15 +1,20 @@
 package com.example.md5_phone_store_management.service.implement;
 
+import com.example.md5_phone_store_management.common.EncryptPasswordUtils;
 import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Role;
 import com.example.md5_phone_store_management.repository.IEmployeeRepository;
+import com.example.md5_phone_store_management.service.CloudinaryService;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,10 +26,28 @@ public class EmployeeService implements IEmployeeService {
     @Autowired
     private IEmployeeRepository employeeRepository;
 
+    @Autowired
+    private EncryptPasswordUtils encryptPasswordUtils;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
 
     @Override
     public void addEmployee(Employee employee) {
-        iEmployeeRepository.save(employee);
+        try {
+            if (!employee.getPassword().startsWith("$2a$")) {
+                employee.setPassword(EncryptPasswordUtils.encryptPasswordUtils(employee.getPassword()));
+            }
+
+            if (employee.getAvatar() == null || employee.getAvatar().isEmpty()) {
+                employee.setAvatar("/img/default-avt.png");
+            }
+
+            iEmployeeRepository.save(employee);
+        } catch (Exception e) {
+            throw new RuntimeException("Có lỗi khi thêm người dùng : " + e.getMessage());
+        }
     }
 
     //Read and search (a Đình Anh)
@@ -79,5 +102,30 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public Optional<Employee> findByUsername(String username) {
         return employeeRepository.findByUsername(username);
+    }
+
+    @Override
+    public void deleteEmployeesById(List<Integer> employeeIDs) {
+        for (int i = 0; i < employeeIDs.size(); i++) {
+            iEmployeeRepository.deleteById(employeeIDs.get(i));
+        }
+        //iEmployeeRepository.deleteAllByIdInBatch(employeeIDs);
+    }
+
+    @Override
+    public Employee updateAvatar(Integer employeeID, MultipartFile file) {
+        try {
+            String avatarUrl = cloudinaryService.uploadFile(file, "avatar");
+            Optional<Employee> optional = employeeRepository.findById(employeeID);
+            if (optional.isPresent()) {
+                Employee employee = optional.get();
+                employee.setAvatar(avatarUrl);
+                return employeeRepository.save(employee);
+            } else {
+                throw new RuntimeException("Employee không tồn tại với ID: " + employeeID);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi upload avatar", e);
+        }
     }
 }
