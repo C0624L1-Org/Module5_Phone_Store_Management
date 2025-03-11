@@ -30,35 +30,34 @@
         </div>
 
         <div class="user-actions">
-
             <ul>
-                <!-- Hiển thị nếu người dùng đã đăng nhập -->
-                <li sec:authorize="isAuthenticated()" class="nav-item">
-                    <span>Xin chào, <span sec:authentication="name"></span>!</span>
+                <!-- Đã đăng nhập -->
+                <li sec:authorize="isAuthenticated()" class="nav-item dropdown">
+                    <a class="d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                        <img th:if="${loggedEmployee != null}"
+                             th:src="${loggedEmployee.avatar}"
+                             alt="avatar"
+                             class="user-avatar">
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><span class="dropdown-item-text"><small>Xin chào</small><br><strong th:text="${loggedEmployee.fullName}"></strong></span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-history me-2"></i>Lịch sử đơn hàng</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-key me-2"></i>Đổi mật khẩu</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
                 </li>
 
-<!--                <li sec:authorize="isAuthenticated()" class="nav-item dropdown">-->
-<!--                    <a class="nav-link dropdown-toggle" href="#" id="navbarAvatarDropdown" role="button"-->
-<!--                       data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--                        <img th:if="${loggedEmployee != null}"-->
-<!--                             th:src="${loggedEmployee.avatar}"-->
-<!--                             alt="avatar"-->
-<!--                             class="user-avatar"-->
-<!--                             style="width:40px; height:40px; border-radius:50%;">-->
-<!--                    </a>-->
-<!--                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarAvatarDropdown">-->
-<!--                        <li><a class="dropdown-item" th:href="@{#}">Thông tin cá nhân</a></li>-->
-<!--                        <li><a class="dropdown-item" th:href="@{#}">Giỏ hàng</a></li>-->
-<!--                        <li><a class="dropdown-item" th:href="@{#}">Lịch sử đơn hàng</a></li>-->
-<!--                        <li><a class="dropdown-item" th:href="@{#}">Đổi mật khẩu</a></li>-->
-<!--                        <li><hr class="dropdown-divider"></li>-->
-<!--                        <li><a class="dropdown-item" th:href="@{#}">Đăng xuất</a></li>-->
-<!--                    </ul>-->
-<!--                </li>-->
-
-                <!-- Hiển thị nếu người dùng chưa đăng nhập -->
-                <li sec:authorize="isAnonymous()"><a th:href="@{/login}">Đăng nhập</a></li>
-                <li sec:authorize="isAnonymous()"><a th:href="@{/register}">Đăng ký</a></li>
+                <!-- Chưa đăng nhập -->
+                <li sec:authorize="isAnonymous()" class="nav-item">
+                    <a th:href="@{/login}"><i class="fas fa-sign-in-alt me-2"></i>Đăng nhập</a>
+                </li>
+                <li sec:authorize="isAnonymous()" class="nav-item">
+                    <a th:href="@{/register}" class="btn btn-outline-light">Đăng ký</a>
+                </li>
             </ul>
         </div>
     </div>
@@ -87,6 +86,25 @@
         dropdownMenu.addEventListener('click', function(e) {
             e.stopPropagation();
         });
+    });
+
+    // Kích hoạt dropdown Bootstrap
+    const dropdowns = document.querySelectorAll('.dropdown-toggle');
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('click', function(e) {
+            e.preventDefault();
+            const dropdownMenu = this.nextElementSibling;
+            dropdownMenu.classList.toggle('show');
+        });
+    });
+
+    // Đóng dropdown khi click ra ngoài
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
     });
 </script>
 
