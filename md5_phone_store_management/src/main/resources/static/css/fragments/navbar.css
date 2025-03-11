@@ -1,0 +1,152 @@
+/* ========== NAVBAR STYLES ========== */
+.navbar {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #d82027;
+    color: white;
+    position: relative;
+    z-index: 1000;
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo img {
+    height: 30px;
+}
+
+/* Dropdown menu */
+.menu-container {
+    position: relative;
+    z-index: 1001;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: block;
+    pointer-events: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 240px;
+    margin-top: 8px;
+    background: white;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1002;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.menu-button {
+    display: flex;
+    align-items: center;
+    background-color: #b11116;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.menu-button:hover {
+    background-color: #9a0e13;
+}
+
+.menu-button i {
+    margin-right: 8px;
+}
+
+/* Search */
+.search-container {
+    flex-grow: 1;
+    margin: 0 20px;
+    position: relative;
+    max-width: 600px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+
+.search-container button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+}
+
+/* User actions */
+.user-actions {
+    display: flex;
+    align-items: center;
+}
+
+.user-icon {
+    margin-right: 15px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.cart-button {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cart-button i {
+    margin-right: 8px;
+}
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 999;
+}
+
+.overlay.show {
+    opacity: 1;
+    visibility: visible;
+}

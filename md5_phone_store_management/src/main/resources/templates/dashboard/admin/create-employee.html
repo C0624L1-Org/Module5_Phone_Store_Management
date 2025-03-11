@@ -27,7 +27,7 @@
       <h3 class="mb-0">Thêm mới nhân viên</h3>
     </div>
     <div class="card-body">
-      <form th:action="@{/employees/create}" method="post" th:object="${employeeDTO}">
+      <form th:action="@{/dashboard/admin/employees/create}" method="post" th:object="${employeeDTO}">
         <!-- Họ tên -->
         <div class="mb-3">
           <label for="fullName" class="form-label">Họ tên</label>
