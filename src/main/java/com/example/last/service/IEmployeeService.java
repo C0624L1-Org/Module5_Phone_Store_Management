@@ -1,4 +1,4 @@
-package com.example.md5_phone_store_management.service1;
+package com.example.last.service;
 
 import com.example.md5_phone_store_management.model1.Employee;
 import com.example.md5_phone_store_management.model1.Role;

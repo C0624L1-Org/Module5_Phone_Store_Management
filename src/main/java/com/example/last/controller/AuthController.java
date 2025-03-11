@@ -1,10 +1,11 @@
-package com.example.md5_phone_store_management.controller1;
+package com.example.last.controller;
 
-import com.example.md5_phone_store_management.model.Employee;
-import com.example.md5_phone_store_management.model.Role;
-import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
-import com.example.md5_phone_store_management.service.AuthService;
+import com.example.md5_phone_store_management.model1.Employee;
+import com.example.md5_phone_store_management.model1.Role;
+import com.example.md5_phone_store_management.model1.dto.EmployeeDTO;
+import com.example.md5_phone_store_management.service1.AuthService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,8 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import jakarta.validation.Valid;
 
 import java.util.Optional;
 

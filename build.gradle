@@ -18,26 +18,31 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+//    testImplementation 'org.springframework.security:spring-security-test'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	// Lombok đỡ phải get setter, getter, constructor
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+	//Khai báo dependency của thư viện Cloudinary
+	implementation 'com.cloudinary:cloudinary-http44:1.34.0'
+}
 
-	// Thư viện web restful
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
-	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.0'
-	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.0'
+//Update phiên bản của thư viện Apache HttpClient
+configurations.all {
+	resolutionStrategy.eachDependency { details ->
+		if (details.requested.group == 'org.apache.httpcomponents' && details.requested.name == 'httpclient') {
+			details.useVersion '4.5.13'
+			details.because 'Cập nhật phiên bản để khắc phục lỗ hổng bảo mật WS-2017-3734 và CVE-2020-13956'
+		}
+	}
 }
 
 tasks.named('test') {

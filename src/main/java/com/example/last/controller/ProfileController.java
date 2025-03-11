@@ -1,7 +1,7 @@
-package com.example.md5_phone_store_management.controller1;
+package com.example.last.controller;
 
 
-import com.example.md5_phone_store_management.model.Employee;
+import com.example.md5_phone_store_management.model1.Employee;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

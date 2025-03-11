@@ -1,5 +1,6 @@
-package com.example.md5_phone_store_management.model1;
+package com.example.last.model;
 
+import com.example.md5_phone_store_management.model1.Supplier;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

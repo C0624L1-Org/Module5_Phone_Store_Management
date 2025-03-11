@@ -1,24 +1,83 @@
-package com.example.last.service;
+package com.example.last.service1.implement;
 
-import com.example.last.model.Employee;
-import com.example.last.repository.EmployeeRepository;
+import com.example.md5_phone_store_management.model1.Employee;
+import com.example.md5_phone_store_management.model1.Role;
+import com.example.md5_phone_store_management.repository1.IEmployeeRepository;
+import com.example.md5_phone_store_management.service1.IEmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
-public class EmployeeService {
+public class EmployeeService implements IEmployeeService {
 
     @Autowired
-    private EmployeeRepository employeeRepository;
+    private IEmployeeRepository iEmployeeRepository;
 
-    public List<Employee> findAllEmployees() {
-        return employeeRepository.findAll();
+    @Autowired
+    private IEmployeeRepository employeeRepository;
+
+
+    @Override
+    public void addEmployee(Employee employee) {
+        iEmployeeRepository.save(employee);
     }
 
-    public void deleteEmployeeById(Long id) {
-        employeeRepository.deleteById(id);
+    //Read and search (a Đình Anh)
+    public Page<Employee> getAllEmployees(Pageable pageable) {
+        return iEmployeeRepository.getAllEmployees(pageable);
+    }
+    public Page<Employee> searchEmployees(String name, String phone, String role, Pageable pageable) {
+        boolean hasName = name != null && !name.isEmpty();
+        boolean hasPhone = phone != null && !phone.isEmpty();
+        boolean hasRole = role != null && !role.isEmpty();
+
+        if (hasName && hasPhone && hasRole) {
+            return iEmployeeRepository.findAllEmployeesByNameAndPhoneNumberAndRole(name, phone, role, pageable);
+        } else if (hasName && hasPhone) {
+            return iEmployeeRepository.findAllEmployeesByNameAndPhoneNumber(name, phone, pageable);
+        } else if (hasPhone && hasRole) {
+            return iEmployeeRepository.findAllEmployeesByPhoneNumberAndRole(phone, role, pageable);
+        } else if (hasName && hasRole) {
+            return iEmployeeRepository.findAllEmployeesByNameAndRole(name, role, pageable);
+        } else if (hasName) {
+            return iEmployeeRepository.findAllEmployeesByName(name, pageable);
+        } else if (hasPhone) {
+            return iEmployeeRepository.findAllEmployeesByPhoneNumber(phone, pageable);
+        } else if (hasRole) {
+            return iEmployeeRepository.findAllEmployeesByRole(role, pageable);
+        } else {
+            return iEmployeeRepository.getAllEmployees(pageable);
+        }
     }
 
+    //Update(Tân)
+    @Override
+    public Employee getEmployeeById(Integer employeeID) {
+        return iEmployeeRepository.getById(employeeID);
+    }
+
+    @Override
+    public int updateEmployee(Integer employeeID, String fullName, LocalDate dob, String address, String phone, Role role, String email) {
+        return iEmployeeRepository.updateEmployee(employeeID, fullName, dob, address, phone, role, email);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return iEmployeeRepository.existsByUsername(username);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return iEmployeeRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<Employee> findByUsername(String username) {
+        return employeeRepository.findByUsername(username);
+    }
 }

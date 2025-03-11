@@ -1,7 +1,6 @@
-package com.example.md5_phone_store_management.model1.dto;
+package com.example.last.model;
 
 import com.example.md5_phone_store_management.model1.Role;
-import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

@@ -1,4 +1,4 @@
-package com.example.md5_phone_store_management.repository1;
+package com.example.last.repository;
 
 import com.example.md5_phone_store_management.model1.Supplier;
 import org.springframework.data.jpa.repository.JpaRepository;

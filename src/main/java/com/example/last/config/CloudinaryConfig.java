@@ -1,4 +1,4 @@
-package com.example.md5_phone_store_management.config;
+package com.example.last.config;
 
 import com.cloudinary.Cloudinary;
 import org.springframework.context.annotation.Bean;

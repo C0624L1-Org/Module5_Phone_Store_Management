@@ -1,10 +1,10 @@
 package com.example.last.model;
 
-import com.example.last.model.Role;
+import com.example.md5_phone_store_management.model1.Role;
 import jakarta.persistence.*;
-import java.util.Date;
+import org.springframework.format.annotation.DateTimeFormat;
 
-// dtb này chưa có unique
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "employee")
@@ -17,10 +17,10 @@ public class Employee {
     private String fullName;
 
     @Column(name = "dob")
-    @Temporal(TemporalType.DATE)
-    private Date dob;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dob;
 
-    @Column(name = "address", length = 500)
+    @Column(name = "address", length = 200)
     private String address;
 
     @Column(name = "phone", length = 15)
@@ -34,11 +34,26 @@ public class Employee {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private
-    Role role;
+    private Role role;
 
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
+
+    // Constructor
+    public Employee() {
+    }
+
+    public Employee(Integer employeeID, String fullName, LocalDate dob, String address, String phone, String username, String password, Role role, String email) {
+        this.employeeID = employeeID;
+        this.fullName = fullName;
+        this.dob = dob;
+        this.address = address;
+        this.phone = phone;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.email = email;
+    }
 
     // Getters and Setters
     public Integer getEmployeeID() {
@@ -57,11 +72,11 @@ public class Employee {
         this.fullName = fullName;
     }
 
-    public Date getDob() {
+    public LocalDate getDob() {
         return dob;
     }
 
-    public void setDob(Date dob) {
+    public void setDob(LocalDate dob) {
         this.dob = dob;
     }
 
@@ -112,20 +127,5 @@ public class Employee {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "employeeID=" + employeeID +
-                ", fullName='" + fullName + '\'' +
-                ", dob=" + dob +
-                ", address='" + address + '\'' +
-                ", phone='" + phone + '\'' +
-                ", username='" + username + '\'' +
-                ", role=" + role +
-                ", email='" + email + '\'' +
-                '}';
-    }
-
 }
 

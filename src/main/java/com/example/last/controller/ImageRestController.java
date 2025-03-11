@@ -1,6 +1,6 @@
-package com.example.md5_phone_store_management.controller1;
+package com.example.last.controller;
 
-import com.example.md5_phone_store_management.service.CloudinaryService;
+import com.example.md5_phone_store_management.service1.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
