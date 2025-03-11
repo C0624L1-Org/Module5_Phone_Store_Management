@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Thông báo</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Custom Style -->
+  <link href="/css/common/toast.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container">
+  <!-- Success Toast -->
+  <div class="toast success" th:if="${messageType} == 'success'">
+    <i class="fa-solid fa-circle-check toast-icon"></i>
+    <div class="toast-content">
+      <div class="toast-title"><strong>Thành Công</strong></div>
+      <div class="toast-message" th:text="${message}"></div>
+    </div>
+    <button class="close-btn">&times;</button>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="toast error" th:if="${messageType} == 'error'">
+    <i class="fa-solid fa-circle-xmark toast-icon"></i>
+    <div class="toast-content">
+      <div class="toast-title"><strong>Lỗi</strong></div>
+      <div class="toast-message" th:text="${message}"></div>
+    </div>
+    <button class="close-btn">&times;</button>
+  </div>
+
+  <!-- Session Success Toast -->
+  <div class="toast success" th:if="${session.SUCCESS_MESSAGE}">
+    <i class="fa-solid fa-circle-check toast-icon"></i>
+    <div class="toast-content">
+      <div class="toast-title"><strong>Thành Công</strong></div>
+      <div class="toast-message"
+           th:text="${session.SUCCESS_MESSAGE}"></div>
+    </div>
+    <button class="close-btn">&times;</button>
+  </div>
+
+  <!-- Session Error Toast -->
+  <div class="toast error" th:if="${session.ERROR_MESSAGE}">
+    <i class="fa-solid fa-circle-xmark toast-icon"></i>
+    <div class="toast-content">
+      <div class="toast-title"><strong>Lỗi</strong></div>
+      <div class="toast-message" th:text="${session.ERROR_MESSAGE}"></div>
+    </div>
+    <button class="close-btn">&times;</button>
+  </div>
+</div>
+
+<!-- Custom JS -->
+<script src="/js/common/toast.js"></script>
+<script th:inline="javascript">
+  window.onload = function() {
+    setTimeout(() => {
+      document.querySelectorAll('.toast').forEach(el => el.remove());
+
+      fetch('/clear-session?key=SUCCESS_MESSAGE', { method: 'POST' });
+      fetch('/clear-session?key=ERROR_MESSAGE', { method: 'POST' });
+    }, 3000);
+  };
+</script>
+</body>
+</html>
