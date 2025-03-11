@@ -25,10 +25,6 @@ public class EmployeeController {
     @Autowired
     private IEmployeeService iEmployeeService;
 
-    @GetMapping("/admin")
-    public String admin(Model model) {
-        return "dashboard/admin/admin-home";
-    }
 
     //Read(a Đình Anh)
     @GetMapping("/admin/employees/list")
