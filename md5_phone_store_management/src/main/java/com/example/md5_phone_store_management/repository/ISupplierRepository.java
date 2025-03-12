@@ -11,4 +11,7 @@ import java.util.List;
 public interface ISupplierRepository extends JpaRepository<Supplier,Integer> {
     @Query(value = "SELECT * FROM  Supplier ",nativeQuery = true )
     List<Supplier> findAll();
+
+    @Query(value = "SELECT * FROM supplier WHERE supplierID = :id", nativeQuery = true)
+    Supplier findBySupplierID( Integer id);
 }

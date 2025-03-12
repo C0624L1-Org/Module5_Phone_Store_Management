@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+<!-- Navbar -->
+<div th:insert="common/navbar :: navbar"></div>
+<!-- Sidebar -->
+<div th:insert="common/sidebar :: sidebar"></div>
+
+<div class="container">
+    <div th:insert="fragments/navbar::navbar"></div>
+    <div class="container mt-3">
+        <h2>List Product</h2>
+        <a th:href="@{/dashboard/products/create-form}" class="btn btn-success btn-md mb-3">
+            <i class="fas fa-user-plus"></i> Thêm mới sản phẩm
+        </a>
+        <form class="example" th:action="@{/dashboard/products/search}" method="get">
+            Name Product:<input type="text" placeholder="Search name product" name="searchProduct">
+            Name Supplier:<input type="text" placeholder="Search name Supplier" name="searchSupplier">
+            <label for="myRange">Search Purchase Price: <span id="rangeValue">0</span></label>
+            <input type="range" min="1" max="100" value="0" class="slider" id="myRange" name="rangePrice">
+            <button type="reset">
+                <a th:href="@{/dashboard/products}">Reset</a>
+            </button>
+            <button type="submit">
+                <i class="fa fa-search"></i>
+            </button>
+        </form>
+        <table class="table table-bordered mt-2">
+            <thead>
+            <tr class="table-dark">
+                <th><input id="selectAll" type="checkbox"></th>
+                <th>STT</th>
+                <th>Tên Sản Phẩm</th>
+                <th>Đơn Vị Cung Cấp</th>
+                <th>Giá Mua Vào</th>
+                <th>Giá Bán</th>
+                <th>CPU</th>
+                <th>Bộ Nhớ</th>
+                <th>Số Lượng</th>
+                <th>Hành Động</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product,index : ${listProducts}">
+                <td th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
+                <td th:text="${product.name}"></td>
+                <td th:text="${product.supplier.name}"></td>
+                <td th:text="${product.purchasePrice}"></td>
+                <td th:text="${product.sellingPrice}"></td>
+                <td th:text="${product.CPU}"></td>
+                <td th:text="${product.storage}"></td>
+                <td th:text="${product.stockQuantity}"></td>
+                <td>
+                    <a th:href="@{#}" class="btn btn-primary btn-sm me-1">
+                        <i class="fas fa-eye"></i> Xem
+                    </a>
+
+                    <a th:href="@{/dashboard/admin/employees/edit/{employeeID}(employeeID=${employee.employeeID})}"
+                       class="btn btn-secondary btn-sm me-1">
+                        <i class="fas fa-pen"></i> Cập Nhật
+                    </a>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+        <button th:href="@{#}" class="btn btn-danger btn-sm me-1" disabled id="deleteSelected">
+            <i class="fas fa-trash-alt"></i> Xoá
+        </button>
+        <!-- Bootstrap Modal Xác nhận Xóa -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" style="margin-top: 150px">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="deleteMessage"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-danger" id="confirmDelete">Đồng ý</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--<ul class="pagination" th:if="${listProducts.totalPages>0}">
+            <li class="page-item" th:if="${listProducts.hasPrevious()}">
+                <a class="page-link" th:href="@{/dashboard/products(page=${listProducts.number - 1})}">Previous</a>
+            </li>
+
+            <li class="page-item" th:each="number :${#numbers.sequence(0,listProducts.totalPages - 1)}">
+                <a class="page-link" th:classappend="${listProducts.number == number} ? 'active':''"
+                   th:href="@{/dashboard/products(page= ${number})}" th:text="${number+1}"></a>
+            </li>
+
+            <li class="page-item" th:if="${listProducts.hasNext()}">
+                <a class="page-link" th:href="@{/dashboard/products(page=${listProducts.number + 1})}">Next</a>
+            </li>
+        </ul>-->
+    </div>
+    <div th:insert="fragments/footer::footer"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+<script>
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("rangeValue");
+    output.innerText = slider.value;
+    slider.oninput = function() {
+        output.innerText = this.value;
+    };
+    document.getElementById('selectAll').addEventListener('click', function () {
+        let checkboxes = document.querySelectorAll('.selectEmployee');
+        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+        updateButtonState();
+    });
+
+    document.querySelectorAll('.selectEmployee').forEach(checkbox => {
+        checkbox.addEventListener('change', updateButtonState);
+    });
+
+    function updateButtonState() {
+        let selectedEmployees = document.querySelectorAll('.selectEmployee:checked');
+        document.getElementById('deleteSelected').disabled = selectedEmployees.length === 0;
+        document.getElementById('updateEmployee').disabled = selectedEmployees.length !== 1;
+    }
+
+    // Xử lý khi nhấn nút Xóa
+    document.getElementById("deleteSelected").addEventListener("click", function () {
+        let selectedEmployees = [];
+        let selectedIds = [];
+        document.querySelectorAll(".selectEmployee:checked").forEach((checkbox) => {
+            let id = checkbox.getAttribute("value");
+            let name = checkbox.getAttribute("data-name");
+            let address = checkbox.getAttribute("data-address");
+            console.log(id);
+            console.log(name);
+            console.log(address);
+            selectedEmployees.push({id, name, address});
+            selectedIds.push(id);
+        });
+
+        if (selectedEmployees.length === 0) {
+            alert("Vui lòng chọn ít nhất một nhân viên để xóa.");
+            return;
+        }
+
+        // Hiển thị danh sách nhân viên cần xóa trong modal
+        let deleteMessage = "Bạn có muốn xóa nhân viên: ";
+        deleteMessage += selectedEmployees.map(emp => `${emp.name} (${emp.address})`).join(", ") + " ?";
+        document.getElementById("deleteMessage").innerText = deleteMessage;
+
+        // Hiển thị modal Bootstrap
+        let deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
+        deleteModal.show();
+
+        // Khi nhấn nút Đồng ý
+        document.getElementById("confirmDelete").onclick = function () {
+            location.href = "/dashboard/admin/employees/delete/" + selectedIds.join(",");
+        };
+    });
+
+    document.getElementById('updateEmployee').addEventListener('click', function () {
+        let selectedEmployees = document.querySelectorAll('.selectEmployee:checked');
+        if (selectedEmployees.length !== 1) {
+            alert('Vui lòng chọn một nhân viên duy nhất để cập nhật.');
+        } else {
+            alert('Thực hiện cập nhật cho nhân viên: ' + selectedEmployees[0].closest('tr').children[1].textContent);
+        }
+    });
+    Swal.fire({
+        title: "Thành công!",
+        text: "[[${message}]]",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false
+    });
+</script>
+</html>
