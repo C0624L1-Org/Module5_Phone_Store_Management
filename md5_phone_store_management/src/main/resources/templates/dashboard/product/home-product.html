@@ -13,10 +13,10 @@
 <body>
 <!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
-<!-- Navbar -->
-<div th:insert="common/navbar :: navbar"></div>
+<!-- Nhúng navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <!-- Sidebar -->
-<div th:insert="common/sidebar :: sidebar"></div>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
 <div class="container">
     <div th:insert="fragments/navbar::navbar"></div>

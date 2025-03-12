@@ -1,14 +1,14 @@
 /* ========== FOOTER STYLES ========== */
 .footer {
     background-color: #333333;
-    width: 100vw;
+    width: 100%;
     position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
+    left: auto;
+    right: auto;
+    margin-left: 0;
+    margin-right: 0;
     padding: 30px 50px;
-    margin-top: 30px;
+    margin-top: auto;
 }
 
 .footer .container {
