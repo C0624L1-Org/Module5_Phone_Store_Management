@@ -3,6 +3,7 @@ package com.example.last.controller;
 import com.example.last.model.Customer;
 import com.example.last.model.Gender;
 import com.example.last.service.CustomerService;
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,8 @@ public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
+//    @Autowired
+//    private EmailValidator emailValidator;
 
 
     @GetMapping
@@ -46,41 +49,40 @@ public class CustomerController {
 
 
     @GetMapping("/search")
-    public String searchCustomers(@RequestParam(required = false) String name,
-                                  @RequestParam(required = false) String phone,
-                                  @RequestParam(required = false) String email,
-                                  @RequestParam(required = false) Integer gender,
+    public String searchCustomers(@RequestParam("search-type") String searchType,
+                                  @RequestParam("keyWord") String keyWord,
                                   Model model) {
-
-
-        String genderString = "";
-        switch (gender != null ? gender : -1) {
-            case 0:
-                genderString = null;
-                break;
-            case 1:
-                genderString = "Male";
-                break;
-            case 2:
-                genderString = "Female";
-                break;
-            case 3:
-                genderString = "Other";
-                break;
-            default:
-                genderString = null;
-                break;
-        }
-
-        System.out.println("Searching customers with name: " + name + ", phone: " + phone + ", email: " + email + ", gender: " + genderString);
-
-
-
-
-        List<Customer> customers = customerService.searchCustomers(name, phone, email, genderString);
+        List<Customer> customers = customerService.searchCustomers(searchType, keyWord);
         model.addAttribute("customers", customers);
         return "customer/customerList";
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @GetMapping("/edit/{id}")

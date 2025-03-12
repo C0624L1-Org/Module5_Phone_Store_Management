@@ -49,7 +49,7 @@ public class CustomerService {
     }
 
 
-    public List<Customer> searchCustomers(String name, String phone, String email, String gender) {
-        return customerRepository.searchCustomers(name, phone, email, gender);
+    public List<Customer> searchCustomers(String searchType, String keyWord) {
+        return customerRepository.searchCustomers(searchType, keyWord);
     }
 }
