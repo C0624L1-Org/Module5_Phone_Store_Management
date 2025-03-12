@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <title>Sidebar</title>
+</head>
+
+<body>
+<!-- Sidebar Fragment -->
+<div class="container">
+  <div th:fragment="sidebar" class="sidebar">
+    <nav class="sidebar p-3">
+      <div class="text-center user-image-back">
+        <img src="/img/dashboard/find_user.png" class="img-fluid rounded-circle avatar-user" alt="logo" width="80">
+      </div>
+
+      <div class="text-center user-data">
+        <h2>Dashboard <span th:text="${loggedEmployee.role.getLabel()}"></span></h2>
+      </div>
+
+      <ul class="nav flex-column mt-3">
+        <!-- Dashboard Riêng của từng Role -->
+        <li class="nav-item">
+          <a th:href="@{/dashboard/admin}" class="nav-link text-white" sec:authorize="hasRole('Admin')">
+            <i class="fas fa-desktop me-2"></i> Thống kê
+          </a>
+          <a th:href="@{/dashboard/sales-staff}" class="nav-link text-white" sec:authorize="hasRole('SalesStaff')">
+            <i class="fas fa-desktop me-2"></i> Thống kê
+          </a>
+          <a th:href="@{/dashboard/sales-person}" class="nav-link text-white" sec:authorize="hasRole('SalesPerson')">
+            <i class="fas fa-desktop me-2"></i> Thống kê
+          </a>
+          <a th:href="@{/dashboard/warehouse-staff}" class="nav-link text-white" sec:authorize="hasRole('WarehouseStaff')">
+            <i class="fas fa-desktop me-2"></i> Thống kê
+          </a>
+        </li>
+
+        <!-- Quản lý nhân viên - Admin -->
+        <li class="nav-item" sec:authorize="hasRole('Admin')">
+          <a th:href="@{/dashboard/admin/employees/list}" class="nav-link text-white">
+            <i class="fas fa-users me-2"></i>Quản lý nhân viên
+          </a>
+        </li>
+
+        <!-- Quản lý thông tin cá nhân - Thủ kho , Nhân viên bán hàng, Admin -->
+        <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'WarehouseStaff', 'SalesPerson')">
+          <a th:href="@{/dashboard/profile}" class="nav-link text-white">
+            <i class="fas fa-id-card me-2"></i>Quản lý thông tin cá nhân
+          </a>
+        </li>
+
+        <!-- Quản lý nhà cung cấp - Thủ kho, Admin -->
+        <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
+          <a th:href="@{/dashboard/warehouse/supplier}" class="nav-link text-white">
+            <i class="fas fa-truck-loading me-2"></i>Quản lý nhà cung cấp
+          </a>
+        </li>
+
+        <!-- Quản lý xuất nhập kho - Thủ kho, Admin -->
+        <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
+          <a th:href="@{/dashboard/warehouse/inventory}" class="nav-link text-white">
+            <i class="fas fa-warehouse me-2"></i>Quản lý xuất nhập kho
+          </a>
+        </li>
+
+        <!-- Quản lý kinh doanh - Thủ kho , Nhân viên kinh doanh, Admin -->
+        <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff', 'SalesStaff')">
+          <a th:href="@{/dashboard/business/management}" class="nav-link text-white">
+            <i class="fas fa-chart-line me-2"></i>Quản lý kinh doanh
+          </a>
+        </li>
+
+        <!-- Quản lý bán hàng - Nhân viên bán hàng & Nhân viên kinh doanh -->
+        <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson', 'SalesStaff')">
+          <a th:href="@{/dashboard/sales/management}" class="nav-link text-white">
+            <i class="fas fa-shopping-cart me-2"></i>Quản lý bán hàng
+          </a>
+        </li>
+
+        <!-- Xem thông tin hàng hóa - Nhân viên bán hàng, Admin -->
+        <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">
+          <a th:href="@{/dashboard/products/view}" class="nav-link text-white">
+            <i class="fas fa-boxes me-2"></i>Xem thông tin hàng hóa
+          </a>
+        </li>
+
+        <!-- Quản lý báo cáo - Admin & Nhân viên kinh doanh -->
+        <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">
+          <a th:href="@{/dashboard/reports}" class="nav-link text-white">
+            <i class="fas fa-file-alt me-2"></i>Quản lý báo cáo
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+</body>
+</html>

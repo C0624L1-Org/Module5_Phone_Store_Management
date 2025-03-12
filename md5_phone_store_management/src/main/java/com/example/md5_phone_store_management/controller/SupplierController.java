@@ -1,6 +1,7 @@
 package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.Supplier;
+import com.example.md5_phone_store_management.service.implement.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,6 @@ public class SupplierController {
 
     @GetMapping("/suppliers")
     public List<Supplier> getAllSuppliers() {
-        return supplierService.getAllSuppliers();
+        return supplierService.getSupplierList();
     }
 }

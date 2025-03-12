@@ -8,7 +8,9 @@
 <div th:fragment="navbar" class="navbar">
     <div class="navbar-container">
         <div class="logo">
-            <img src="/img/fptshop_logo.png" alt="Shop Logo">
+            <a th:href="@{/home}">
+                <img src="/img/fpt_logo.png" alt="Shop Logo">
+            </a>
             <div class="menu-container">
                 <div class="menu-button">
                     <i>☰</i>
@@ -32,6 +34,7 @@
         <div class="user-actions">
             <ul>
                 <!-- Đã đăng nhập -->
+                <li sec:authorize="isAuthenticated()"><span class=""><small>Xin chào </small><strong th:text="${loggedEmployee.fullName}"></strong>!</span></li>
                 <li sec:authorize="isAuthenticated()" class="nav-item dropdown">
                     <a class="d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                         <img th:if="${loggedEmployee != null}"
@@ -40,16 +43,18 @@
                              class="user-avatar">
                     </a>
                     <ul class="dropdown-menu">
-                        <li><span class="dropdown-item-text"><small>Xin chào</small><br><strong th:text="${loggedEmployee.fullName}"></strong></span></li>
+                        <li><span class="dropdown-item-text"><strong>Chức Năng</strong></span></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-history me-2"></i>Lịch sử đơn hàng</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-key me-2"></i>Đổi mật khẩu</a></li>
+                        <li><a class="menu-item" href="#"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
+<!--                        <li><a class="menu-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng</a></li>-->
+<!--                        <li><a class="menu-item" href="#"><i class="fas fa-history me-2"></i>Lịch sử đơn hàng</a></li>-->
+                        <li><a class="menu-item" href="#"><i class="fas fa-key me-2"></i>Đổi mật khẩu</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        <li><a class="menu-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
                     </ul>
                 </li>
+
+                <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
 
                 <!-- Chưa đăng nhập -->
                 <li sec:authorize="isAnonymous()" class="nav-item">
@@ -62,6 +67,8 @@
         </div>
     </div>
 </div>
+
+<div class="overlay"></div>
 
 <!-- Navbar Script -->
 <script th:fragment="navbar-script">

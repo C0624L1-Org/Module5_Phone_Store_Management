@@ -31,6 +31,21 @@ public class EmployeeController {
         return "dashboard/admin/admin-home";
     }
 
+    @GetMapping("/warehouse-staff")
+    public String warehouseStaff(Model model) {
+        return "dashboard/warehouse-staff/warehouse-staff-home";
+    }
+
+    @GetMapping("/sales-staff")
+    public String salesStaff(Model model) {
+        return "dashboard/sales-staff/sales-staff-home";
+    }
+
+    @GetMapping("/sales-person")
+    public String salesPerson(Model model) {
+        return "dashboard/sales-person/sales-person-home";
+    }
+
     //Read(a Đình Anh)
     @GetMapping("/admin/employees/list")
     public ModelAndView getListEmployees(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
@@ -106,7 +121,7 @@ public class EmployeeController {
     public String updateEmployee(@Valid @ModelAttribute("employee") EmployeeDTO employeeDTO,
                                  BindingResult bindingResult,
                                  @PathVariable("employeeID") Integer employeeID,
-                                 @RequestParam("avatarFile") MultipartFile avatarFile,
+                                 @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
                                  RedirectAttributes redirectAttributes,
                                  Model model) {
         Employee employeeToUpdate = iEmployeeService.getEmployeeById(employeeDTO.getEmployeeID());
@@ -142,13 +157,30 @@ public class EmployeeController {
                 employeeDTO.getEmail()
         );
 
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            if (avatarFile.getSize() > 10 * 1024 * 1024) {
+                redirectAttributes.addFlashAttribute("messageType", "error");
+                redirectAttributes.addFlashAttribute("message", "Kích thước ảnh quá lớn!");
+                model.addAttribute("employee", employeeDTO);
+                model.addAttribute("roles", Role.values());
+                return "redirect:/dashboard/admin/employees/edit/" + employeeID;
+            }
+            if (!avatarFile.getContentType().startsWith("image/")) {
+                redirectAttributes.addFlashAttribute("messageType", "error");
+                redirectAttributes.addFlashAttribute("message", "Định dạng ảnh không hợp lệ!");
+                model.addAttribute("employee", employeeDTO);
+                model.addAttribute("roles", Role.values());
+                return "redirect:/dashboard/admin/employees/edit/" + employeeID;
+            }
+            iEmployeeService.updateAvatar(employeeID, avatarFile);
+        }
+
         Employee updatedEmployee = iEmployeeService.getEmployeeById(employeeDTO.getEmployeeID());
         EmployeeDTO updatedEmployeeDTO = new EmployeeDTO();
         BeanUtils.copyProperties(updatedEmployee, updatedEmployeeDTO);
+
         model.addAttribute("employee", updatedEmployeeDTO);
         model.addAttribute("roles", Role.values());
-
-        Employee updatedAvatar = iEmployeeService.updateAvatar(employeeID, avatarFile);
 
         redirectAttributes.addFlashAttribute("messageType", "success");
         redirectAttributes.addFlashAttribute("message", "Cập nhật người dùng thành công");

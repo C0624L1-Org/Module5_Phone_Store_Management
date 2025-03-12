@@ -17,7 +17,16 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          AuthenticationException authException) throws IOException, ServletException {
         String requestURI = request.getRequestURI();
 
-        if (requestURI.contains("favicon.ico")) {
+        if (requestURI.contains("favicon.ico") ||
+                requestURI.contains(".png") ||
+                requestURI.contains(".jpg") ||
+                requestURI.contains(".jpeg") ||
+                requestURI.contains(".gif") ||
+                requestURI.contains(".css") ||
+                requestURI.contains(".js") ||
+                requestURI.startsWith("/img/") ||
+                requestURI.startsWith("/css/") ||
+                requestURI.startsWith("/js/")) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }

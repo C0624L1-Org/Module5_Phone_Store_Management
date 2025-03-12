@@ -27,27 +27,50 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private String determineTargetUrl(HttpServletRequest request, Authentication authentication) {
         // Kiểm tra nếu session có REDIRECT_URL hợp lệ
         String targetUrl = (String) request.getSession().getAttribute("REDIRECT_URL");
-
         if (targetUrl != null && !targetUrl.isEmpty() &&
                 !targetUrl.contains("favicon.ico") &&
                 !targetUrl.contains("error") &&
                 !targetUrl.contains("dashboard") &&
-                !targetUrl.startsWith("/clear-session")) {
+                !targetUrl.startsWith("/clear-session") &&
+                !targetUrl.contains(".png") &&
+                !targetUrl.contains(".jpg") &&
+                !targetUrl.contains("/img/")) {
             request.getSession().removeAttribute("REDIRECT_URL");
             return targetUrl;
         }
 
-        // Nếu không có, xác định URL dựa trên Role
-        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_Admin"))) {
-            return "/dashboard/admin";
-        } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SalesStaff"))) {
-            return "/dashboard/sales";
-        } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SalesPerson"))) {
-            return "/dashboard/business-staff";
-        } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_WarehouseStaff"))) {
-            return "/dashboard/warehouse-staff";
-        } else {
-            return "/";
+        // Sử dụng switch-case để phân quyền dựa trên role của người dùng
+        targetUrl = null;
+        for (var authority : authentication.getAuthorities()) {
+            String role = authority.getAuthority();
+            switch (role) {
+                case "ROLE_Admin":
+                    targetUrl = "/dashboard/admin";
+                    break;
+                case "ROLE_SalesStaff":
+                    targetUrl = "/dashboard/sales-staff";
+                    break;
+                case "ROLE_SalesPerson":
+                    targetUrl = "/dashboard/sales-person";
+                    break;
+                case "ROLE_WarehouseStaff":
+                    targetUrl = "/dashboard/warehouse-staff";
+                    break;
+                default:
+                    // Nếu không khớp với các role trên, bạn có thể để trống hoặc xử lý theo nhu cầu
+                    break;
+            }
+            if (targetUrl != null) {
+                // Nếu đã tìm được URL phù hợp thì dừng vòng lặp
+                break;
+            }
         }
+
+        // Nếu không có role nào khớp, trả về đường dẫn mặc định
+        if (targetUrl == null) {
+            targetUrl = "/";
+        }
+        return targetUrl;
     }
+
 }
