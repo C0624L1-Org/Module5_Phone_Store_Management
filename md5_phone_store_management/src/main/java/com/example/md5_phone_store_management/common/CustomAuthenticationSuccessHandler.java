@@ -39,7 +39,6 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             return targetUrl;
         }
 
-        // Sử dụng switch-case để phân quyền dựa trên role của người dùng
         targetUrl = null;
         for (var authority : authentication.getAuthorities()) {
             String role = authority.getAuthority();
@@ -57,16 +56,13 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                     targetUrl = "/dashboard/warehouse-staff";
                     break;
                 default:
-                    // Nếu không khớp với các role trên, bạn có thể để trống hoặc xử lý theo nhu cầu
                     break;
             }
             if (targetUrl != null) {
-                // Nếu đã tìm được URL phù hợp thì dừng vòng lặp
                 break;
             }
         }
 
-        // Nếu không có role nào khớp, trả về đường dẫn mặc định
         if (targetUrl == null) {
             targetUrl = "/";
         }
