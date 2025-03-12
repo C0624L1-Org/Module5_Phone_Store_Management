@@ -13,7 +13,7 @@ public class ProfileController {
     @GetMapping("/profile")
     public String profile(HttpSession session, Model model) {
         Employee employee = (Employee) session.getAttribute("employee");
-        if (employee == null) return "redirect:/auth/login";
+        if (employee == null) return "redirect:/login";
 
         model.addAttribute("employee", employee);
         return "profile";

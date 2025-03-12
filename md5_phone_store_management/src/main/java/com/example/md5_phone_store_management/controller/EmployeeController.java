@@ -22,6 +22,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/dashboard")
 public class EmployeeController {
+
     @Autowired
     private IEmployeeService iEmployeeService;
 
@@ -33,7 +34,7 @@ public class EmployeeController {
     //Read(a Đình Anh)
     @GetMapping("/admin/employees/list")
     public ModelAndView getListEmployees(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
-        ModelAndView mv = new ModelAndView("/dashboard/admin/list-employee");
+        ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
         Pageable pageable =  PageRequest.of(page, 9);
         mv.addObject("currentPage", page);
         mv.addObject("employeePage", iEmployeeService.getAllEmployees(pageable));
@@ -45,7 +46,7 @@ public class EmployeeController {
                                         @RequestParam(required = false) String phone,
                                         @RequestParam( required = false) String role,
                                         @RequestParam(name = "page",defaultValue = "0",required = false) int page) {
-        ModelAndView mv = new ModelAndView("/dashboard/admin/list-employee");
+        ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
         Pageable pageable =  PageRequest.of(page, 9);
         mv.addObject("currentPage", page);
         mv.addObject("employeePage", iEmployeeService.searchEmployees(name, phone, role, pageable));
@@ -60,7 +61,7 @@ public class EmployeeController {
     @GetMapping("/admin/employees/create")
     public String employees(Model model) {
         model.addAttribute("employeeDTO", new EmployeeDTO());
-        return "dashboard/admin/create-employee";
+        return "dashboard/admin/employees/create-employee";
     }
 
     @PostMapping("/admin/employees/create")
@@ -70,7 +71,7 @@ public class EmployeeController {
                                  Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("employeeDTO", employeeDTO);
-            return "dashboard/admin/create-employee";
+            return "dashboard/admin/employees/create-employee";
         } else {
             Employee employee = new Employee();
             BeanUtils.copyProperties(employeeDTO, employee);
@@ -98,7 +99,7 @@ public class EmployeeController {
         model.addAttribute("employee", employee);
         model.addAttribute("roles", Role.values());
 
-        return "dashboard/admin/update-employee";
+        return "dashboard/admin/employees/update-employee";
     }
 
     @PostMapping("/admin/employees/edit/{employeeID}")
@@ -128,7 +129,7 @@ public class EmployeeController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("employee", employeeDTO);
             model.addAttribute("roles", Role.values());
-            return "dashboard/admin/update-employee";
+            return "dashboard/admin/employees/update-employee";
         }
 
         int updatedRows = iEmployeeService.updateEmployee(
