@@ -68,7 +68,7 @@
                         <i class="fas fa-eye"></i> Xem
                     </a>
 
-                    <a th:href="@{/dashboard/admin/employees/edit/{employeeID}(employeeID=${employee.employeeID})}"
+                    <a th:href="@{#}"
                        class="btn btn-secondary btn-sm me-1">
                         <i class="fas fa-pen"></i> Cập Nhật
                     </a>
@@ -117,7 +117,7 @@
     <div th:insert="fragments/footer::footer"></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</body>
+
 <script>
     var slider = document.getElementById("myRange");
     var output = document.getElementById("rangeValue");
@@ -192,4 +192,5 @@
         showConfirmButton: false
     });
 </script>
+</body>
 </html>
