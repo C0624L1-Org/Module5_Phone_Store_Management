@@ -19,6 +19,16 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
+    @PostMapping("/admin/customers/delete")
+    public String deleteCustomers(@RequestParam List<Integer> ids) {
+        for (Integer customerID : ids) {
+            customerService.deleteCustomer(Collections.singletonList(customerID));
+        }
+        System.out.println("đã chạy qua pt xóa ");
+        return "redirect:/dashboard/admin/customers/list";
+    }
+
+
     @GetMapping("/admin/customers/list")
     public String listCustomers(Model model) {
         List<Customer> customers = customerService.findAllCustomers();
@@ -81,14 +91,7 @@ public class CustomerController {
     }
 
 
-    @PostMapping("/admin/customers/delete")
-    public String deleteCustomers(@RequestParam List<Integer> ids) {
-        for (Integer customerID : ids) {
-            customerService.deleteCustomer(Collections.singletonList(customerID));
-        }
-        System.out.println("đã chạy qua pt xóa ");
-        return "redirect:/dashboard/admin/customers/list";
-    }
+
 
 
 }

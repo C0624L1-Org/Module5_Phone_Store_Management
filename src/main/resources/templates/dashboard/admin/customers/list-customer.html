@@ -55,9 +55,10 @@
                         </button>
                     </form>
 
-                    <!-- Nút thêm mới & xóa -->
-                    <form action="/dashboard/admin/customers/delete" method="post" id="delete-form" onsubmit="return validateDelete()"
+
+                    <form th:action="@{/dashboard/admin/customers/delete}" method="post" id="delete-form" onsubmit="return validateDelete()"
                           class="flex items-center gap-2">
+                        <input type="hidden" name="ids" id="ids" />
                         <button type="button" class="bg-green-600 text-white py-1 px-3 rounded-full" id="add-button"
                                 onclick="window.location.href='/dashboard/admin/customers/create'">Thêm mới
                         </button>
@@ -129,12 +130,16 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+
     function validateDelete() {
         const checkboxes = document.querySelectorAll('input[name="ids"]:checked');
         if (checkboxes.length === 0) {
             alert('Vui lòng chọn khách hàng cần xóa');
             return false; // Ngăn form gửi yêu cầu
         }
+
+        const ids = Array.from(checkboxes).map(checkbox => checkbox.value);
+        document.getElementById('ids').value = ids.join(','); // Gán giá trị vào trường ẩn
 
         const customerDetails = Array.from(checkboxes).map(checkbox => {
             const name = checkbox.getAttribute('data-name');

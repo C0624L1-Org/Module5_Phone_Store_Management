@@ -27,7 +27,8 @@
 <div class="bg-gray-200 py-2">
     <h2 class="text-lg font-bold">Sửa Khách Hàng</h2>
 
-    <form action="/dashboard/admin/customers/update" method="post">
+<!--        <form th:action="@{/dashboard/admin/customers/update}" th:object="customer" method="post" >-->
+        <form th:action="@{/dashboard/admin/customers/update}" method="post">
         <input type="hidden" name="customerID" th:value="${customer.customerID}"/>
         <div>
             <label for="full-name">Họ tên:</label>
