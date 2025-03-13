@@ -8,43 +8,52 @@ import com.example.md5_phone_store_management.service.implement.SupplierService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/dashboard/products")
 public class ProductController {
-
     @Autowired
-    private ProductService productService;
-
+    ProductService productService;
     @Autowired
-    private SupplierService supplierService;
-
-    // làm tạm để kiểm thử
-    @GetMapping
-    public String home(){
+    SupplierService supplierService;
+    // Tuấn Anh
+    @GetMapping("/list")
+    public String index(Model model,
+                        @RequestParam(name = "page", defaultValue = "0", required = false) int page){
+        Pageable pageable = PageRequest.of(page,2);
+        Page<Product> listProducts = productService.findAll(pageable);
+        model.addAttribute("listProducts",listProducts);
         return "dashboard/product/home-product";
     }
 
+    @GetMapping("/search")
+    public String search(Model model,@RequestParam(name="searchProduct",required=false) String searchProduct,
+                         @RequestParam(name="searchSupplier",required=false) String searchSupplier,
+                         @RequestParam(name="rangePrice",required=false) double rangePrice,
+                         @RequestParam(name="page",defaultValue = "0")int page){
+        Pageable pageable = PageRequest.of(page,2);
+        Page<Product> listProducts= productService.searchProductByNameAndSupplier_NameAndPurchasePrice(searchProduct,searchSupplier,rangePrice,pageable);
+        model.addAttribute("listProducts",listProducts);
+        return "dashboard/product/home-product";
+    }
+    // Đình Anh
     @GetMapping("/create-form")
     public String createForm(Model model) {
         model.addAttribute("productDTO", new ProductDTO());
-        model.addAttribute("supplier", supplierService.getSupplierList());
+        model.addAttribute("supplier",supplierService.getSupplierList());
         return "dashboard/product/create-product-form";
     }
-
     @PostMapping("/add-product")
-    public String addProduct(@Valid @ModelAttribute("productDTO") ProductDTO productDTO,
-                             BindingResult biResult,
-                             RedirectAttributes redirectAttr,
-                             Model model) {
+    public String addProduct(@Valid@ModelAttribute("productDTO") ProductDTO productDTO,
+                             BindingResult biResult,RedirectAttributes redirectAttr , Model model) {
         if (biResult.hasErrors()) {
             model.addAttribute("supplier",supplierService.getSupplierList());
             return "dashboard/product/create-product-form";

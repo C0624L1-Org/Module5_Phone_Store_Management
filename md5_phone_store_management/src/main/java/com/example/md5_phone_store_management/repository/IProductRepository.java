@@ -1,6 +1,8 @@
 package com.example.md5_phone_store_management.repository;
 
 import com.example.md5_phone_store_management.model.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +14,7 @@ import java.math.BigDecimal;
 
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Integer> {
-
+    // Đình Anh
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO product (name, purchasePrice, sellingPrice, CPU, storage, " +
@@ -40,4 +42,14 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
                           @Param("cpu") String cpu,
                           @Param("storage") String storage,
                           @Param("description") String description);
+    // Tuấn Anh
+    @Query("SELECT p FROM Product  p ")
+    Page<Product> findAll(Pageable pageable);
+
+    @Query("select p from Product p where " +
+            "(:name is null or p.name like concat('%',:name,'%' ) )" +
+            "and (:supplierName is null or p.supplier.name like concat('%',:supplierName,'%'))" +
+            "and (:purchasePrice is null or p.purchasePrice >=:purchasePrice)")
+    Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(@Param("name") String name,@Param("supplierName") String supplierName,
+                                                                      @Param("purchasePrice")double purchasePrice, Pageable pageable);
 }

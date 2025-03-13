@@ -27,36 +27,34 @@
 <div class="bg-gray-200 py-2">
     <h2 class="text-lg font-bold">Thêm Khách Hàng</h2>
 
-    <form action="/dashboard/admin/customers/create" method="post">
+    <form th:action="@{/dashboard/admin/customers/create}" method="post" th:object="${customer}">
         <div>
             <label for="full-name">Họ tên:</label>
-            <input type="text" id="full-name" name="fullName" class="border border-gray-300 rounded px-2 py-1" required/>
+            <input type="text" id="full-name" name="fullName" class="border border-gray-300 rounded px-2 py-1" th:field="*{fullName}" required/>
         </div>
         <div>
             <label for="dob">Ngày sinh:</label>
-            <input type="date" id="dob" name="dob" class="border border-gray-300 rounded px-2 py-1" required/>
+            <input type="date" id="dob" name="dob" class="border border-gray-300 rounded px-2 py-1" th:field="*{dob}" required/>
         </div>
         <div>
             <label for="phone">Số điện thoại:</label>
-            <input type="text" id="phone" name="phone" class="border border-gray-300 rounded px-2 py-1" required/>
+            <input type="text" id="phone" name="phone" class="border border-gray-300 rounded px-2 py-1" th:field="*{phone}" required/>
         </div>
         <div>
             <label for="address">Địa chỉ:</label>
-            <input type="text" id="address" name="address" class="border border-gray-300 rounded px-2 py-1"/>
+            <input type="text" id="address" name="address" class="border border-gray-300 rounded px-2 py-1" th:field="*{address}" required/>
         </div>
         <div>
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" class="border border-gray-300 rounded px-2 py-1" required/>
+            <input type="email" id="email" name="email" class="border border-gray-300 rounded px-2 py-1" th:field="*{email}" required/>
         </div>
         <div>
             <label for="gender">Giới tính:</label>
-            <select id="gender" name="gender" class="border border-gray-300 rounded px-2 py-1">
-                <option value="Male">Nam</option>
-                <option value="Female">Nữ</option>
-                <option value="Other">Khác</option>
+            <select id="gender" name="gender" class="border border-gray-300 rounded px-2 py-1" th:field="*{gender}">
+                <option th:each="gender : ${genders}" th:value="${gender}" th:text="${gender.getLabel()}"></option>
             </select>
         </div>
-        <input type="hidden" name="purchaseCount" value="0"/>
+        <input type="hidden" name="purchaseCount" value="0" th:field="*{purchaseCount}"/>
         <button type="submit" class="bg-blue-600 text-white py-1 px-2 rounded">Thêm mới</button>
     </form>
 </div>
