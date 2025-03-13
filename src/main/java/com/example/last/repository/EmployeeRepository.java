@@ -1,11 +1,10 @@
 package com.example.last.repository;
 
 import com.example.last.model.Employee;
+import com.example.last.model.Role;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import com.example.last.model.Role;
-
 
 import java.util.List;
 
@@ -87,6 +86,4 @@ public class EmployeeRepository {
             System.out.println("No employee found with ID " + id);
         }
     }
-
-
 }

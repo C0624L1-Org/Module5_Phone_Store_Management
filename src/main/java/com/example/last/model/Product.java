@@ -1,6 +1,5 @@
 package com.example.last.model;
 
-import com.example.last.model.Supplier;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

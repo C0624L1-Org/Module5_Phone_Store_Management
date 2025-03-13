@@ -1,6 +1,7 @@
 package com.example.last.config;
 
 import com.cloudinary.Cloudinary;
+import com.example.last.common.CloudinaryProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

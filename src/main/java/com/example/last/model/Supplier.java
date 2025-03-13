@@ -2,6 +2,8 @@ package com.example.last.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "supplier")
 public class Supplier {
@@ -22,7 +24,6 @@ public class Supplier {
     @Column(name = "email", length = 50)
     private String email;
 
-    // Constructors
     public Supplier() {}
 
     public Supplier(String name, String address, String phone, String email) {
@@ -32,7 +33,6 @@ public class Supplier {
         this.email = email;
     }
 
-    // Getters and Setters
     public Integer getSupplierID() {
         return supplierID;
     }

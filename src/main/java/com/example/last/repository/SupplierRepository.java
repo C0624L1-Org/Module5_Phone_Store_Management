@@ -12,7 +12,6 @@ import java.util.List;
 
 @Repository
 public class SupplierRepository {
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -46,11 +45,11 @@ public class SupplierRepository {
     }
 
     public void save(Supplier supplier) {
-         jdbcTemplate.update(SAVE_QUERY, supplier.getName(), supplier.getAddress(), supplier.getPhone(), supplier.getEmail());
+        jdbcTemplate.update(SAVE_QUERY, supplier.getName(), supplier.getAddress(), supplier.getPhone(), supplier.getEmail());
     }
 
     public void update(Integer supplierID, Supplier supplier) {
-         jdbcTemplate.update(UPDATE_QUERY, supplier.getName(), supplier.getAddress(), supplier.getPhone(), supplier.getEmail(), supplier.getSupplierID());
+        jdbcTemplate.update(UPDATE_QUERY, supplier.getName(), supplier.getAddress(), supplier.getPhone(), supplier.getEmail(), supplier.getSupplierID());
     }
 
     public int deleteById(Integer supplierID) {

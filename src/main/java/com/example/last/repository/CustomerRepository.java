@@ -15,7 +15,6 @@ import java.util.List;
 
 @Repository
 public class CustomerRepository {
-
     private final JdbcTemplate jdbcTemplate;
 
     private static final String SELECT_ALL_CUSTOMERS = "SELECT * FROM customer";
@@ -48,8 +47,9 @@ public class CustomerRepository {
         } else {
             sql = "SELECT * FROM customer";
         }
-            return jdbcTemplate.query(sql, params.toArray(), new CustomerRowMapper());
+        return jdbcTemplate.query(sql, params.toArray(), new CustomerRowMapper());
     }
+
 
     public void deleteCustomer(List<Integer> customerIDs) {
         jdbcTemplate.batchUpdate(DELETE_CUSTOMERS_BY_IDS, new BatchPreparedStatementSetter() {

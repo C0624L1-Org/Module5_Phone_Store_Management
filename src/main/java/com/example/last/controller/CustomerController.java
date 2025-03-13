@@ -1,108 +1,74 @@
 package com.example.last.controller;
 
 import com.example.last.model.Customer;
-import com.example.last.model.Gender;
 import com.example.last.service.CustomerService;
-import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.beans.BeanUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/customers")
+@RequestMapping("/dashboard")
 public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
-//    @Autowired
-//    private EmailValidator emailValidator;
 
-
-    @GetMapping
+    @GetMapping("/admin/customers/list")
     public String listCustomers(Model model) {
         List<Customer> customers = customerService.findAllCustomers();
         model.addAttribute("customers", customers);
-        return "customer/customerList";
+        return "dashboard/admin/customers/list-customer";
     }
 
-    @GetMapping("/add")
+    @GetMapping("/admin/customers/create")
     public String showAddCustomerForm(Model model) {
         model.addAttribute("customer", new Customer());
-        return "customer/customerAdd";
+        return "dashboard/admin/customers/create-customer";
     }
 
-
-    @PostMapping("/create")
-    public String createCustomer(@ModelAttribute Customer customer, RedirectAttributes redirectAttributes) {
+    @PostMapping("/admin/customers/create")
+    public String createCustomer(@ModelAttribute Customer customer,
+                                 RedirectAttributes redirectAttributes) {
         customerService.addNewCustomer(customer);
         redirectAttributes.addFlashAttribute("message", "Thêm khách hàng thành công.");
-        return "redirect:/customers";
+        return "redirect:/dashboard/admin/customers/list";
     }
 
 
-    @GetMapping("/search")
+    @GetMapping("/admin/customers/search")
     public String searchCustomers(@RequestParam("search-type") String searchType,
                                   @RequestParam("keyWord") String keyWord,
                                   Model model) {
         List<Customer> customers = customerService.searchCustomers(searchType, keyWord);
         model.addAttribute("customers", customers);
-        return "customer/customerList";
+        return "dashboard/admin/customers/list-customer";
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @GetMapping("/edit/{id}")
+    @GetMapping("/admin/customers/edit/{id}")
     public String editCustomer(@PathVariable Integer id, Model model) {
         Customer customer = customerService.getCustomerByID(id);
         if (customer == null) {
             model.addAttribute("error", "Khách hàng không tồn tại.");
-            return "redirect:/customers";
+            return "redirect:dashboard/admin/customers/list";
         }
         model.addAttribute("customer", customer);
-        return "customer/customerEdit";
+        return "dashboard/admin/customers/update-customer";
     }
 
-    @PostMapping("/update")
+    @PostMapping("/admin/customers/update")
     public String updateCustomer(@RequestParam Integer customerID, @ModelAttribute Customer customer, RedirectAttributes redirectAttributes) {
         System.out.println("Updating customer with ID: " + customerID);
         Customer customerNeedUpdate = customerService.getCustomerByID(customerID);
         if (customerNeedUpdate == null) {
             redirectAttributes.addFlashAttribute("error", "Khách hàng không tồn tại.");
-            return "redirect:/customers";
+            return "redirect:/dashboard/admin/customers/list";
         }
         BeanUtils.copyProperties(customer, customerNeedUpdate, "customerID");
         boolean isUpdated = customerService.updateCustomer(customerNeedUpdate);
@@ -111,16 +77,17 @@ public class CustomerController {
         } else {
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi cập nhật khách hàng.");
         }
-        return "redirect:/customers";
+        return "redirect:/dashboard/admin/customers/list";
     }
 
 
-    @PostMapping("/delete")
+    @PostMapping("/admin/customers/delete")
     public String deleteCustomers(@RequestParam List<Integer> ids) {
         for (Integer customerID : ids) {
             customerService.deleteCustomer(Collections.singletonList(customerID));
         }
-        return "redirect:/customers";
+        System.out.println("đã chạy qua pt xóa ");
+        return "redirect:/dashboard/admin/customers/list";
     }
 
 

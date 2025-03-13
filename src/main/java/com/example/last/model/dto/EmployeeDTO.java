@@ -1,4 +1,4 @@
-package com.example.last.model;
+package com.example.last.model.dto;
 
 import com.example.last.model.Role;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,12 +18,13 @@ public class EmployeeDTO implements Validator {
     private String password;
     private Role role;
     private String email;
+    private String avatar;
 
     // Constructor
     public EmployeeDTO() {
     }
 
-    public EmployeeDTO(Integer employeeID, String fullName, LocalDate dob, String address, String phone, String username, String password, Role role, String email) {
+    public EmployeeDTO(Integer employeeID, String fullName, LocalDate dob, String address, String phone, String username, String password, Role role, String email, String avatar) {
         this.employeeID = employeeID;
         this.fullName = fullName;
         this.dob = dob;
@@ -33,6 +34,7 @@ public class EmployeeDTO implements Validator {
         this.password = password;
         this.role = role;
         this.email = email;
+        this.avatar = avatar;
     }
 
     // Get/Set
@@ -108,6 +110,14 @@ public class EmployeeDTO implements Validator {
         this.email = email;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     @Override
     public boolean supports(Class<?> clazz) {
         return false;
@@ -149,8 +159,10 @@ public class EmployeeDTO implements Validator {
         }
 
         // Validate phone
-        else if (!phone.matches("^\\d{10,15}$")) {
-            errors.rejectValue("phone", "", "Số điện thoại phải không hợp lệ!");
+        if (phone == null || phone.trim().isEmpty()) {
+            errors.rejectValue("phone", "input.null");
+        } else if (!phone.matches("^[0-9]{10,15}$")) {
+            errors.rejectValue("phone", "", "Số điện thoại phải chứa từ 10 đến 15 chữ số!");
         }
 
         // Validate role

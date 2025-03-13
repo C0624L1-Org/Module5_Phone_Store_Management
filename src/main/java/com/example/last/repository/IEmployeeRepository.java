@@ -55,4 +55,11 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
 
     Optional<Employee> findByUsername(String username);
 
+    //Delete
+    @Query(value = "SELECT * FROM employee WHERE employee.id = id", nativeQuery = true)
+    Employee findOneEmployeeById(@Param("id") Integer id);
+
+    @Query(value = "DELETE * FROM employee WHERE employee.id = id", nativeQuery = true)
+    void deleteEmployeeById(@Param("id") Integer id);
+
 }

@@ -115,6 +115,4 @@ public class Customer {
                 ", purchaseCount=" + purchaseCount +
                 '}';
     }
-
 }
-

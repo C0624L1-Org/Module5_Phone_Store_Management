@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Danh sách Khách hàng</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+<!-- Nhúng navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<!-- Sidebar -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<div class="main-content mt-5">
+<table>
+    <tr>
+        <td>
+            <div class="bg-gray-200 py-2 px-4">
+                <h1 class="text-lg font-bold mb-2">Danh sách Khách hàng</h1>
+
+                <div class="flex justify-between items-center border border-gray-300 rounded-full p-2 bg-white">
+                    <!-- Form tìm kiếm -->
+                    <form action="/dashboard/admin/customers/search" method="get" id="search-form" class="flex items-center gap-2">
+                        <select id="search-type" name="search-type" class="border border-gray-300 rounded px-2 py-1">
+                            <option value="name">Tìm Theo Tên</option>
+                            <option value="phone">Tìm Theo Số Điện Thoại</option>
+                            <option value="email">Tìm Theo Email</option>
+                            <option value="gender">Tìm Theo Giới Tính</option>
+                        </select>
+                        <div id="input-container" class="flex-1">
+                            <input type="text" id="search-input" name="keyWord" placeholder="Nhập thông tin tìm kiếm"
+                                   class="border border-gray-300 rounded px-2 py-1 w-full"/>
+                        </div>
+
+                        <button type="submit" id="search-button" class="bg-blue-600 text-white py-1 px-3 rounded-full">
+                            Tìm
+                        </button>
+
+                        <button type="button" id="refresh-button" class="bg-gray-500 text-white py-1 px-3 rounded-full"
+                                onclick="window.location.href='http://localhost:8080/customers'">
+                            Làm mới
+                        </button>
+                    </form>
+
+                    <!-- Nút thêm mới & xóa -->
+                    <form action="/dashboard/admin/customers/delete" method="post" id="delete-form" onsubmit="return validateDelete()"
+                          class="flex items-center gap-2">
+                        <button type="button" class="bg-green-600 text-white py-1 px-3 rounded-full" id="add-button"
+                                onclick="window.location.href='/dashboard/admin/customers/create'">Thêm mới
+                        </button>
+                        <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded-full" id="delete-button">
+                            Xóa
+                        </button>
+                    </form>
+                </div>
+
+                <div class="overflow-y-auto max-h-80 border border-gray-300 rounded">
+                    <table class="min-w-full bg-white border border-gray-300">
+                        <thead class="sticky top-0 bg-white">
+                        <tr>
+                            <th class="border border-gray-300 px-4 py-2">Chọn</th>
+                            <th class="border border-gray-300 px-4 py-2">ID</th>
+                            <th class="border border-gray-300 px-4 py-2">Họ tên</th>
+                            <th class="border border-gray-300 px-4 py-2">Ngày sinh / Tuổi</th>
+                            <th class="border border-gray-300 px-4 py-2">Địa chỉ</th>
+                            <th class="border border-gray-300 px-4 py-2">Số điện thoại</th>
+                            <th class="border border-gray-300 px-4 py-2">Email</th>
+                            <th class="border border-gray-300 px-4 py-2">Giới Tính</th>
+                            <th class="border border-gray-300 px-4 py-2">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="customer-table-body">
+                        <tr th:each="customer : ${customers}">
+                            <td class="border border-gray-300 px-4 py-2">
+                                <input type="checkbox" name="ids" th:value="${customer.customerID}"
+                                       class="customer-checkbox" th:data-name="${customer.fullName}" />
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.customerID}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.fullName}"></td>
+                            <td class="border border-gray-300 px-4 py-3"
+                                th:text="${#dates.format(customer.dob, 'dd-MM-yyyy') + ' ( ' + T(java.time.Period).between(customer.dob.toLocalDate(), T(java.time.LocalDate).now()).getYears() + ' )'}">
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.address}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.phone}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.email}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.gender}"></td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <a th:href="@{/dashboard/admin/customers/edit/{id}(id=${customer.customerID})}"
+                                   class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
+
+
+                            </td>
+
+
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+            </div>
+
+        </td>
+    <tr>
+</table>
+</div>
+
+<!-- Nhúng footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Các script khác -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function validateDelete() {
+        const checkboxes = document.querySelectorAll('input[name="ids"]:checked');
+        if (checkboxes.length === 0) {
+            alert('Vui lòng chọn khách hàng cần xóa');
+            return false; // Ngăn form gửi yêu cầu
+        }
+
+        const customerDetails = Array.from(checkboxes).map(checkbox => {
+            const name = checkbox.getAttribute('data-name');
+            const phone = checkbox.closest('tr').querySelector('td:nth-child(6)').innerText;
+            return `${name} (SĐT: ${phone})`;
+        });
+
+        const customerList = customerDetails.join(', ');
+
+        const confirmationMessage = `Bạn có chắc chắn muốn xóa các khách hàng: ${customerList} không?`;
+        return confirm(confirmationMessage);
+    }
+
+
+    // Thay đổi nội dung ô nhập tùy theo loại tìm kiếm
+    document.getElementById("search-type").addEventListener("change", function () {
+        let inputContainer = document.getElementById("input-container");
+        inputContainer.innerHTML = ""; // Xóa nội dung cũ
+
+        if (this.value === "gender") {
+            // Tạo checkbox
+            inputContainer.innerHTML = `
+                <label><input type="radio" name="keyWord" value="male"> Nam</label>
+                <label><input type="radio" name="keyWord" value="female"> Nữ</label>
+                <label><input type="radio" name="keyWord" value="other"> Khác</label>
+            `;
+        } else {
+            // Trả về ô input text
+            inputContainer.innerHTML = `
+                <input type="text" id="search-input" name="keyWord" placeholder="Nhập thông tin tìm kiếm"
+                       class="border border-gray-300 rounded px-2 py-1"/>
+            `;
+        }
+    });
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
+
+<label>
+
+</label>

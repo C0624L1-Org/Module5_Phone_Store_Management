@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Navbar</title>
+</head>
+<body>
+<!-- Navbar Fragment -->
+<div th:fragment="navbar" class="navbar">
+    <div class="navbar-container">
+        <div class="logo">
+            <a th:href="@{/home}">
+                <img src="/img/fpt_logo.png" alt="Shop Logo">
+            </a>
+            <div class="menu-container">
+                <div class="menu-button">
+                    <i>☰</i>
+                    <span>Danh mục</span>
+                </div>
+                <!-- Dropdown Menu -->
+                <div class="dropdown-menu">
+                    <div class="menu-item">Danh mục 1</div>
+                    <div class="menu-item">Danh mục 2</div>
+                    <div class="menu-item">Danh mục 3</div>
+                    <div class="menu-item">Danh mục 4</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" placeholder="Nhập tên điện thoại, máy tính, phụ kiện... cần tìm">
+            <button>🔍</button>
+        </div>
+
+        <div class="user-actions">
+            <ul>
+                <!-- Đã đăng nhập -->
+                <li sec:authorize="isAuthenticated()"><span class=""><small>Xin chào </small><strong th:text="${loggedEmployee.fullName}"></strong>!</span></li>
+                <li sec:authorize="isAuthenticated()" class="nav-item dropdown">
+                    <a class="d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                        <img th:if="${loggedEmployee != null}"
+                             th:src="${loggedEmployee.avatar}"
+                             alt="avatar"
+                             class="user-avatar">
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><span class="dropdown-item-text"><strong>Chức Năng</strong></span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="menu-item" href="#"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
+<!--                        <li><a class="menu-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng</a></li>-->
+<!--                        <li><a class="menu-item" href="#"><i class="fas fa-history me-2"></i>Lịch sử đơn hàng</a></li>-->
+                        <li><a class="menu-item" href="#"><i class="fas fa-key me-2"></i>Đổi mật khẩu</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="menu-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </li>
+
+                <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+
+                <!-- Chưa đăng nhập -->
+                <li sec:authorize="isAnonymous()" class="nav-item">
+                    <a th:href="@{/login}"><i class="fas fa-sign-in-alt me-2"></i>Đăng nhập</a>
+                </li>
+                <li sec:authorize="isAnonymous()" class="nav-item">
+                    <a th:href="@{/register}" class="btn btn-outline-light">Đăng ký</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="overlay"></div>
+
+<!-- Navbar Script -->
+<script th:fragment="navbar-script">
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuButton = document.querySelector('.menu-button');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        const overlay = document.querySelector('.overlay');
+
+        menuButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+            overlay.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.menu-container')) {
+                dropdownMenu.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        });
+
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+
+    // Kích hoạt dropdown Bootstrap
+    const dropdowns = document.querySelectorAll('.dropdown-toggle');
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('click', function(e) {
+            e.preventDefault();
+            const dropdownMenu = this.nextElementSibling;
+            dropdownMenu.classList.toggle('show');
+        });
+    });
+
+    // Đóng dropdown khi click ra ngoài
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

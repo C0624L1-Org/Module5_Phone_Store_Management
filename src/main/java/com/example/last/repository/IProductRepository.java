@@ -15,6 +15,16 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
 
     @Modifying
     @Transactional
+    @Query(value = "INSERT INTO product (name, purchasePrice, sellingPrice, CPU, storage, " +
+            "screenSize, camera, selfie, detailedDescription, image, stockQuantity," +
+            " qrCode, supplierID) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)", nativeQuery = true)
+    void saveProduct(String name, BigDecimal purchasePrice, BigDecimal sellingPrice, String CPU,
+                     String storage, String screenSize, String camera, String selfie,
+                     String detailedDescription, String image, Integer stockQuantity,
+                     String qrCode, Integer supplierID);
+
+    @Modifying
+    @Transactional
     @Query("UPDATE Product p SET p.name = :name, p.purchasePrice = :purchasePrice,p.sellingPrice=:sellingPrice, p.image = :image, " +
             "p.screenSize = :screenSize, p.camera = :camera, p.selfie = :selfie, " +
             "p.CPU = :cpu, p.storage = :storage, p.detailedDescription = :description " +
