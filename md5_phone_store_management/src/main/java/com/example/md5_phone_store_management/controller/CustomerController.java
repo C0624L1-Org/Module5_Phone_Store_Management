@@ -50,13 +50,12 @@ public class CustomerController {
     }
 
 
-
-@GetMapping("/admin/customers/edit/{id}")
+    @GetMapping("/admin/customers/edit/{id}")
     public String editCustomer(@PathVariable Integer id, Model model) {
         Customer customer = customerService.getCustomerByID(id);
         if (customer == null) {
             model.addAttribute("error", "Khách hàng không tồn tại.");
-            return "redirect:/admin/customers/list";
+            return "redirect:dashboard/admin/customers/list";
         }
         model.addAttribute("customer", customer);
         return "dashboard/admin/customers/update-customer";
@@ -68,7 +67,7 @@ public class CustomerController {
         Customer customerNeedUpdate = customerService.getCustomerByID(customerID);
         if (customerNeedUpdate == null) {
             redirectAttributes.addFlashAttribute("error", "Khách hàng không tồn tại.");
-            return "redirect:/admin/customers/list";
+            return "redirect:dashboard/admin/customers/list";
         }
         BeanUtils.copyProperties(customer, customerNeedUpdate, "customerID");
         boolean isUpdated = customerService.updateCustomer(customerNeedUpdate);
@@ -77,7 +76,7 @@ public class CustomerController {
         } else {
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi cập nhật khách hàng.");
         }
-        return "redirect:/admin/customers/list";
+        return "redirect:dashboard/admin/customers/list";
     }
 
 
