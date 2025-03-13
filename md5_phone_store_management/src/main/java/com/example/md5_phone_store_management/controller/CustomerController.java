@@ -41,39 +41,17 @@ public class CustomerController {
     }
 
     @GetMapping("/admin/customers/search")
-    public String searchCustomers(@RequestParam(required = false) String name,
-                                  @RequestParam(required = false) String phone,
-                                  @RequestParam(required = false) String email,
-                                  @RequestParam(required = false) Integer gender,
+    public String searchCustomers(@RequestParam("search-type") String searchType,
+                                  @RequestParam("keyWord") String keyWord,
                                   Model model) {
-
-        String genderString = "";
-        switch (gender != null ? gender : -1) {
-            case 0:
-                genderString = null;
-                break;
-            case 1:
-                genderString = "Male";
-                break;
-            case 2:
-                genderString = "Female";
-                break;
-            case 3:
-                genderString = "Other";
-                break;
-            default:
-                genderString = null;
-                break;
-        }
-
-        System.out.println("Searching customers with name: " + name + ", phone: " + phone + ", email: " + email + ", gender: " + genderString);
-
-        List<Customer> customers = customerService.searchCustomers(name, phone, email, genderString);
+        List<Customer> customers = customerService.searchCustomers(searchType, keyWord);
         model.addAttribute("customers", customers);
         return "dashboard/admin/customers/list-customer";
     }
 
-    @GetMapping("/admin/customers/edit/{id}")
+
+
+@GetMapping("/admin/customers/edit/{id}")
     public String editCustomer(@PathVariable Integer id, Model model) {
         Customer customer = customerService.getCustomerByID(id);
         if (customer == null) {

@@ -28,116 +28,28 @@ public class CustomerRepository {
     private static final String SEARCH_CUSTOMER_BY_EMAIL = "SELECT * FROM customer WHERE email like ?";
     private static final String SEARCH_CUSTOMER_BY_GENDER = "SELECT * FROM customer WHERE gender = ?";
 
-    private static final String SEARCH_CUSTOMER_BY_NAME_PHONE = "SELECT * FROM customer WHERE full_Name like ? AND phone like ?";
-    private static final String SEARCH_CUSTOMER_BY_NAME_EMAIL = "SELECT * FROM customer WHERE full_Name like ? AND email like ?";
-    private static final String SEARCH_CUSTOMER_BY_NAME_GENDER = "SELECT * FROM customer WHERE full_Name like ? AND gender = ?";
-    private static final String SEARCH_CUSTOMER_BY_PHONE_EMAIL = "SELECT * FROM customer WHERE phone like ? AND email like ?";
-    private static final String SEARCH_CUSTOMER_BY_PHONE_GENDER = "SELECT * FROM customer WHERE phone like ? AND gender = ?";
-    private static final String SEARCH_CUSTOMER_BY_EMAIL_GENDER = "SELECT * FROM customer WHERE email like ? AND gender = ?";
-
-    private static final String SEARCH_CUSTOMER_BY_NAME_PHONE_EMAIL = "SELECT * FROM customer WHERE full_Name like ? AND phone like ? AND email like ?";
-    private static final String SEARCH_CUSTOMER_BY_NAME_PHONE_GENDER = "SELECT * FROM customer WHERE full_Name like ? AND phone like ? AND gender = ?";
-    private static final String SEARCH_CUSTOMER_BY_NAME_EMAIL_GENDER = "SELECT * FROM customer WHERE full_Name like ? AND email like ? AND gender = ?";
-    private static final String SEARCH_CUSTOMER_BY_PHONE_EMAIL_GENDER = "SELECT * FROM customer WHERE phone like ? AND email like ? AND gender = ?";
-
-    private static final String SEARCH_CUSTOMER_BY_NAME_PHONE_EMAIL_GENDER = "SELECT * FROM customer WHERE full_Name like ? AND phone like ? AND email like ? AND gender = ?";
-
-
-    public List<Customer> searchCustomers(String name, String phone, String email, String gender) {
+    //    searchCustomers(searchType, keyWord);
+    public List<Customer> searchCustomers(String searchType, String keyWord) {
         List<Object> params = new ArrayList<>();
         String sql = "";
-
-        if (name != null && !name.isEmpty() &&
-                phone != null && !phone.isEmpty() &&
-                email != null && !email.isEmpty() &&
-                gender != null && !gender.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME_PHONE_EMAIL_GENDER;
-            params.add("%"+name+"%");
-            params.add("%"+phone+"%");
-            params.add("%"+email+"%");
-            params.add(gender);
-        }
-        // Check for 3 parameters
-        else if (name != null && !name.isEmpty() &&
-                phone != null && !phone.isEmpty() &&
-                email != null && !email.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME_PHONE_EMAIL;
-            params.add("%"+name+"%");
-            params.add("%"+phone+"%");
-            params.add("%"+email+"%");
-        } else if (name != null && !name.isEmpty() &&
-                phone != null && !phone.isEmpty() &&
-                gender != null && !gender.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME_PHONE_GENDER;
-            params.add("%"+name+"%");
-            params.add("%"+phone+"%");
-            params.add(gender);
-        } else if (name != null && !name.isEmpty() &&
-                email != null && !email.isEmpty() &&
-                gender != null && !gender.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME_EMAIL_GENDER;
-            params.add("%"+name+"%");
-            params.add("%"+email+"%");
-            params.add(gender);
-        } else if (phone != null && !phone.isEmpty() &&
-                email != null && !email.isEmpty() &&
-                gender != null && !gender.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_PHONE_EMAIL_GENDER;
-            params.add("%"+phone+"%");
-            params.add("%"+email+"%");
-            params.add(gender);
-        }
-        // Check for 2 parameters
-        else if (name != null && !name.isEmpty() &&
-                phone != null && !phone.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME_PHONE;
-            params.add("%"+name+"%");
-            params.add("%"+phone+"%");
-        } else if (name != null && !name.isEmpty() &&
-                email != null && !email.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME_EMAIL;
-            params.add("%"+name+"%");
-            params.add("%"+email+"%");
-        } else if (name != null && !name.isEmpty() &&
-                gender != null && !gender.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_NAME_GENDER;
-            params.add("%"+name+"%");
-            params.add(gender);
-        } else if (phone != null && !phone.isEmpty() &&
-                email != null && !email.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_PHONE_EMAIL;
-            params.add("%"+phone+"%");
-            params.add("%"+email+"%");
-        } else if (phone != null && !phone.isEmpty() &&
-                gender != null && !gender.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_PHONE_GENDER;
-            params.add("%"+phone+"%");
-            params.add(gender);
-        } else if (email != null && !email.isEmpty() &&
-                gender != null && !gender.isEmpty()) {
-            sql = SEARCH_CUSTOMER_BY_EMAIL_GENDER;
-            params.add("%"+email+"%");
-            params.add(gender);
-        }
-        // Check for single parameters
-        else if (name != null && !name.isEmpty()) {
+        if (searchType.equals("name")) {
             sql = SEARCH_CUSTOMER_BY_NAME;
-            params.add("%" + name + "%");
-        } else if (phone != null && !phone.isEmpty()) {
+            params.add("%" + keyWord + "%");
+        } else if (searchType.equals("phone")) {
             sql = SEARCH_CUSTOMER_BY_PHONE;
-            params.add("%" + phone + "%");
-        } else if (email != null && !email.isEmpty()) {
+            params.add("%" + keyWord + "%");
+        } else if (searchType.equals("email")) {
             sql = SEARCH_CUSTOMER_BY_EMAIL;
-            params.add("%" + email + "%");
-        } else if (gender != null && !gender.isEmpty()) {
+            params.add("%" + keyWord + "%");
+        } else if (searchType.equals("gender")) {
             sql = SEARCH_CUSTOMER_BY_GENDER;
-            params.add(gender);
+            params.add(keyWord);
         } else {
             sql = "SELECT * FROM customer";
         }
-
         return jdbcTemplate.query(sql, params.toArray(), new CustomerRowMapper());
     }
+
 
     public void deleteCustomer(List<Integer> customerIDs) {
         jdbcTemplate.batchUpdate(DELETE_CUSTOMERS_BY_IDS, new BatchPreparedStatementSetter() {
