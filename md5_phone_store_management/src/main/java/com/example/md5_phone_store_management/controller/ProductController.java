@@ -1,6 +1,7 @@
 package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.Product;
+import com.example.md5_phone_store_management.model.Role;
 import com.example.md5_phone_store_management.model.Supplier;
 import com.example.md5_phone_store_management.model.dto.ProductDTO;
 import com.example.md5_phone_store_management.service.implement.ProductService;
@@ -15,7 +16,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/dashboard/products")
@@ -51,15 +55,21 @@ public class ProductController {
         model.addAttribute("supplier",supplierService.getSupplierList());
         return "dashboard/product/create-product-form";
     }
+
     @PostMapping("/add-product")
-    public String addProduct(@Valid@ModelAttribute("productDTO") ProductDTO productDTO,
-                             BindingResult biResult,RedirectAttributes redirectAttr , Model model) {
+    public String addProduct(@Valid @ModelAttribute("productDTO") ProductDTO productDTO,
+                             BindingResult biResult,
+                             @RequestParam(value = "imgProducts", required = false) List<MultipartFile> imgProducts,
+                             RedirectAttributes redirectAttr,
+                             Model model) {
         if (biResult.hasErrors()) {
-            model.addAttribute("supplier",supplierService.getSupplierList());
+            model.addAttribute("supplier", supplierService.getSupplierList());
             return "dashboard/product/create-product-form";
         }
+
         Product product = new Product();
         BeanUtils.copyProperties(productDTO, product);
+
         Supplier supplier = supplierService.getSupplier(productDTO.getSupplierID());
         if (supplier == null) {
             model.addAttribute("error", "Nhà cung cấp không hợp lệ!");
@@ -67,8 +77,32 @@ public class ProductController {
             return "dashboard/product/create-product-form";
         }
         product.setSupplier(supplier);
-        productService.saveProduct(product);
-        redirectAttr.addFlashAttribute("message","Đã Thêm mới thành công");
-        return "redirect:/dashboard/products";
+
+        // Nếu có file ảnh được upload
+        if (imgProducts != null && !imgProducts.isEmpty()) {
+            for (MultipartFile file : imgProducts) {
+                if (file.getSize() > 10 * 1024 * 1024) { // 10MB
+                    redirectAttr.addFlashAttribute("messageType", "error");
+                    redirectAttr.addFlashAttribute("message", "Kích thước ảnh quá lớn!");
+                    return "redirect:/dashboard/admin/products/add-product";
+                }
+                if (!file.getContentType().startsWith("image/")) {
+                    redirectAttr.addFlashAttribute("messageType", "error");
+                    redirectAttr.addFlashAttribute("message", "Định dạng ảnh không hợp lệ!");
+                    return "redirect:/dashboard/admin/products/add-product";
+                }
+            }
+            // Lưu kèm danh sách ảnh
+            productService.saveProductWithImg(product, imgProducts);
+        } else {
+            // Không có file upload nào, chỉ lưu sản phẩm
+            productService.saveProduct(product);
+        }
+
+        redirectAttr.addFlashAttribute("messageType", "success");
+        redirectAttr.addFlashAttribute("message", "Đã Thêm mới thành công!");
+        return "redirect:/dashboard/products/list";
     }
+
+
 }
