@@ -29,7 +29,9 @@
     </div>
     <div class="card-body">
       <form th:action="@{/dashboard/products/add-product}" method="post"
-            th:object="${productDTO}" enctype="multipart/form-data">
+            th:object="${productDTO}"
+            enctype="multipart/form-data">
+
         <div class="mb-3">
           <label for="name" class="form-label">Tên sản phẩm</label>
           <input type="text" th:field="*{name}" id="name" class="form-control" placeholder="Nhập tên sản phẩm">
@@ -84,9 +86,11 @@
 
         <!-- Hình ảnh sản phẩm -->
         <div class="mb-3">
-          <label class="form-label">Hình ảnh (URL)</label>
-          <input type="text" class="form-control" th:field="*{image}">
+          <label for="imgProducts" class="form-label">Chọn hình ảnh sản phẩm</label>
+          <input type="file" class="form-control" id="imgProducts" name="imgProducts" multiple>
+<!--          <p class="text-danger small" th:if="${#fields.hasErrors('imgProducts')}" th:text="${#fields.errors('imgProducts')[0]}"></p>-->
         </div>
+
         <!-- Số lượng tồn kho -->
         <div class="mb-3">
           <label for="stockQuantity" class="form-label">Số lượng tồn kho</label>
@@ -110,7 +114,8 @@
         </div>
 
         <button type="submit" class="btn btn-success">Thêm sản phẩm</button>
-        <a href="/dashboard/products" class="btn btn-secondary">Hủy</a>
+
+        <a href="/dashboard/products/list" class="btn btn-secondary">Hủy</a>
       </form>
     </div>
   </div>
