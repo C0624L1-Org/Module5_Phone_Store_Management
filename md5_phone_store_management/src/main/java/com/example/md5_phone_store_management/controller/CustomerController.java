@@ -37,8 +37,9 @@ public class CustomerController {
                                  RedirectAttributes redirectAttributes) {
         customerService.addNewCustomer(customer);
         redirectAttributes.addFlashAttribute("message", "Thêm khách hàng thành công.");
-        return "redirect:/admin/customers/list";
+        return "redirect:/dashboard/admin/customers/list";
     }
+
 
     @GetMapping("/admin/customers/search")
     public String searchCustomers(@RequestParam("search-type") String searchType,
@@ -67,7 +68,7 @@ public class CustomerController {
         Customer customerNeedUpdate = customerService.getCustomerByID(customerID);
         if (customerNeedUpdate == null) {
             redirectAttributes.addFlashAttribute("error", "Khách hàng không tồn tại.");
-            return "redirect:dashboard/admin/customers/list";
+            return "redirect:/dashboard/admin/customers/list";
         }
         BeanUtils.copyProperties(customer, customerNeedUpdate, "customerID");
         boolean isUpdated = customerService.updateCustomer(customerNeedUpdate);
@@ -76,7 +77,7 @@ public class CustomerController {
         } else {
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi cập nhật khách hàng.");
         }
-        return "redirect:dashboard/admin/customers/list";
+        return "redirect:/dashboard/admin/customers/list";
     }
 
 
@@ -85,6 +86,9 @@ public class CustomerController {
         for (Integer customerID : ids) {
             customerService.deleteCustomer(Collections.singletonList(customerID));
         }
-        return "redirect:/admin/customers/list";
+        System.out.println("đã chạy qua pt xóa ");
+        return "redirect:/dashboard/admin/customers/list";
     }
+
+
 }

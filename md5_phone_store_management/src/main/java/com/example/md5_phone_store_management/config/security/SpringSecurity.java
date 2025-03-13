@@ -38,6 +38,8 @@ public class SpringSecurity {
         http
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/clear-session")
+//                        thêm tạm để check sao nó reject request
+//                        .ignoringRequestMatchers("/clear-session", "/admin/customers/delete")
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login",
@@ -49,19 +51,18 @@ public class SpringSecurity {
                                 "/",
                                 "/register",
                                 "/clear-session").permitAll()
-                                .requestMatchers("/dashboard/admin/**").hasRole("Admin")
-                                .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")
-//                              .requestMatchers("/home/**").hasAnyRole( "ADMIN")
-                                .anyRequest().authenticated()
+                        .requestMatchers("/dashboard/admin/**").hasRole("Admin")
+                        .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                                .loginPage("/login")
-                                .usernameParameter("username")
-                                .passwordParameter("password")
-                                .loginProcessingUrl("/perform_login")
-                                .successHandler(customAuthenticationSuccessHandler)
-                                .failureHandler(customAuthenticationFailureHandler)
-                                .permitAll()
+                        .loginPage("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .loginProcessingUrl("/perform_login")
+                        .successHandler(customAuthenticationSuccessHandler)
+                        .failureHandler(customAuthenticationFailureHandler)
+                        .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
