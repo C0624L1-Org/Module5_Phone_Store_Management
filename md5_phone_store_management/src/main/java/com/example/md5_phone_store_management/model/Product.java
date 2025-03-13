@@ -18,22 +18,41 @@ public class Product {
     private BigDecimal purchasePrice;
     @Column(nullable = false)
     private BigDecimal sellingPrice;
+    @Column(nullable = false)
+    private BigDecimal retailPrice;
     private String CPU;
     private String storage;
     private String screenSize;
     private String camera;
     private String selfie;
-
     @Lob
     private String detailedDescription;
-
     private String image;
     private Integer stockQuantity;
     private String qrCode;
-
     @ManyToOne
     @JoinColumn(name = "supplierID", foreignKey = @ForeignKey(name = "FK_product_supplier"))
     private Supplier supplier;
+
+    public Product() {}
+
+    public Product(Integer productID, String name, BigDecimal purchasePrice, BigDecimal sellingPrice, BigDecimal retailPrice, String CPU, String storage, String screenSize, String camera, String selfie, String detailedDescription, String image, Integer stockQuantity, String qrCode, Supplier supplier) {
+        this.productID = productID;
+        this.name = name;
+        this.purchasePrice = purchasePrice;
+        this.sellingPrice = sellingPrice;
+        this.retailPrice = retailPrice;
+        this.CPU = CPU;
+        this.storage = storage;
+        this.screenSize = screenSize;
+        this.camera = camera;
+        this.selfie = selfie;
+        this.detailedDescription = detailedDescription;
+        this.image = image;
+        this.stockQuantity = stockQuantity;
+        this.qrCode = qrCode;
+        this.supplier = supplier;
+    }
 
     public Integer getProductID() {
         return productID;
@@ -145,5 +164,13 @@ public class Product {
 
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
     }
 }

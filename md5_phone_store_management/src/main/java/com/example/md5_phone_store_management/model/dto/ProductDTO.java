@@ -17,8 +17,12 @@ public class ProductDTO {
     private BigDecimal purchasePrice;
 
     @NotNull(message = "Giá bán không được để trống")
-    @DecimalMin(value = "10000", message = "Giá nhập phải lớn hơn 10.000")
+    @DecimalMin(value = "10000", message = "Giá bán phải lớn hơn 10.000")
     private BigDecimal sellingPrice;
+
+    @NotNull(message = "Giá bán lẻ không được để trống")
+    @DecimalMin(value = "10000", message = "Giá bán lẻ phải lớn hơn 10.000")
+    private BigDecimal retailPrice;
 
     private String CPU;
     @Pattern(regexp = "^[1-9]\\d*(MB|GB|TB)$",
@@ -149,5 +153,13 @@ public class ProductDTO {
 
     public void setSupplierID(Integer supplierID) {
         this.supplierID = supplierID;
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
     }
 }
