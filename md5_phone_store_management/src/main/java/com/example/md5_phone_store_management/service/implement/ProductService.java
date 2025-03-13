@@ -59,7 +59,7 @@ public class ProductService implements IProductService {
             // Gán danh sách ảnh đã tạo vào product
             product.setImages(productImages);
         }
-        // Lưu sản phẩm không có ảnh)
+        // Lưu sản phẩm không có ảnh
         productRepository.save(product);
     }
 

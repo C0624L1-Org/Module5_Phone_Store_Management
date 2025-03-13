@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Integer> {
 
-    // Đình Anh: Sửa lại truy vấn INSERT, loại bỏ trường image
+    // Đình Anh: Sửa lại truy vấn INSERT, bỏ trường image
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO product (name, purchasePrice, sellingPrice, CPU, storage, " +
