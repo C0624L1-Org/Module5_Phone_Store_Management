@@ -38,8 +38,6 @@ public class SpringSecurity {
         http
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/clear-session")
-//                        thêm tạm để check sao nó reject request
-//                        .ignoringRequestMatchers("/clear-session", "/admin/customers/delete")
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login",

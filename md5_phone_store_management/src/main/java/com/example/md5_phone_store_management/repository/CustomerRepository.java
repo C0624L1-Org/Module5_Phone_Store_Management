@@ -2,6 +2,7 @@ package com.example.md5_phone_store_management.repository;
 
 import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Gender;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,12 +19,12 @@ public class CustomerRepository {
     private final JdbcTemplate jdbcTemplate;
 
     private static final String SELECT_ALL_CUSTOMERS = "SELECT * FROM customer";
-    private static final String UPDATE_CUSTOMER = "UPDATE customer SET full_Name = ?, phone = ?, address = ?, email = ?, dob = ?, gender = ? WHERE customerID = ?";
+    private static final String UPDATE_CUSTOMER = "UPDATE customer SET full_name = ?, phone = ?, address = ?, email = ?, dob = ?, gender = ? WHERE customerID = ?";
     private static final String DELETE_CUSTOMERS_BY_IDS = "DELETE FROM customer WHERE customerID = ?";
     private static final String SELECT_CUSTOMER_BY_ID = "SELECT * FROM customer WHERE customerID = ?";
-    private static final String INSERT_CUSTOMER = "INSERT INTO customer (full_Name, phone, address, email, dob, gender, purchase_count) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_CUSTOMER = "INSERT INTO customer (full_name, phone, address, email, dob, gender, purchase_count) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SEARCH_CUSTOMER_BY_NAME = "SELECT * FROM customer WHERE full_Name like ?";
+    private static final String SEARCH_CUSTOMER_BY_NAME = "SELECT * FROM customer WHERE full_name like ?";
     private static final String SEARCH_CUSTOMER_BY_PHONE = "SELECT * FROM customer WHERE phone like ?";
     private static final String SEARCH_CUSTOMER_BY_EMAIL = "SELECT * FROM customer WHERE email like ?";
     private static final String SEARCH_CUSTOMER_BY_GENDER = "SELECT * FROM customer WHERE gender = ?";
@@ -98,7 +99,7 @@ public class CustomerRepository {
         public Customer mapRow(ResultSet rs, int rowNum) throws SQLException {
             Customer customer = new Customer();
             customer.setCustomerID(rs.getInt("customerID"));
-            customer.setFullName(rs.getString("full_Name"));
+            customer.setFullName(rs.getString("full_name"));
             customer.setPhone(rs.getString("phone"));
             customer.setAddress(rs.getString("address"));
             customer.setEmail(rs.getString("email"));

@@ -3,6 +3,7 @@ package com.example.md5_phone_store_management.model;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -25,30 +26,35 @@ public class Product {
     private String screenSize;
     private String camera;
     private String selfie;
+
     @Lob
     private String detailedDescription;
-    private String image;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images;
+
     private Integer stockQuantity;
     private String qrCode;
+
     @ManyToOne
     @JoinColumn(name = "supplierID", foreignKey = @ForeignKey(name = "FK_product_supplier"))
     private Supplier supplier;
 
-    public Product() {}
+    public Product() {
+    }
 
-    public Product(Integer productID, String name, BigDecimal purchasePrice, BigDecimal sellingPrice, BigDecimal retailPrice, String CPU, String storage, String screenSize, String camera, String selfie, String detailedDescription, String image, Integer stockQuantity, String qrCode, Supplier supplier) {
+    public Product(Integer productID, String name, BigDecimal purchasePrice, BigDecimal sellingPrice, String CPU, String storage, String screenSize, String camera, String selfie, String detailedDescription, List<ProductImage> images, Integer stockQuantity, String qrCode, Supplier supplier) {
         this.productID = productID;
         this.name = name;
         this.purchasePrice = purchasePrice;
         this.sellingPrice = sellingPrice;
-        this.retailPrice = retailPrice;
         this.CPU = CPU;
         this.storage = storage;
         this.screenSize = screenSize;
         this.camera = camera;
         this.selfie = selfie;
         this.detailedDescription = detailedDescription;
-        this.image = image;
+        this.images = images;
         this.stockQuantity = stockQuantity;
         this.qrCode = qrCode;
         this.supplier = supplier;
@@ -134,12 +140,12 @@ public class Product {
         this.detailedDescription = detailedDescription;
     }
 
-    public String getImage() {
-        return image;
+    public List<ProductImage> getImages() {
+        return images;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImages(List<ProductImage> images) {
+        this.images = images;
     }
 
     public Integer getStockQuantity() {
