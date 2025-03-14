@@ -48,6 +48,10 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
+    public Customer addNewCustomerAjax(Customer customer) {
+       return customerRepository.saveAjax(customer);
+    }
+
 
     public List<Customer> searchCustomers(String searchType, String keyWord) {
         return customerRepository.searchCustomers(searchType, keyWord);

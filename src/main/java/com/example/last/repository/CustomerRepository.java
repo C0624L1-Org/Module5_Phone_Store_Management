@@ -28,6 +28,18 @@ public class CustomerRepository {
     private static final String SEARCH_CUSTOMER_BY_EMAIL = "SELECT * FROM customer WHERE email like ?";
     private static final String SEARCH_CUSTOMER_BY_GENDER = "SELECT * FROM customer WHERE gender = ?";
 
+    public Customer saveAjax(Customer customer) {
+        jdbcTemplate.update(INSERT_CUSTOMER, customer.getFullName(), customer.getPhone(), customer.getAddress(), customer.getEmail(), customer.getDob(), customer.getGender().name(), customer.getPurchaseCount());
+        // Lấy ID của khách hàng vừa được thêm (nếu có)
+        // Giả sử bạn có một cách để lấy ID của khách hàng vừa thêm, ví dụ như sử dụng một truy vấn để lấy khách hàng mới nhất
+        // Hoặc bạn có thể thay đổi cách lưu để trả về ID của khách hàng mới
+        Integer newCustomerId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+        customer.setCustomerID(newCustomerId);
+        return customer;
+    }
+
+
+
     //    searchCustomers(searchType, keyWord);
     public List<Customer> searchCustomers(String searchType, String keyWord) {
         List<Object> params = new ArrayList<>();
@@ -90,6 +102,7 @@ public class CustomerRepository {
             jdbcTemplate.update(INSERT_CUSTOMER, customer.getFullName(), customer.getPhone(), customer.getAddress(), customer.getEmail(), customer.getDob(), customer.getGender().name(), customer.getPurchaseCount());
         }
     }
+
 
 
     //  ánh xạ kết quả từ ResultSet to obj Customer

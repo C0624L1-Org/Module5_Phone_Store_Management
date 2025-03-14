@@ -4,13 +4,16 @@ import com.example.last.model.Customer;
 import com.example.last.service.CustomerService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/dashboard")
@@ -36,19 +39,34 @@ public class CustomerController {
         return "dashboard/admin/customers/list-customer";
     }
 
-    @GetMapping("/admin/customers/create")
-    public String showAddCustomerForm(Model model) {
-        model.addAttribute("customer", new Customer());
-        return "dashboard/admin/customers/create-customer";
-    }
 
     @PostMapping("/admin/customers/create")
-    public String createCustomer(@ModelAttribute Customer customer,
-                                 RedirectAttributes redirectAttributes) {
-        customerService.addNewCustomer(customer);
-        redirectAttributes.addFlashAttribute("message", "Thêm khách hàng thành công.");
-        return "redirect:/dashboard/admin/customers/list";
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> createCustomer(@ModelAttribute Customer customer) {
+        // Lưu khách hàng vào cơ sở dữ liệu
+        Customer savedCustomer = customerService.addNewCustomerAjax(customer);
+
+        // Chuẩn bị phản hồi
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("customer", savedCustomer); // Bao gồm dữ liệu khách hàng đã lưu
+
+        return ResponseEntity.ok(response);
     }
+
+//    @GetMapping("/admin/customers/create")
+//    public String showAddCustomerForm(Model model) {
+//        model.addAttribute("customer", new Customer());
+//        return "dashboard/admin/customers/create-customer";
+//    }
+//
+//    @PostMapping("/admin/customers/create")
+//    public String createCustomer(@ModelAttribute Customer customer,
+//                                 RedirectAttributes redirectAttributes) {
+//        customerService.addNewCustomer(customer);
+//        redirectAttributes.addFlashAttribute("message", "Thêm khách hàng thành công.");
+//        return "redirect:/dashboard/admin/customers/list";
+//    }
 
 
     @GetMapping("/admin/customers/search")

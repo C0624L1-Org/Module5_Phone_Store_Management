@@ -59,8 +59,8 @@
                     <form th:action="@{/dashboard/admin/customers/delete}" method="post" id="delete-form" onsubmit="return validateDelete()"
                           class="flex items-center gap-2">
                         <input type="hidden" name="ids" id="ids" />
-                        <button type="button" class="bg-green-600 text-white py-1 px-3 rounded-full" id="add-button"
-                                onclick="window.location.href='/dashboard/admin/customers/create'">Thêm mới
+                        <button type="button" class="bg-green-600 text-white py-1 px-3 rounded-full" id="add-button" onclick="showAddCustomerForm()">
+                            Thêm mới
                         </button>
                         <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded-full" id="delete-button">
                             Xóa
@@ -153,8 +153,6 @@
         return confirm(confirmationMessage);
     }
 
-
-    // Thay đổi nội dung ô nhập tùy theo loại tìm kiếm
     document.getElementById("search-type").addEventListener("change", function () {
         let inputContainer = document.getElementById("input-container");
         inputContainer.innerHTML = ""; // Xóa nội dung cũ
@@ -184,6 +182,97 @@
 
 
 </script>
+
+
+
+
+<form id="add-customer-form" th:action="@{/dashboard/admin/customers/create}" method="post" style="display: none;">
+    <div>
+        <label for="full-name">Họ tên:</label>
+        <input type="text" id="full-name" name="fullName" class="border border-gray-300 rounded px-2 py-1" required/>
+    </div>
+    <div>
+        <label for="dob">Ngày sinh:</label>
+        <input type="date" id="dob" name="dob" class="border border-gray-300 rounded px-2 py-1" required/>
+    </div>
+    <div>
+        <label for="phone">Số điện thoại:</label>
+        <input type="text" id="phone" name="phone" class="border border-gray-300 rounded px-2 py-1" required/>
+    </div>
+    <div>
+        <label for="address">Địa chỉ:</label>
+        <input type="text" id="address" name="address" class="border border-gray-300 rounded px-2 py-1"/>
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" class="border border-gray-300 rounded px-2 py-1" required/>
+    </div>
+    <div>
+        <label for="gender">Giới tính:</label>
+        <select id="gender" name="gender" class="border border-gray-300 rounded px-2 py-1">
+            <option value="Male">Nam</option>
+            <option value="Female">Nữ</option>
+            <option value="Other">Khác</option>
+        </select>
+    </div>
+    <input type="hidden" name="purchaseCount" value="0"/>
+    <button type="submit" class="bg-blue-600 text-white py-1 px-2 rounded">Thêm mới</button>
+</form>
+
+<script>
+    function showAddCustomerForm() {
+
+        document.getElementById('add-customer-form').style.display = 'block';
+    }
+</script>
+
+<script>
+    document.getElementById('add-customer-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Ngăn chặn hành động gửi form mặc định
+
+        const formData = new FormData(this); // Lấy dữ liệu từ form
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Giả sử phản hồi chứa dữ liệu khách hàng mới
+                    const customer = data.customer;
+
+                    // Cập nhật danh sách khách hàng trong trang chính
+                    const customerTableBody = document.getElementById('customer-table-body');
+                    const newRow = `
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2">
+                            <input type="checkbox" name="ids" value="${customer.customerID}" class="customer-checkbox" data-name="${customer.fullName}" />
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2">${customer.customerID}</td>
+                        <td class="border border-gray-300 px-4 py-2">${customer.fullName}</td>
+                        <td class="border border-gray-300 px-4 py-3">${customer.dob} (Tuổi: ${customer.age})</td>
+                        <td class="border border-gray-300 px-4 py-2">${customer.address}</td>
+                        <td class="border border-gray-300 px-4 py-2">${customer.phone}</td>
+                        <td class="border border-gray-300 px-4 py-2">${customer.email}</td>
+                        <td class="border border-gray-300 px-4 py-2">${customer.gender}</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            <a href="/dashboard/admin/customers/edit/${customer.customerID}" class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
+                        </td>
+                    </tr>
+                `;
+                    customerTableBody.insertAdjacentHTML('beforeend', newRow); // Thêm hàng mới vào bảng
+
+                    // Tùy chọn: Đặt lại form
+                    this.reset();
+                } else {
+                    alert('Lỗi khi thêm khách hàng: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Lỗi:', error));
+    });
+</script>
+
 </body>
 </html>
 
