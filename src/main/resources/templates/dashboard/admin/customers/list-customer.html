@@ -4,7 +4,6 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Danh sách Khách hàng</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/dashboard/dashboard.css">
@@ -35,6 +34,12 @@
             max-width: 500px;
             width: 100%;
         }
+
+        #search-form {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -44,58 +49,51 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 <!-- Sidebar -->
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
 <div class="main-content mt-5">
     <table>
         <tr>
             <td>
                 <div class="bg-gray-200 py-2 px-4">
                     <h1 class="text-lg font-bold mb-2">Danh sách Khách hàng</h1>
-
-                    <div class="flex justify-between items-center border border-gray-300 rounded-full p-2 bg-white">
-                        <!-- Form tìm kiếm -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-radius: 9999px; padding: 0.5rem; background-color: white; width: 100%; white-space: nowrap;">
                         <form action="/dashboard/admin/customers/search" method="get" id="search-form"
-                              class="flex items-center gap-2">
+                              style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
                             <select id="search-type" name="search-type"
-                                    class="border border-gray-300 rounded px-2 py-1">
+                                    style="border-radius: 0.25rem; padding: 0.25rem 0.5rem; flex-shrink: 0;">
                                 <option value="name">Tìm Theo Tên</option>
                                 <option value="phone">Tìm Theo Số Điện Thoại</option>
                                 <option value="email">Tìm Theo Email</option>
                                 <option value="gender">Tìm Theo Giới Tính</option>
                             </select>
-                            <div id="input-container" class="flex-1">
-                                <input type="text" id="search-input" name="keyWord"
-                                       placeholder="Nhập thông tin tìm kiếm"
-                                       class="border border-gray-300 rounded px-2 py-1 w-full"/>
-                            </div>
-
+                            <input type="text" id="search-input" name="keyWord" placeholder="Nhập thông tin tìm kiếm"
+                                   style="border-radius: 0.25rem; padding: 0.25rem 0.5rem; flex-grow: 1; min-width: 0;"/>
                             <button type="submit" id="search-button"
-                                    class="bg-blue-600 text-white py-1 px-3 rounded-full">
+                                    style="background-color: #3B82F6; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; flex-shrink: 0;">
                                 Tìm
                             </button>
-
+                        </form>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
                             <button type="button" id="refresh-button"
-                                    class="bg-gray-500 text-white py-1 px-3 rounded-full"
-                                    onclick="window.location.href='http://localhost:8080/customers'">
+                                    style="background-color: #6B7280; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; margin-left: 40rem;"
+                                    onclick="window.location.href='/dashboard/admin/customers/list'">
                                 Làm mới
                             </button>
-                        </form>
-
-
-                        <form th:action="@{/dashboard/admin/customers/delete}" method="post" id="delete-form"
-                              onsubmit="return validateDelete()"
-                              class="flex items-center gap-2">
-                            <input type="hidden" name="ids" id="ids"/>
                             <button type="button" class="bg-green-600 text-white py-1 px-3 rounded-full" id="add-button"
-                                    onclick="showAddCustomerForm()">
+                                    onclick="showAddCustomerForm()"
+                                    style="background-color: #22C55E; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px;">
                                 Thêm mới
                             </button>
-                            <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded-full"
-                                    id="delete-button">
-                                Xóa
-                            </button>
-                        </form>
+                            <form action="/dashboard/admin/customers/delete" method="post" id="delete-form"
+                                  onsubmit="return validateDelete()" style="flex-shrink: 0;">
+                                <input type="hidden" name="ids" id="ids"/>
+                                <button type="submit"
+                                        style="background-color: #EF4444; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px;"
+                                        id="delete-button">Xóa
+                                </button>
+                            </form>
+                        </div>
                     </div>
+
 
                     <div class="overflow-y-auto max-h-80 border border-gray-300 rounded">
                         <table class="min-w-full bg-white border border-gray-300">
@@ -129,62 +127,49 @@
                                 <td class="border border-gray-300 px-4 py-2" th:text="${customer.gender}"></td>
                                 <td class="border border-gray-300 px-4 py-2">
                                     <a th:href="@{/dashboard/admin/customers/edit/{id}(id=${customer.customerID})}"
-                                       class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
-
-
+                                       class="text-white rounded-full"
+                                       style="background-color: #F59E0B; border: 1px solid black; text-decoration: none; padding: 0.5rem 1rem; display: inline-block; border-radius: 9999px;">
+                                        Sửa
+                                    </a>
                                 </td>
-
-
                             </tr>
                             </tbody>
                         </table>
                     </div>
-
-
                 </div>
-
             </td>
-        <tr>
+        </tr>
     </table>
 </div>
-
 <!-- Nhúng footer -->
 <div th:replace="~{fragments/footer :: footer}"></div>
-
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
-
 <!-- Các script khác -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-
     function validateDelete() {
         const checkboxes = document.querySelectorAll('input[name="ids"]:checked');
         if (checkboxes.length === 0) {
             alert('Vui lòng chọn khách hàng cần xóa');
             return false; // Ngăn form gửi yêu cầu
         }
-
         const ids = Array.from(checkboxes).map(checkbox => checkbox.value);
         document.getElementById('ids').value = ids.join(','); // Gán giá trị vào trường ẩn
-
         const customerDetails = Array.from(checkboxes).map(checkbox => {
             const name = checkbox.getAttribute('data-name');
             const phone = checkbox.closest('tr').querySelector('td:nth-child(6)').innerText;
             return `${name} (SĐT: ${phone})`;
         });
-
         const customerList = customerDetails.join(', ');
-
         const confirmationMessage = `Bạn có chắc chắn muốn xóa các khách hàng: ${customerList} không?`;
         return confirm(confirmationMessage);
     }
 
+    // Đổi sreach theo box hoặc string
     document.getElementById("search-type").addEventListener("change", function () {
         let inputContainer = document.getElementById("input-container");
         inputContainer.innerHTML = ""; // Xóa nội dung cũ
-
         if (this.value === "gender") {
             // Tạo checkbox
             inputContainer.innerHTML = `
@@ -200,8 +185,6 @@
             `;
         }
     });
-
-
 </script>
 
 <!-- Modal Thêm Khách Hàng -->
@@ -216,33 +199,33 @@
             </div>
             <div class="modal-body">
                 <form id="add-customer-form" th:action="@{/dashboard/admin/customers/create}" method="post">
-                    <div>
-                        <label for="full-name">Họ tên:</label>
+                    <div class="mb-4">
+                        <label for="full-name" class="block text-sm font-medium text-gray-700">Họ tên:</label><br>
                         <input type="text" id="full-name" name="fullName"
                                class="border border-gray-300 rounded px-2 py-1" required/>
                     </div>
-                    <div>
-                        <label for="dob">Ngày sinh:</label>
+                    <div class="mb-4">
+                        <label for="dob" class="block text-sm font-medium text-gray-700">Ngày sinh:</label><br>
                         <input type="date" id="dob" name="dob" class="border border-gray-300 rounded px-2 py-1"
                                required/>
                     </div>
-                    <div>
-                        <label for="phone">Số điện thoại:</label>
+                    <div class="mb-4">
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Số điện thoại:</label><br>
                         <input type="text" id="phone" name="phone" class="border border-gray-300 rounded px-2 py-1"
                                required/>
                     </div>
-                    <div>
-                        <label for="address">Địa chỉ:</label>
+                    <div class="mb-4">
+                        <label for="address" class="block text-sm font-medium text-gray-700">Địa chỉ:</label><br>
                         <input type="text" id="address" name="address"
                                class="border border-gray-300 rounded px-2 py-1"/>
                     </div>
-                    <div>
-                        <label for="email">Email:</label>
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email:</label><br>
                         <input type="email" id="email" name="email" class="border border-gray-300 rounded px-2 py-1"
                                required/>
                     </div>
-                    <div>
-                        <label for="gender">Giới tính:</label>
+                    <div class="mb-4">
+                        <label for="gender" class="block text-sm font-medium text-gray-700">Giới tính:</label><br>
                         <select id="gender" name="gender" class="border border-gray-300 rounded px-2 py-1">
                             <option value="Male">Nam</option>
                             <option value="Female">Nữ</option>
@@ -250,7 +233,9 @@
                         </select>
                     </div>
                     <input type="hidden" name="purchaseCount" value="0"/>
-                    <button type="submit" class="bg-blue-600 text-white py-1 px-2 rounded">Thêm mới</button>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                        <button type="submit" class="bg-blue-600 text-white py-1 px-4 rounded">Thêm mới</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -267,10 +252,7 @@
         document.body.style.overflow = 'auto'; // Cho phép cuộn trang khi modal đóng
     }
 </script>
-
-
 <script>
-
     document.getElementById('add-customer-form').addEventListener('submit', function (event) {
         event.preventDefault(); // Ngăn chặn hành động gửi form mặc định
 
@@ -297,7 +279,7 @@
                     <td class="border border-gray-300 px-4 py-2">${customer.fullName}</td>
 
 
-                    // <td class="border border-gray-300 px-4 py-3">${customer.dob} (Tuổi: ${customer.age})</td>
+                  <td class="border border-gray-300 px-4 py-3">${customer.dob} (Tuổi: ${customer.age})</td>
                     <td class="border border-gray-300 px-4 py-2">${customer.address}</td>
                     <td class="border border-gray-300 px-4 py-2">${customer.phone}</td>
                     <td class="border border-gray-300 px-4 py-2">${customer.email}</td>
@@ -321,10 +303,7 @@
             .catch(error => console.error('Lỗi:', error));
     });
 </script>
-
 </body>
 </html>
-
 <label>
-
 </label>
