@@ -83,7 +83,7 @@
                                     style="background-color: #22C55E; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px;">
                                 Thêm mới
                             </button>
-                            <form action="/dashboard/admin/customers/delete" method="post" id="delete-form"
+                            <form th:action="@{/dashboard/admin/customers/delete}" method="post" id="delete-form"
                                   onsubmit="return validateDelete()" style="flex-shrink: 0;">
                                 <input type="hidden" name="ids" id="ids"/>
                                 <button type="submit"
@@ -121,6 +121,7 @@
                                 <td class="border border-gray-300 px-4 py-3"
                                     th:text="${#dates.format(customer.dob, 'dd-MM-yyyy') + ' ( ' + T(java.time.Period).between(customer.dob.toLocalDate(), T(java.time.LocalDate).now()).getYears() + ' )'}">
                                 </td>
+
                                 <td class="border border-gray-300 px-4 py-2" th:text="${customer.address}"></td>
                                 <td class="border border-gray-300 px-4 py-2" th:text="${customer.phone}"></td>
                                 <td class="border border-gray-300 px-4 py-2" th:text="${customer.email}"></td>
@@ -131,7 +132,19 @@
                                        style="background-color: #F59E0B; border: 1px solid black; text-decoration: none; padding: 0.5rem 1rem; display: inline-block; border-radius: 9999px;">
                                         Sửa
                                     </a>
+                                    <!--                                                                </td>-->
+                                    <!--                                <td class="border border-gray-300 px-4 py-2">-->
+                                    <!--                                    <a href="javascript:void(0);" onclick="showEditCustomerModal({-->
+                                    <!--        customerID: '${customer.customerID}',-->
+                                    <!--        fullName: `${customer.fullName}`,-->
+                                    <!--        dob: `${#dates.format(customer.dob, 'yyyy-MM-dd')}`,-->
+                                    <!--        phone: `${customer.phone}`,-->
+                                    <!--        address: `${customer.address}`,-->
+                                    <!--        email: `${customer.email}`,-->
+                                    <!--        gender: `${customer.gender}`-->
+                                    <!--    })" class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>-->
                                 </td>
+
                             </tr>
                             </tbody>
                         </table>
@@ -141,6 +154,8 @@
         </tr>
     </table>
 </div>
+
+
 <!-- Nhúng footer -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 <!-- Nhúng script navbar -->
@@ -186,6 +201,63 @@
         }
     });
 </script>
+
+<!-- Modal Sửa Khách Hàng -->
+<div id="editCustomerModal" class="modal" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sửa Khách Hàng</h5>
+                <button type="button" class="close" onclick="closeEditCustomerModal()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-customer-form" th:action="@{/dashboard/admin/customers/update}" method="post">
+                    <input type="hidden" id="editCustomerID" name="customerID"/>
+                    <div class="mb-4">
+                        <label for="edit-full-name" class="block text-sm font-medium text-gray-700">Họ tên:</label><br>
+                        <input type="text" id="edit-full-name" name="fullName"
+                               class="border border-gray-300 rounded px-2 py-1" required/>
+                    </div>
+                    <div class="mb-4">
+                        <label for="edit-dob" class="block text-sm font-medium text-gray-700">Ngày sinh:</label><br>
+                        <input type="date" id="edit-dob" name="dob" class="border border-gray-300 rounded px-2 py-1"
+                               required/>
+                    </div>
+                    <div class="mb-4">
+                        <label for="edit-phone" class="block text-sm font-medium text-gray-700">Số điện
+                            thoại:</label><br>
+                        <input type="text" id="edit-phone" name="phone" class="border border-gray-300 rounded px-2 py-1"
+                               required/>
+                    </div>
+                    <div class="mb-4">
+                        <label for="edit-address" class="block text-sm font-medium text-gray-700">Địa chỉ:</label><br>
+                        <input type="text" id="edit-address" name="address"
+                               class="border border-gray-300 rounded px-2 py-1"/>
+                    </div>
+                    <div class="mb-4">
+                        <label for="edit-email" class="block text-sm font-medium text-gray-700">Email:</label><br>
+                        <input type="email" id="edit-email" name="email"
+                               class="border border-gray-300 rounded px-2 py-1" required/>
+                    </div>
+                    <div class="mb-4">
+                        <label for="edit-gender" class="block text-sm font-medium text-gray-700">Giới tính:</label><br>
+                        <select id="edit-gender" name="gender" class="border border-gray-300 rounded px-2 py-1">
+                            <option value="Male">Nam</option>
+                            <option value="Female">Nữ</option>
+                            <option value="Other">Khác</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                        <button type="submit" class="bg-blue-600 text-white py-1 px-4 rounded">Cập nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Modal Thêm Khách Hàng -->
 <div id="addCustomerModal" class="modal" tabindex="-1" role="dialog" style="display: none;">
@@ -298,6 +370,111 @@
                     this.reset();
                 } else {
                     alert('Lỗi khi thêm khách hàng: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Lỗi:', error));
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Đảm bảo rằng mã chỉ chạy sau khi DOM đã được tải hoàn toàn
+
+        // Ví dụ: thêm sự kiện cho nút "Sửa"
+        const editButtons = document.querySelectorAll('.edit-button'); // Giả sử bạn có class cho nút sửa
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const customer = {
+                    customerID: this.getAttribute('data-id'), // Lấy ID từ thuộc tính data
+                    fullName: this.getAttribute('data-fullname'),
+                    dob: this.getAttribute('data-dob'),
+                    phone: this.getAttribute('data-phone'),
+                    address: this.getAttribute('data-address'),
+                    email: this.getAttribute('data-email'),
+                    gender: this.getAttribute('data-gender')
+                };
+                showEditCustomerModal(customer);
+            });
+        });
+    });
+
+    function showEditCustomerModal(customer) {
+        // Kiểm tra xem modal có tồn tại không
+        const modal = document.getElementById('editCustomerModal');
+        if (modal) {
+            document.getElementById('editCustomerID').value = customer.customerID;
+            document.getElementById('edit-full-name').value = customer.fullName;
+            document.getElementById('edit-dob').value = customer.dob; // Đảm bảo rằng dob là định dạng yyyy-MM-dd
+            document.getElementById('edit-phone').value = customer.phone;
+            document.getElementById('edit-address').value = customer.address;
+            document.getElementById('edit-email').value = customer.email;
+            document.getElementById('edit-gender').value = customer.gender;
+
+            // Hiển thị modal
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Ngăn cuộn trang khi modal mở
+        } else {
+            console.error('Modal không tồn tại');
+        }
+    }
+
+
+    function closeEditCustomerModal() {
+        document.getElementById('editCustomerModal').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Cho phép cuộn trang khi modal đóng
+    }
+
+    document.getElementById('edit-customer-form').addEventListener('submit', function (event) {
+        event.preventDefault(); // Ngăn chặn hành động gửi form mặc định
+
+        const formData = new FormData(this); // Lấy dữ liệu từ form
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cập nhật danh sách khách hàng trong trang chính
+                    const customerTableBody = document.getElementById('customer-table-body');
+                    const updatedRow = `
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">
+                        <input type="checkbox" name="ids" value="${data.customer.customerID}" class="customer-checkbox" data-name="${data.customer.fullName}" />
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">${data.customer.customerID}</td>
+                    <td class="border border-gray-300 px-4 py-2">${data.customer.fullName}</td>
+                    <td class="border border-gray-300 px-4 py-3">${data.customer.dob} (Tuổi: ${data.customer.age})</td>
+                    <td class="border border-gray-300 px-4 py-2">${data.customer.address}</td>
+                    <td class="border border-gray-300 px-4 py-2">${data.customer.phone}</td>
+                    <td class="border border-gray-300 px-4 py-2">${data.customer.email}</td>
+                    <td class="border border-gray-300 px-4 py-2">${data.customer.gender}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        <a href="javascript:void(0);" onclick="showEditCustomerModal({
+                            customerID: ${data.customer.customerID},
+                            fullName: '${data.customer.fullName}',
+                            dob: '${#dates.format(data.customer.dob, 'yyyy-MM-dd')}',
+                            phone: '${data.customer.phone}',
+                            address: '${data.customer.address}',
+                            email: '${data.customer.email}',
+                            gender: '${data.customer.gender}'
+                        })" class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
+                    </td>
+                </tr>
+                `;
+                    // Tìm hàng tương ứng và cập nhật
+                    const rowToUpdate = customerTableBody.querySelector(`tr[data-id="${data.customer.customerID}"]`);
+                    if (rowToUpdate) {
+                        rowToUpdate.outerHTML = updatedRow; // Cập nhật hàng
+                    }
+
+                    // Đóng modal
+                    closeEditCustomerModal();
+
+                    // Tùy chọn: Đặt lại form
+                    this.reset();
+                } else {
+                    alert('Lỗi khi cập nhật khách hàng: ' + data.message);
                 }
             })
             .catch(error => console.error('Lỗi:', error));
