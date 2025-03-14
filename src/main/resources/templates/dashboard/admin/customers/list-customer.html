@@ -5,16 +5,37 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Danh sách Khách hàng</title>
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/dashboard/dashboard.css">
     <link rel="stylesheet" href="/css/fragments/navbar.css">
     <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/fragments/sidebar.css">
     <link rel="stylesheet" href="/css/common/toast.css">
     <link rel="stylesheet" href="/css/common/pagination.css">
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /*background-color: rgba(0, 0, 0, 0.5); !* Màu nền tối *!*/
+            background-color: rgba(0, 0, 0, 0.7); /* Màu nền tối */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Đảm bảo modal nằm trên các phần tử khác */
+        }
+
+        .modal-dialog {
+            background-color: white; /* Màu nền của modal */
+            border-radius: 5px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
 <!-- Hiển thị thông báo -->
@@ -25,99 +46,106 @@
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
 <div class="main-content mt-5">
-<table>
-    <tr>
-        <td>
-            <div class="bg-gray-200 py-2 px-4">
-                <h1 class="text-lg font-bold mb-2">Danh sách Khách hàng</h1>
+    <table>
+        <tr>
+            <td>
+                <div class="bg-gray-200 py-2 px-4">
+                    <h1 class="text-lg font-bold mb-2">Danh sách Khách hàng</h1>
 
-                <div class="flex justify-between items-center border border-gray-300 rounded-full p-2 bg-white">
-                    <!-- Form tìm kiếm -->
-                    <form action="/dashboard/admin/customers/search" method="get" id="search-form" class="flex items-center gap-2">
-                        <select id="search-type" name="search-type" class="border border-gray-300 rounded px-2 py-1">
-                            <option value="name">Tìm Theo Tên</option>
-                            <option value="phone">Tìm Theo Số Điện Thoại</option>
-                            <option value="email">Tìm Theo Email</option>
-                            <option value="gender">Tìm Theo Giới Tính</option>
-                        </select>
-                        <div id="input-container" class="flex-1">
-                            <input type="text" id="search-input" name="keyWord" placeholder="Nhập thông tin tìm kiếm"
-                                   class="border border-gray-300 rounded px-2 py-1 w-full"/>
-                        </div>
+                    <div class="flex justify-between items-center border border-gray-300 rounded-full p-2 bg-white">
+                        <!-- Form tìm kiếm -->
+                        <form action="/dashboard/admin/customers/search" method="get" id="search-form"
+                              class="flex items-center gap-2">
+                            <select id="search-type" name="search-type"
+                                    class="border border-gray-300 rounded px-2 py-1">
+                                <option value="name">Tìm Theo Tên</option>
+                                <option value="phone">Tìm Theo Số Điện Thoại</option>
+                                <option value="email">Tìm Theo Email</option>
+                                <option value="gender">Tìm Theo Giới Tính</option>
+                            </select>
+                            <div id="input-container" class="flex-1">
+                                <input type="text" id="search-input" name="keyWord"
+                                       placeholder="Nhập thông tin tìm kiếm"
+                                       class="border border-gray-300 rounded px-2 py-1 w-full"/>
+                            </div>
 
-                        <button type="submit" id="search-button" class="bg-blue-600 text-white py-1 px-3 rounded-full">
-                            Tìm
-                        </button>
+                            <button type="submit" id="search-button"
+                                    class="bg-blue-600 text-white py-1 px-3 rounded-full">
+                                Tìm
+                            </button>
 
-                        <button type="button" id="refresh-button" class="bg-gray-500 text-white py-1 px-3 rounded-full"
-                                onclick="window.location.href='http://localhost:8080/customers'">
-                            Làm mới
-                        </button>
-                    </form>
+                            <button type="button" id="refresh-button"
+                                    class="bg-gray-500 text-white py-1 px-3 rounded-full"
+                                    onclick="window.location.href='http://localhost:8080/customers'">
+                                Làm mới
+                            </button>
+                        </form>
 
 
-                    <form th:action="@{/dashboard/admin/customers/delete}" method="post" id="delete-form" onsubmit="return validateDelete()"
-                          class="flex items-center gap-2">
-                        <input type="hidden" name="ids" id="ids" />
-                        <button type="button" class="bg-green-600 text-white py-1 px-3 rounded-full" id="add-button" onclick="showAddCustomerForm()">
-                            Thêm mới
-                        </button>
-                        <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded-full" id="delete-button">
-                            Xóa
-                        </button>
-                    </form>
+                        <form th:action="@{/dashboard/admin/customers/delete}" method="post" id="delete-form"
+                              onsubmit="return validateDelete()"
+                              class="flex items-center gap-2">
+                            <input type="hidden" name="ids" id="ids"/>
+                            <button type="button" class="bg-green-600 text-white py-1 px-3 rounded-full" id="add-button"
+                                    onclick="showAddCustomerForm()">
+                                Thêm mới
+                            </button>
+                            <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded-full"
+                                    id="delete-button">
+                                Xóa
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="overflow-y-auto max-h-80 border border-gray-300 rounded">
+                        <table class="min-w-full bg-white border border-gray-300">
+                            <thead class="sticky top-0 bg-white">
+                            <tr>
+                                <th class="border border-gray-300 px-4 py-2">Chọn</th>
+                                <th class="border border-gray-300 px-4 py-2">ID</th>
+                                <th class="border border-gray-300 px-4 py-2">Họ tên</th>
+                                <th class="border border-gray-300 px-4 py-2">Ngày sinh / Tuổi</th>
+                                <th class="border border-gray-300 px-4 py-2">Địa chỉ</th>
+                                <th class="border border-gray-300 px-4 py-2">Số điện thoại</th>
+                                <th class="border border-gray-300 px-4 py-2">Email</th>
+                                <th class="border border-gray-300 px-4 py-2">Giới Tính</th>
+                                <th class="border border-gray-300 px-4 py-2">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody id="customer-table-body">
+                            <tr th:each="customer : ${customers}">
+                                <td class="border border-gray-300 px-4 py-2">
+                                    <input type="checkbox" name="ids" th:value="${customer.customerID}"
+                                           class="customer-checkbox" th:data-name="${customer.fullName}"/>
+                                </td>
+                                <td class="border border-gray-300 px-4 py-2" th:text="${customer.customerID}"></td>
+                                <td class="border border-gray-300 px-4 py-2" th:text="${customer.fullName}"></td>
+                                <td class="border border-gray-300 px-4 py-3"
+                                    th:text="${#dates.format(customer.dob, 'dd-MM-yyyy') + ' ( ' + T(java.time.Period).between(customer.dob.toLocalDate(), T(java.time.LocalDate).now()).getYears() + ' )'}">
+                                </td>
+                                <td class="border border-gray-300 px-4 py-2" th:text="${customer.address}"></td>
+                                <td class="border border-gray-300 px-4 py-2" th:text="${customer.phone}"></td>
+                                <td class="border border-gray-300 px-4 py-2" th:text="${customer.email}"></td>
+                                <td class="border border-gray-300 px-4 py-2" th:text="${customer.gender}"></td>
+                                <td class="border border-gray-300 px-4 py-2">
+                                    <a th:href="@{/dashboard/admin/customers/edit/{id}(id=${customer.customerID})}"
+                                       class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
+
+
+                                </td>
+
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
                 </div>
 
-                <div class="overflow-y-auto max-h-80 border border-gray-300 rounded">
-                    <table class="min-w-full bg-white border border-gray-300">
-                        <thead class="sticky top-0 bg-white">
-                        <tr>
-                            <th class="border border-gray-300 px-4 py-2">Chọn</th>
-                            <th class="border border-gray-300 px-4 py-2">ID</th>
-                            <th class="border border-gray-300 px-4 py-2">Họ tên</th>
-                            <th class="border border-gray-300 px-4 py-2">Ngày sinh / Tuổi</th>
-                            <th class="border border-gray-300 px-4 py-2">Địa chỉ</th>
-                            <th class="border border-gray-300 px-4 py-2">Số điện thoại</th>
-                            <th class="border border-gray-300 px-4 py-2">Email</th>
-                            <th class="border border-gray-300 px-4 py-2">Giới Tính</th>
-                            <th class="border border-gray-300 px-4 py-2">Hành động</th>
-                        </tr>
-                        </thead>
-                        <tbody id="customer-table-body">
-                        <tr th:each="customer : ${customers}">
-                            <td class="border border-gray-300 px-4 py-2">
-                                <input type="checkbox" name="ids" th:value="${customer.customerID}"
-                                       class="customer-checkbox" th:data-name="${customer.fullName}" />
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.customerID}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.fullName}"></td>
-                            <td class="border border-gray-300 px-4 py-3"
-                                th:text="${#dates.format(customer.dob, 'dd-MM-yyyy') + ' ( ' + T(java.time.Period).between(customer.dob.toLocalDate(), T(java.time.LocalDate).now()).getYears() + ' )'}">
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.address}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.phone}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.email}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${customer.gender}"></td>
-                            <td class="border border-gray-300 px-4 py-2">
-                                <a th:href="@{/dashboard/admin/customers/edit/{id}(id=${customer.customerID})}"
-                                   class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
-
-
-                            </td>
-
-
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-
-
-            </div>
-
-        </td>
-    <tr>
-</table>
+            </td>
+        <tr>
+    </table>
 </div>
 
 <!-- Nhúng footer -->
@@ -174,60 +202,76 @@
     });
 
 
-
-
-
-
-
-
-
 </script>
 
-
-
-
-<form id="add-customer-form" th:action="@{/dashboard/admin/customers/create}" method="post" style="display: none;">
-    <div>
-        <label for="full-name">Họ tên:</label>
-        <input type="text" id="full-name" name="fullName" class="border border-gray-300 rounded px-2 py-1" required/>
+<!-- Modal Thêm Khách Hàng -->
+<div id="addCustomerModal" class="modal" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm Khách Hàng</h5>
+                <button type="button" class="close" onclick="closeAddCustomerModal()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-customer-form" th:action="@{/dashboard/admin/customers/create}" method="post">
+                    <div>
+                        <label for="full-name">Họ tên:</label>
+                        <input type="text" id="full-name" name="fullName"
+                               class="border border-gray-300 rounded px-2 py-1" required/>
+                    </div>
+                    <div>
+                        <label for="dob">Ngày sinh:</label>
+                        <input type="date" id="dob" name="dob" class="border border-gray-300 rounded px-2 py-1"
+                               required/>
+                    </div>
+                    <div>
+                        <label for="phone">Số điện thoại:</label>
+                        <input type="text" id="phone" name="phone" class="border border-gray-300 rounded px-2 py-1"
+                               required/>
+                    </div>
+                    <div>
+                        <label for="address">Địa chỉ:</label>
+                        <input type="text" id="address" name="address"
+                               class="border border-gray-300 rounded px-2 py-1"/>
+                    </div>
+                    <div>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" class="border border-gray-300 rounded px-2 py-1"
+                               required/>
+                    </div>
+                    <div>
+                        <label for="gender">Giới tính:</label>
+                        <select id="gender" name="gender" class="border border-gray-300 rounded px-2 py-1">
+                            <option value="Male">Nam</option>
+                            <option value="Female">Nữ</option>
+                            <option value="Other">Khác</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="purchaseCount" value="0"/>
+                    <button type="submit" class="bg-blue-600 text-white py-1 px-2 rounded">Thêm mới</button>
+                </form>
+            </div>
+        </div>
     </div>
-    <div>
-        <label for="dob">Ngày sinh:</label>
-        <input type="date" id="dob" name="dob" class="border border-gray-300 rounded px-2 py-1" required/>
-    </div>
-    <div>
-        <label for="phone">Số điện thoại:</label>
-        <input type="text" id="phone" name="phone" class="border border-gray-300 rounded px-2 py-1" required/>
-    </div>
-    <div>
-        <label for="address">Địa chỉ:</label>
-        <input type="text" id="address" name="address" class="border border-gray-300 rounded px-2 py-1"/>
-    </div>
-    <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" class="border border-gray-300 rounded px-2 py-1" required/>
-    </div>
-    <div>
-        <label for="gender">Giới tính:</label>
-        <select id="gender" name="gender" class="border border-gray-300 rounded px-2 py-1">
-            <option value="Male">Nam</option>
-            <option value="Female">Nữ</option>
-            <option value="Other">Khác</option>
-        </select>
-    </div>
-    <input type="hidden" name="purchaseCount" value="0"/>
-    <button type="submit" class="bg-blue-600 text-white py-1 px-2 rounded">Thêm mới</button>
-</form>
-
+</div>
 <script>
     function showAddCustomerForm() {
+        document.getElementById('addCustomerModal').style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Ngăn cuộn trang khi modal mở
+    }
 
-        document.getElementById('add-customer-form').style.display = 'block';
+    function closeAddCustomerModal() {
+        document.getElementById('addCustomerModal').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Cho phép cuộn trang khi modal đóng
     }
 </script>
 
+
 <script>
-    document.getElementById('add-customer-form').addEventListener('submit', function(event) {
+
+    document.getElementById('add-customer-form').addEventListener('submit', function (event) {
         event.preventDefault(); // Ngăn chặn hành động gửi form mặc định
 
         const formData = new FormData(this); // Lấy dữ liệu từ form
@@ -245,23 +289,28 @@
                     // Cập nhật danh sách khách hàng trong trang chính
                     const customerTableBody = document.getElementById('customer-table-body');
                     const newRow = `
-                    <tr>
-                        <td class="border border-gray-300 px-4 py-2">
-                            <input type="checkbox" name="ids" value="${customer.customerID}" class="customer-checkbox" data-name="${customer.fullName}" />
-                        </td>
-                        <td class="border border-gray-300 px-4 py-2">${customer.customerID}</td>
-                        <td class="border border-gray-300 px-4 py-2">${customer.fullName}</td>
-                        <td class="border border-gray-300 px-4 py-3">${customer.dob} (Tuổi: ${customer.age})</td>
-                        <td class="border border-gray-300 px-4 py-2">${customer.address}</td>
-                        <td class="border border-gray-300 px-4 py-2">${customer.phone}</td>
-                        <td class="border border-gray-300 px-4 py-2">${customer.email}</td>
-                        <td class="border border-gray-300 px-4 py-2">${customer.gender}</td>
-                        <td class="border border-gray-300 px-4 py-2">
-                            <a href="/dashboard/admin/customers/edit/${customer.customerID}" class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">
+                        <input type="checkbox" name="ids" value="${customer.customerID}" class="customer-checkbox" data-name="${customer.fullName}" />
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">${customer.customerID}</td>
+                    <td class="border border-gray-300 px-4 py-2">${customer.fullName}</td>
+
+
+                    // <td class="border border-gray-300 px-4 py-3">${customer.dob} (Tuổi: ${customer.age})</td>
+                    <td class="border border-gray-300 px-4 py-2">${customer.address}</td>
+                    <td class="border border-gray-300 px-4 py-2">${customer.phone}</td>
+                    <td class="border border-gray-300 px-4 py-2">${customer.email}</td>
+                    <td class="border border-gray-300 px-4 py-2">${customer.gender}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        <a href="/dashboard/admin/customers/edit/${customer.customerID}" class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
+                    </td>
+                </tr>
                 `;
                     customerTableBody.insertAdjacentHTML('beforeend', newRow); // Thêm hàng mới vào bảng
+
+                    // Đóng modal
+                    closeAddCustomerModal();
 
                     // Tùy chọn: Đặt lại form
                     this.reset();
