@@ -63,6 +63,12 @@ public class ProductService implements IProductService {
         productRepository.save(product);
     }
 
+    //update
+    @Override
+    public Product getProductById(Integer id) {
+        return productRepository.findByProductID(id);
+    }
+
     //Tuấn Anh
     @Override
     public Page<Product> findAll(Pageable pageable) {
