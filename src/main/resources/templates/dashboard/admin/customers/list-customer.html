@@ -322,6 +322,56 @@
     }
 </script>
 <script>
+    // document.getElementById('add-customer-form').addEventListener('submit', function (event) {
+    //     event.preventDefault(); // Ngăn chặn hành động gửi form mặc định
+    //
+    //     const formData = new FormData(this); // Lấy dữ liệu từ form
+    //
+    //     fetch(this.action, {
+    //         method: 'POST',
+    //         body: formData,
+    //     })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.success) {
+    //                 // Giả sử phản hồi chứa dữ liệu khách hàng mới
+    //                 const customer = data.customer;
+    //
+    //                 // Cập nhật danh sách khách hàng trong trang chính
+    //                 const customerTableBody = document.getElementById('customer-table-body');
+    //                 const newRow = `
+    //             <tr>
+    //                 <td class="border border-gray-300 px-4 py-2">
+    //                     <input type="checkbox" name="ids" value="${customer.customerID}" class="customer-checkbox" data-name="${customer.fullName}" />
+    //                 </td>
+    //                 <td class="border border-gray-300 px-4 py-2">${customer.customerID}</td>
+    //                 <td class="border border-gray-300 px-4 py-2">${customer.fullName}</td>
+    //
+    //
+    //               <td class="border border-gray-300 px-4 py-3">${customer.dob} (Tuổi: ${customer.age})</td>
+    //                 <td class="border border-gray-300 px-4 py-2">${customer.address}</td>
+    //                 <td class="border border-gray-300 px-4 py-2">${customer.phone}</td>
+    //                 <td class="border border-gray-300 px-4 py-2">${customer.email}</td>
+    //                 <td class="border border-gray-300 px-4 py-2">${customer.gender}</td>
+    //                 <td class="border border-gray-300 px-4 py-2">
+    //                     <a href="/dashboard/admin/customers/edit/${customer.customerID}" class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
+    //                 </td>
+    //             </tr>
+    //             `;
+    //                 customerTableBody.insertAdjacentHTML('beforeend', newRow); // Thêm hàng mới vào bảng
+    //
+    //                 // Đóng modal
+    //                 closeAddCustomerModal();
+    //
+    //                 // Tùy chọn: Đặt lại form
+    //                 this.reset();
+    //             } else {
+    //                 alert('Lỗi khi thêm khách hàng: ' + data.message);
+    //             }
+    //         })
+    //         .catch(error => console.error('Lỗi:', error));
+    // });
+
     document.getElementById('add-customer-form').addEventListener('submit', function (event) {
         event.preventDefault(); // Ngăn chặn hành động gửi form mặc định
 
@@ -331,47 +381,20 @@
             method: 'POST',
             body: formData,
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Giả sử phản hồi chứa dữ liệu khách hàng mới
-                    const customer = data.customer;
-
-                    // Cập nhật danh sách khách hàng trong trang chính
-                    const customerTableBody = document.getElementById('customer-table-body');
-                    const newRow = `
-                <tr>
-                    <td class="border border-gray-300 px-4 py-2">
-                        <input type="checkbox" name="ids" value="${customer.customerID}" class="customer-checkbox" data-name="${customer.fullName}" />
-                    </td>
-                    <td class="border border-gray-300 px-4 py-2">${customer.customerID}</td>
-                    <td class="border border-gray-300 px-4 py-2">${customer.fullName}</td>
-
-
-                  <td class="border border-gray-300 px-4 py-3">${customer.dob} (Tuổi: ${customer.age})</td>
-                    <td class="border border-gray-300 px-4 py-2">${customer.address}</td>
-                    <td class="border border-gray-300 px-4 py-2">${customer.phone}</td>
-                    <td class="border border-gray-300 px-4 py-2">${customer.email}</td>
-                    <td class="border border-gray-300 px-4 py-2">${customer.gender}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        <a href="/dashboard/admin/customers/edit/${customer.customerID}" class="bg-yellow-600 text-white py-1 px-2 rounded">Sửa</a>
-                    </td>
-                </tr>
-                `;
-                    customerTableBody.insertAdjacentHTML('beforeend', newRow); // Thêm hàng mới vào bảng
-
-                    // Đóng modal
-                    closeAddCustomerModal();
-
-                    // Tùy chọn: Đặt lại form
-                    this.reset();
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
                 } else {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                if (data && !data.success) {
                     alert('Lỗi khi thêm khách hàng: ' + data.message);
                 }
             })
             .catch(error => console.error('Lỗi:', error));
     });
-
 
 
 </script>
