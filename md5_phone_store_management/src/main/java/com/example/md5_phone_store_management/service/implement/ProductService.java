@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class ProductService implements IProductService {
         productRepository.saveProduct(product.getName(),
                 product.getPurchasePrice(),
                 product.getSellingPrice(),
+                product.getRetailPrice(),
                 product.getCPU(),
                 product.getStorage(),
                 product.getScreenSize(),
@@ -60,13 +62,44 @@ public class ProductService implements IProductService {
             product.setImages(productImages);
         }
         // Lưu sản phẩm không có ảnh
+        System.out.println("Lưu sản phẩm");
         productRepository.save(product);
+        System.out.println("Kết thúc lưu sản phẩm");
     }
 
     //update
     @Override
     public Product getProductById(Integer id) {
         return productRepository.findByProductID(id);
+    }
+
+    @Override
+    public boolean updateProductWithSellingPrice(Product product) {
+        try{
+            productRepository.updateProduct(product.getProductID(),
+                    product.getName(),
+                    product.getSellingPrice(),
+                    product.getScreenSize(),
+                    product.getCamera(),
+                    product.getSelfie(),
+                    product.getCPU(),
+                    product.getStorage(),
+                    product.getDetailedDescription());
+            return true;
+        } catch (Exception e){
+            System.out.println("Lỗi khi thực hiện cập nhật");
+            return false;
+        }
+    }
+
+    @Override
+    public void saveProductImage(Product product, ProductImage productImage) {
+
+    }
+
+    @Override
+    public void deleteProductImages(Product product) {
+
     }
 
     //Tuấn Anh

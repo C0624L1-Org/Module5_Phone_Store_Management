@@ -1,10 +1,12 @@
 package com.example.md5_phone_store_management.service;
 
 import com.example.md5_phone_store_management.model.Product;
+import com.example.md5_phone_store_management.model.ProductImage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface IProductService {
@@ -18,4 +20,7 @@ public interface IProductService {
 
     //update
     Product getProductById(Integer id);
+    boolean updateProductWithSellingPrice(Product product);
+    void saveProductImage(Product product, ProductImage productImage);
+    void deleteProductImages(Product product);
 }
