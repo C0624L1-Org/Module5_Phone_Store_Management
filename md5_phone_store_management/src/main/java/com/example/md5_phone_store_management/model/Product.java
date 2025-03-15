@@ -19,6 +19,8 @@ public class Product {
     private BigDecimal purchasePrice;
     @Column(nullable = false)
     private BigDecimal sellingPrice;
+    @Column(nullable = false)
+    private BigDecimal retailPrice;
     private String CPU;
     private String storage;
     private String screenSize;
@@ -168,5 +170,13 @@ public class Product {
 
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
     }
 }

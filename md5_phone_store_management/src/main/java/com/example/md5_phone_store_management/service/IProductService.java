@@ -15,4 +15,7 @@ public interface IProductService {
     //Đình Anh
     void saveProduct(Product product);
     void saveProductWithImg(Product product, List<MultipartFile> files);
+
+    //update
+    Product getProductById(Integer id);
 }

@@ -55,4 +55,8 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
                                                                       @Param("supplierName") String supplierName,
                                                                       @Param("purchasePrice") double purchasePrice,
                                                                       Pageable pageable);
+
+    //update
+    @Query(value = "SELECT * FROM product WHERE product.productID = :id", nativeQuery = true)
+    Product findByProductID(@Param("id") Integer id);
 }

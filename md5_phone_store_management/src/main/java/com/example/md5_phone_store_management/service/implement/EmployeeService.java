@@ -103,8 +103,9 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public void deleteEmployeesById(List<Integer> employeeIDs) {
-        for (int i = 0; i < employeeIDs.size(); i++) {
-            iEmployeeRepository.deleteById(employeeIDs.get(i));
+        for (Integer employeeID : employeeIDs) {
+            System.out.println(employeeID);
+            iEmployeeRepository.deleteEmployeeById(employeeID);
         }
         //iEmployeeRepository.deleteAllByIdInBatch(employeeIDs);
     }

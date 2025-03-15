@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Thêm Sản phẩm</title>
+  <title>Cập Nhật Sản phẩm</title>
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -25,10 +25,10 @@
 <div class="main-content mt-5">
   <div class="card shadow w-50 mx-auto">
     <div class="card-header bg-success text-white">
-      <h3 class="mb-0">Thêm mới sản phẩm</h3>
+      <h3 class="mb-0">Cập nhật sản phẩm: <strong th:text="${productDTO.name}"></strong></h3>
     </div>
     <div class="card-body">
-      <form th:action="@{/dashboard/products/add-product}" method="post"
+      <form th:action="@{/dashboard/products/update-product}" method="post"
             th:object="${productDTO}"
             enctype="multipart/form-data">
 
@@ -91,7 +91,9 @@
 
         <!-- Hình ảnh sản phẩm -->
         <div class="mb-3">
-          <label for="imgProducts" class="form-label">Chọn hình ảnh sản phẩm</label>
+          <label for="imgProducts" class="form-label">Hình ảnh sản phẩm</label>
+          <!--hiển thị hinh ảnh-->
+          <img th:each="img : *{images}" th:src="${img.imageUrl}" th:alt="${img.product.name}" class="img-thumbnail">
           <input type="file" class="form-control" id="imgProducts" name="imgProducts" multiple>
 <!--          <p class="text-danger small" th:if="${#fields.hasErrors('imgProducts')}" th:text="${#fields.errors('imgProducts')[0]}"></p>-->
         </div>
@@ -118,7 +120,7 @@
           </select>
         </div>
 
-        <button type="submit" class="btn btn-success">Thêm sản phẩm</button>
+        <button type="submit" class="btn btn-success">Cập nhật</button>
 
         <a href="/dashboard/products/list" class="btn btn-secondary">Hủy</a>
       </form>

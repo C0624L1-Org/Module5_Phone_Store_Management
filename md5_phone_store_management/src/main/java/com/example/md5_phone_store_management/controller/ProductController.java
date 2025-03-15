@@ -28,31 +28,33 @@ public class ProductController {
     ProductService productService;
     @Autowired
     SupplierService supplierService;
+
     // Tuấn Anh
     @GetMapping("/list")
     public String index(Model model,
-                        @RequestParam(name = "page", defaultValue = "0", required = false) int page){
-        Pageable pageable = PageRequest.of(page,2);
+                        @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
+        Pageable pageable = PageRequest.of(page, 2);
         Page<Product> listProducts = productService.findAll(pageable);
-        model.addAttribute("listProducts",listProducts);
+        model.addAttribute("listProducts", listProducts);
         return "dashboard/product/home-product";
     }
 
     @GetMapping("/search")
-    public String search(Model model,@RequestParam(name="searchProduct",required=false) String searchProduct,
-                         @RequestParam(name="searchSupplier",required=false) String searchSupplier,
-                         @RequestParam(name="rangePrice",required=false) double rangePrice,
-                         @RequestParam(name="page",defaultValue = "0")int page){
-        Pageable pageable = PageRequest.of(page,2);
-        Page<Product> listProducts= productService.searchProductByNameAndSupplier_NameAndPurchasePrice(searchProduct,searchSupplier,rangePrice,pageable);
-        model.addAttribute("listProducts",listProducts);
+    public String search(Model model, @RequestParam(name = "searchProduct", required = false) String searchProduct,
+                         @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
+                         @RequestParam(name = "rangePrice", required = false) double rangePrice,
+                         @RequestParam(name = "page", defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 2);
+        Page<Product> listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(searchProduct, searchSupplier, rangePrice, pageable);
+        model.addAttribute("listProducts", listProducts);
         return "dashboard/product/home-product";
     }
+
     // Đình Anh
     @GetMapping("/create-form")
     public String createForm(Model model) {
         model.addAttribute("productDTO", new ProductDTO());
-        model.addAttribute("supplier",supplierService.getSupplierList());
+        model.addAttribute("supplier", supplierService.getSupplierList());
         return "dashboard/product/create-product-form";
     }
 
@@ -62,6 +64,7 @@ public class ProductController {
                              @RequestParam(value = "imgProducts", required = false) List<MultipartFile> imgProducts,
                              RedirectAttributes redirectAttr,
                              Model model) {
+        System.out.println(productDTO.toString());
         if (biResult.hasErrors()) {
             model.addAttribute("supplier", supplierService.getSupplierList());
             return "dashboard/product/create-product-form";
@@ -69,9 +72,11 @@ public class ProductController {
 
         Product product = new Product();
         BeanUtils.copyProperties(productDTO, product);
-
+        System.out.println(product.toString());
         Supplier supplier = supplierService.getSupplier(productDTO.getSupplierID());
+        System.out.println(supplier.toString());
         if (supplier == null) {
+
             model.addAttribute("error", "Nhà cung cấp không hợp lệ!");
             model.addAttribute("supplier", supplierService.getSupplierList());
             return "dashboard/product/create-product-form";
@@ -104,5 +109,22 @@ public class ProductController {
         return "redirect:/dashboard/products/list";
     }
 
+    //update
+    @GetMapping("/update-form/{id}")
+    public String updateForm(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes, Model model) {
+        Product product = productService.getProductById(id);
+        if (product == null) {
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy sản phẩm");
+            return "redirect:/dashboard/products/list";
+        }
+        ProductDTO productDTO = new ProductDTO();
+        BeanUtils.copyProperties(product, productDTO);
+        productDTO.setSupplierID(product.getSupplier().getSupplierID());
+        model.addAttribute("productDTO", productDTO);
+        model.addAttribute("supplier", supplierService.getSupplierList());
+        return "dashboard/product/update-product-form";
+
+    }
 
 }
