@@ -55,11 +55,12 @@
             </thead>
             <tbody>
             <tr th:each="product,index : ${listProducts}">
+                <td></td>
                 <td th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
                 <td th:text="${product.name}"></td>
                 <td th:text="${product.supplier.name}"></td>
-                <td th:text="${product.purchasePrice}"></td>
-                <td th:text="${product.sellingPrice}"></td>
+                <td th:text="${#numbers.formatInteger(product.purchasePrice,1,'POINT') + ' VND'}"></td>
+                <td th:text="${#numbers.formatInteger(product.sellingPrice,1,'POINT') + ' VND'}"></td>
                 <td th:text="${product.CPU}"></td>
                 <td th:text="${product.storage}"></td>
                 <td th:text="${product.stockQuantity}"></td>

@@ -2,6 +2,7 @@ package com.example.md5_phone_store_management.model.dto;
 
 import com.example.md5_phone_store_management.model.ProductImage;
 import jakarta.validation.constraints.*;
+import org.springframework.format.annotation.NumberFormat;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,14 +17,15 @@ public class ProductDTO {
 
     @NotNull(message = "Giá nhập không được để trống")
     @DecimalMin(value = "10000", message = "Giá nhập phải lớn hơn 10.000")
+    @NumberFormat(pattern = "############")
     private BigDecimal purchasePrice;
 
     @NotNull(message = "Giá bán không được để trống")
     @DecimalMin(value = "10000", message = "Giá bán phải lớn hơn 10.000")
+    @NumberFormat(pattern = "############")
     private BigDecimal sellingPrice;
 
-    @NotNull(message = "Giá bán lẻ không được để trống")
-    @DecimalMin(value = "10000", message = "Giá bán lẻ phải lớn hơn 10.000")
+    @NumberFormat(pattern = "############")
     private BigDecimal retailPrice;
 
     private String CPU;

@@ -19,7 +19,6 @@ public class Product {
     private BigDecimal purchasePrice;
     @Column(nullable = false)
     private BigDecimal sellingPrice;
-    @Column(nullable = false)
     private BigDecimal retailPrice;
     private String CPU;
     private String storage;

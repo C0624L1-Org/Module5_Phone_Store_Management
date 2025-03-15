@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -69,32 +70,32 @@ public class ProductController {
             model.addAttribute("supplier", supplierService.getSupplierList());
             return "dashboard/product/create-product-form";
         }
-
         Product product = new Product();
         BeanUtils.copyProperties(productDTO, product);
         System.out.println(product.toString());
         Supplier supplier = supplierService.getSupplier(productDTO.getSupplierID());
         System.out.println(supplier.toString());
         if (supplier == null) {
-
-            model.addAttribute("error", "Nhà cung cấp không hợp lệ!");
+            model.addAttribute("messageType", "error");
+            model.addAttribute("message", "Nhà cung cấp không hợp lệ!");
             model.addAttribute("supplier", supplierService.getSupplierList());
             return "dashboard/product/create-product-form";
         }
         product.setSupplier(supplier);
+        //product.setRetailPrice(new BigDecimal(0));
 
         // Nếu có file ảnh được upload
-        if (imgProducts != null && !imgProducts.isEmpty()) {
+        if (imgProducts != null && !imgProducts.isEmpty() && imgProducts.stream().anyMatch(file -> file.getSize() > 0)) {
             for (MultipartFile file : imgProducts) {
                 if (file.getSize() > 10 * 1024 * 1024) { // 10MB
                     redirectAttr.addFlashAttribute("messageType", "error");
                     redirectAttr.addFlashAttribute("message", "Kích thước ảnh quá lớn!");
-                    return "redirect:/dashboard/admin/products/add-product";
+                    return "redirect:/dashboard/products/create-form";
                 }
                 if (!file.getContentType().startsWith("image/")) {
                     redirectAttr.addFlashAttribute("messageType", "error");
                     redirectAttr.addFlashAttribute("message", "Định dạng ảnh không hợp lệ!");
-                    return "redirect:/dashboard/admin/products/add-product";
+                    return "redirect:/dashboard/products/create-form";
                 }
             }
             // Lưu kèm danh sách ảnh
@@ -124,7 +125,44 @@ public class ProductController {
         model.addAttribute("productDTO", productDTO);
         model.addAttribute("supplier", supplierService.getSupplierList());
         return "dashboard/product/update-product-form";
+    }
 
+    @PostMapping("/update-product")
+    public String updateProduct(@Valid @ModelAttribute("productDTO") ProductDTO productDTO,
+                                BindingResult biResult,
+                                @RequestParam(value = "imgProducts", required = false) List<MultipartFile> imgProducts,
+                                RedirectAttributes redirectAttr,
+                                Model model) {
+
+        if (biResult.hasErrors()) {
+            return "dashboard/product/update-product-form";
+        }
+        Product product = new Product();
+        BeanUtils.copyProperties(productDTO, product);
+        // Nếu có file ảnh được upload
+        if (imgProducts != null && !imgProducts.isEmpty()) {
+            for (MultipartFile file : imgProducts) {
+                if (file.getSize() > 10 * 1024 * 1024) { // 10MB
+                    redirectAttr.addFlashAttribute("messageType", "error");
+                    redirectAttr.addFlashAttribute("message", "Kích thước ảnh quá lớn!");
+                    return "dashboard/product/update-product-form/" + productDTO.getProductID();
+                }
+                if (!file.getContentType().startsWith("image/")) {
+                    redirectAttr.addFlashAttribute("messageType", "error");
+                    redirectAttr.addFlashAttribute("message", "Định dạng ảnh không hợp lệ!");
+                    return "dashboard/product/update-product-form/" + productDTO.getProductID();
+                }
+            }
+            // Lưu kèm danh sách ảnh
+            productService.saveProductWithImg(product, imgProducts);
+        } else {
+            // Không có file upload nào, chỉ lưu sản phẩm
+            productService.saveProduct(product);
+        }
+
+        redirectAttr.addFlashAttribute("messageType", "success");
+        redirectAttr.addFlashAttribute("message", "Đã Thêm mới thành công!");
+        return "redirect:/dashboard/products/list";
     }
 
 }
