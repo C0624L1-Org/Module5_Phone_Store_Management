@@ -79,17 +79,18 @@ public class ProductController {
         product.setSupplier(supplier);
 
         // Nếu có file ảnh được upload
-        if (imgProducts != null && !imgProducts.isEmpty()) {
+        if (imgProducts != null && !imgProducts.isEmpty()
+                && imgProducts.stream().anyMatch(file -> file.getSize() > 0)) {
             for (MultipartFile file : imgProducts) {
                 if (file.getSize() > 10 * 1024 * 1024) { // 10MB
                     redirectAttr.addFlashAttribute("messageType", "error");
                     redirectAttr.addFlashAttribute("message", "Kích thước ảnh quá lớn!");
-                    return "redirect:/dashboard/admin/products/add-product";
+                    return "redirect:/dashboard/products/create-form";
                 }
                 if (!file.getContentType().startsWith("image/")) {
                     redirectAttr.addFlashAttribute("messageType", "error");
                     redirectAttr.addFlashAttribute("message", "Định dạng ảnh không hợp lệ!");
-                    return "redirect:/dashboard/admin/products/add-product";
+                       return "redirect:/dashboard/products/create-form";
                 }
             }
             // Lưu kèm danh sách ảnh

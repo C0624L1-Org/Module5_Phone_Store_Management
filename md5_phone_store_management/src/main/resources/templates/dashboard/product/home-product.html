@@ -30,8 +30,8 @@
             Name Supplier:<input type="text" placeholder="Search name Supplier" name="searchSupplier">
             <label for="myRange">Search Purchase Price: <span id="rangeValue">0</span></label>
             <input type="range" min="1" max="100" value="0" class="slider" id="myRange" name="rangePrice">
-            <button type="reset">
-                <a th:href="@{/dashboard/products}">Reset</a>
+            <button type="button" class="btn btn-secondary" onclick="resetSearch()">
+                Reset
             </button>
             <button type="submit">
                 <i class="fa fa-search"></i>
@@ -40,7 +40,6 @@
         <table class="table table-bordered mt-2">
             <thead>
             <tr class="table-dark">
-                <th><input id="selectAll" type="checkbox"></th>
                 <th>STT</th>
                 <th>Tên Sản Phẩm</th>
                 <th>Đơn Vị Cung Cấp</th>
@@ -64,10 +63,6 @@
                 <td th:text="${product.storage}"></td>
                 <td th:text="${product.stockQuantity}"></td>
                 <td>
-                    <a th:href="@{#}" class="btn btn-primary btn-sm me-1">
-                        <i class="fas fa-eye"></i> Xem
-                    </a>
-
                     <a th:href="@{#}"
                        class="btn btn-secondary btn-sm me-1">
                         <i class="fas fa-pen"></i> Cập Nhật
@@ -77,42 +72,20 @@
 
             </tbody>
         </table>
-        <button th:href="@{#}" class="btn btn-danger btn-sm me-1" disabled id="deleteSelected">
-            <i class="fas fa-trash-alt"></i> Xoá
-        </button>
-        <!-- Bootstrap Modal Xác nhận Xóa -->
-        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" style="margin-top: 150px">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p id="deleteMessage"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="button" class="btn btn-danger" id="confirmDelete">Đồng ý</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!--<ul class="pagination" th:if="${listProducts.totalPages>0}">
+        <ul class="pagination" th:if="${listProducts.totalPages>0}">
             <li class="page-item" th:if="${listProducts.hasPrevious()}">
-                <a class="page-link" th:href="@{/dashboard/products(page=${listProducts.number - 1})}">Previous</a>
+                <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">Previous</a>
             </li>
 
             <li class="page-item" th:each="number :${#numbers.sequence(0,listProducts.totalPages - 1)}">
                 <a class="page-link" th:classappend="${listProducts.number == number} ? 'active':''"
-                   th:href="@{/dashboard/products(page= ${number})}" th:text="${number+1}"></a>
+                   th:href="@{/dashboard/products/list(page= ${number})}" th:text="${number+1}"></a>
             </li>
 
             <li class="page-item" th:if="${listProducts.hasNext()}">
-                <a class="page-link" th:href="@{/dashboard/products(page=${listProducts.number + 1})}">Next</a>
+                <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">Next</a>
             </li>
-        </ul>-->
+        </ul>
     </div>
     <div th:insert="fragments/footer::footer"></div>
 </div>
@@ -122,75 +95,23 @@
     var slider = document.getElementById("myRange");
     var output = document.getElementById("rangeValue");
     output.innerText = slider.value;
-    slider.oninput = function() {
+    slider.oninput = function () {
         output.innerText = this.value;
     };
-    document.getElementById('selectAll').addEventListener('click', function () {
-        let checkboxes = document.querySelectorAll('.selectEmployee');
-        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-        updateButtonState();
-    });
-
-    document.querySelectorAll('.selectEmployee').forEach(checkbox => {
-        checkbox.addEventListener('change', updateButtonState);
-    });
-
-    function updateButtonState() {
-        let selectedEmployees = document.querySelectorAll('.selectEmployee:checked');
-        document.getElementById('deleteSelected').disabled = selectedEmployees.length === 0;
-        document.getElementById('updateEmployee').disabled = selectedEmployees.length !== 1;
+    if ("[[${message}]]".trim() !== "") {
+        Swal.fire({
+            title: "Thành công!",
+            text: "[[${message}]]",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+        function resetSearch() {
+        document.querySelector("form.example").reset();  // Xóa dữ liệu nhập vào
+        window.location.href = "/dashboard/products/list";   // Chuyển hướng về danh sách sản phẩm
     }
 
-    // Xử lý khi nhấn nút Xóa
-    document.getElementById("deleteSelected").addEventListener("click", function () {
-        let selectedEmployees = [];
-        let selectedIds = [];
-        document.querySelectorAll(".selectEmployee:checked").forEach((checkbox) => {
-            let id = checkbox.getAttribute("value");
-            let name = checkbox.getAttribute("data-name");
-            let address = checkbox.getAttribute("data-address");
-            console.log(id);
-            console.log(name);
-            console.log(address);
-            selectedEmployees.push({id, name, address});
-            selectedIds.push(id);
-        });
-
-        if (selectedEmployees.length === 0) {
-            alert("Vui lòng chọn ít nhất một nhân viên để xóa.");
-            return;
-        }
-
-        // Hiển thị danh sách nhân viên cần xóa trong modal
-        let deleteMessage = "Bạn có muốn xóa nhân viên: ";
-        deleteMessage += selectedEmployees.map(emp => `${emp.name} (${emp.address})`).join(", ") + " ?";
-        document.getElementById("deleteMessage").innerText = deleteMessage;
-
-        // Hiển thị modal Bootstrap
-        let deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
-        deleteModal.show();
-
-        // Khi nhấn nút Đồng ý
-        document.getElementById("confirmDelete").onclick = function () {
-            location.href = "/dashboard/admin/employees/delete/" + selectedIds.join(",");
-        };
-    });
-
-    document.getElementById('updateEmployee').addEventListener('click', function () {
-        let selectedEmployees = document.querySelectorAll('.selectEmployee:checked');
-        if (selectedEmployees.length !== 1) {
-            alert('Vui lòng chọn một nhân viên duy nhất để cập nhật.');
-        } else {
-            alert('Thực hiện cập nhật cho nhân viên: ' + selectedEmployees[0].closest('tr').children[1].textContent);
-        }
-    });
-    Swal.fire({
-        title: "Thành công!",
-        text: "[[${message}]]",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false
-    });
 </script>
 </body>
 </html>
