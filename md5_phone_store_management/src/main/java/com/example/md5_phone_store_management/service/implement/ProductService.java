@@ -74,7 +74,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public boolean updateProductWithSellingPrice(Product product) {
+    public void updateProductWithSellingPrice(Product product) {
         try{
             productRepository.updateProduct(product.getProductID(),
                     product.getName(),
@@ -85,21 +85,19 @@ public class ProductService implements IProductService {
                     product.getCPU(),
                     product.getStorage(),
                     product.getDetailedDescription());
-            return true;
         } catch (Exception e){
-            System.out.println("Lỗi khi thực hiện cập nhật");
-            return false;
+            System.out.println("Lỗi khi thực hiện cập nhật: " + e);
         }
     }
 
     @Override
     public void saveProductImage(Product product, ProductImage productImage) {
-
+        productRepository.saveProductImage(productImage.getDescription(), productImage.getImageUrl(), product.getProductID());
     }
 
     @Override
     public void deleteProductImages(Product product) {
-
+        productRepository.deleteProductImages(product.getProductID());
     }
 
     //Tuấn Anh

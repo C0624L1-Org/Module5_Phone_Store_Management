@@ -127,6 +127,7 @@ public class ProductController {
         ProductDTO productDTO = new ProductDTO();
         BeanUtils.copyProperties(product, productDTO);
         productDTO.setSupplierID(product.getSupplier().getSupplierID());
+        System.out.println("Before updating: " + productDTO.toString());
         model.addAttribute("productDTO", productDTO);
         model.addAttribute("supplier", supplierService.getSupplierList());
         return "dashboard/product/update-product-form";
@@ -138,17 +139,21 @@ public class ProductController {
                                 @RequestParam(value = "imgProducts", required = false) List<MultipartFile> imgProducts,
                                 RedirectAttributes redirectAttr,
                                 Model model) {
-
+        System.out.println("After updating: " + productDTO.toString());
         if (biResult.hasErrors()) {
+            System.out.println(biResult.getAllErrors().get(0).getDefaultMessage());
             return "dashboard/product/update-product-form";
         }
-        System.out.println(productDTO.toString());
+
         Product product = new Product();
         BeanUtils.copyProperties(productDTO, product);
+        product.setSupplier(supplierService.getSupplier(productDTO.getSupplierID()));
 
         // Nếu có file ảnh được upload
         if (imgProducts != null && !imgProducts.isEmpty()
                 && imgProducts.stream().anyMatch(file -> file.getSize() > 0)) {
+            //delete old product images
+            productService.deleteProductImages(product);
             List<ProductImage> productImages = new ArrayList<>();
             for (MultipartFile file : imgProducts) {
                 if (file.getSize() > 10 * 1024 * 1024) { // 10MB
@@ -161,19 +166,20 @@ public class ProductController {
                     redirectAttr.addFlashAttribute("message", "Định dạng ảnh không hợp lệ!");
                     return "redirect:/dashboard/products/create-form/" + product.getProductID();
                 }
-                try{
+                try {
                     String imageUrl = cloudinaryService.uploadFile(file, "product");
                     ProductImage pi = new ProductImage();
                     pi.setImageUrl(imageUrl);
                     pi.setProduct(product);
                     productImages.add(pi);
+                    productService.saveProductImage(product, pi); //save new product image into db
                 } catch (IOException e) {
                     throw new RuntimeException("Lỗi khi upload ảnh sản phẩm", e);
                 }
             }
-            product.setImages(productImages);
-
         }
+        System.out.println("Product: " + product.toString());
+        productService.updateProductWithSellingPrice(product);
 
 
         redirectAttr.addFlashAttribute("messageType", "success");

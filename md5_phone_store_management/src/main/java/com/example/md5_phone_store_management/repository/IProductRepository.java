@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Integer> {
@@ -48,9 +49,9 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     @Modifying
     @Transactional
     @Query(value = "UPDATE product p SET p.name = ?2, p.sellingPrice = ?3, p.screenSize = ?4, " +
-            "p.camera = ?5, p.selfie = ?6, p.CPU = ?7, p.storage = ?8, p.description = ?9 " +
+            "p.camera = ?5, p.selfie = ?6, p.CPU = ?7, p.storage = ?8, p.detailedDescription = ?9 " +
             "WHERE p.productID = ?1", nativeQuery = true)
-    Product updateProduct(Integer productID,
+    void updateProduct(Integer productID,
                           String name,
                           BigDecimal sellingPrice,
                           String screenSize,
@@ -60,10 +61,14 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
                           String storage,
                           String description);
 
+    @Modifying
+    @Transactional
     @Query(value = "INSERT INTO product_images(description, imageUrl, product_id) VALUES (?1, ?2, ?3)", nativeQuery = true)
     void saveProductImage(String description, String imageUrl, Integer productID);
 
-    @Query(value = "DELETE FROM product_images pi WHERE pi.product_id = ?1", nativeQuery = true)
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM product_images WHERE product_id = ?1", nativeQuery = true)
     void deleteProductImages(Integer productID);
 
 }

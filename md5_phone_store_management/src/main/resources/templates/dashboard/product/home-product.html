@@ -19,16 +19,15 @@
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
 <div class="container">
-    <div th:insert="fragments/navbar::navbar"></div>
-    <div class="container mt-3">
-        <h2>List Product</h2>
+    <div class="main-content mt-5">
+        <h2>Danh sách hàng hóa</h2>
         <a th:href="@{/dashboard/products/create-form}" class="btn btn-success btn-md mb-3">
             <i class="fas fa-user-plus"></i> Thêm mới sản phẩm
         </a>
         <form class="example" th:action="@{/dashboard/products/search}" method="get">
-            Name Product:<input type="text" placeholder="Search name product" name="searchProduct">
-            Name Supplier:<input type="text" placeholder="Search name Supplier" name="searchSupplier">
-            <label for="myRange">Search Purchase Price: <span id="rangeValue">0</span></label>
+            Tên hàng hóa    <input type="text" placeholder="Nhập tên hàng hóa" name="searchProduct">
+            Tên nhà cung cấp    <input type="text" placeholder="Nhập tên nhà cung cấp" name="searchSupplier">
+            <label for="myRange">Giá  <span id="rangeValue">0</span></label>
             <input type="range" min="1" max="100" value="0" class="slider" id="myRange" name="rangePrice">
             <button type="button" class="btn btn-secondary" onclick="resetSearch()">
                 Reset
@@ -40,7 +39,7 @@
         <table class="table table-bordered mt-2">
             <thead>
             <tr class="table-dark">
-                <th><input id="selectAll" type="checkbox"></th>
+                <!--<th><input id="selectAll" type="checkbox"></th>-->
                 <th>STT</th>
                 <th>Tên Sản Phẩm</th>
                 <th>Đơn Vị Cung Cấp</th>
@@ -55,7 +54,6 @@
             </thead>
             <tbody>
             <tr th:each="product,index : ${listProducts}">
-                <td></td>
                 <td th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
                 <td th:text="${product.name}"></td>
                 <td th:text="${product.supplier.name}"></td>
@@ -74,10 +72,10 @@
 
             </tbody>
         </table>
-        <button th:href="@{#}" class="btn btn-danger btn-sm me-1" disabled id="deleteSelected">
+        <!--<button th:href="@{#}" class="btn btn-danger btn-sm me-1" disabled id="deleteSelected">
             <i class="fas fa-trash-alt"></i> Xoá
         </button>
-        <!-- Bootstrap Modal Xác nhận Xóa -->
+        &lt;!&ndash; Bootstrap Modal Xác nhận Xóa &ndash;&gt;
         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" style="margin-top: 150px">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -94,22 +92,22 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
 
-        <!--<ul class="pagination" th:if="${listProducts.totalPages>0}">
+        <ul class="pagination" th:if="${listProducts.totalPages>0}">
             <li class="page-item" th:if="${listProducts.hasPrevious()}">
-                <a class="page-link" th:href="@{/dashboard/products(page=${listProducts.number - 1})}">Previous</a>
+                <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">Trước</a>
             </li>
 
             <li class="page-item" th:each="number :${#numbers.sequence(0,listProducts.totalPages - 1)}">
                 <a class="page-link" th:classappend="${listProducts.number == number} ? 'active':''"
-                   th:href="@{/dashboard/products(page= ${number})}" th:text="${number+1}"></a>
+                   th:href="@{/dashboard/products/list(page= ${number})}" th:text="${number+1}"></a>
             </li>
 
             <li class="page-item" th:if="${listProducts.hasNext()}">
-                <a class="page-link" th:href="@{/dashboard/products(page=${listProducts.number + 1})}">Next</a>
+                <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">Sau</a>
             </li>
-        </ul>-->
+        </ul>
     </div>
     <div th:insert="fragments/footer::footer"></div>
 </div>

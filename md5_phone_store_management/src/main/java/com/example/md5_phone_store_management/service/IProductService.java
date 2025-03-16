@@ -20,7 +20,7 @@ public interface IProductService {
 
     //update
     Product getProductById(Integer id);
-    boolean updateProductWithSellingPrice(Product product);
+    void updateProductWithSellingPrice(Product product);
     void saveProductImage(Product product, ProductImage productImage);
     void deleteProductImages(Product product);
 }

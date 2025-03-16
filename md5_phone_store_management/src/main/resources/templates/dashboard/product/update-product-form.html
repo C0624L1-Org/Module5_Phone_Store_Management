@@ -33,6 +33,12 @@
                   enctype="multipart/form-data">
 
                 <input type="hidden" th:field="*{productID}">
+                <input type="hidden" th:field="*{purchasePrice}">
+                <input type="hidden" th:field="*{retailPrice}">
+                <input type="hidden" th:field="*{stockQuantity}">
+                <input type="hidden" th:field="*{qrCode}">
+                <input type="hidden" th:field="*{supplierID}">
+
                 <div class="mb-3">
                     <label for="name" class="form-label">Tên sản phẩm</label>
                     <input type="text" th:field="*{name}" id="name" class="form-control"
@@ -42,9 +48,10 @@
                 </div>
                 <div class="mb-3">
                     <label for="sellingPrice" class="form-label">Giá bán</label>
-                    <input type="number" th:field="*{sellingPrice}" id="sellingPrice" class="form-control"> VND
+                    <input type="number" th:field="*{{sellingPrice}}" id="sellingPrice" class="form-control" pattern="[0-9]">
                     <p class="text-danger small" th:if="${#fields.hasErrors('sellingPrice')}"
                        th:text="${#fields.errors('sellingPrice')[0]}"></p>
+
                 </div>
                 <!-- Hình ảnh sản phẩm -->
                 <div class="mb-3">
@@ -52,8 +59,7 @@
                     <input type="file" class="form-control" id="imgProducts" name="imgProducts" multiple>
                     <!--hiển thị hinh ảnh-->
                     <img th:each="img : *{images}" th:src="${img.imageUrl}" th:alt="${img.product.name}"
-                         class="img-thumbnail">
-                    <!--<p class="text-danger small" th:if="${#fields.hasErrors('imgProducts')}" th:text="${#fields.errors('imgProducts')[0]}"></p>-->
+                         class="img-thumbnail" height="200px" width="200px">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Kích thước màn hình</label>

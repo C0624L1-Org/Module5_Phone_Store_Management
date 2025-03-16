@@ -15,10 +15,11 @@ public class Product {
     @Column(nullable = false, length = 200)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "decimal(15,0)")
     private BigDecimal purchasePrice;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "decimal(15,0)")
     private BigDecimal sellingPrice;
+    @Column(columnDefinition = "decimal(15,0)")
     private BigDecimal retailPrice;
     private String CPU;
     private String storage;
@@ -177,5 +178,26 @@ public class Product {
 
     public void setRetailPrice(BigDecimal retailPrice) {
         this.retailPrice = retailPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productID=" + productID +
+                ", name='" + name + '\'' +
+                ", purchasePrice=" + purchasePrice +
+                ", sellingPrice=" + sellingPrice +
+                ", retailPrice=" + retailPrice +
+                ", CPU='" + CPU + '\'' +
+                ", storage='" + storage + '\'' +
+                ", screenSize='" + screenSize + '\'' +
+                ", camera='" + camera + '\'' +
+                ", selfie='" + selfie + '\'' +
+                ", detailedDescription='" + detailedDescription + '\'' +
+                ", images=" + images +
+                ", stockQuantity=" + stockQuantity +
+                ", qrCode='" + qrCode + '\'' +
+                ", supplier=" + supplier +
+                '}';
     }
 }
