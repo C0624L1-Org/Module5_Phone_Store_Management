@@ -26,6 +26,9 @@ public class EmployeeController {
     @Autowired
     private IEmployeeService iEmployeeService;
 
+    @Autowired
+    private GlobalControllerAdvice globalControllerAdvice;
+
     @GetMapping("/admin")
     public String admin(Model model) {
         return "dashboard/admin/admin-home";
@@ -191,13 +194,19 @@ public class EmployeeController {
     //delete
     @GetMapping("/admin/employees/delete/{ids}")
     public String deleteEmployee(@PathVariable List<Integer> ids, Model model, RedirectAttributes redirectAttributes) {
-        try {
-            iEmployeeService.deleteEmployeesById(ids);
-            redirectAttributes.addFlashAttribute("messageType", "success");
-            redirectAttributes.addFlashAttribute("message", "Xóa nhân viên thành công");
-        } catch (Exception e) {
+        Employee currentEmployee = globalControllerAdvice.currentEmployee();
+        if (ids.contains(currentEmployee.getEmployeeID())) {
             redirectAttributes.addFlashAttribute("messageType", "error");
-            redirectAttributes.addFlashAttribute("message", "Xóa nhân viên không thành công");
+            redirectAttributes.addFlashAttribute("message", "Bạn không thể tự xóa chính mình!");
+        } else {
+            try {
+                iEmployeeService.deleteEmployeesById(ids);
+                redirectAttributes.addFlashAttribute("messageType", "success");
+                redirectAttributes.addFlashAttribute("message", "Xóa nhân viên thành công");
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("messageType", "error");
+                redirectAttributes.addFlashAttribute("message", "Xóa nhân viên không thành công");
+            }
         }
         return "redirect:/dashboard/admin/employees/list";
     }

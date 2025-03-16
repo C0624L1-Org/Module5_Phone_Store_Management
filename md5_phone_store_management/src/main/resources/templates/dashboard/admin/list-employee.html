@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách nhân viên</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/css/common/navbar.css">
+    <link rel="stylesheet" href="/css/common/sidebar.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+<!-- Navbar -->
+<div th:insert="common/navbar :: navbar"></div>
+<!-- Sidebar -->
+<div th:insert="common/sidebar :: sidebar"></div>
+
+<!-- Nội dung trong trang -->
+<div class="main-content mt-5">
+    <div class="row">
+        <main class="fade-in" id="page-title">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">DANH SÁCH NHÂN VIÊN</h1>
+            </div>
+
+            <!-- Button Thêm Người Dùng -->
+            <a th:href="@{/employees/create}" class="btn btn-success btn-md mb-3">
+                <i class="fas fa-user-plus"></i> Thêm mới nhân viên
+            </a>
+
+            <!-- Search -->
+            <form action="/employees/search" class="mb-3" method="GET">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="name">Tên nhân viên:</label>
+                        <input class="form-control" name="name" id="name"
+                               placeholder="Tên nhân viên" type="text" th:value="${param.name}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="phoneNumber">Số điện thoại </label>
+                        <input class="form-control" name="phone" id="phoneNumber"
+                               placeholder="Số điện thoại" th:value="${param.phone}" type="text">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="role">Vai trò:</label>
+                        <select class="form-control" name="role" id="role">
+                            <option value="">Chọn vai trò</option>
+                            <option th:selected="${param.role == 'Admin'}" th:value="Admin">Admin</option>
+                            <option th:selected="${param.role == 'SalesStaff'}" th:value="SalesStaff">Nhân viên kinh
+                                doanh
+                            </option>
+                            <option th:selected="${param.role == 'WarehouseStaff'}" th:value="WarehouseStaff">Thủ kho
+                            </option>
+                            <option th:selected="${param.role == 'SalesPerson'}" th:value="SalesPerson">Nhân viên bán
+                                hàng
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <a class="btn btn-secondary" href="/employees">
+                            <i class="bi bi-x-circle"></i> Xóa tìm kiếm
+                        </a>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th><input id="selectAll" type="checkbox"></th>
+                        <th>Họ và tên</th>
+                        <th>Ngày sinh</th>
+                        <th>Địa chỉ</th>
+                        <th>Công việc</th>
+                        <th>Số điện thoại</th>
+                        <th>Hành Động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="employee:${employeePage}">
+                        <td><input name="selectEmployIds" class="selectEmployee"
+                                   th:value="${employee.employeeID}" th:data-name="${employee.fullName}"
+                                   th:data-address="${employee.address}"
+                                   type="checkbox"></td>
+                        <td th:text="${employee.fullName}"></td>
+                        <td th:text="${employee.dob}"></td>
+                        <td th:text="${employee.address}"></td>
+                        <td>
+                                <span th:switch="${employee.role?.name()}">
+                                    <span th:case="'Admin'">Admin</span>
+                                    <span th:case="'SalesStaff'">Nhân viên kinh doanh</span>
+                                    <span th:case="'SalesPerson'">Nhân viên bán hàng</span>
+                                    <span th:case="'WarehouseStaff'">Thủ kho</span>
+                                    <span th:case="*">Không xác định</span>
+                                </span>
+                        </td>
+                        <td th:text="${employee.phone}"></td>
+                        <td>
+                            <a th:href="@{#}" class="btn btn-primary btn-sm me-1">
+                                <i class="fas fa-eye"></i> Xem
+                            </a>
+
+                            <a th:href="@{/admin/employee/edit/{employeeID}(employeeID=${employee.employeeID})}"
+                               class="btn btn-secondary btn-sm me-1">
+                                <i class="fas fa-pen"></i> Cập Nhật
+                            </a>
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--Delete Button-->
+            <button th:href="@{#}" class="btn btn-danger btn-sm me-1" disabled id="deleteSelected">
+                <i class="fas fa-trash-alt"></i> Xoá
+            </button>
+            <!-- Bootstrap Modal Xác nhận Xóa -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="deleteMessage"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-danger" id="confirmDelete">Đồng ý</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Phân trang-->
+            <nav aria-label="Pagination" class="mt-3">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/employees/search(page=${currentPage - 1}, name=${param.name}, phone=${param.phone}, role=${param.role})}">Trước
+                        </a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${i == currentPage} ? 'active'"
+                        th:each="i : ${#numbers.sequence(0, totalPage - 1)}">
+                        <a class="page-link"
+                           th:href="@{/employees/search(page=${i}, name=${param.name}, phone=${param.phone}, role=${param.role})}"
+                           th:text="${i + 1}">
+                        </a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/employees/search(page=${currentPage + 1}, name=${param.name}, phone=${param.phone}, role=${param.role})}">Sau
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </main>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<div th:replace="~{/common/footer :: footer}"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.getElementById('selectAll').addEventListener('click', function () {
+        let checkboxes = document.querySelectorAll('.selectEmployee');
+        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+        updateButtonState();
+    });
+
+    document.querySelectorAll('.selectEmployee').forEach(checkbox => {
+        checkbox.addEventListener('change', updateButtonState);
+    });
+
+    function updateButtonState() {
+        let selectedEmployees = document.querySelectorAll('.selectEmployee:checked');
+        document.getElementById('deleteSelected').disabled = selectedEmployees.length === 0;
+        document.getElementById('updateEmployee').disabled = selectedEmployees.length !== 1;
+    }
+
+    // Xử lý khi nhấn nút Xóa
+    document.getElementById("deleteSelected").addEventListener("click", function () {
+        let selectedEmployees = [];
+        let selectedIds = [];
+        document.querySelectorAll(".selectEmployee:checked").forEach((checkbox) => {
+            let id = checkbox.getAttribute("value");
+            let name = checkbox.getAttribute("data-name");
+            let address = checkbox.getAttribute("data-address");
+            console.log(id);
+            console.log(name);
+            console.log(address);
+            selectedEmployees.push({id, name, address});
+            selectedIds.push(id);
+        });
+
+        if (selectedEmployees.length === 0) {
+            alert("Vui lòng chọn ít nhất một nhân viên để xóa.");
+            return;
+        }
+
+        // Hiển thị danh sách nhân viên cần xóa trong modal
+        let deleteMessage = "Bạn có muốn xóa nhân viên: ";
+        deleteMessage += selectedEmployees.map(emp => `${emp.name} (${emp.address})`).join(", ") + " ?";
+        document.getElementById("deleteMessage").innerText = deleteMessage;
+
+        // Hiển thị modal Bootstrap
+        let deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
+        deleteModal.show();
+
+        // Khi nhấn nút Đồng ý
+        document.getElementById("confirmDelete").onclick = function () {
+            location.href = "/employees/delete/" + selectedIds.join(",");
+        };
+    });
+
+    document.getElementById('updateEmployee').addEventListener('click', function () {
+        let selectedEmployees = document.querySelectorAll('.selectEmployee:checked');
+        if (selectedEmployees.length !== 1) {
+            alert('Vui lòng chọn một nhân viên duy nhất để cập nhật.');
+        } else {
+            alert('Thực hiện cập nhật cho nhân viên: ' + selectedEmployees[0].closest('tr').children[1].textContent);
+        }
+    });
+</script>
+</body>
+</html>

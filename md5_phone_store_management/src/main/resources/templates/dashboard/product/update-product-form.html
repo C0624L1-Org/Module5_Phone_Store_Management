@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Thêm Sản phẩm</title>
+    <title>Cập Nhật Sản phẩm</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -25,12 +25,19 @@
 <div class="main-content mt-5">
     <div class="card shadow w-50 mx-auto">
         <div class="card-header bg-success text-white">
-            <h3 class="mb-0">Thêm mới sản phẩm</h3>
+            <h3 class="mb-0">Cập nhật sản phẩm: <strong th:text="${productDTO.name}"></strong></h3>
         </div>
         <div class="card-body">
-            <form th:action="@{/dashboard/products/add-product}" method="post"
+            <form th:action="@{/dashboard/products/update-product}" method="post"
                   th:object="${productDTO}"
                   enctype="multipart/form-data">
+
+                <input type="hidden" th:field="*{productID}">
+                <input type="hidden" th:field="*{purchasePrice}">
+                <input type="hidden" th:field="*{retailPrice}">
+                <input type="hidden" th:field="*{stockQuantity}">
+                <input type="hidden" th:field="*{qrCode}">
+                <input type="hidden" th:field="*{supplierID}">
 
                 <div class="mb-3">
                     <label for="name" class="form-label">Tên sản phẩm</label>
@@ -39,30 +46,20 @@
                     <p class="text-danger small" th:if="${#fields.hasErrors('name')}"
                        th:text="${#fields.errors('name')[0]}"></p>
                 </div>
+                <div class="mb-3">
+                    <label for="sellingPrice" class="form-label">Giá bán</label>
+                    <input type="number" th:field="*{{sellingPrice}}" id="sellingPrice" class="form-control" pattern="[0-9]">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('sellingPrice')}"
+                       th:text="${#fields.errors('sellingPrice')[0]}"></p>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="purchasePrice" class="form-label">Giá nhập</label>
-                        <input type="number" th:field="*{purchasePrice}" id="purchasePrice" class="form-control">
-                        <p class="text-danger small" th:if="${#fields.hasErrors('purchasePrice')}"
-                           th:text="${#fields.errors('purchasePrice')[0]}"></p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="sellingPrice" class="form-label">Giá bán</label>
-                        <input type="number" th:field="*{sellingPrice}" id="sellingPrice" class="form-control">
-                        <p class="text-danger small" th:if="${#fields.hasErrors('sellingPrice')}"
-                           th:text="${#fields.errors('sellingPrice')[0]}"></p>
-                    </div>
                 </div>
+                <!-- Hình ảnh sản phẩm -->
                 <div class="mb-3">
-                    <label class="form-label">CPU</label>
-                    <input type="text" class="form-control" th:field="*{CPU}">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Bộ nhớ</label>
-                    <input type="text" class="form-control" th:field="*{storage}">
-                    <p class="text-danger small" th:if="${#fields.hasErrors('storage')}"
-                       th:text="${#fields.errors('storage')[0]}"></p>
+                    <label for="imgProducts" class="form-label">Hình ảnh sản phẩm</label>
+                    <input type="file" class="form-control" id="imgProducts" name="imgProducts" multiple>
+                    <!--hiển thị hinh ảnh-->
+                    <img th:each="img : *{images}" th:src="${img.imageUrl}" th:alt="${img.product.name}"
+                         class="img-thumbnail" height="200px" width="200px">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Kích thước màn hình</label>
@@ -75,50 +72,47 @@
                        th:text="${#fields.errors('camera')[0]}"></p>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Camera Selfie</label>
+                    <label class="form-label">Selfie</label>
                     <input type="text" class="form-control" th:field="*{selfie}">
                     <p class="text-danger small" th:if="${#fields.hasErrors('selfie')}"
                        th:text="${#fields.errors('selfie')[0]}"></p>
                 </div>
-
+                <div class="mb-3">
+                    <label class="form-label">CPU</label>
+                    <input type="text" class="form-control" th:field="*{CPU}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Lưu trữ</label>
+                    <input type="text" class="form-control" th:field="*{storage}">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('storage')}"
+                       th:text="${#fields.errors('storage')[0]}"></p>
+                </div>
                 <!-- Mô tả sản phẩm -->
                 <div class="mb-3">
-                    <label class="form-label">Mô tả chi tiết</label>
+                    <label class="form-label">Mô tả thêm</label>
                     <textarea class="form-control" th:field="*{detailedDescription}"></textarea>
                 </div>
-
-                <!-- Hình ảnh sản phẩm -->
-                <div class="mb-3">
-                    <label for="imgProducts" class="form-label">Chọn hình ảnh sản phẩm</label>
-                    <input type="file" class="form-control" id="imgProducts" name="imgProducts" accept="image/*"
-                           multiple>
-                    <!--          <p class="text-danger small" th:if="${#fields.hasErrors('imgProducts')}" th:text="${#fields.errors('imgProducts')[0]}"></p>-->
-                </div>
-
-                <!-- Số lượng tồn kho -->
+                <!--&lt;!&ndash; Số lượng tồn kho &ndash;&gt;
                 <div class="mb-3">
                     <label for="stockQuantity" class="form-label">Số lượng tồn kho</label>
                     <input type="number" th:field="*{stockQuantity}" id="stockQuantity" class="form-control">
                     <p class="text-danger small" th:if="${#fields.hasErrors('stockQuantity')}"
                        th:text="${#fields.errors('stockQuantity')[0]}"></p>
                 </div>
-
-                <!-- Mã QR -->
+                &lt;!&ndash; Mã QR &ndash;&gt;
                 <div class="mb-3">
                     <label class="form-label">Mã QR</label>
                     <input type="text" class="form-control" th:field="*{qrCode}">
                 </div>
-
-                <!-- Nhà cung cấp -->
+                &lt;!&ndash; Nhà cung cấp &ndash;&gt;
                 <div class="mb-3">
                     <label class="form-label">Nhà cung cấp</label>
                     <select class="form-control" th:field="*{supplierID}">
-                        <option value="">-- Chọn nhà cung cấp --</option>
+                        <option value="">&#45;&#45; Chọn nhà cung cấp &#45;&#45;</option>
                         <option th:each="sup : ${supplier}" th:value="${sup.supplierID}" th:text="${sup.name}"></option>
                     </select>
-                </div>
-
-                <button type="submit" class="btn btn-success">Thêm sản phẩm</button>
+                </div>-->
+                <button type="submit" class="btn btn-success">Cập nhật</button>
 
                 <a href="/dashboard/products/list" class="btn btn-secondary">Hủy</a>
             </form>
