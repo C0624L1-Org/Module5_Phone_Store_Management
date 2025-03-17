@@ -17,14 +17,17 @@ public class GlobalControllerAdvice {
     private EmployeeService employeeService;
 
     @ModelAttribute("loggedEmployee")
-    public Optional<Employee> currentEmployee() {
+    public Employee currentEmployee() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null
                 && authentication.isAuthenticated()
                 && !"anonymousUser".equals(authentication.getPrincipal())) {
             String username = authentication.getName();
-            return employeeService.findByUsername(username);
+            Optional<Employee> employeeOpt = employeeService.findByUsername(username);
+            if (employeeOpt.isPresent()) {
+                return employeeOpt.get();
+            }
         }
-        return Optional.empty();
+        return null;
     }
 }

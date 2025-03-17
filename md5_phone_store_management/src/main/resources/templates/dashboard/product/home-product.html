@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+<!-- Nhúng navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<!-- Sidebar -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<div class="container">
+    <div class="main-content mt-5">
+        <h2>Danh sách hàng hóa</h2>
+        <a th:href="@{/dashboard/products/create-form}" class="btn btn-success btn-md mb-3">
+            <i class="fas fa-user-plus"></i> Thêm mới sản phẩm
+        </a>
+        <form class="example" th:action="@{/dashboard/products/search}" method="get">
+            Tên hàng hóa    <input type="text" placeholder="Nhập tên hàng hóa" name="searchProduct">
+            Tên nhà cung cấp    <input type="text" placeholder="Nhập tên nhà cung cấp" name="searchSupplier">
+            <label for="myRange">Giá  <span id="rangeValue">0</span></label>
+            <input type="range" min="1" max="100" value="0" class="slider" id="myRange" name="rangePrice">
+            <button type="button" class="btn btn-secondary" onclick="resetSearch()">
+                Reset
+            </button>
+            <button type="submit">
+                <i class="fa fa-search"></i>
+            </button>
+        </form>
+        <table class="table table-bordered mt-2">
+            <thead>
+            <tr class="table-dark">
+                <!--<th><input id="selectAll" type="checkbox"></th>-->
+                <th>STT</th>
+                <th>Tên Sản Phẩm</th>
+                <th>Đơn Vị Cung Cấp</th>
+                <th>Giá Mua Vào</th>
+                <th>Giá Bán</th>
+                <th>CPU</th>
+                <th>Bộ Nhớ</th>
+                <th>Số Lượng</th>
+                <th>Hành Động</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product,index : ${listProducts}">
+                <td th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
+                <td th:text="${product.name}"></td>
+                <td th:text="${product.supplier.name}"></td>
+                <td th:text="${#numbers.formatInteger(product.purchasePrice,1,'POINT') + ' VND'}"></td>
+                <td th:text="${#numbers.formatInteger(product.sellingPrice,1,'POINT') + ' VND'}"></td>
+                <td th:text="${product.CPU}"></td>
+                <td th:text="${product.storage}"></td>
+                <td th:text="${product.stockQuantity}"></td>
+                <td>
+                    <a th:href="@{/dashboard/products/update-form/{id}(id=${product.productID})}"
+                       class="btn btn-secondary btn-sm me-1">
+                        <i class="fas fa-pen"></i> Cập Nhật
+                    </a>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+        <!--<button th:href="@{#}" class="btn btn-danger btn-sm me-1" disabled id="deleteSelected">
+            <i class="fas fa-trash-alt"></i> Xoá
+        </button>
+        &lt;!&ndash; Bootstrap Modal Xác nhận Xóa &ndash;&gt;
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" style="margin-top: 150px">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="deleteMessage"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-danger" id="confirmDelete">Đồng ý</button>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+
+        <ul class="pagination" th:if="${listProducts.totalPages>0}">
+            <li class="page-item" th:if="${listProducts.hasPrevious()}">
+                <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">Trước</a>
+            </li>
+
+            <li class="page-item" th:each="number :${#numbers.sequence(0,listProducts.totalPages - 1)}">
+                <a class="page-link" th:classappend="${listProducts.number == number} ? 'active':''"
+                   th:href="@{/dashboard/products/list(page= ${number})}" th:text="${number+1}"></a>
+            </li>
+
+            <li class="page-item" th:if="${listProducts.hasNext()}">
+                <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">Sau</a>
+            </li>
+        </ul>
+    </div>
+    <div th:insert="fragments/footer::footer"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("rangeValue");
+    output.innerText = slider.value;
+    slider.oninput = function () {
+        output.innerText = this.value;
+    };
+    if ("[[${message}]]".trim() !== "") {
+        Swal.fire({
+            title: "Thành công!",
+            text: "[[${message}]]",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+        function resetSearch() {
+        document.querySelector("form.example").reset();  // Xóa dữ liệu nhập vào
+        window.location.href = "/dashboard/products/list";   // Chuyển hướng về danh sách sản phẩm
+    }
+
+</script>
+</body>
+</html>

@@ -24,9 +24,6 @@ public class EmployeeService implements IEmployeeService {
     private IEmployeeRepository iEmployeeRepository;
 
     @Autowired
-    private IEmployeeRepository employeeRepository;
-
-    @Autowired
     private EncryptPasswordUtils encryptPasswordUtils;
 
     @Autowired
@@ -101,13 +98,14 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public Optional<Employee> findByUsername(String username) {
-        return employeeRepository.findByUsername(username);
+        return iEmployeeRepository.findByUsername(username);
     }
 
     @Override
     public void deleteEmployeesById(List<Integer> employeeIDs) {
-        for (int i = 0; i < employeeIDs.size(); i++) {
-            iEmployeeRepository.deleteById(employeeIDs.get(i));
+        for (Integer employeeID : employeeIDs) {
+            System.out.println(employeeID);
+            iEmployeeRepository.deleteEmployeeById(employeeID);
         }
         //iEmployeeRepository.deleteAllByIdInBatch(employeeIDs);
     }
@@ -116,11 +114,11 @@ public class EmployeeService implements IEmployeeService {
     public Employee updateAvatar(Integer employeeID, MultipartFile file) {
         try {
             String avatarUrl = cloudinaryService.uploadFile(file, "avatar");
-            Optional<Employee> optional = employeeRepository.findById(employeeID);
+            Optional<Employee> optional = iEmployeeRepository.findById(employeeID);
             if (optional.isPresent()) {
                 Employee employee = optional.get();
                 employee.setAvatar(avatarUrl);
-                return employeeRepository.save(employee);
+                return iEmployeeRepository.save(employee);
             } else {
                 throw new RuntimeException("Employee không tồn tại với ID: " + employeeID);
             }

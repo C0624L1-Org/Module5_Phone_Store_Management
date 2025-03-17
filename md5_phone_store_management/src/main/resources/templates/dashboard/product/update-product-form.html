@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cập Nhật Sản phẩm</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+<!-- Nhúng navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<!-- Sidebar -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<div class="main-content mt-5">
+    <div class="card shadow w-50 mx-auto">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">Cập nhật sản phẩm: <strong th:text="${productDTO.name}"></strong></h3>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/dashboard/products/update-product}" method="post"
+                  th:object="${productDTO}"
+                  enctype="multipart/form-data">
+
+                <input type="hidden" th:field="*{productID}">
+                <input type="hidden" th:field="*{purchasePrice}">
+                <input type="hidden" th:field="*{retailPrice}">
+                <input type="hidden" th:field="*{stockQuantity}">
+                <input type="hidden" th:field="*{qrCode}">
+                <input type="hidden" th:field="*{supplierID}">
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Tên sản phẩm</label>
+                    <input type="text" th:field="*{name}" id="name" class="form-control"
+                           placeholder="Nhập tên sản phẩm">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('name')}"
+                       th:text="${#fields.errors('name')[0]}"></p>
+                </div>
+                <div class="mb-3">
+                    <label for="sellingPrice" class="form-label">Giá bán</label>
+                    <input type="number" th:field="*{{sellingPrice}}" id="sellingPrice" class="form-control" pattern="[0-9]">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('sellingPrice')}"
+                       th:text="${#fields.errors('sellingPrice')[0]}"></p>
+
+                </div>
+                <!-- Hình ảnh sản phẩm -->
+                <div class="mb-3">
+                    <label for="imgProducts" class="form-label">Hình ảnh sản phẩm</label>
+                    <input type="file" class="form-control" id="imgProducts" name="imgProducts" multiple>
+                    <!--hiển thị hinh ảnh-->
+                    <img th:each="img : *{images}" th:src="${img.imageUrl}" th:alt="${img.product.name}"
+                         class="img-thumbnail" height="200px" width="200px">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Kích thước màn hình</label>
+                    <input type="text" class="form-control" th:field="*{screenSize}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Camera</label>
+                    <input type="text" class="form-control" th:field="*{camera}">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('camera')}"
+                       th:text="${#fields.errors('camera')[0]}"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Selfie</label>
+                    <input type="text" class="form-control" th:field="*{selfie}">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('selfie')}"
+                       th:text="${#fields.errors('selfie')[0]}"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">CPU</label>
+                    <input type="text" class="form-control" th:field="*{CPU}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Lưu trữ</label>
+                    <input type="text" class="form-control" th:field="*{storage}">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('storage')}"
+                       th:text="${#fields.errors('storage')[0]}"></p>
+                </div>
+                <!-- Mô tả sản phẩm -->
+                <div class="mb-3">
+                    <label class="form-label">Mô tả thêm</label>
+                    <textarea class="form-control" th:field="*{detailedDescription}"></textarea>
+                </div>
+                <!--&lt;!&ndash; Số lượng tồn kho &ndash;&gt;
+                <div class="mb-3">
+                    <label for="stockQuantity" class="form-label">Số lượng tồn kho</label>
+                    <input type="number" th:field="*{stockQuantity}" id="stockQuantity" class="form-control">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('stockQuantity')}"
+                       th:text="${#fields.errors('stockQuantity')[0]}"></p>
+                </div>
+                &lt;!&ndash; Mã QR &ndash;&gt;
+                <div class="mb-3">
+                    <label class="form-label">Mã QR</label>
+                    <input type="text" class="form-control" th:field="*{qrCode}">
+                </div>
+                &lt;!&ndash; Nhà cung cấp &ndash;&gt;
+                <div class="mb-3">
+                    <label class="form-label">Nhà cung cấp</label>
+                    <select class="form-control" th:field="*{supplierID}">
+                        <option value="">&#45;&#45; Chọn nhà cung cấp &#45;&#45;</option>
+                        <option th:each="sup : ${supplier}" th:value="${sup.supplierID}" th:text="${sup.name}"></option>
+                    </select>
+                </div>-->
+                <button type="submit" class="btn btn-success">Cập nhật</button>
+
+                <a href="/dashboard/products/list" class="btn btn-secondary">Hủy</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Nhúng footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Các script khác -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

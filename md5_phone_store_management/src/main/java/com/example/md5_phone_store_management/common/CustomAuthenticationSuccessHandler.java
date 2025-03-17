@@ -41,7 +41,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_Admin"))) {
             return "/dashboard/admin";
         } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SalesStaff"))) {
-            return "/dashboard/sales-staff";
+            return "/dashboard/sales";
         } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SalesPerson"))) {
             return "/dashboard/business-staff";
         } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_WarehouseStaff"))) {

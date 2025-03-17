@@ -16,7 +16,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             throws IOException, ServletException {
 
         // Lưu thông báo lỗi vào session
-        request.getSession().setAttribute("ERROR_MESSAGE", "Bạn không có quyền truy cập!");
+        request.getSession().setAttribute("ERROR_MESSAGE", "Bạn không có quyền truy cập trang này!");
 
         // Chuyển hướng về trang home
         response.sendRedirect(request.getContextPath() + "/home");

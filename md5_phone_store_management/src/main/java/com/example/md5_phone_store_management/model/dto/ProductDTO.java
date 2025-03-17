@@ -1,53 +1,60 @@
-package com.example.md5_phone_store_management.model;
+package com.example.md5_phone_store_management.model.dto;
 
-import jakarta.persistence.*;
+import com.example.md5_phone_store_management.model.ProductImage;
+import jakarta.validation.constraints.*;
+import org.springframework.format.annotation.NumberFormat;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Entity
-@Table(name = "product")
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ProductDTO {
     private Integer productID;
 
-    @Column(nullable = false, length = 200)
+    @NotBlank(message = "Tên sản phẩm không được để trống")
+    @Size(min = 5, message = "Tên sản phẩm phải có ít nhất 5 ký tự")
+    @Size(max = 50, message = "Tên sản phẩm không vượt quá 50 ký tự")
     private String name;
 
-    @Column(nullable = false, columnDefinition = "decimal(15,0)")
+    @NotNull(message = "Giá nhập không được để trống")
+    @DecimalMin(value = "10000", message = "Giá nhập phải lớn hơn 10.000")
+    @NumberFormat(pattern = "############")
     private BigDecimal purchasePrice;
-    @Column(nullable = false, columnDefinition = "decimal(15,0)")
+
+    @NotNull(message = "Giá bán không được để trống")
+    @DecimalMin(value = "10000", message = "Giá bán phải lớn hơn 10.000")
+    @NumberFormat(pattern = "############")
     private BigDecimal sellingPrice;
-    @Column(columnDefinition = "decimal(15,0)")
+
+    @NumberFormat(pattern = "############")
     private BigDecimal retailPrice;
+
     private String CPU;
+    @Pattern(regexp = "^[1-9]\\d*(MB|GB|TB)$",
+            message = "Bộ nhớ phải có định dạng số + MB, GB hoặc TB, ví dụ: 512MB, 8GB, 1TB")
     private String storage;
     private String screenSize;
+    @Pattern(regexp = "^[1-9]\\d*MP$",
+            message = "Camera phải có định dạng số + MP, ví dụ: 12MP, 108MP")
     private String camera;
+    @Pattern(regexp = "^[1-9]\\d*MP$",
+            message = "Camera phải có định dạng số + MP, ví dụ: 12MP, 108MP")
     private String selfie;
-
-    @Lob
     private String detailedDescription;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
-
+    @NotNull(message = "Số lượng tồn kho không được để trống")
+    @Positive(message = "Số lượng tồn kho phải lớn hơn 0")
     private Integer stockQuantity;
     private String qrCode;
+    private Integer supplierID;
 
-    @ManyToOne
-    @JoinColumn(name = "supplierID", foreignKey = @ForeignKey(name = "FK_product_supplier"))
-    private Supplier supplier;
+    public ProductDTO() {}
 
-    public Product() {
-    }
-
-    public Product(Integer productID, String name, BigDecimal purchasePrice, BigDecimal sellingPrice, String CPU, String storage, String screenSize, String camera, String selfie, String detailedDescription, List<ProductImage> images, Integer stockQuantity, String qrCode, Supplier supplier) {
+    public ProductDTO(Integer productID, String name, BigDecimal purchasePrice, BigDecimal sellingPrice, BigDecimal retailPrice, String CPU, String storage, String screenSize, String camera, String selfie, String detailedDescription, List<ProductImage> images, Integer stockQuantity, String qrCode, Integer supplierID) {
         this.productID = productID;
         this.name = name;
         this.purchasePrice = purchasePrice;
         this.sellingPrice = sellingPrice;
+        this.retailPrice = retailPrice;
         this.CPU = CPU;
         this.storage = storage;
         this.screenSize = screenSize;
@@ -57,7 +64,7 @@ public class Product {
         this.images = images;
         this.stockQuantity = stockQuantity;
         this.qrCode = qrCode;
-        this.supplier = supplier;
+        this.supplierID = supplierID;
     }
 
     public Integer getProductID() {
@@ -164,12 +171,12 @@ public class Product {
         this.qrCode = qrCode;
     }
 
-    public Supplier getSupplier() {
-        return supplier;
+    public Integer getSupplierID() {
+        return supplierID;
     }
 
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
+    public void setSupplierID(Integer supplierID) {
+        this.supplierID = supplierID;
     }
 
     public BigDecimal getRetailPrice() {
@@ -182,7 +189,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product{" +
+        return "ProductDTO{" +
                 "productID=" + productID +
                 ", name='" + name + '\'' +
                 ", purchasePrice=" + purchasePrice +
@@ -197,7 +204,7 @@ public class Product {
                 ", images=" + images +
                 ", stockQuantity=" + stockQuantity +
                 ", qrCode='" + qrCode + '\'' +
-                ", supplier=" + supplier +
+                ", supplierID=" + supplierID +
                 '}';
     }
 }
