@@ -1,24 +1,32 @@
 package com.example.md5_phone_store_management.model.dto;
 
+import com.example.md5_phone_store_management.model.ProductImage;
 import jakarta.validation.constraints.*;
+import org.springframework.format.annotation.NumberFormat;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ProductDTO {
     private Integer productID;
 
     @NotBlank(message = "Tên sản phẩm không được để trống")
-    @Size(min = 5,message = "Tên sản phẩm phải có ít nhất 5 ký tự")
-    @Size (max = 50,message = "Tên sản phẩm không vượt quá 50 ký tự")
+    @Size(min = 5, message = "Tên sản phẩm phải có ít nhất 5 ký tự")
+    @Size(max = 50, message = "Tên sản phẩm không vượt quá 50 ký tự")
     private String name;
 
     @NotNull(message = "Giá nhập không được để trống")
     @DecimalMin(value = "10000", message = "Giá nhập phải lớn hơn 10.000")
+    @NumberFormat(pattern = "############")
     private BigDecimal purchasePrice;
 
     @NotNull(message = "Giá bán không được để trống")
-    @DecimalMin(value = "10000", message = "Giá nhập phải lớn hơn 10.000")
+    @DecimalMin(value = "10000", message = "Giá bán phải lớn hơn 10.000")
+    @NumberFormat(pattern = "############")
     private BigDecimal sellingPrice;
+
+    @NumberFormat(pattern = "############")
+    private BigDecimal retailPrice;
 
     private String CPU;
     @Pattern(regexp = "^[1-9]\\d*(MB|GB|TB)$",
@@ -32,12 +40,32 @@ public class ProductDTO {
             message = "Camera phải có định dạng số + MP, ví dụ: 12MP, 108MP")
     private String selfie;
     private String detailedDescription;
-    private String image;
+    private List<ProductImage> images;
     @NotNull(message = "Số lượng tồn kho không được để trống")
     @Positive(message = "Số lượng tồn kho phải lớn hơn 0")
     private Integer stockQuantity;
     private String qrCode;
     private Integer supplierID;
+
+    public ProductDTO() {}
+
+    public ProductDTO(Integer productID, String name, BigDecimal purchasePrice, BigDecimal sellingPrice, BigDecimal retailPrice, String CPU, String storage, String screenSize, String camera, String selfie, String detailedDescription, List<ProductImage> images, Integer stockQuantity, String qrCode, Integer supplierID) {
+        this.productID = productID;
+        this.name = name;
+        this.purchasePrice = purchasePrice;
+        this.sellingPrice = sellingPrice;
+        this.retailPrice = retailPrice;
+        this.CPU = CPU;
+        this.storage = storage;
+        this.screenSize = screenSize;
+        this.camera = camera;
+        this.selfie = selfie;
+        this.detailedDescription = detailedDescription;
+        this.images = images;
+        this.stockQuantity = stockQuantity;
+        this.qrCode = qrCode;
+        this.supplierID = supplierID;
+    }
 
     public Integer getProductID() {
         return productID;
@@ -119,12 +147,12 @@ public class ProductDTO {
         this.detailedDescription = detailedDescription;
     }
 
-    public String getImage() {
-        return image;
+    public List<ProductImage> getImages() {
+        return images;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImages(List<ProductImage> images) {
+        this.images = images;
     }
 
     public Integer getStockQuantity() {
@@ -149,5 +177,34 @@ public class ProductDTO {
 
     public void setSupplierID(Integer supplierID) {
         this.supplierID = supplierID;
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductDTO{" +
+                "productID=" + productID +
+                ", name='" + name + '\'' +
+                ", purchasePrice=" + purchasePrice +
+                ", sellingPrice=" + sellingPrice +
+                ", retailPrice=" + retailPrice +
+                ", CPU='" + CPU + '\'' +
+                ", storage='" + storage + '\'' +
+                ", screenSize='" + screenSize + '\'' +
+                ", camera='" + camera + '\'' +
+                ", selfie='" + selfie + '\'' +
+                ", detailedDescription='" + detailedDescription + '\'' +
+                ", images=" + images +
+                ", stockQuantity=" + stockQuantity +
+                ", qrCode='" + qrCode + '\'' +
+                ", supplierID=" + supplierID +
+                '}';
     }
 }

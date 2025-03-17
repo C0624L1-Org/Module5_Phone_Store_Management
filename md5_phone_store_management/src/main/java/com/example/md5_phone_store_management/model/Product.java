@@ -3,6 +3,7 @@ package com.example.md5_phone_store_management.model;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -14,10 +15,12 @@ public class Product {
     @Column(nullable = false, length = 200)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "decimal(15,0)")
     private BigDecimal purchasePrice;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "decimal(15,0)")
     private BigDecimal sellingPrice;
+    @Column(columnDefinition = "decimal(15,0)")
+    private BigDecimal retailPrice;
     private String CPU;
     private String storage;
     private String screenSize;
@@ -27,13 +30,35 @@ public class Product {
     @Lob
     private String detailedDescription;
 
-    private String image;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images;
+
     private Integer stockQuantity;
     private String qrCode;
 
     @ManyToOne
     @JoinColumn(name = "supplierID", foreignKey = @ForeignKey(name = "FK_product_supplier"))
     private Supplier supplier;
+
+    public Product() {
+    }
+
+    public Product(Integer productID, String name, BigDecimal purchasePrice, BigDecimal sellingPrice, String CPU, String storage, String screenSize, String camera, String selfie, String detailedDescription, List<ProductImage> images, Integer stockQuantity, String qrCode, Supplier supplier) {
+        this.productID = productID;
+        this.name = name;
+        this.purchasePrice = purchasePrice;
+        this.sellingPrice = sellingPrice;
+        this.CPU = CPU;
+        this.storage = storage;
+        this.screenSize = screenSize;
+        this.camera = camera;
+        this.selfie = selfie;
+        this.detailedDescription = detailedDescription;
+        this.images = images;
+        this.stockQuantity = stockQuantity;
+        this.qrCode = qrCode;
+        this.supplier = supplier;
+    }
 
     public Integer getProductID() {
         return productID;
@@ -115,12 +140,12 @@ public class Product {
         this.detailedDescription = detailedDescription;
     }
 
-    public String getImage() {
-        return image;
+    public List<ProductImage> getImages() {
+        return images;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImages(List<ProductImage> images) {
+        this.images = images;
     }
 
     public Integer getStockQuantity() {
@@ -145,5 +170,34 @@ public class Product {
 
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productID=" + productID +
+                ", name='" + name + '\'' +
+                ", purchasePrice=" + purchasePrice +
+                ", sellingPrice=" + sellingPrice +
+                ", retailPrice=" + retailPrice +
+                ", CPU='" + CPU + '\'' +
+                ", storage='" + storage + '\'' +
+                ", screenSize='" + screenSize + '\'' +
+                ", camera='" + camera + '\'' +
+                ", selfie='" + selfie + '\'' +
+                ", detailedDescription='" + detailedDescription + '\'' +
+                ", images=" + images +
+                ", stockQuantity=" + stockQuantity +
+                ", qrCode='" + qrCode + '\'' +
+                ", supplier=" + supplier +
+                '}';
     }
 }
