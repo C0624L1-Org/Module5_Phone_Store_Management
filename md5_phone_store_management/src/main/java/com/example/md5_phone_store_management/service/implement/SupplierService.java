@@ -21,4 +21,10 @@ public class SupplierService implements ISupplierService {
     public Supplier getSupplier(Integer id) {
         return supplierRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public void saveSupplier(Supplier supplier) {
+        supplierRepository.insert(supplier.getName(),supplier.getAddress(),
+                supplier.getPhone(),supplier.getEmail());
+    }
 }

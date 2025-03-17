@@ -7,4 +7,5 @@ import java.util.List;
 public interface ISupplierService {
     List<Supplier> getSupplierList();
     Supplier getSupplier(Integer id);
+    void saveSupplier(Supplier supplier);
 }
