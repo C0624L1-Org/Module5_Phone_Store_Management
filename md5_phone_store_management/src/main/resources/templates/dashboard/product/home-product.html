@@ -8,7 +8,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css"/>
     <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
 </head>
 <body>
 <!-- Hiển thị thông báo -->
@@ -18,7 +20,6 @@
 <!-- Sidebar -->
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-<div class="container">
     <div class="main-content mt-5">
         <h2>Danh sách hàng hóa</h2>
         <a th:href="@{/dashboard/products/create-form}" class="btn btn-success btn-md mb-3">
@@ -109,8 +110,14 @@
             </li>
         </ul>
     </div>
-    <div th:insert="fragments/footer::footer"></div>
-</div>
+
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Nhúng footer -->
+<div th:insert="fragments/footer::footer"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
