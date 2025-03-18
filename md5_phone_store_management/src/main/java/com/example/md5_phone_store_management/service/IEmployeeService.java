@@ -32,4 +32,7 @@ public interface IEmployeeService {
     //Upload Avatar
     Employee updateAvatar(Integer employeeID, MultipartFile file);
 
-}
+    boolean changePassword(String username, String oldPassword, String newPassword);
+    }
+
+

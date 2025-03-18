@@ -16,9 +16,12 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 public class EmployeeService implements IEmployeeService {
+
+    private static final Logger logger = Logger.getLogger(EmployeeService.class.getName());
 
     @Autowired
     private IEmployeeRepository iEmployeeRepository;
@@ -51,6 +54,7 @@ public class EmployeeService implements IEmployeeService {
     public Page<Employee> getAllEmployees(Pageable pageable) {
         return iEmployeeRepository.getAllEmployees(pageable);
     }
+
     public Page<Employee> searchEmployees(String name, String phone, String role, Pageable pageable) {
         boolean hasName = name != null && !name.isEmpty();
         boolean hasPhone = phone != null && !phone.isEmpty();
@@ -125,5 +129,36 @@ public class EmployeeService implements IEmployeeService {
         } catch (IOException e) {
             throw new RuntimeException("Lỗi khi upload avatar", e);
         }
+    }
+
+    // phuong thức đổi mật khẩu
+    @Override
+    public boolean changePassword(String username, String oldPassword, String newPassword) {
+        Optional<Employee> optionalEmployee = iEmployeeRepository.findByUsername(username);
+        if (optionalEmployee.isPresent()) {
+            Employee employee = optionalEmployee.get();
+
+            // Debug: In giá trị để kiểm tra
+            logger.info("Username: " + username);
+            logger.info("Encrypted Password from DB: " + employee.getPassword());
+            logger.info("Raw Old Password from Form: " + oldPassword);
+            logger.info("Checking if old password matches...");
+
+            // Kiểm tra mật khẩu cũ
+            if (!EncryptPasswordUtils.ParseEncrypt(employee.getPassword(), oldPassword)) {
+                logger.warning("Old password does not match the encrypted password!");
+                return false;
+            }
+
+            String newEncryptedPassword = EncryptPasswordUtils.encryptPasswordUtils(newPassword);
+            employee.setPassword(newEncryptedPassword);
+            iEmployeeRepository.save(employee);
+            logger.info("Password changed successfully. New encrypted password: " + newEncryptedPassword);
+            return true;
+        }
+        logger.warning("User not found: " + username);
+        return false;
+
+
     }
 }
