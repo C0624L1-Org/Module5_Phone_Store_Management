@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -45,6 +46,27 @@ public class SupplierController {
         BeanUtils.copyProperties(supplierDTO, supplier);
         supplierService.saveSupplier(supplier);
         return "dashboard/supplier/supplier-home";
+    }
+    @GetMapping("/update-supplierForm/{id}")
+    public String updateSupplier(@PathVariable ("id") Integer id, Model model) {
+        Supplier supplier =supplierService.getSupplier(id);
+        SupplierDTO supplierDTO = new SupplierDTO();
+        BeanUtils.copyProperties(supplier, supplierDTO);
+        model.addAttribute("supplierDTO", supplierDTO);
+        return "dashboard/supplier/update-supplier-form";
+    }
+    @PostMapping("/update-supplier")
+    public String changeInformSupplier (@Valid @ModelAttribute("supplierDTO") SupplierDTO supplierDTO,
+                                        BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        if(bindingResult.hasErrors()) {
+            model.addAttribute("supplierDTO", supplierDTO);
+            return "dashboard/supplier/update-supplier-form";
+        }
+        Supplier supplier = new Supplier();
+        BeanUtils.copyProperties(supplierDTO, supplier);
+        supplierService.updateSupplier(supplier);
+        redirectAttributes.addFlashAttribute ("message","updated successfully");
+        return "redirect:/dashboard/suppliers";
     }
 }
 

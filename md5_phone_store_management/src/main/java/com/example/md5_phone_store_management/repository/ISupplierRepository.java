@@ -25,5 +25,10 @@ public interface ISupplierRepository extends JpaRepository<Supplier,Integer> {
             "VALUES (:name, :address, :phone, :email)", nativeQuery = true)
     void insert(@Param("name") String name, @Param("address") String address,
                 @Param("phone") String phone, @Param("email") String email);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE  Supplier s set p.name=?2, p.address=?3,p.phome=?4,p.email =?5 WHERE s.supplierId=?1", nativeQuery = true)
+    void updateSupplier (String name, String address, String phone, String email);
 }
 

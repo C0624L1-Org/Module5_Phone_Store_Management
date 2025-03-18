@@ -9,5 +9,6 @@ public interface ISupplierService {
     List<Supplier> getSupplierList();
     Supplier getSupplier(Integer id);
     void saveSupplier(Supplier supplier);
+    void updateSupplier(Supplier supplier);
 }
 

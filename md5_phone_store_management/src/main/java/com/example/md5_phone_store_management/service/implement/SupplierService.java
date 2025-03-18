@@ -28,4 +28,9 @@ public class SupplierService implements ISupplierService {
         supplierRepository.insert(supplier.getName(),supplier.getAddress(),
                 supplier.getPhone(),supplier.getEmail());
     }
+
+    @Override
+    public void updateSupplier(Supplier supplier) {
+        supplierRepository.updateSupplier(supplier.getName(),supplier.getAddress(),supplier.getPhone(),supplier.getEmail());
+    }
 }
