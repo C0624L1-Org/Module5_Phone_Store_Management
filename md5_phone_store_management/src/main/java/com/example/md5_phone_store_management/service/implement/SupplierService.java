@@ -1,3 +1,4 @@
+
 package com.example.md5_phone_store_management.service.implement;
 
 import com.example.md5_phone_store_management.model.Supplier;
@@ -20,5 +21,11 @@ public class SupplierService implements ISupplierService {
     }
     public Supplier getSupplier(Integer id) {
         return supplierRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void saveSupplier(Supplier supplier) {
+        supplierRepository.insert(supplier.getName(),supplier.getAddress(),
+                supplier.getPhone(),supplier.getEmail());
     }
 }
