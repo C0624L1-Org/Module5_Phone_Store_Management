@@ -1,3 +1,4 @@
+
 package com.example.md5_phone_store_management.repository;
 
 import com.example.md5_phone_store_management.model.Supplier;
@@ -25,3 +26,4 @@ public interface ISupplierRepository extends JpaRepository<Supplier,Integer> {
     void insert(@Param("name") String name, @Param("address") String address,
                 @Param("phone") String phone, @Param("email") String email);
 }
+

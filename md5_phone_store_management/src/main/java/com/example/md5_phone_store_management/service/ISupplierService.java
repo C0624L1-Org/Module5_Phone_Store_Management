@@ -1,3 +1,4 @@
+
 package com.example.md5_phone_store_management.service;
 
 import com.example.md5_phone_store_management.model.Supplier;
@@ -9,3 +10,4 @@ public interface ISupplierService {
     Supplier getSupplier(Integer id);
     void saveSupplier(Supplier supplier);
 }
+
