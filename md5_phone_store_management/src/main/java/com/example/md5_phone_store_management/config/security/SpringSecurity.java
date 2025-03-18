@@ -42,24 +42,25 @@ public class SpringSecurity {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login",
                                 "/css/**",
+                                "/img/**",
                                 "/js/**",
                                 "/favicon.ico",
                                 "/home",
                                 "/",
                                 "/register",
                                 "/clear-session").permitAll()
+                        .requestMatchers("/dashboard/admin/**").hasRole("Admin")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")
-//                        .requestMatchers("/home/**").hasAnyRole( "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                                .loginPage("/login")
-                                .usernameParameter("username")
-                                .passwordParameter("password")
-                                .loginProcessingUrl("/perform_login")
-                                .successHandler(customAuthenticationSuccessHandler)
-                                .failureHandler(customAuthenticationFailureHandler)
-                                .permitAll()
+                        .loginPage("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .loginProcessingUrl("/perform_login")
+                        .successHandler(customAuthenticationSuccessHandler)
+                        .failureHandler(customAuthenticationFailureHandler)
+                        .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))

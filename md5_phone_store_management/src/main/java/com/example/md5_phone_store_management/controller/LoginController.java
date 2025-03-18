@@ -14,20 +14,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class LoginController {
-
     @Autowired
     private IEmployeeService iEmployeeService;
 
-    @GetMapping("/login")
-    public String login(Model model, @RequestParam(value = "error", required = false) String error) {
-        if (error != null) {
-            model.addAttribute("errorMessage", "Tài khoản hoặc mật khẩu không đúng!");
-        }
+    @RequestMapping("/login")
+    public String login() {
         return "auth/login";
     }
 
@@ -51,19 +46,22 @@ public class LoginController {
             bindingResult.rejectValue("email", "", "Email đã tồn tại!");
         }
 
+        System.out.println("Phone from form: " + employeeDTO.getPhone());
+
         employeeDTO.validate(employeeDTO, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("employeeDTO", employeeDTO);
-            model.addAttribute("roles", Role.values());
             return "auth/register";
         }
 
         Employee newEmployee = new Employee();
         BeanUtils.copyProperties(employeeDTO, newEmployee);
-        iEmployeeService.addEmployee(newEmployee);
 
+        iEmployeeService.addEmployee(newEmployee);
         redirectAttributes.addFlashAttribute("messageType", "success");
         redirectAttributes.addFlashAttribute("message", "Đăng ký thành công! Hãy đăng nhập.");
+
         return "redirect:/login";
     }
+
 }
