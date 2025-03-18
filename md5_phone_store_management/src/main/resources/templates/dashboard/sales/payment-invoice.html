@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hóa đơn thanh toán</title>
+
+</head>
+<body>
+<div class="container">
+    <h1>Hóa đơn thanh toán</h1>
+
+    <div class="invoice-details">
+        <p><strong>Mã giao dịch:</strong> <span th:text="${transactionId}"></span></p>
+        <p><strong>Số tiền:</strong> <span th:text="${#numbers.formatCurrency(amount)}"></span>VND</p>
+        <p><strong>Thông tin đơn hàng:</strong> <span th:text="${orderInfo}"></span></p>
+        <p><strong>Ngày thanh toán:</strong> <span th:text="${#dates.format(payDate, 'dd/MM/yyyy HH:mm')}"></span></p>
+        <p><strong>Mã ngân hàng:</strong> <span th:text="${bankCode}"></span></p>
+        <p><strong>Loại thẻ:</strong> <span th:text="${cardType}"></span></p>
+    </div>
+
+    <a th:href="@{/}">Quay lại trang chủ</a>
+</div>
+</body>
+</html>

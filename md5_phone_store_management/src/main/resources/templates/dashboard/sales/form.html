@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Bán Hàng</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-light">
+      <h4>Bán hàng</h4>
+    </div>
+    <div class="card-body">
+      <!-- Thông tin khách hàng -->
+      <div class="card mb-3">
+        <div class="card-header">
+          Thông tin khách hàng
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <button class="btn btn-outline-secondary w-100">Chọn khách hàng cũ</button>
+            </div>
+            <div class="col-md-6">
+              <button class="btn btn-outline-secondary w-100">Quét mã QR</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="hoTen" class="form-label">Họ và tên</label>
+            <input type="text" class="form-control" id="hoTen">
+          </div>
+          <div class="mb-3">
+            <label for="soDienThoai" class="form-label">Số điện thoại</label>
+            <input type="tel" class="form-control" id="soDienThoai">
+          </div>
+          <div class="mb-3">
+            <label for="diaChi" class="form-label">Địa chỉ</label>
+            <input type="text" class="form-control" id="diaChi">
+          </div>
+          <div class="mb-3">
+            <label for="tuoi" class="form-label">Tuổi</label>
+            <input type="number" class="form-control" id="tuoi" style="width: 150px;">
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">e-mail</label>
+            <input type="email" class="form-control" id="email">
+          </div>
+        </div>
+      </div>
+
+      <!-- Thông tin sản phẩm -->
+      <div class="card mb-3">
+        <div class="card-header">
+          Thông tin sản phẩm
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <button class="btn btn-outline-secondary w-100 mb-3">Chọn sản phẩm</button>
+          </div>
+          <div class="mb-3">
+            <label for="tenSanPham" class="form-label">Tên sản phẩm</label>
+            <input type="text" class="form-control" id="tenSanPham">
+          </div>
+          <div class="mb-3">
+            <label for="donGia" class="form-label">Đơn giá</label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="donGia">
+              <span class="input-group-text">VND</span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="soLuong" class="form-label">Số lượng</label>
+            <input type="number" class="form-control" id="soLuong" style="width: 150px;">
+          </div>
+          <button class="btn btn-primary">+ Thêm sản phẩm</button>
+        </div>
+      </div>
+
+      <!-- Thanh toán -->
+      <div class="mb-3">
+        <label for="thanhTien" class="form-label">Thành tiền</label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="thanhTien" readonly>
+          <span class="input-group-text">VND</span>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Hình thức thanh toán</label>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="theTinDung" checked>
+          <label class="form-check-label" for="theTinDung">
+            Thẻ tín dụng
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="tienMat">
+          <label class="form-check-label" for="tienMat">
+            Tiền mặt
+          </label>
+        </div>
+      </div>
+
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="inHoaDon" checked>
+        <label class="form-check-label" for="inHoaDon">In hóa đơn</label>
+      </div>
+
+      <button type="submit" class="btn btn-success">Tiến hành thanh toán</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
