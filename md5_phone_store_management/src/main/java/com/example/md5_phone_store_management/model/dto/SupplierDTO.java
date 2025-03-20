@@ -14,6 +14,7 @@ public class SupplierDTO {
     private String name;
 
     @Size(max = 500, message = "Địa chỉ không được vượt quá 500 ký tự")
+    @NotBlank(message = "Địa chỉ không được để trống")
     private String address;
 
     @NotBlank(message = "Số điện thoại không được để trống")

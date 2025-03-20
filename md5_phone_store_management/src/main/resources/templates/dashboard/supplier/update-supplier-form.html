@@ -51,7 +51,7 @@
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" th:field="*{email}" id="email" class="form-control" placeholder="Nhập email">
+                    <input type="text" th:field="*{email}" id="email" class="form-control" placeholder="Nhập email">
                     <p class="text-danger small" th:if="${#fields.hasErrors('email')}" th:text="${#fields.errors('email')[0]}"></p>
                 </div>
 
