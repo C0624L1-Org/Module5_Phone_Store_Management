@@ -48,6 +48,9 @@ public class EmployeeController {
                                         @RequestParam(name = "page",defaultValue = "0",required = false) int page) {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
         Pageable pageable =  PageRequest.of(page, 3);
+        name = (name != null) ? name.trim() : null;
+        phone = (phone != null) ? phone.trim() : null;
+        role = (role != null) ? role.trim() : null;
         mv.addObject("currentPage", page);
         mv.addObject("employeePage", iEmployeeService.searchEmployees(name, phone, role, pageable));
         mv.addObject("totalPage",iEmployeeService.searchEmployees(name, phone, role, pageable).getTotalPages());
