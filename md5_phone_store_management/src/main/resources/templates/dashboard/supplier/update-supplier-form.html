@@ -51,13 +51,55 @@
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" th:field="*{email}" id="email" class="form-control" placeholder="Nhập email">
+                    <input type="text" th:field="*{email}" id="email" class="form-control" placeholder="Nhập email">
                     <p class="text-danger small" th:if="${#fields.hasErrors('email')}" th:text="${#fields.errors('email')[0]}"></p>
                 </div>
 
-                <button type="submit" class="btn btn-success">Cập nhật</button>
-                <a href="/dashboard/suppliers" class="btn btn-secondary">Hủy</a>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmModal">
+                    Cập nhật
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmCancelModal">
+                    Hủy
+                </button>
             </form>
+        </div>
+    </div>
+</div>
+<!-- Modal xác nhận thay đổi -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Xác nhận thay đổi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn thay đổi thông tin nhà cung cấp
+                <strong th:text="${supplierDTO.name}"></strong> không?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-success" id="confirmUpdate">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal xác nhận hủy -->
+<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmCancelModalLabel">Xác nhận hủy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn hủy cập nhật thông tin nhà cung cấp không?
+                Mọi thay đổi sẽ không được lưu lại.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+                <a href="/dashboard/suppliers" class="btn btn-danger">Hủy cập nhật</a>
+            </div>
         </div>
     </div>
 </div>
@@ -68,5 +110,10 @@
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 <!-- Các script khác -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById("confirmUpdate").addEventListener("click", function () {
+        document.querySelector("form").submit();
+    });
+</script>
 </body>
 </html>
