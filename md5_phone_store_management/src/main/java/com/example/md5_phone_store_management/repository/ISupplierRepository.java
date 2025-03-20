@@ -1,34 +1,30 @@
-
 package com.example.md5_phone_store_management.repository;
 
 import com.example.md5_phone_store_management.model.Supplier;
-import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface ISupplierRepository extends JpaRepository<Supplier,Integer> {
-    @Query(value = "SELECT * FROM  Supplier ",nativeQuery = true )
-    List<Supplier> findAll();
+public interface ISupplierRepository extends JpaRepository<Supplier, Integer> {
 
+    // Tìm tất cả nhà cung cấp với phân trang
+    @Query(value = "SELECT * FROM supplier", nativeQuery = true)
+    Page<Supplier> findAll(Pageable pageable);
+
+    // Tìm nhà cung cấp theo ID
     @Query(value = "SELECT * FROM supplier WHERE supplierID = :id", nativeQuery = true)
-    Supplier findBySupplierID( Integer id);
+    Supplier findBySupplierID(Integer id);
 
-    @Modifying  // Bắt buộc khi dùng INSERT, UPDATE, DELETE
-    @Transactional  // Đảm bảo câu lệnh được thực thi trong một transaction
-    @Query(value = "INSERT INTO supplier (name, address, phone, email) " +
-            "VALUES (:name, :address, :phone, :email)", nativeQuery = true)
-    void insert(@Param("name") String name, @Param("address") String address,
-                @Param("phone") String phone, @Param("email") String email);
-
-    @Modifying
-    @Transactional
-    @Query(value = "UPDATE  Supplier s set p.name=?2, p.address=?3,p.phome=?4,p.email =?5 WHERE s.supplierId=?1", nativeQuery = true)
-    void updateSupplier (String name, String address, String phone, String email);
+    // Tìm kiếm nhà cung cấp động
+    @Query(value = "SELECT * FROM supplier WHERE " +
+            "(name LIKE %:name% OR :name IS NULL) AND " +
+            "(address LIKE %:address% OR :address IS NULL) AND " +
+            "(phone LIKE %:phone% OR :phone IS NULL) AND " +
+            "(email LIKE %:email% OR :email IS NULL)", nativeQuery = true)
+    Page<Supplier> searchSuppliersDynamic(@Param("name") String name, @Param("address") String address,
+                                          @Param("phone") String phone, @Param("email") String email, Pageable pageable);
 }
-
