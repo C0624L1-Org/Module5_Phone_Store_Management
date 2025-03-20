@@ -33,6 +33,9 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     @Query("SELECT p FROM Product p")
     Page<Product> findAll(Pageable pageable);
 
+    @Query("SELECT p FROM Product p")
+    List<Product> findAllProducts();
+
     @Query("select p from Product p where " +
             "(:name is null or p.name like concat('%',:name,'%')) " +
             "and (:supplierName is null or p.supplier.name like concat('%',:supplierName,'%')) " +

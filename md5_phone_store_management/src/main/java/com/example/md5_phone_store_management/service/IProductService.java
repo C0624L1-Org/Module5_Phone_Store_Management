@@ -12,6 +12,7 @@ import java.util.List;
 public interface IProductService {
     //Tuấn Anh
     Page<Product> findAll(Pageable pageable);
+    List<Product> findAllProducts();
     Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(String name, String supplierName, double purchasePrice, Pageable pageable);
 
     //Đình Anh

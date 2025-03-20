@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "customer")
@@ -51,6 +52,24 @@ public class Customer {
     @Min(value = 0, message = "Số lần mua hàng không được âm!")
     @Column(name = "purchaseCount", nullable = false)
     private int purchaseCount = 0;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Invoice> invoices;
+
+    //Constructor
+    public Customer() {}
+
+    public Customer(Integer customerID, String fullName, String phone, String address, String email, Date dob, Gender gender, int purchaseCount, List<Invoice> invoices) {
+        this.customerID = customerID;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.address = address;
+        this.email = email;
+        this.dob = dob;
+        this.gender = gender;
+        this.purchaseCount = purchaseCount;
+        this.invoices = invoices;
+    }
 
     // Getters and Setters
     public Integer getCustomerID() {
@@ -115,6 +134,14 @@ public class Customer {
 
     public void setPurchaseCount(int purchaseCount) {
         this.purchaseCount = purchaseCount;
+    }
+
+    public List<Invoice> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(List<Invoice> invoices) {
+        this.invoices = invoices;
     }
 
     @Override
