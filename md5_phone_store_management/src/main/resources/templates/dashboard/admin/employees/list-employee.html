@@ -68,7 +68,7 @@
                         <button class="btn btn-primary me-2" type="submit">
                             <i class="fas fa-search"></i> Tìm kiếm
                         </button>
-                        <a class="btn btn-secondary" href="/dashboard/admin/customers/list" id="refresh-button">
+                        <a class="btn btn-secondary" href="/dashboard/admin/employees/list" id="refresh-button">
                             <i class="fas fa-sync-alt"></i> Làm mới
                         </a>
                     </div>
@@ -93,7 +93,7 @@
                     <tr th:each="employee:${employeePage}">
                         <td><input name="selectEmployIds" class="selectEmployee"
                                    th:value="${employee.employeeID}" th:data-name="${employee.fullName}"
-                                   th:data-address="${employee.address}"
+                                   th:data-phone="${employee.phone}"
                                    type="checkbox">
                         </td>
                         <td th:text="${employee.fullName}"></td>
@@ -128,16 +128,24 @@
                 <i class="fas fa-trash-alt"></i> Xoá
             </button>
             <!-- Bootstrap Modal Xác nhận Xóa -->
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true"
-                 style="margin-top: 150px">
-                <div class="modal-dialog">
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <p id="deleteMessage"></p>
+                            <p>Bạn có chắc chắn muốn xóa các nhân viên sau không?</p>
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>Tên Nhân Viên</th>
+                                    <th>Số điện thoại</th>
+                                </tr>
+                                </thead>
+                                <tbody id="deleteTableBody"></tbody>
+                            </table>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -211,17 +219,48 @@
     }
 
     // Xử lý khi nhấn nút Xóa
+    // document.getElementById("deleteSelected").addEventListener("click", function () {
+    //     let selectedEmployees = [];
+    //     let selectedIds = [];
+    //     document.querySelectorAll(".selectEmployee:checked").forEach((checkbox) => {
+    //         let id = checkbox.getAttribute("value");
+    //         let name = checkbox.getAttribute("data-name");
+    //         let address = checkbox.getAttribute("data-address");
+    //         console.log(id);
+    //         console.log(name);
+    //         console.log(address);
+    //         selectedEmployees.push({id, name, address});
+    //         selectedIds.push(id);
+    //     });
+    //
+    //     if (selectedEmployees.length === 0) {
+    //         alert("Vui lòng chọn ít nhất một nhân viên để xóa.");
+    //         return;
+    //     }
+    //
+    //     // Hiển thị danh sách nhân viên cần xóa trong modal
+    //     let deleteMessage = "Bạn có muốn xóa nhân viên: ";
+    //     deleteMessage += selectedEmployees.map(emp => `${emp.name} (${emp.address})`).join(", ") + " ?";
+    //     document.getElementById("deleteMessage").innerText = deleteMessage;
+    //
+    //     // Hiển thị modal Bootstrap
+    //     let deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
+    //     deleteModal.show();
+    //
+    //     // Khi nhấn nút Đồng ý
+    //     document.getElementById("confirmDelete").onclick = function () {
+    //         location.href = "/dashboard/admin/employees/delete/" + selectedIds.join(",");
+    //     };
+    // });
+
     document.getElementById("deleteSelected").addEventListener("click", function () {
         let selectedEmployees = [];
         let selectedIds = [];
         document.querySelectorAll(".selectEmployee:checked").forEach((checkbox) => {
             let id = checkbox.getAttribute("value");
             let name = checkbox.getAttribute("data-name");
-            let address = checkbox.getAttribute("data-address");
-            console.log(id);
-            console.log(name);
-            console.log(address);
-            selectedEmployees.push({id, name, address});
+            let phone = checkbox.getAttribute("data-phone");
+            selectedEmployees.push({ id, name, phone });
             selectedIds.push(id);
         });
 
@@ -230,10 +269,17 @@
             return;
         }
 
-        // Hiển thị danh sách nhân viên cần xóa trong modal
-        let deleteMessage = "Bạn có muốn xóa nhân viên: ";
-        deleteMessage += selectedEmployees.map(emp => `${emp.name} (${emp.address})`).join(", ") + " ?";
-        document.getElementById("deleteMessage").innerText = deleteMessage;
+        // Hiển thị danh sách nhân viên cần xóa trong bảng
+        let deleteTableBody = document.getElementById("deleteTableBody");
+        deleteTableBody.innerHTML = ""; // Xóa nội dung cũ
+
+        selectedEmployees.forEach(emp => {
+            let row = `<tr>
+            <td>${emp.name}</td>
+            <td>${emp.phone}</td>
+        </tr>`;
+            deleteTableBody.innerHTML += row;
+        });
 
         // Hiển thị modal Bootstrap
         let deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
@@ -245,6 +291,8 @@
         };
     });
 
+
+
     document.getElementById('updateEmployee').addEventListener('click', function () {
         let selectedEmployees = document.querySelectorAll('.selectEmployee:checked');
         if (selectedEmployees.length !== 1) {
@@ -255,4 +303,5 @@
     });
 </script>
 </body>
+>>>>>>> 33e659f (sửa delete employee)
 </html>
