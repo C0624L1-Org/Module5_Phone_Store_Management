@@ -1,103 +1,103 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <title>Đăng Ký</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--  <title>Đăng Ký</title>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">-->
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!--Custom-->
-  <link rel="stylesheet" href="/css/home.css">
-  <link rel="stylesheet" href="/css/fragments/navbar.css">
-  <link rel="stylesheet" href="/css/fragments/footer.css">
-  <link rel="stylesheet" href="/css/register.css">
-</head>
-<body>
-<!-- Hiển thị thông báo -->
-<div th:replace="~{common/toast}"></div>
-<!-- Nhúng navbar -->
-<div th:replace="~{fragments/navbar :: navbar}"></div>
+<!--  &lt;!&ndash; Bootstrap CSS &ndash;&gt;-->
+<!--  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">-->
+<!--  &lt;!&ndash;Custom&ndash;&gt;-->
+<!--  <link rel="stylesheet" href="/css/home.css">-->
+<!--  <link rel="stylesheet" href="/css/fragments/navbar.css">-->
+<!--  <link rel="stylesheet" href="/css/fragments/footer.css">-->
+<!--  <link rel="stylesheet" href="/css/register.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--&lt;!&ndash; Hiển thị thông báo &ndash;&gt;-->
+<!--<div th:replace="~{common/toast}"></div>-->
+<!--&lt;!&ndash; Nhúng navbar &ndash;&gt;-->
+<!--<div th:replace="~{fragments/navbar :: navbar}"></div>-->
 
-<div class="register-page">
-  <div class="container">
-    <div class="image-side">
-      <div class="image-content">
-        <h2>Tham gia cùng chúng tôi</h2>
-        <p>Đăng ký để nhận những ưu đãi đặc biệt và cập nhật mới nhất về sản phẩm.</p>
-      </div>
-    </div>
-    <div class="form-side">
-      <div class="logo">
-        <div class="logo-icon">P</div>
-        <div class="logo-text">Phone<span>Store</span></div>
-      </div>
-      <div class="form-header">
-        <h1>Đăng Ký Tài Khoản</h1>
-        <p>Điền đầy đủ thông tin bên dưới để tạo tài khoản mới</p>
-      </div>
-      <form th:object="${employeeDTO}" method="post" th:action="@{/register}">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="fullName">Họ và Tên</label>
-            <input type="text" id="fullName" th:field="*{fullName}" placeholder="Nhập họ và tên">
-            <span class="error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Lỗi</span>
-          </div>
-          <div class="form-group">
-            <label for="username">Tài Khoản</label>
-            <input type="text" id="username" th:field="*{username}" placeholder="Nhập tài khoản">
-            <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Lỗi</span>
-          </div>
-          <div class="form-group">
-            <label for="password">Mật Khẩu</label>
-            <input type="password" id="password" th:field="*{password}" placeholder="Nhập mật khẩu">
-            <span class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Lỗi</span>
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" th:field="*{email}" placeholder="Nhập email">
-            <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Lỗi</span>
-          </div>
-          <div class="form-group">
-            <label for="phone">Số Điện Thoại</label>
-            <input type="tel" id="phone" th:field="*{phone}" placeholder="Nhập số điện thoại">
-            <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Lỗi</span>
-          </div>
-          <div class="form-group">
-            <label for="dob">Ngày Sinh</label>
-            <input type="date" id="dob" th:field="*{dob}" />
-            <span class="error" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}">Lỗi</span>
-          </div>
-          <div class="form-group">
-            <label for="role">Vai Trò</label>
-            <select id="role" th:field="*{role}">
-              <option th:each="role : ${T(com.example.md5_phone_store_management.model.Role).values()}"
-                      th:value="${role}" th:text="${role.label}"></option>
-            </select>
-            <span class="error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">Lỗi</span>
-          </div>
-          <div class="form-group full-width">
-            <label for="address">Địa Chỉ</label>
-            <input type="text" id="address" th:field="*{address}" placeholder="Nhập địa chỉ" />
-            <span class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}">Lỗi</span>
-          </div>
-        </div>
-        <button type="submit">Đăng Ký</button>
-      </form>
-      <div class="login-link">
-        Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
+<!--<div class="register-page">-->
+<!--  <div class="container">-->
+<!--    <div class="image-side">-->
+<!--      <div class="image-content">-->
+<!--        <h2>Tham gia cùng chúng tôi</h2>-->
+<!--        <p>Đăng ký để nhận những ưu đãi đặc biệt và cập nhật mới nhất về sản phẩm.</p>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="form-side">-->
+<!--      <div class="logo">-->
+<!--        <div class="logo-icon">P</div>-->
+<!--        <div class="logo-text">Phone<span>Store</span></div>-->
+<!--      </div>-->
+<!--      <div class="form-header">-->
+<!--        <h1>Đăng Ký Tài Khoản</h1>-->
+<!--        <p>Điền đầy đủ thông tin bên dưới để tạo tài khoản mới</p>-->
+<!--      </div>-->
+<!--      <form th:object="${employeeDTO}" method="post" th:action="@{/register}">-->
+<!--        <div class="form-grid">-->
+<!--          <div class="form-group">-->
+<!--            <label for="fullName">Họ và Tên</label>-->
+<!--            <input type="text" id="fullName" th:field="*{fullName}" placeholder="Nhập họ và tên">-->
+<!--            <span class="error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Lỗi</span>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label for="username">Tài Khoản</label>-->
+<!--            <input type="text" id="username" th:field="*{username}" placeholder="Nhập tài khoản">-->
+<!--            <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Lỗi</span>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label for="password">Mật Khẩu</label>-->
+<!--            <input type="password" id="password" th:field="*{password}" placeholder="Nhập mật khẩu">-->
+<!--            <span class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Lỗi</span>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label for="email">Email</label>-->
+<!--            <input type="email" id="email" th:field="*{email}" placeholder="Nhập email">-->
+<!--            <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Lỗi</span>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label for="phone">Số Điện Thoại</label>-->
+<!--            <input type="tel" id="phone" th:field="*{phone}" placeholder="Nhập số điện thoại">-->
+<!--            <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Lỗi</span>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label for="dob">Ngày Sinh</label>-->
+<!--            <input type="date" id="dob" th:field="*{dob}" />-->
+<!--            <span class="error" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}">Lỗi</span>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label for="role">Vai Trò</label>-->
+<!--            <select id="role" th:field="*{role}">-->
+<!--              <option th:each="role : ${T(com.example.md5_phone_store_management.model.Role).values()}"-->
+<!--                      th:value="${role}" th:text="${role.label}"></option>-->
+<!--            </select>-->
+<!--            <span class="error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">Lỗi</span>-->
+<!--          </div>-->
+<!--          <div class="form-group full-width">-->
+<!--            <label for="address">Địa Chỉ</label>-->
+<!--            <input type="text" id="address" th:field="*{address}" placeholder="Nhập địa chỉ" />-->
+<!--            <span class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}">Lỗi</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <button type="submit">Đăng Ký</button>-->
+<!--      </form>-->
+<!--      <div class="login-link">-->
+<!--        Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>-->
 
-      </div>
-    </div>
-  </div>
-</div>
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
 
-<!-- Nhúng footer -->
-<div th:replace="~{fragments/footer :: footer}"></div>
+<!--&lt;!&ndash; Nhúng footer &ndash;&gt;-->
+<!--<div th:replace="~{fragments/footer :: footer}"></div>-->
 
-<!-- Nhúng script navbar -->
-<div th:replace="~{fragments/navbar :: navbar-script}"></div>
-</body>
-</html>
+<!--&lt;!&ndash; Nhúng script navbar &ndash;&gt;-->
+<!--<div th:replace="~{fragments/navbar :: navbar-script}"></div>-->
+<!--</body>-->
+<!--</html>-->

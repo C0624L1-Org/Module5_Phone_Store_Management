@@ -71,4 +71,16 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     @Query(value = "DELETE FROM product_images WHERE product_id = ?1", nativeQuery = true)
     void deleteProductImages(Integer productID);
 
+    // Đếm tổng số sản phẩm
+    @Query(value = "SELECT COUNT(*) FROM product", nativeQuery = true)
+    long countProducts();
+
+    // Đếm tổng số sản phẩm đã bán
+//    @Query(value = "SELECT SUM(quantity) FROM invoice_detail", nativeQuery = true)
+//    Long countSoldProducts();
+
+    // Tính tổng doanh thu
+//    @Query(value = "SELECT SUM(total_amount) FROM invoice", nativeQuery = true)
+//    BigDecimal calculateTotalRevenue();
+
 }

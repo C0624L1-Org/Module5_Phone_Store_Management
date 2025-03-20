@@ -17,5 +17,8 @@ public interface ISupplierService {
 
     Page<Supplier> searchSuppliers(String name, String address, String phone, String email, int page, int size);
 
+    // Đếm tổng số nhà cung cấp
+    long countSuppliers();
+
 }
 

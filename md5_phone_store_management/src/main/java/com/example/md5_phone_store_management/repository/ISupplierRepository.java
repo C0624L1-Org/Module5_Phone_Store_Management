@@ -27,4 +27,8 @@ public interface ISupplierRepository extends JpaRepository<Supplier, Integer> {
             "(email LIKE %:email% OR :email IS NULL)", nativeQuery = true)
     Page<Supplier> searchSuppliersDynamic(@Param("name") String name, @Param("address") String address,
                                           @Param("phone") String phone, @Param("email") String email, Pageable pageable);
+
+    // Đếm tổng số nhà cung cấp
+    @Query(value = "SELECT COUNT(*) FROM supplier", nativeQuery = true)
+    long countSuppliers();
 }

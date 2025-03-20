@@ -23,4 +23,12 @@ public interface IProductService {
     void updateProductWithSellingPrice(Product product);
     void saveProductImage(Product product, ProductImage productImage);
     void deleteProductImages(Product product);
+
+    // Đếm tổng số sản phẩm
+    long countProducts();
+    // Đếm tổng số sản phẩm đã bán
+//    Long countSoldProducts();
+    // Tính tổng doanh thu
+//    BigDecimal calculateTotalRevenue();
+
 }

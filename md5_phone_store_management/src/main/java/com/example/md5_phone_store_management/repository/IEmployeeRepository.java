@@ -61,8 +61,16 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
     @Query(value = "DELETE FROM employee WHERE employeeID = ?1", nativeQuery = true)
     void deleteEmployeeById(Integer id);
 
+    //Đếm
+    long count();
 
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE role = 'SalesStaff'", nativeQuery = true)
+    long countSalesStaff();
 
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE role = 'SalesPerson'", nativeQuery = true)
+    long countSalesPerson();
 
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE role = 'WarehouseStaff'", nativeQuery = true)
+    long countWarehouseStaff();
 
 }

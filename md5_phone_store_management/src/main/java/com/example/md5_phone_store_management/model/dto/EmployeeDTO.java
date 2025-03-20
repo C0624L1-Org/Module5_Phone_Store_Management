@@ -132,13 +132,23 @@ public class EmployeeDTO implements Validator {
         String username = employee.getUsername();
         if (username.trim().isEmpty()) {
             errors.rejectValue("username", "input.null");
-        } else if (username.length() < 3 || username.length() > 21) {
+        } else if (username.length() < 3 || username.length() > 20) {
             errors.rejectValue("username", "", "Tên tài khoản phải từ 3 đến 20 ký tự!");
         } else if (!username.matches("^[a-zA-Z0-9]*$")) {
             errors.rejectValue("username", "", "Tài khoản không chứa ký tự đặc biệt và khoảng trắng!");
         }
 
         // Validate password
+        String password = employee.getPassword();
+        if (employee.getEmployeeID() == null) {
+            if (password.trim().isEmpty()) {
+                errors.rejectValue("password", "input.null");
+            } else if (password.length() < 6 || password.length() > 30) {
+                errors.rejectValue("password", "", "Mật khẩu phải từ 6 đến 30 ký tự!");
+            }
+        }
+
+        // Validate Full Name
         String fullName = employee.getFullName();
         if (fullName.trim().isEmpty()) {
             errors.rejectValue("fullName", "input.null");
@@ -149,8 +159,8 @@ public class EmployeeDTO implements Validator {
         }
 
         // Validate dob
-        if (employee.getDob().isAfter(LocalDate.now())) {
-            errors.rejectValue("dob", "", "Ngày sinh không thể sau ngày hiện tại!");
+        if (employee.getDob() == null || !employee.getDob().isBefore(LocalDate.now())) {
+            errors.rejectValue("dob", "", "Ngày sinh phải trước ngày hiện tại!");
         }
 
         // Validate address

@@ -33,6 +33,13 @@ public interface IEmployeeService {
     Employee updateAvatar(Integer employeeID, MultipartFile file);
 
     boolean changePassword(String username, String oldPassword, String newPassword);
-    }
+
+    //Đếm
+    long countEmployee();
+    long countSalesStaff();
+    long countBusinessStaff();
+    long countWarehouseStaff();
+
+}
 
 

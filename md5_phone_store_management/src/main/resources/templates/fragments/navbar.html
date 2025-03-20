@@ -54,11 +54,11 @@
                     </ul>
                 </li>
 
-                <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}" style="color: white"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
 
                 <!-- Chưa đăng nhập -->
                 <li sec:authorize="isAnonymous()" class="nav-item">
-                    <a th:href="@{/login}"><i class="fas fa-sign-in-alt me-2"></i>Đăng nhập</a>
+                    <a th:href="@{/login}" style="color: white"><i class="fas fa-sign-in-alt me-2"></i>Đăng nhập</a>
                 </li>
                 <li sec:authorize="isAnonymous()" class="nav-item">
                     <a th:href="@{/register}" class="btn btn-outline-light">Đăng ký</a>

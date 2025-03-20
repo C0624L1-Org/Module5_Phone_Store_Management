@@ -54,6 +54,20 @@
         </a>
       </li>
 
+      <!-- Quản lý sản phẩm - Nhân viên kinh doanh, Admin -->
+      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff', 'SalesPerson')">
+        <a th:href="@{/dashboard/products/list}" class="nav-link text-white">
+          <i class="fas fa-chart-line me-2"></i>Quản lý sản phẩm
+        </a>
+      </li>
+
+      <!-- Quản lý bán hàng - Nhân viên bán hàng & Nhân viên kinh doanh -->
+      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson', 'SalesStaff')">
+        <a th:href="@{/dashboard/sales/form}" class="nav-link text-white">
+          <i class="fas fa-shopping-cart me-2"></i>Quản lý bán hàng
+        </a>
+      </li>
+
       <!-- Quản lý xuất nhập kho - Thủ kho, Admin -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
         <a th:href="@{/dashboard/warehouse/inventory}" class="nav-link text-white">
@@ -65,13 +79,6 @@
       <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff', 'SalesStaff')">
         <a th:href="@{/dashboard/business/management}" class="nav-link text-white">
           <i class="fas fa-chart-line me-2"></i>Quản lý kinh doanh
-        </a>
-      </li>
-
-      <!-- Quản lý bán hàng - Nhân viên bán hàng & Nhân viên kinh doanh -->
-      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson', 'SalesStaff')">
-        <a th:href="@{/dashboard/sales/form}" class="nav-link text-white">
-          <i class="fas fa-shopping-cart me-2"></i>Quản lý bán hàng
         </a>
       </li>
 
