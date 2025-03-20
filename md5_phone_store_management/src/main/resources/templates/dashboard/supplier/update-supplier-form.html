@@ -28,7 +28,7 @@
             <h3 class="mb-0">Chỉnh Sửa Nhà Cung Cấp: <strong th:text="${supplierDTO.name}"></strong></h3>
         </div>
         <div class="card-body">
-            <form th:action="@{/dashboard/suppliers/update-supplier}" method="post" th:object="${supplierDTO}">
+            <form th:action="@{/dashboard/update-supplier}" method="post" th:object="${supplierDTO}">
                 <input type="hidden" th:field="*{supplierID}">
 
                 <div class="mb-3">

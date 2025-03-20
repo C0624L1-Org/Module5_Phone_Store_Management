@@ -2,7 +2,6 @@ package com.example.md5_phone_store_management.model;
 
 import jakarta.persistence.*;
 
-import java.util.List;
 
 @Entity
 @Table(name = "supplier")
