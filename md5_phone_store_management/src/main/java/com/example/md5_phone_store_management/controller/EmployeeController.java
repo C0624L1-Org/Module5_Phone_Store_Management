@@ -29,25 +29,7 @@ public class EmployeeController {
     @Autowired
     private GlobalControllerAdvice globalControllerAdvice;
 
-    @GetMapping("/admin")
-    public String admin(Model model) {
-        return "dashboard/admin/admin-home";
-    }
 
-    @GetMapping("/warehouse-staff")
-    public String warehouseStaff(Model model) {
-        return "dashboard/warehouse-staff/warehouse-staff-home";
-    }
-
-    @GetMapping("/sales-staff")
-    public String salesStaff(Model model) {
-        return "dashboard/sales-staff/sales-staff-home";
-    }
-
-    @GetMapping("/sales-person")
-    public String salesPerson(Model model) {
-        return "dashboard/sales-person/sales-person-home";
-    }
 
     //Read(a Đình Anh)
     @GetMapping("/admin/employees/list")

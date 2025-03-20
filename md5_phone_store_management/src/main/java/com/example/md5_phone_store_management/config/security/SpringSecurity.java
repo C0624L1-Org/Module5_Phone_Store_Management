@@ -1,3 +1,4 @@
+
 package com.example.md5_phone_store_management.config.security;
 
 import com.example.md5_phone_store_management.common.CustomAccessDeniedHandler;
@@ -48,7 +49,8 @@ public class SpringSecurity {
                                 "/home",
                                 "/",
                                 "/register",
-                                "/clear-session").permitAll()
+                                "/clear-session",
+                                "/api/payment/**").permitAll()
                         .requestMatchers("/dashboard/admin/**").hasRole("Admin")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")
                         .anyRequest().authenticated()

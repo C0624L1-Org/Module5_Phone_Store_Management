@@ -1,8 +1,12 @@
+
 package com.example.md5_phone_store_management.repository;
 
-import org.apache.logging.log4j.util.Supplier;
+import com.example.md5_phone_store_management.model.Supplier;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,4 +19,16 @@ public interface ISupplierRepository extends JpaRepository<Supplier,Integer> {
     @Query(value = "SELECT * FROM supplier WHERE supplierID = :id", nativeQuery = true)
     Supplier findBySupplierID( Integer id);
 
+    @Modifying  // Bắt buộc khi dùng INSERT, UPDATE, DELETE
+    @Transactional  // Đảm bảo câu lệnh được thực thi trong một transaction
+    @Query(value = "INSERT INTO supplier (name, address, phone, email) " +
+            "VALUES (:name, :address, :phone, :email)", nativeQuery = true)
+    void insert(@Param("name") String name, @Param("address") String address,
+                @Param("phone") String phone, @Param("email") String email);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE  Supplier s set p.name=?2, p.address=?3,p.phome=?4,p.email =?5 WHERE s.supplierId=?1", nativeQuery = true)
+    void updateSupplier (String name, String address, String phone, String email);
 }
+

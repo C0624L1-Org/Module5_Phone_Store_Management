@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh Sửa Nhà Cung Cấp</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+<!-- Nhúng navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<!-- Sidebar -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<div class="main-content mt-5">
+    <div class="card shadow w-50 mx-auto">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">Chỉnh Sửa Nhà Cung Cấp: <strong th:text="${supplierDTO.name}"></strong></h3>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/dashboard/suppliers/update-supplier}" method="post" th:object="${supplierDTO}">
+                <input type="hidden" th:field="*{supplierID}">
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Tên nhà cung cấp</label>
+                    <input type="text" th:field="*{name}" id="name" class="form-control" placeholder="Nhập tên nhà cung cấp">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('name')}" th:text="${#fields.errors('name')[0]}"></p>
+                </div>
+
+                <div class="mb-3">
+                    <label for="address" class="form-label">Địa chỉ</label>
+                    <input type="text" th:field="*{address}" id="address" class="form-control" placeholder="Nhập địa chỉ">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('address')}" th:text="${#fields.errors('address')[0]}"></p>
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Số điện thoại</label>
+                    <input type="text" th:field="*{phone}" id="phone" class="form-control" placeholder="Nhập số điện thoại">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('phone')}" th:text="${#fields.errors('phone')[0]}"></p>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" th:field="*{email}" id="email" class="form-control" placeholder="Nhập email">
+                    <p class="text-danger small" th:if="${#fields.hasErrors('email')}" th:text="${#fields.errors('email')[0]}"></p>
+                </div>
+
+                <button type="submit" class="btn btn-success">Cập nhật</button>
+                <a href="/dashboard/suppliers" class="btn btn-secondary">Hủy</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Nhúng footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+<!-- Các script khác -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

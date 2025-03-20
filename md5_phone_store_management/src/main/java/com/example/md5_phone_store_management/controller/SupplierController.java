@@ -1,63 +1,73 @@
+
 package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.Supplier;
-
+import com.example.md5_phone_store_management.model.dto.SupplierDTO;
 import com.example.md5_phone_store_management.service.implement.SupplierService;
+import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/dashboard/warehouse/supplier")
+@RequestMapping("dashboard/suppliers")
 public class SupplierController {
 
     @Autowired
     private SupplierService supplierService;
 
-    @GetMapping
-    public String listSuppliers(Model model) {
-        List<Supplier> suppliers = supplierService.getSupplierList();
-        model.addAttribute("suppliers", suppliers);
-        return "dashboard/supplier/supplier-list";
+    @GetMapping("/suppliers")
+    public List<Supplier> getAllSuppliers() {
+        return supplierService.getSupplierList();
     }
 
-    @GetMapping("/add")
-    public String showAddForm(Model model) {
-        model.addAttribute("supplier", new Supplier());
-        return "dashboard/supplier/supplier-form";
+    @GetMapping("create")
+    public String createSupplier(Model model) {
+        SupplierDTO supplierDTO = new SupplierDTO();
+        model.addAttribute("supplierDTO", supplierDTO);
+        return "dashboard/supplier/create-supplier";
     }
 
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable("id") Integer id, Model model) {
-        Supplier supplier = supplierService.getSupplier(id);
-        model.addAttribute("supplier", supplier);
-        return "dashboard/supplier/supplier-form";
-    }
-
-    @PostMapping("/save")
-    public String saveSupplier(@ModelAttribute Supplier supplier) {
+    @PostMapping("create")
+    public String createSupplier(@Valid @ModelAttribute(name="supplierDTO")SupplierDTO supplierDTO,
+                                 BindingResult bindingResult,
+                                 Model model) {
+        if(bindingResult.hasErrors()) {
+            model.addAttribute("supplierDTO", supplierDTO);
+            return "dashboard/supplier/create-supplier";
+        }
+        Supplier supplier = new Supplier();
+        BeanUtils.copyProperties(supplierDTO, supplier);
         supplierService.saveSupplier(supplier);
-        return "redirect:/dashboard/warehouse/supplier";
+        return "dashboard/supplier/supplier-home";
+    }
+    @GetMapping("/update-supplierForm/{id}")
+    public String updateSupplier(@PathVariable ("id") Integer id, Model model) {
+        Supplier supplier =supplierService.getSupplier(id);
+        SupplierDTO supplierDTO = new SupplierDTO();
+        BeanUtils.copyProperties(supplier, supplierDTO);
+        model.addAttribute("supplierDTO", supplierDTO);
+        return "dashboard/supplier/update-supplier-form";
     }
 
-
-//    khoa test delete
-//    @GetMapping("/delete/{id}")
-//    public String deleteSupplier(@PathVariable("id") Integer id) {
-//        supplierService.deleteSupplier(id);
-//        return "redirect:/dashboard/warehouse/supplier";
-//    }
-
-    @GetMapping("/search")
-    public String searchSuppliers(@RequestParam("keyword") String keyword, Model model) {
-        List<Supplier> suppliers = supplierService.searchSuppliers(keyword);
-        model.addAttribute("suppliers", suppliers);
-        model.addAttribute("keyword", keyword);
-        return "supplier-list";
+    @PostMapping("/update-supplier")
+    public String changeInformSupplier (@Valid @ModelAttribute("supplierDTO") SupplierDTO supplierDTO,
+                                        BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        if(bindingResult.hasErrors()) {
+            model.addAttribute("supplierDTO", supplierDTO);
+            return "dashboard/supplier/update-supplier-form";
+        }
+        Supplier supplier = new Supplier();
+        BeanUtils.copyProperties(supplierDTO, supplier);
+        supplierService.updateSupplier(supplier);
+        redirectAttributes.addFlashAttribute ("message","updated successfully");
+        return "redirect:/dashboard/suppliers";
     }
-
-
 }
+

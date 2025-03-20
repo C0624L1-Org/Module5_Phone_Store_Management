@@ -1,10 +1,29 @@
 package com.example.md5_phone_store_management.model.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 public class SupplierDTO {
+
     private Integer supplierID;
+
+    @NotBlank(message = "Tên không được để trống")
+    @Size(max = 50, message = "Tên không được vượt quá 50 ký tự")
     private String name;
+
+    @Size(max = 500, message = "Địa chỉ không được vượt quá 500 ký tự")
     private String address;
+
+    @NotBlank(message = "Số điện thoại không được để trống")
+    @Pattern(regexp = "^[0-9]{10,15}$", message = "Số điện thoại phải từ 10 đến 15 số")
+    @Size(max = 15, message = "Số điện thoại không được vượt quá 15 ký tự")
     private String phone;
+
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không hợp lệ")
+    @Size(max = 50, message = "Email không được vượt quá 50 ký tự")
     private String email;
 
     public SupplierDTO() {}
@@ -38,8 +57,7 @@ public class SupplierDTO {
     }
 
     public void setAddress(String address) {
-        this.address = address;
-    }
+    this.address = address;}
 
     public String getPhone() {
         return phone;
