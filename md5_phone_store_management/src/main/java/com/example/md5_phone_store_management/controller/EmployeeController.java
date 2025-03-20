@@ -35,7 +35,7 @@ public class EmployeeController {
     @GetMapping("/admin/employees/list")
     public ModelAndView getListEmployees(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
-        Pageable pageable =  PageRequest.of(page, 9);
+        Pageable pageable =  PageRequest.of(page, 3);
         mv.addObject("currentPage", page);
         mv.addObject("employeePage", iEmployeeService.getAllEmployees(pageable));
         mv.addObject("totalPage",iEmployeeService.getAllEmployees(pageable).getTotalPages());
@@ -47,7 +47,7 @@ public class EmployeeController {
                                         @RequestParam( required = false) String role,
                                         @RequestParam(name = "page",defaultValue = "0",required = false) int page) {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
-        Pageable pageable =  PageRequest.of(page, 9);
+        Pageable pageable =  PageRequest.of(page, 3);
         mv.addObject("currentPage", page);
         mv.addObject("employeePage", iEmployeeService.searchEmployees(name, phone, role, pageable));
         mv.addObject("totalPage",iEmployeeService.searchEmployees(name, phone, role, pageable).getTotalPages());

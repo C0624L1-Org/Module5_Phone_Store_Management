@@ -153,11 +153,19 @@
                         </a>
                     </li>
 
-                    <li class="page-item" th:classappend="${i == currentPage} ? 'active'"
+
+                    <li class="page-item" th:if="${totalPage > 0}" th:classappend="${i == currentPage} ? 'active'"
                         th:each="i : ${#numbers.sequence(0, totalPage - 1)}">
                         <a class="page-link"
                            th:href="@{/dashboard/admin/employees/search(page=${i}, name=${param.name}, phone=${param.phone}, role=${param.role})}"
                            th:text="${i + 1}">
+                        </a>
+                    </li>
+
+                    <li class="page-item active" th:unless="${totalPage > 0}">
+                        <a class="page-link"
+                           th:href="@{/dashboard/admin/employees/search(page=${currentPage}, name=${param.name}, phone=${param.phone}, role=${param.role})}">
+                            1
                         </a>
                     </li>
 
