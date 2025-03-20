@@ -41,10 +41,10 @@
           </a>
         </li>
 
-        <!-- Quản lý thông tin cá nhân - Thủ kho , Nhân viên bán hàng, Admin -->
-        <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'WarehouseStaff', 'SalesPerson')">
-          <a th:href="@{/dashboard/profile}" class="nav-link text-white">
-            <i class="fas fa-id-card me-2"></i>Quản lý thông tin cá nhân
+        <!-- Quản lý khách hàng - Nhân viên bán hàng, Admin -->
+        <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">
+          <a th:href="@{/dashboard/admin/customers/list}" class="nav-link text-white">
+            <i class="fas fa-id-card me-2"></i>Quản lý khách hàng
           </a>
         </li>
 

@@ -61,15 +61,14 @@ public class SalesController {
                                 Pageable pageable,
                                 HttpSession session,
                                 @RequestParam(required = false) Integer customerId) {
-        // Get and add customers list to the model
+
         List<Customer> customers = customerService.findAllCustomers();
         model.addAttribute("customers", customers);
 
-        // Get and add products list to the model
+
         Page<Product> productPage = iProductService.findAll(pageable);
         model.addAttribute("products", productPage.getContent());
 
-        // Get active cart for customer if specified
         if (customerId != null) {
             Customer customer = customerService.getCustomerByID(customerId);
             if (customer != null) {
@@ -93,7 +92,6 @@ public class SalesController {
                             HttpSession session,
                             RedirectAttributes redirectAttributes) {
 
-        // Get the customer
         Customer customer;
         if (customerId != null) {
             customer = customerService.getCustomerByID(customerId);
@@ -113,17 +111,14 @@ public class SalesController {
             return "redirect:/dashboard/sales/form?customerId=" + customer.getCustomerID();
         }
 
-        // Check stock quantity
         if (product.getStockQuantity() < quantity) {
             redirectAttributes.addFlashAttribute("error",
                     "Số lượng trong kho không đủ. Hiện chỉ còn " + product.getStockQuantity() + " sản phẩm.");
             return "redirect:/dashboard/sales/form?customerId=" + customer.getCustomerID();
         }
 
-        // Get or create cart
         Cart cart = cartService.getActiveCartForCustomer(customer);
 
-        // Add item to cart
         cartService.addItemToCart(cart, product, quantity);
 
         redirectAttributes.addFlashAttribute("success", "Đã thêm sản phẩm vào giỏ hàng");
@@ -247,7 +242,6 @@ public class SalesController {
             Product product = item.getProduct();
             int quantity = item.getQuantity();
 
-            // Verify stock again
             if (product.getStockQuantity() < quantity) {
                 redirectAttributes.addFlashAttribute("error",
                         "Số lượng sản phẩm " + product.getName() + " trong kho không đủ. Hiện chỉ còn " +
@@ -259,7 +253,6 @@ public class SalesController {
             quantities.add(quantity);
         }
 
-        // Store in session for later use
         session.setAttribute("customer", customer);
         session.setAttribute("employee", employee);
         session.setAttribute("products", products);
@@ -270,7 +263,7 @@ public class SalesController {
 
         // Process payment based on method
         if ("VNPAY".equals(paymentMethod)) {
-            // Generate a unique order ID
+
             Long orderId = generateOrderId();
             session.setAttribute("orderId", orderId);
 
@@ -314,15 +307,12 @@ public class SalesController {
         invoice.setProducts(products);
         invoice.setProductQuantities(quantities);
 
-        // Save invoice to database
         Invoice savedInvoice = invoiceService.saveInvoice(invoice);
 
-        // Update product stock
         for (int i = 0; i < products.size(); i++) {
             Product product = products.get(i);
             int quantity = quantities.get(i);
 
-            // Decrease stock quantity
             product.setStockQuantity(product.getStockQuantity() - quantity);
             iProductService.updateProductWithSellingPrice(product);
         }
@@ -350,7 +340,6 @@ public class SalesController {
             String transactionId = params.get("vnp_TransactionNo");
             Invoice invoice = processPayment(session, "VNPAY", transactionId);
 
-            // Mark cart as inactive
             Integer cartId = (Integer) session.getAttribute("cartId");
             if (cartId != null) {
                 Cart cart = cartService.getCartById(cartId);

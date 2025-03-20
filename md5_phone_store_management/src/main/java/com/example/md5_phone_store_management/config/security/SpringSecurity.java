@@ -80,10 +80,10 @@ public class SpringSecurity {
                         .maximumSessions(1)
                         .expiredUrl("/login")
                 )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .accessDeniedHandler(customAccessDeniedHandler)
-                )
+//                .exceptionHandling(ex -> ex
+//                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+//                        .accessDeniedHandler(customAccessDeniedHandler)
+//                )
                 // Tắt hoàn toàn RequestCache phuc vụ việc redirect về trang cố ý truy cập trước khi đăng nhập
                 .requestCache(RequestCacheConfigurer::disable
                 );
