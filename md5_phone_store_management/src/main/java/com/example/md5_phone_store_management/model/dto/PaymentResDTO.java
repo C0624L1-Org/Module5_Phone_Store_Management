@@ -1,9 +1,6 @@
 package com.example.md5_phone_store_management.model.dto;
 
-import java.io.Serializable;
-
-public class PaymentResDTO implements Serializable {
-
+public class PaymentResDTO {
     private String status;
     private String message;
     private String URL;

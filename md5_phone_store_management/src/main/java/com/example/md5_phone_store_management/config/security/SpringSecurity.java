@@ -49,7 +49,7 @@ public class SpringSecurity {
                                 "/",
                                 "/register",
                                 "/clear-session",
-                                "/api/payment/**").permitAll()
+                                "/api/**").permitAll()
                         .requestMatchers("/dashboard/admin/**").hasRole("Admin")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")
                         .anyRequest().authenticated()

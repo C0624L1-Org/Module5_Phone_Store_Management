@@ -1,11 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Form Bán Hàng</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .cart-item {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #eee;
+      border-radius: 5px;
+    }
+    .error-message {
+      color: red;
+      margin-top: 5px;
+    }
+    .success-message {
+      color: green;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
 <div class="container mt-4">
@@ -13,108 +29,237 @@
     <div class="card-header bg-light">
       <h4>Bán hàng</h4>
     </div>
+
+    <!-- Flash messages -->
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <span th:text="${error}"></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+      <span th:text="${success}"></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <div class="card-body">
       <!-- Thông tin khách hàng -->
       <div class="card mb-3">
-        <div class="card-header">
-          Thông tin khách hàng
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Thông tin khách hàng</span>
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+            + Thêm khách hàng mới
+          </button>
         </div>
         <div class="card-body">
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <button class="btn btn-outline-secondary w-100">Chọn khách hàng cũ</button>
+          <form id="customerForm" th:action="@{/dashboard/sales/form}" method="get">
+            <div class="mb-3">
+              <label for="customerId" class="form-label">Chọn khách hàng</label>
+              <select class="form-select" id="customerId" name="customerId" onchange="this.form.submit()">
+                <option value="">-- Chọn khách hàng --</option>
+                <option th:each="customer : ${customers}"
+                        th:value="${customer.customerID}"
+                        th:text="${customer.fullName + ' - ' + customer.phone}"
+                        th:selected="${session.currentCustomer != null && session.currentCustomer.customerID == customer.customerID}"></option>
+              </select>
             </div>
-            <div class="col-md-6">
-              <button class="btn btn-outline-secondary w-100">Quét mã QR</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Thêm Khách Hàng Mới -->
+      <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addCustomerModalLabel">Thêm Khách Hàng Mới</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="newCustomerForm" th:action="@{/dashboard/sales/add-customer}" method="post" th:object="${customes}">
+                <div class="mb-3">
+                  <label for="fullName" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="fullName" name="fullName" required>
+                </div>
+                <div class="mb-3">
+                  <label for="phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control" id="phone" name="phone" required
+                         pattern="[0-9]{10}" title="Số điện thoại phải có 10 chữ số">
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="email" name="email">
+                </div>
+                <div class="mb-3">
+                  <label for="address" class="form-label">Địa chỉ</label>
+                  <textarea class="form-control" id="address" name="address" rows="2"></textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="dob" class="form-label">Ngày sinh</label>
+                  <input type="date" class="form-control" id="dob" name="dob">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Giới tính</label>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="gender" id="male" value="MALE" checked>
+                    <label class="form-check-label" for="male">Nam</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="gender" id="female" value="FEMALE">
+                    <label class="form-check-label" for="female">Nữ</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="gender" id="other" value="OTHER">
+                    <label class="form-check-label" for="other">Khác</label>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                  <button type="submit" class="btn btn-primary">Thêm khách hàng</button>
+                </div>
+              </form>
             </div>
           </div>
-          <div class="mb-3">
-            <label for="hoTen" class="form-label">Họ và tên</label>
-            <input type="text" class="form-control" id="hoTen">
-          </div>
-          <div class="mb-3">
-            <label for="soDienThoai" class="form-label">Số điện thoại</label>
-            <input type="tel" class="form-control" id="soDienThoai">
-          </div>
-          <div class="mb-3">
-            <label for="diaChi" class="form-label">Địa chỉ</label>
-            <input type="text" class="form-control" id="diaChi">
-          </div>
-          <div class="mb-3">
-            <label for="tuoi" class="form-label">Tuổi</label>
-            <input type="number" class="form-control" id="tuoi" style="width: 150px;">
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">e-mail</label>
-            <input type="email" class="form-control" id="email">
-          </div>
         </div>
       </div>
 
-      <!-- Thông tin sản phẩm -->
-      <div class="card mb-3">
-        <div class="card-header">
-          Thông tin sản phẩm
+      <!-- Chỉ hiển thị các phần còn lại nếu đã chọn khách hàng -->
+      <div th:if="${session.currentCustomer != null}">
+        <!-- Thêm sản phẩm vào giỏ hàng -->
+        <div class="card mb-3">
+          <div class="card-header">
+            Thêm sản phẩm vào giỏ hàng
+          </div>
+          <div class="card-body">
+            <form th:action="@{/dashboard/sales/add-to-cart}" method="get">
+              <input type="hidden" name="customerId" th:value="${session.currentCustomer.customerID}">
+              <div class="row">
+                <div class="col-md-5">
+                  <label for="productId" class="form-label">Sản phẩm</label>
+                  <select class="form-select" id="productId" name="productId" required onchange="updatePrice()">
+                    <option value="">-- Chọn sản phẩm --</option>
+                    <option th:each="product : ${products}"
+                            th:value="${product.productID}"
+                            th:text="${product.name}"
+                            th:data-price="${product.sellingPrice}"
+                            th:data-stock="${product.stockQuantity}"></option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="quantity" class="form-label">Số lượng</label>
+                  <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1" required>
+                </div>
+                <div class="col-md-2">
+                  <label for="itemPrice" class="form-label">Đơn giá</label>
+                  <input type="text" class="form-control" id="itemPrice" readonly>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label d-block">&nbsp;</label>
+                  <button type="submit" class="btn btn-primary">Thêm vào giỏ</button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <button class="btn btn-outline-secondary w-100 mb-3">Chọn sản phẩm</button>
+
+        <!-- Giỏ hàng -->
+        <div class="card mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Giỏ hàng</span>
+            <a th:href="@{/dashboard/sales/clear-cart}" class="btn btn-sm btn-outline-danger"
+               th:if="${cartItems != null && !cartItems.isEmpty()}">Xóa giỏ hàng</a>
           </div>
-          <div class="mb-3">
-            <label for="tenSanPham" class="form-label">Tên sản phẩm</label>
-            <input type="text" class="form-control" id="tenSanPham">
-          </div>
-          <div class="mb-3">
-            <label for="donGia" class="form-label">Đơn giá</label>
-            <div class="input-group">
-              <input type="number" class="form-control" id="donGia">
-              <span class="input-group-text">VND</span>
+          <div class="card-body">
+            <div th:if="${cartItems == null || cartItems.isEmpty()}" class="alert alert-info">
+              Giỏ hàng trống
+            </div>
+
+            <div th:if="${cartItems != null && !cartItems.isEmpty()}">
+              <div class="cart-item" th:each="item : ${cartItems}">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong th:text="${item.product.name}"></strong>
+                    <div>
+                      <form th:action="@{/dashboard/sales/update-quantity}" method="get" class="d-inline-flex align-items-center">
+                        <input type="hidden" name="productId" th:value="${item.product.productID}">
+                        <label for="newQuantity" class="me-2">Số lượng:</label>
+                        <input type="number" class="form-control form-control-sm me-2"
+                               style="width: 70px;" id="newQuantity" name="quantity"
+                               th:value="${item.quantity}" min="1" required>
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Cập nhật</button>
+                      </form>
+                    </div>
+                    <div>Đơn giá: <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')}"></span> VND</div>
+                  </div>
+                  <div>
+                    <div class="text-end mb-2" th:text="${#numbers.formatDecimal(item.price.multiply(new java.math.BigDecimal(item.quantity)), 0, 'COMMA', 0, 'POINT') + ' VND'}"></div>
+                    <a th:href="@{'/dashboard/sales/remove-from-cart/' + ${item.product.productID}}" class="btn btn-sm btn-danger">Xóa</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <h5>Tổng tiền:</h5>
+                <h5 th:text="${cartTotal != null ? #numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}"></h5>
+              </div>
+
+              <!-- Thanh toán -->
+              <div class="card mt-3">
+                <div class="card-header">
+                  Thanh toán
+                </div>
+                <div class="card-body">
+                  <form th:action="@{/dashboard/sales/checkout}" method="post">
+                    <input type="hidden" name="customerId" th:value="${session.currentCustomer.customerID}">
+
+                    <div class="mb-3">
+                      <label class="form-label">Hình thức thanh toán</label>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="vnpay" value="VNPAY" checked>
+                        <label class="form-check-label" for="vnpay">VNPAY</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="cash" value="CASH">
+                        <label class="form-check-label" for="cash">Tiền mặt</label>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                      <input type="checkbox" class="form-check-input" id="printInvoice" name="printInvoice" checked>
+                      <label class="form-check-label" for="printInvoice">In hóa đơn</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Tiến hành thanh toán</button>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="mb-3">
-            <label for="soLuong" class="form-label">Số lượng</label>
-            <input type="number" class="form-control" id="soLuong" style="width: 150px;">
-          </div>
-          <button class="btn btn-primary">+ Thêm sản phẩm</button>
         </div>
       </div>
-
-      <!-- Thanh toán -->
-      <div class="mb-3">
-        <label for="thanhTien" class="form-label">Thành tiền</label>
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" id="thanhTien" readonly>
-          <span class="input-group-text">VND</span>
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Hình thức thanh toán</label>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="theTinDung" checked>
-          <label class="form-check-label" for="theTinDung">
-            Thẻ tín dụng
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="tienMat">
-          <label class="form-check-label" for="tienMat">
-            Tiền mặt
-          </label>
-        </div>
-      </div>
-
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="inHoaDon" checked>
-        <label class="form-check-label" for="inHoaDon">In hóa đơn</label>
-      </div>
-
-      <button type="submit" class="btn btn-success">Tiến hành thanh toán</button>
     </div>
   </div>
 </div>
 
 <!-- Bootstrap JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/payment/vnpay.js}"></script>
+<script>
+  function updatePrice() {
+    const productSelect = document.getElementById('productId');
+    const itemPriceInput = document.getElementById('itemPrice');
+
+    const selectedOption = productSelect.options[productSelect.selectedIndex];
+    if (selectedOption.value) {
+      const price = parseFloat(selectedOption.getAttribute('data-price'));
+      itemPriceInput.value = new Intl.NumberFormat('vi-VN').format(price) + ' VND';
+    } else {
+      itemPriceInput.value = '';
+    }
+  }
+
+  // Initialize price display
+  document.addEventListener('DOMContentLoaded', function() {
+    updatePrice();
+  });
+</script>
 </body>
 </html>
