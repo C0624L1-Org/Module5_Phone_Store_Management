@@ -12,271 +12,276 @@
   <link rel="stylesheet" href="/css/home.css">
   <link rel="stylesheet" href="/css/fragments/navbar.css">
   <link rel="stylesheet" href="/css/fragments/footer.css">
+  <link rel="stylesheet" href="/css/common/layout.css">
 
 </head>
 <body>
 <!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
 <!-- Nhúng navbar -->
-<div th:replace="~{fragments/navbar :: navbar}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-<!-- Main content -->
-<div class="container">
-  <!-- Hero Slider -->
-  <div class="hero-slider">
-    <div class="main-slide">
-      <div class="product-info">
-        <h1 class="product-title">
-          HONOR Magic V3 <span>5G</span>
-        </h1>
-        <p class="product-subtitle">Điện thoại gập siêu mỏng nhẹ</p>
-      </div>
+<div class="content-wrapper">
+  <!-- Main content for page without sidebar -->
+  <main class="full-width-container">
+    <div class="container">
+      <!-- Hero Slider -->
+      <div class="hero-slider">
+        <div class="main-slide">
+          <div class="product-info">
+            <h1 class="product-title">
+              HONOR Magic V3 <span>5G</span>
+            </h1>
+            <p class="product-subtitle">Điện thoại gập siêu mỏng nhẹ</p>
+          </div>
 
-      <div class="product-image">
-        <img >
-        <div class="exclusive-badge">
-          ĐỘC<br>QUYỀN
+          <div class="product-image">
+            <img >
+            <div class="exclusive-badge">
+              ĐỘC<br>QUYỀN
+            </div>
+          </div>
+
+          <div class="promotion-info">
+            <div class="discount-badge">
+              Giảm ngay
+            </div>
+            <div class="discount-price">
+              2.000.000đ
+            </div>
+            <p class="warranty-text">Bảo hành Premium Care+</p>
+            <a href="#" class="buy-now-button">Mua ngay</a>
+          </div>
+
+          <div class="sparkle sparkle-1">✧</div>
+          <div class="sparkle sparkle-2">✧</div>
         </div>
-      </div>
 
-      <div class="promotion-info">
-        <div class="discount-badge">
-          Giảm ngay
-        </div>
-        <div class="discount-price">
-          2.000.000đ
-        </div>
-        <p class="warranty-text">Bảo hành Premium Care+</p>
-        <a href="#" class="buy-now-button">Mua ngay</a>
-      </div>
-
-      <div class="sparkle sparkle-1">✧</div>
-      <div class="sparkle sparkle-2">✧</div>
-    </div>
-
-    <div class="dots-container">
-      <span class="dot active"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-    </div>
-  </div>
-
-  <!-- Banner section -->
-  <div class="banner-container">
-    <div class="banner banner-1">
-      <div class="warranty-badge">BẢO HÀNH TRỌN ĐỜI</div>
-      <h2 class="phone-title">Galaxy S25 Ultra</h2>
-      <p class="phone-subtitle">Galaxy AI 💫</p>
-      <div class="promotion-badge">Tặng 7 Triệu</div>
-    </div>
-
-    <div class="banner banner-2">
-      <h2 class="aircon-text">MÁY LẠNH<br>LẠNH THẦN TỐC</h2>
-      <div class="installment-badge">TRẢ GÓP TỪ 17K/NGÀY</div>
-    </div>
-  </div>
-
-  <!-- Category section -->
-  <div class="category-section">
-    <h2 class="section-title">Danh mục nổi bật</h2>
-    <div class="category-grid">
-      <div class="category-item">
-        <div class="category-icon">📱</div>
-        <div class="category-name">Điện thoại</div>
-      </div>
-      <div class="category-item">
-        <div class="category-icon">💻</div>
-        <div class="category-name">Laptop</div>
-      </div>
-      <div class="category-item">
-        <div class="category-icon">📟</div>
-        <div class="category-name">Máy tính bảng</div>
-      </div>
-      <div class="category-item">
-        <div class="category-icon">🔄</div>
-        <div class="category-name">Xem tất cả</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Deal section -->
-  <div class="deal-section">
-    <div class="deal-header">
-      <div class="deal-title">
-        <i>🔥</i> DEAL SỐC TRONG NGÀY
-      </div>
-      <div class="countdown">
-        <span>Kết thúc trong</span>
-        <div class="countdown-item">05</div>
-        <div class="countdown-separator">:</div>
-        <div class="countdown-item">43</div>
-        <div class="countdown-separator">:</div>
-        <div class="countdown-item">21</div>
-      </div>
-      <a href="#" class="view-all">Xem tất cả ></a>
-    </div>
-
-    <div class="product-grid">
-      <div class="product-card">
-        <div class="discount-tag">Giảm 28%</div>
-        <div class="product-card-image">
-          <img >
-        </div>
-        <h3 class="product-card-title">iPhone 15 256GB Chính hãng VN/A</h3>
-        <div class="product-card-price">21.990.000₫</div>
-        <div class="product-card-old-price">27.990.000₫</div>
-        <div class="product-card-gift">Quà 1.500.000₫</div>
-        <div class="rating">
-          <div class="stars">★★★★★</div>
-          <div class="count">(124)</div>
+        <div class="dots-container">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
         </div>
       </div>
 
-      <div class="product-card">
-        <div class="discount-tag">Giảm 20%</div>
-        <div class="product-card-image">
-          <img >
+      <!-- Banner section -->
+      <div class="banner-container">
+        <div class="banner banner-1">
+          <div class="warranty-badge">BẢO HÀNH TRỌN ĐỜI</div>
+          <h2 class="phone-title">Galaxy S25 Ultra</h2>
+          <p class="phone-subtitle">Galaxy AI 💫</p>
+          <div class="promotion-badge">Tặng 7 Triệu</div>
         </div>
-        <h3 class="product-card-title">Samsung Galaxy S24 8GB/256GB</h3>
-        <div class="product-card-price">19.490.000₫</div>
-        <div class="product-card-old-price">23.990.000₫</div>
-        <div class="product-card-gift">Quà 2.000.000₫</div>
-        <div class="rating">
-          <div class="stars">★★★★☆</div>
-          <div class="count">(98)</div>
+
+        <div class="banner banner-2">
+          <h2 class="aircon-text">MÁY LẠNH<br>LẠNH THẦN TỐC</h2>
+          <div class="installment-badge">TRẢ GÓP TỪ 17K/NGÀY</div>
         </div>
       </div>
 
-      <div class="product-card">
-        <div class="discount-tag">Giảm 15%</div>
-        <div class="product-card-image">
-          <img >
-        </div>
-        <h3 class="product-card-title">MacBook Air M3 13" 8GB/256GB</h3>
-        <div class="product-card-price">27.990.000₫</div>
-        <div class="product-card-old-price">32.990.000₫</div>
-        <div class="product-card-gift">Quà 1.000.000₫</div>
-        <div class="rating">
-          <div class="stars">★★★★★</div>
-          <div class="count">(85)</div>
-        </div>
-      </div>
-
-      <div class="product-card">
-        <div class="discount-tag">Giảm 30%</div>
-        <div class="product-card-image">
-          <img >
-        </div>
-        <h3 class="product-card-title">Xiaomi Redmi Note 13 Pro 5G</h3>
-        <div class="product-card-price">8.490.000₫</div>
-        <div class="product-card-old-price">12.490.000₫</div>
-        <div class="product-card-gift">Quà 800.000₫</div>
-        <div class="rating">
-          <div class="stars">★★★★☆</div>
-          <div class="count">(76)</div>
+      <!-- Category section -->
+      <div class="category-section">
+        <h2 class="section-title">Danh mục nổi bật</h2>
+        <div class="category-grid">
+          <div class="category-item">
+            <div class="category-icon">📱</div>
+            <div class="category-name">Điện thoại</div>
+          </div>
+          <div class="category-item">
+            <div class="category-icon">💻</div>
+            <div class="category-name">Laptop</div>
+          </div>
+          <div class="category-item">
+            <div class="category-icon">📟</div>
+            <div class="category-name">Máy tính bảng</div>
+          </div>
+          <div class="category-item">
+            <div class="category-icon">🔄</div>
+            <div class="category-name">Xem tất cả</div>
+          </div>
         </div>
       </div>
 
-      <div class="product-card">
-        <div class="discount-tag">Giảm 25%</div>
-        <div class="product-card-image">
-          <img >
+      <!-- Deal section -->
+      <div class="deal-section">
+        <div class="deal-header">
+          <div class="deal-title">
+            <i>🔥</i> DEAL SỐC TRONG NGÀY
+          </div>
+          <div class="countdown">
+            <span>Kết thúc trong</span>
+            <div class="countdown-item">05</div>
+            <div class="countdown-separator">:</div>
+            <div class="countdown-item">43</div>
+            <div class="countdown-separator">:</div>
+            <div class="countdown-item">21</div>
+          </div>
+          <a href="#" class="view-all">Xem tất cả ></a>
         </div>
-        <h3 class="product-card-title">iPad Gen 10 WiFi 64GB Chính hãng</h3>
-        <div class="product-card-price">9.990.000₫</div>
-        <div class="product-card-old-price">12.990.000₫</div>
-        <div class="product-card-gift">Quà 1.200.000₫</div>
-        <div class="rating">
-          <div class="stars">★★★★★</div>
-          <div class="count">(67)</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Second Deal section -->
-  <div class="deal-section">
-    <div class="deal-header">
-      <div class="deal-title">
-        ĐIỆN THOẠI NỔI BẬT
-      </div>
-      <a href="#" class="view-all">Xem tất cả ></a>
-    </div>
+        <div class="product-grid">
+          <div class="product-card">
+            <div class="discount-tag">Giảm 28%</div>
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">iPhone 15 256GB Chính hãng VN/A</h3>
+            <div class="product-card-price">21.990.000₫</div>
+            <div class="product-card-old-price">27.990.000₫</div>
+            <div class="product-card-gift">Quà 1.500.000₫</div>
+            <div class="rating">
+              <div class="stars">★★★★★</div>
+              <div class="count">(124)</div>
+            </div>
+          </div>
 
-    <div class="product-grid">
-      <div class="product-card">
-        <div class="product-card-image">
-          <img >
-        </div>
-        <h3 class="product-card-title">Samsung Galaxy Z Flip6 5G</h3>
-        <div class="product-card-price">22.990.000₫</div>
-        <div class="product-card-gift">Trả góp 0%</div>
-        <div class="rating">
-          <div class="stars">★★★★★</div>
-          <div class="count">(53)</div>
+          <div class="product-card">
+            <div class="discount-tag">Giảm 20%</div>
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">Samsung Galaxy S24 8GB/256GB</h3>
+            <div class="product-card-price">19.490.000₫</div>
+            <div class="product-card-old-price">23.990.000₫</div>
+            <div class="product-card-gift">Quà 2.000.000₫</div>
+            <div class="rating">
+              <div class="stars">★★★★☆</div>
+              <div class="count">(98)</div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="discount-tag">Giảm 15%</div>
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">MacBook Air M3 13" 8GB/256GB</h3>
+            <div class="product-card-price">27.990.000₫</div>
+            <div class="product-card-old-price">32.990.000₫</div>
+            <div class="product-card-gift">Quà 1.000.000₫</div>
+            <div class="rating">
+              <div class="stars">★★★★★</div>
+              <div class="count">(85)</div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="discount-tag">Giảm 30%</div>
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">Xiaomi Redmi Note 13 Pro 5G</h3>
+            <div class="product-card-price">8.490.000₫</div>
+            <div class="product-card-old-price">12.490.000₫</div>
+            <div class="product-card-gift">Quà 800.000₫</div>
+            <div class="rating">
+              <div class="stars">★★★★☆</div>
+              <div class="count">(76)</div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="discount-tag">Giảm 25%</div>
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">iPad Gen 10 WiFi 64GB Chính hãng</h3>
+            <div class="product-card-price">9.990.000₫</div>
+            <div class="product-card-old-price">12.990.000₫</div>
+            <div class="product-card-gift">Quà 1.200.000₫</div>
+            <div class="rating">
+              <div class="stars">★★★★★</div>
+              <div class="count">(67)</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="product-card">
-        <div class="product-card-image">
-          <img >
+      <!-- Second Deal section -->
+      <div class="deal-section">
+        <div class="deal-header">
+          <div class="deal-title">
+            ĐIỆN THOẠI NỔI BẬT
+          </div>
+          <a href="#" class="view-all">Xem tất cả ></a>
         </div>
-        <h3 class="product-card-title">OPPO Reno11 F 5G 8GB/256GB</h3>
-        <div class="product-card-price">8.990.000₫</div>
-        <div class="product-card-gift">Quà 700.000₫</div>
-        <div class="rating">
-          <div class="stars">★★★★☆</div>
-          <div class="count">(42)</div>
-        </div>
-      </div>
 
-      <div class="product-card">
-        <div class="discount-tag">Giảm 18%</div>
-        <div class="product-card-image">
-          <img >
-        </div>
-        <h3 class="product-card-title">vivo V30 5G 12GB/512GB</h3>
-        <div class="product-card-price">12.490.000₫</div>
-        <div class="product-card-old-price">14.990.000₫</div>
-        <div class="product-card-gift">Quà 1.200.000₫</div>
-        <div class="rating">
-          <div class="stars">★★★★☆</div>
-          <div class="count">(38)</div>
-        </div>
-      </div>
+        <div class="product-grid">
+          <div class="product-card">
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">Samsung Galaxy Z Flip6 5G</h3>
+            <div class="product-card-price">22.990.000₫</div>
+            <div class="product-card-gift">Trả góp 0%</div>
+            <div class="rating">
+              <div class="stars">★★★★★</div>
+              <div class="count">(53)</div>
+            </div>
+          </div>
 
-      <div class="product-card">
-        <div class="product-card-image">
-          <img >
-        </div>
-        <h3 class="product-card-title">iPhone 16 Pro Max 256GB</h3>
-        <div class="product-card-price">34.990.000₫</div>
-        <div class="product-card-gift">Trả góp 0%</div>
-        <div class="rating">
-          <div class="stars">★★★★★</div>
-          <div class="count">(45)</div>
-        </div>
-      </div>
+          <div class="product-card">
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">OPPO Reno11 F 5G 8GB/256GB</h3>
+            <div class="product-card-price">8.990.000₫</div>
+            <div class="product-card-gift">Quà 700.000₫</div>
+            <div class="rating">
+              <div class="stars">★★★★☆</div>
+              <div class="count">(42)</div>
+            </div>
+          </div>
 
-      <div class="product-card">
-        <div class="product-card-image">
-          <img >
-        </div>
-        <h3 class="product-card-title">Xiaomi 14 Ultra 5G 12GB/512GB</h3>
-        <div class="product-card-price">24.990.000₫</div>
-        <div class="product-card-gift">Quà 2.000.000₫</div>
-        <div class="rating">
-          <div class="stars">★★★★☆</div>
-          <div class="count">(37)</div>
+          <div class="product-card">
+            <div class="discount-tag">Giảm 18%</div>
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">vivo V30 5G 12GB/512GB</h3>
+            <div class="product-card-price">12.490.000₫</div>
+            <div class="product-card-old-price">14.990.000₫</div>
+            <div class="product-card-gift">Quà 1.200.000₫</div>
+            <div class="rating">
+              <div class="stars">★★★★☆</div>
+              <div class="count">(38)</div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">iPhone 16 Pro Max 256GB</h3>
+            <div class="product-card-price">34.990.000₫</div>
+            <div class="product-card-gift">Trả góp 0%</div>
+            <div class="rating">
+              <div class="stars">★★★★★</div>
+              <div class="count">(45)</div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="product-card-image">
+              <img >
+            </div>
+            <h3 class="product-card-title">Xiaomi 14 Ultra 5G 12GB/512GB</h3>
+            <div class="product-card-price">24.990.000₫</div>
+            <div class="product-card-gift">Quà 2.000.000₫</div>
+            <div class="rating">
+              <div class="stars">★★★★☆</div>
+              <div class="count">(37)</div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+  </main>
+
+  <!-- Nhúng footer -->
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
-<div class="overlay"></div>
 
-<!-- Nhúng footer -->
-<div th:replace="~{fragments/footer :: footer}"></div>
+<div class="overlay"></div>
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>

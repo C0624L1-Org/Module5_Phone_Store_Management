@@ -6,9 +6,7 @@ import jakarta.validation.constraints.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "customer")
@@ -53,9 +51,6 @@ public class Customer {
     @Min(value = 0, message = "Số lần mua hàng không được âm!")
     @Column(name = "purchaseCount", nullable = false)
     private int purchaseCount = 0;
-
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Cart> carts = new ArrayList<>();
 
     // Getters and Setters
     public Integer getCustomerID() {

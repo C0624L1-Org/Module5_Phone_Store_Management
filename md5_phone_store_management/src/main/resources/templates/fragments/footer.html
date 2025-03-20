@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Footer</title>
 </head>
 <body>
 <!-- Footer -->
-<div th:fragment="footer" class="footer">
+<footer th:fragment="footer" class="footer">
     <div class="container">
         <div class="footer-top">
             <div class="footer-column">
@@ -32,15 +32,15 @@
             <div class="footer-column">
                 <h3 class="footer-title">Thông tin liên hệ</h3>
                 <ul class="footer-contact">
-                    <li><i>📞</i> 0123 456 789</li>
-                    <li><i>📧</i> support@codegym.com.vn</li>
-                    <li><i>🏠</i> Số 1, Thủ Đức, TP.HCM</li>
+                    <li><i class="fas fa-phone"></i> 0123 456 789</li>
+                    <li><i class="fas fa-envelope"></i> support@codegym.com.vn</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Số 1, Thủ Đức, TP.HCM</li>
                 </ul>
                 <div class="social-links">
-                    <a href="#" class="social-link">📘</a>
-                    <a href="#" class="social-link">📸</a>
-                    <a href="#" class="social-link">🐦</a>
-                    <a href="#" class="social-link">▶️</a>
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
         </div>
@@ -52,6 +52,6 @@
             <div class="payment-method">VNPAY</div>
         </div>
     </div>
-</div>
+</footer>
 </body>
 </html>

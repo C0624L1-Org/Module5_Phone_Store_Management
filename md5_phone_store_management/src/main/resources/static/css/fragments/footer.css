@@ -1,40 +1,58 @@
-/* ========== FOOTER STYLES ========== */
+/* === FOOTER STYLES === */
 .footer {
     background-color: #333333;
-    width: 100%;
-    position: relative;
-    left: auto;
-    right: auto;
-    margin-left: 0;
-    margin-right: 0;
-    padding: 30px 50px;
+    color: white;
+    padding: 30px 0;
     margin-top: auto;
+    position: relative;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
 }
 
+.content-wrapper .footer {
+    /*width: calc(100% - 280px);*/
+    /*margin-left: 280px; */
+}
+
+body:not(:has(.sidebar)) .footer {
+    width: 100%;
+    margin-left: 0;
+}
+
+/* Footer container */
 .footer .container {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
 }
 
 .footer-top {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     margin-bottom: 30px;
 }
 
 .footer-column {
     flex: 1;
+    min-width: 200px;
+    padding: 0 15px;
+    margin-bottom: 20px;
 }
 
 .footer-title {
     font-size: 16px;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     color: #ffffff;
 }
 
 .footer-links {
     list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .footer-links li {
@@ -45,18 +63,22 @@
     text-decoration: none;
     color: #ffffff;
     font-size: 14px;
+    transition: color 0.2s;
 }
 
 .footer-links a:hover {
     color: #d82027;
 }
 
+/* Contact info */
 .footer-contact {
     list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .footer-contact li {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     font-size: 14px;
     color: #ffffff;
     display: flex;
@@ -67,8 +89,10 @@
     margin-right: 10px;
     color: #d82027;
     font-size: 16px;
+    width: 16px;
 }
 
+/* Social links */
 .social-links {
     display: flex;
     gap: 10px;
@@ -76,9 +100,9 @@
 }
 
 .social-link {
-    width: 35px;
-    height: 35px;
-    background-color: #eee;
+    width: 36px;
+    height: 36px;
+    background-color: #444;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -86,19 +110,19 @@
     text-decoration: none;
     color: #ffffff;
     font-size: 16px;
+    transition: background-color 0.2s;
 }
 
 .social-link:hover {
     background-color: #d82027;
-    color: white;
 }
 
+/* Footer bottom */
 .footer-bottom {
-    border-top: 1px solid #eee;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 20px;
     text-align: center;
     font-size: 13px;
-    color: #ffffff;
 }
 
 .payment-methods {
@@ -109,12 +133,8 @@
 }
 
 .payment-method {
-    width: 40px;
-    height: 25px;
-    background-color: rgba(192, 208, 243, 0.8);
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 12px;
 }

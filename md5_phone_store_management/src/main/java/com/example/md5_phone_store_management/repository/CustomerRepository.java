@@ -30,9 +30,6 @@ public class CustomerRepository {
     private static final String SEARCH_CUSTOMER_BY_EMAIL = "SELECT * FROM customer WHERE email like ?";
     private static final String SEARCH_CUSTOMER_BY_GENDER = "SELECT * FROM customer WHERE gender = ?";
 
-    // Xóa Cart
-    private static final String DELETE_CARTS_BY_CUSTOMER_ID = "DELETE FROM carts WHERE customer_id = ?";
-
     // Kiểm tra số điện thoại đã tồn tại
     public boolean isPhoneExists(String phone) {
         String sql = "SELECT COUNT(*) > 0 FROM customer WHERE phone = ?";
@@ -94,9 +91,6 @@ public class CustomerRepository {
 
 
     public void deleteCustomer(List<Integer> customerIDs) {
-        for (Integer id : customerIDs) {
-            jdbcTemplate.update(DELETE_CARTS_BY_CUSTOMER_ID, id);
-        }
         jdbcTemplate.batchUpdate(DELETE_CUSTOMERS_BY_IDS, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {

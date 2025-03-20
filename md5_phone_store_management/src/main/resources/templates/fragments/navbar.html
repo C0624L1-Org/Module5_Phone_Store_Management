@@ -5,8 +5,8 @@
 </head>
 <body>
 <!-- Navbar Fragment -->
-<div th:fragment="navbar" class="navbar">
-    <div class="navbar-container">
+<nav th:fragment="navbar" class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid">
         <div class="logo">
             <a th:href="@{/home}">
                 <img src="/img/fpt_logo.png" alt="Shop Logo">
@@ -42,12 +42,12 @@
                              alt="avatar"
                              class="user-avatar">
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu" style="color: black">
                         <li><span class="dropdown-item-text"><strong>Chức Năng</strong></span></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="menu-item" th:href="@{/common/profile}"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
-<!--                        <li><a class="menu-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng</a></li>-->
-<!--                        <li><a class="menu-item" href="#"><i class="fas fa-history me-2"></i>Lịch sử đơn hàng</a></li>-->
+                        <!--                        <li><a class="menu-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng</a></li>-->
+                        <!--                        <li><a class="menu-item" href="#"><i class="fas fa-history me-2"></i>Lịch sử đơn hàng</a></li>-->
                         <li><a class="menu-item" th:href="@{/common/change-password}"><i class="fas fa-key me-2"></i>Đổi mật khẩu</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="menu-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
@@ -66,7 +66,7 @@
             </ul>
         </div>
     </div>
-</div>
+</nav>
 
 <div class="overlay"></div>
 
