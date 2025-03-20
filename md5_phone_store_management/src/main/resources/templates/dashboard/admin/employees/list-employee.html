@@ -66,12 +66,13 @@
                     </div>
                     <div class="col-md-3 d-flex align-items-end">
                         <button class="btn btn-primary me-2" type="submit">
-                            <i class="bi bi-search"></i> Tìm kiếm
+                            <i class="fas fa-search"></i> Tìm kiếm
                         </button>
-                        <a class="btn btn-secondary" href="/dashboard/admin/employees/list">
-                            <i class="bi bi-x-circle"></i> Xóa tìm kiếm
+                        <a class="btn btn-secondary" href="/dashboard/admin/customers/list" id="refresh-button">
+                            <i class="fas fa-sync-alt"></i> Làm mới
                         </a>
                     </div>
+
                 </div>
             </form>
 
@@ -81,7 +82,7 @@
                     <tr>
                         <th><input id="selectAll" type="checkbox"></th>
                         <th>Họ và tên</th>
-                        <th>Ngày sinh</th>
+                        <th>Ngày sinh / Tuổi</th>
                         <th>Địa chỉ</th>
                         <th>Công việc</th>
                         <th>Số điện thoại</th>
@@ -93,9 +94,10 @@
                         <td><input name="selectEmployIds" class="selectEmployee"
                                    th:value="${employee.employeeID}" th:data-name="${employee.fullName}"
                                    th:data-address="${employee.address}"
-                                   type="checkbox"></td>
+                                   type="checkbox">
+                        </td>
                         <td th:text="${employee.fullName}"></td>
-                        <td th:text="${employee.dob}"></td>
+                        <td th:text="${employee.dob.format(T(java.time.format.DateTimeFormatter).ofPattern('dd-MM-yyyy')) + ' ( ' + T(java.time.Period).between(employee.dob, T(java.time.LocalDate).now()).getYears() + ' tuổi )'}"></td>
                         <td th:text="${employee.address}"></td>
                         <td>
                                 <span th:switch="${employee.role?.name()}">
@@ -126,7 +128,8 @@
                 <i class="fas fa-trash-alt"></i> Xoá
             </button>
             <!-- Bootstrap Modal Xác nhận Xóa -->
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" style="margin-top: 150px">
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true"
+                 style="margin-top: 150px">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
