@@ -1,31 +1,16 @@
-package com.example.md5_phone_store_management.model;
+package com.example.md5_phone_store_management.model.dto;
 
-import jakarta.persistence.*;
-
-
-@Entity
-@Table(name = "supplier")
-public class Supplier {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "supplierID")
+public class SupplierDTO {
     private Integer supplierID;
-
-    @Column(name = "name", nullable = false, length = 50)
     private String name;
-
-    @Column(name = "address", length = 500)
     private String address;
-
-    @Column(name = "phone", length = 15)
     private String phone;
-
-    @Column(name = "email", length = 50)
     private String email;
 
-    public Supplier() {}
+    public SupplierDTO() {}
 
-    public Supplier(String name, String address, String phone, String email) {
+    public SupplierDTO(Integer supplierID, String name, String address, String phone, String email) {
+        this.supplierID = supplierID;
         this.name = name;
         this.address = address;
         this.phone = phone;
@@ -70,16 +55,5 @@ public class Supplier {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    @Override
-    public String toString() {
-        return "Supplier{" +
-                "supplierID=" + supplierID +
-                ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                '}';
     }
 }
