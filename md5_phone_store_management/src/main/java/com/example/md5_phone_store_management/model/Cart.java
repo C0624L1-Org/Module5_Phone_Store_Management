@@ -45,7 +45,7 @@ public class Cart {
     }
 
     public Cart(Customer customer) {
-//        this.customer = customer;
+        this.customer = customer;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }

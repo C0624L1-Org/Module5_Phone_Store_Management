@@ -50,7 +50,7 @@
 
         <!-- Quản lý nhà cung cấp - Thủ kho, Admin -->
         <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
-          <a th:href="@{/dashboard/warehouse/supplier}" class="nav-link text-white">
+          <a th:href="@{/dashboard/suppliers}" class="nav-link text-white">
             <i class="fas fa-truck-loading me-2"></i>Quản lý nhà cung cấp
           </a>
         </li>
@@ -71,7 +71,7 @@
 
         <!-- Quản lý bán hàng - Nhân viên bán hàng & Nhân viên kinh doanh -->
         <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson', 'SalesStaff')">
-          <a th:href="@{/dashboard/sales/management}" class="nav-link text-white">
+          <a th:href="@{/dashboard/sales/form}" class="nav-link text-white">
             <i class="fas fa-shopping-cart me-2"></i>Quản lý bán hàng
           </a>
         </li>

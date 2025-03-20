@@ -54,8 +54,8 @@ public class Customer {
     @Column(name = "purchaseCount", nullable = false)
     private int purchaseCount = 0;
 
-//    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Cart> carts = new ArrayList<>();
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cart> carts = new ArrayList<>();
 
     // Getters and Setters
     public Integer getCustomerID() {
