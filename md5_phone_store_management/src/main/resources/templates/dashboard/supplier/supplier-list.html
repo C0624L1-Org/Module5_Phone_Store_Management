@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Nhà Cung Cấp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="mb-4">Danh sách Nhà Cung Cấp</h2>
+
+    <!-- Form tìm kiếm với các trường nhập riêng biệt -->
+    <form action="/dashboard/suppliers" method="get" class="mb-3">
+        <div class="row">
+            <div class="col-md-3">
+                <input type="text" name="name" th:value="${name}" class="form-control" placeholder="Tìm kiếm theo tên">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="address" th:value="${address}" class="form-control" placeholder="Tìm kiếm theo địa chỉ">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="phone" th:value="${phone}" class="form-control" placeholder="Tìm kiếm theo số điện thoại">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="email" th:value="${email}" class="form-control" placeholder="Tìm kiếm theo email">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+            <div class="col-md-3">
+                <!-- Nút Xóa tìm kiếm -->
+                <a href="/dashboard/suppliers" class="btn btn-secondary">Xóa tìm kiếm</a>
+            </div>
+        </div>
+    </form>
+
+
+    <a href="/dashboard/suppliers/create" class="btn btn-primary mb-3">Thêm Nhà Cung Cấp</a>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Địa chỉ</th>
+            <th>Điện thoại</th>
+            <th>Email</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="supplier : ${suppliers}">
+            <td th:text="${supplier.supplierID}"></td>
+            <td th:text="${supplier.name}"></td>
+            <td th:text="${supplier.address}"></td>
+            <td th:text="${supplier.phone}"></td>
+            <td th:text="${supplier.email}"></td>
+            <td>
+                <a th:href="@{/dashboard/update-supplierForm/{id}(id=${supplier.supplierID})}" class="btn btn-warning">Sửa</a>
+                <a th:href="@{/dashboard/suppliers/delete/{id}(id=${supplier.supplierID})}" class="btn btn-danger"
+                   onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
