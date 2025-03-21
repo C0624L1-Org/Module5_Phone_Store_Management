@@ -6,9 +6,13 @@ import com.example.md5_phone_store_management.model.Gender;
 import com.example.md5_phone_store_management.model.Role;
 import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
 import com.example.md5_phone_store_management.service.CustomerService;
+import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +26,28 @@ public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private CustomerServiceImpl customerServiceWithJpa;
+
+
+    @GetMapping("/admin/customers/list")
+    public String listCustomers(Model model,
+                                @RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "5") int size,
+                                @RequestParam(required = false) String name,
+                                @RequestParam(required = false) String phone) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Customer> customerPage = customerServiceWithJpa.findAllCustomers(pageable);
+
+        model.addAttribute("customerPage", customerPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPage", customerPage.getTotalPages());
+
+        return "dashboard/admin/customers/list-customer";
+    }
+
+
 
     @GetMapping("/admin/customers/delete")
     public String deleteCustomers(@RequestParam List<Integer> ids, HttpSession session) {
@@ -53,12 +79,7 @@ public class CustomerController {
 
 
 
-    @GetMapping("/admin/customers/list")
-    public String listCustomers(Model model) {
-        List<Customer> customers = customerService.findAllCustomers();
-        model.addAttribute("customers", customers);
-        return "dashboard/admin/customers/list-customer";
-    }
+
 
 
     @GetMapping("/admin/customers/search")

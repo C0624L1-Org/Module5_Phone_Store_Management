@@ -1,9 +1,11 @@
 package com.example.md5_phone_store_management.repository;
 
 import com.example.md5_phone_store_management.model.Customer;
+import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Gender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class CustomerRepository {
+public class CustomerRepository  {
     private final JdbcTemplate jdbcTemplate;
 
     private static final String SELECT_ALL_CUSTOMERS = "SELECT * FROM customer";
