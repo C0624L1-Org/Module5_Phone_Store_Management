@@ -1,5 +1,6 @@
 package com.example.md5_phone_store_management.controller;
 
+import com.example.md5_phone_store_management.service.ICustomerService;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IProductService;
 import com.example.md5_phone_store_management.service.ISupplierService;
@@ -22,6 +23,9 @@ public class DashboardController {
     @Autowired
     private IProductService iProductService;
 
+    @Autowired
+    private ICustomerService iCustomerService;
+
     @GetMapping("/admin")
     public String admin(Model model) {
         // Thống kê nhân viên
@@ -29,6 +33,7 @@ public class DashboardController {
         model.addAttribute("countSalesStaff", iEmployeeService.countSalesStaff());
         model.addAttribute("countBusinessStaff", iEmployeeService.countBusinessStaff());
         model.addAttribute("countWarehouseStaff", iEmployeeService.countWarehouseStaff());
+        model.addAttribute("countCustomer", iCustomerService.countTotalCustomers());
 
         // Thống kê nhà cung cấp
         model.addAttribute("countSuppliers", iSupplierService.countSuppliers());

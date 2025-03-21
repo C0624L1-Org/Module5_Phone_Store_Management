@@ -18,4 +18,9 @@ public class CustomerServiceImpl implements ICustomerService {
     public Page<Customer> findAllCustomers(Pageable pageable) {
         return customerRepository.getAllCustomerPageable(pageable);
     }
+
+    @Override
+    public Integer countTotalCustomers() {
+        return customerRepository.countTotalCustomers();
+    }
 }

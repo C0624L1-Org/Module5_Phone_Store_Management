@@ -12,4 +12,8 @@ import org.springframework.stereotype.Repository;
 public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
     @Query(value = "SELECT * FROM customer", nativeQuery = true)
     Page<Customer> getAllCustomerPageable(Pageable pageable);
+
+    @Query(value = "SELECT COUNT(*) FROM customer", nativeQuery = true)
+    Integer countTotalCustomers();
+
 }
