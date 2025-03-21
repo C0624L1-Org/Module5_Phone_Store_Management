@@ -2,38 +2,73 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang quản lý Nhân viên bán hàng</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
     <link rel="stylesheet" href="/css/fragments/navbar.css">
-    <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
 </head>
 <body>
 <!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
+
 <!-- Nhúng navbar -->
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<!-- Sidebar -->
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-<!-- Nội dung trong trang -->
-<div class="main-content mt-5">
-    <h1>Đây là Trang quản lý Nhân viên bán hàng </h1>
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h1 class="mb-4">Trang quản lý Nhân viên bán hàng</h1>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-success text-white">
+                                    <h3 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Chức năng bán hàng</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group">
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-cash-register me-2"></i> Tạo đơn hàng mới
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-history me-2"></i> Lịch sử đơn hàng
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-user-friends me-2"></i> Quản lý khách hàng
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
-
-<!-- Nhúng footer -->
-<!--<div th:replace="~{fragments/footer :: footer}"></div>-->
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-<!-- Các script khác -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

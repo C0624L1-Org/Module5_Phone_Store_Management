@@ -2,131 +2,301 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Cập Nhật Sản phẩm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập nhật sản phẩm</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
     <link rel="stylesheet" href="/css/fragments/navbar.css">
-    <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <style>
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .btn-create {
+            background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .product-image-preview {
+            display: inline-block;
+            margin: 10px;
+            position: relative;
+        }
+
+        .product-image-preview img {
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-image-preview img:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
 <!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
+
 <!-- Nhúng navbar -->
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<!-- Sidebar -->
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-<div class="main-content mt-5">
-    <div class="card shadow w-50 mx-auto">
-        <div class="card-header bg-success text-white">
-            <h3 class="mb-0">Cập nhật sản phẩm: <strong th:text="${productDTO.name}"></strong></h3>
-        </div>
-        <div class="card-body">
-            <form th:action="@{/dashboard/products/update-product}" method="post"
-                  th:object="${productDTO}"
-                  enctype="multipart/form-data">
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-                <input type="hidden" th:field="*{productID}">
-                <input type="hidden" th:field="*{purchasePrice}">
-                <input type="hidden" th:field="*{retailPrice}">
-                <input type="hidden" th:field="*{stockQuantity}">
-                <input type="hidden" th:field="*{qrCode}">
-                <input type="hidden" th:field="*{supplierID}">
+        <!-- Main content area -->
+        <div class="content-container">
+            <div class="container py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/products/list}">Quản lý sản phẩm</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Cập nhật sản phẩm</li>
+                    </ol>
+                </nav>
 
-                <div class="mb-3">
-                    <label for="name" class="form-label">Tên sản phẩm</label>
-                    <input type="text" th:field="*{name}" id="name" class="form-control"
-                           placeholder="Nhập tên sản phẩm">
-                    <p class="text-danger small" th:if="${#fields.hasErrors('name')}"
-                       th:text="${#fields.errors('name')[0]}"></p>
-                </div>
-                <div class="mb-3">
-                    <label for="sellingPrice" class="form-label">Giá bán</label>
-                    <input type="number" th:field="*{{sellingPrice}}" id="sellingPrice" class="form-control" pattern="[0-9]">
-                    <p class="text-danger small" th:if="${#fields.hasErrors('sellingPrice')}"
-                       th:text="${#fields.errors('sellingPrice')[0]}"></p>
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="form-section mb-4">
+                            <div class="form-header">
+                                <h3 class="mb-0">
+                                    <i class="fas fa-edit me-2"></i>
+                                    Cập nhật sản phẩm: <span th:text="${productDTO.name}"></span>
+                                </h3>
+                                <p class="text-white-50 mt-2 mb-0">Cập nhật thông tin sản phẩm</p>
+                            </div>
 
-                </div>
-                <!-- Hình ảnh sản phẩm -->
-                <div class="mb-3">
-                    <label for="imgProducts" class="form-label">Hình ảnh sản phẩm</label>
-                    <input type="file" class="form-control" id="imgProducts" name="imgProducts" multiple>
-                    <!--hiển thị hinh ảnh-->
-                    <img th:each="img : *{images}" th:src="${img.imageUrl}" th:alt="${img.product.name}"
-                         class="img-thumbnail" height="200px" width="200px">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Kích thước màn hình</label>
-                    <input type="text" class="form-control" th:field="*{screenSize}">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Camera</label>
-                    <input type="text" class="form-control" th:field="*{camera}">
-                    <p class="text-danger small" th:if="${#fields.hasErrors('camera')}"
-                       th:text="${#fields.errors('camera')[0]}"></p>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Selfie</label>
-                    <input type="text" class="form-control" th:field="*{selfie}">
-                    <p class="text-danger small" th:if="${#fields.hasErrors('selfie')}"
-                       th:text="${#fields.errors('selfie')[0]}"></p>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">CPU</label>
-                    <input type="text" class="form-control" th:field="*{CPU}">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Lưu trữ</label>
-                    <input type="text" class="form-control" th:field="*{storage}">
-                    <p class="text-danger small" th:if="${#fields.hasErrors('storage')}"
-                       th:text="${#fields.errors('storage')[0]}"></p>
-                </div>
-                <!-- Mô tả sản phẩm -->
-                <div class="mb-3">
-                    <label class="form-label">Mô tả thêm</label>
-                    <textarea class="form-control" th:field="*{detailedDescription}"></textarea>
-                </div>
-                <!--&lt;!&ndash; Số lượng tồn kho &ndash;&gt;
-                <div class="mb-3">
-                    <label for="stockQuantity" class="form-label">Số lượng tồn kho</label>
-                    <input type="number" th:field="*{stockQuantity}" id="stockQuantity" class="form-control">
-                    <p class="text-danger small" th:if="${#fields.hasErrors('stockQuantity')}"
-                       th:text="${#fields.errors('stockQuantity')[0]}"></p>
-                </div>
-                &lt;!&ndash; Mã QR &ndash;&gt;
-                <div class="mb-3">
-                    <label class="form-label">Mã QR</label>
-                    <input type="text" class="form-control" th:field="*{qrCode}">
-                </div>
-                &lt;!&ndash; Nhà cung cấp &ndash;&gt;
-                <div class="mb-3">
-                    <label class="form-label">Nhà cung cấp</label>
-                    <select class="form-control" th:field="*{supplierID}">
-                        <option value="">&#45;&#45; Chọn nhà cung cấp &#45;&#45;</option>
-                        <option th:each="sup : ${supplier}" th:value="${sup.supplierID}" th:text="${sup.name}"></option>
-                    </select>
-                </div>-->
-                <button type="submit" class="btn btn-success">Cập nhật</button>
+                            <div class="p-4">
+                                <form th:action="@{/dashboard/products/update-product}" method="post"
+                                      th:object="${productDTO}"
+                                      enctype="multipart/form-data"
+                                      class="needs-validation" novalidate>
 
-                <a href="/dashboard/products/list" class="btn btn-secondary">Hủy</a>
-            </form>
+                                    <!-- Hidden fields -->
+                                    <input type="hidden" th:field="*{productID}">
+                                    <input type="hidden" th:field="*{purchasePrice}">
+                                    <input type="hidden" th:field="*{retailPrice}">
+                                    <input type="hidden" th:field="*{stockQuantity}">
+                                    <input type="hidden" th:field="*{qrCode}">
+                                    <input type="hidden" th:field="*{supplierID}">
+
+                                    <div class="row">
+                                        <!-- Tên sản phẩm -->
+                                        <div class="col-md-12 mb-3">
+                                            <label for="name" class="form-label">
+                                                <i class="fas fa-tag me-2"></i>Tên sản phẩm
+                                            </label>
+                                            <input type="text" th:field="*{name}" id="name" class="form-control"
+                                                   placeholder="Nhập tên sản phẩm">
+                                            <div class="text-danger" th:if="${#fields.hasErrors('name')}"
+                                                 th:text="${#fields.errors('name')[0]}"></div>
+                                        </div>
+
+                                        <!-- Giá bán -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="sellingPrice" class="form-label">
+                                                <i class="fas fa-tags me-2"></i>Giá bán
+                                            </label>
+                                            <input type="number" th:field="*{{sellingPrice}}" id="sellingPrice" class="form-control"
+                                                   placeholder="0" pattern="[0-9]">
+                                            <div class="text-danger" th:if="${#fields.hasErrors('sellingPrice')}"
+                                                 th:text="${#fields.errors('sellingPrice')[0]}"></div>
+                                        </div>
+
+                                        <!-- CPU -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="CPU" class="form-label">
+                                                <i class="fas fa-microchip me-2"></i>CPU
+                                            </label>
+                                            <input type="text" class="form-control" th:field="*{CPU}" id="CPU"
+                                                   placeholder="Nhập thông tin CPU">
+                                        </div>
+
+                                        <!-- Bộ nhớ -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="storage" class="form-label">
+                                                <i class="fas fa-memory me-2"></i>Bộ nhớ
+                                            </label>
+                                            <input type="text" class="form-control" th:field="*{storage}" id="storage"
+                                                   placeholder="Nhập thông tin bộ nhớ">
+                                            <div class="text-danger" th:if="${#fields.hasErrors('storage')}"
+                                                 th:text="${#fields.errors('storage')[0]}"></div>
+                                        </div>
+
+                                        <!-- Kích thước màn hình -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="screenSize" class="form-label">
+                                                <i class="fas fa-desktop me-2"></i>Kích thước màn hình
+                                            </label>
+                                            <input type="text" class="form-control" th:field="*{screenSize}" id="screenSize"
+                                                   placeholder="Nhập kích thước màn hình">
+                                        </div>
+
+                                        <!-- Camera -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="camera" class="form-label">
+                                                <i class="fas fa-camera me-2"></i>Camera
+                                            </label>
+                                            <input type="text" class="form-control" th:field="*{camera}" id="camera"
+                                                   placeholder="Nhập thông số camera">
+                                            <div class="text-danger" th:if="${#fields.hasErrors('camera')}"
+                                                 th:text="${#fields.errors('camera')[0]}"></div>
+                                        </div>
+
+                                        <!-- Camera Selfie -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="selfie" class="form-label">
+                                                <i class="fas fa-camera-retro me-2"></i>Camera Selfie
+                                            </label>
+                                            <input type="text" class="form-control" th:field="*{selfie}" id="selfie"
+                                                   placeholder="Nhập thông số camera selfie">
+                                            <div class="text-danger" th:if="${#fields.hasErrors('selfie')}"
+                                                 th:text="${#fields.errors('selfie')[0]}"></div>
+                                        </div>
+
+                                        <!-- Mô tả sản phẩm -->
+                                        <div class="col-md-12 mb-3">
+                                            <label for="detailedDescription" class="form-label">
+                                                <i class="fas fa-info-circle me-2"></i>Mô tả chi tiết
+                                            </label>
+                                            <textarea class="form-control" th:field="*{detailedDescription}" id="detailedDescription"
+                                                      rows="3" placeholder="Nhập mô tả chi tiết về sản phẩm"></textarea>
+                                        </div>
+
+                                        <!-- Hình ảnh sản phẩm -->
+                                        <div class="col-md-12 mb-3">
+                                            <label for="imgProducts" class="form-label">
+                                                <i class="fas fa-images me-2"></i>Hình ảnh sản phẩm
+                                            </label>
+                                            <input type="file" class="form-control" id="imgProducts" name="imgProducts" accept="image/*"
+                                                   multiple>
+                                            <div class="form-text">Tải lên ảnh mới sẽ thay thế ảnh cũ. Có thể chọn nhiều ảnh.</div>
+
+                                            <!-- Hiển thị ảnh hiện tại -->
+                                            <div class="mt-3">
+                                                <h6 class="fw-bold">Ảnh hiện tại:</h6>
+                                                <div class="d-flex flex-wrap">
+                                                    <div th:each="img : *{images}" class="product-image-preview">
+                                                        <img th:src="${img.imageUrl}" th:alt="${img.product.name}"
+                                                             class="img-thumbnail" height="150px" width="150px">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end mt-4 gap-2">
+                                        <a href="/dashboard/products/list" class="btn btn-cancel">
+                                            <i class="fas fa-times me-2"></i>Hủy bỏ
+                                        </a>
+                                        <button type="submit" class="btn btn-create">
+                                            <i class="fas fa-save me-2"></i>Cập nhật
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Nhúng footer -->
-<div th:replace="~{fragments/footer :: footer}"></div>
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-<!-- Các script khác -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Form validation script -->
+<script>
+    // invalid fields
+    (function () {
+        'use strict'
+
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Vòng lặp ngăn chặn việc submit
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
 </body>
 </html>

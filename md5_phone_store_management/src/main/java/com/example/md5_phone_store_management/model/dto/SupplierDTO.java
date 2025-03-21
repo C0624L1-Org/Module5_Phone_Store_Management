@@ -1,11 +1,13 @@
 package com.example.md5_phone_store_management.model.dto;
 
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class SupplierDTO {
+public class SupplierDTO implements Validator {
 
     private Integer supplierID;
 
@@ -14,6 +16,7 @@ public class SupplierDTO {
     private String name;
 
     @Size(max = 500, message = "Địa chỉ không được vượt quá 500 ký tự")
+    @NotBlank(message = "Địa chỉ không được để trống")
     private String address;
 
     @NotBlank(message = "Số điện thoại không được để trống")
@@ -73,5 +76,15 @@ public class SupplierDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return false;
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+
     }
 }

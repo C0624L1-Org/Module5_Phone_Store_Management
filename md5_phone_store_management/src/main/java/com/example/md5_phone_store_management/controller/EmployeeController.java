@@ -7,6 +7,7 @@ import com.example.md5_phone_store_management.service.IEmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -29,38 +30,51 @@ public class EmployeeController {
     @Autowired
     private GlobalControllerAdvice globalControllerAdvice;
 
-
-
     //Read(a Đình Anh)
     @GetMapping("/admin/employees/list")
     public ModelAndView getListEmployees(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
-        Pageable pageable =  PageRequest.of(page, 9);
+        Pageable pageable =  PageRequest.of(page, 5);
         mv.addObject("currentPage", page);
         mv.addObject("employeePage", iEmployeeService.getAllEmployees(pageable));
         mv.addObject("totalPage",iEmployeeService.getAllEmployees(pageable).getTotalPages());
         return mv;
     }
     @GetMapping("/admin/employees/search")
-    public ModelAndView searchEmployees(@RequestParam (required = false) String name,
+    public ModelAndView searchEmployees(@RequestParam(required = false) String name,
                                         @RequestParam(required = false) String phone,
-                                        @RequestParam( required = false) String role,
-                                        @RequestParam(name = "page",defaultValue = "0",required = false) int page) {
+                                        @RequestParam(required = false) String role,
+                                        @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
-        Pageable pageable =  PageRequest.of(page, 9);
+        Pageable pageable = PageRequest.of(page, 5);
+
+        name = (name != null) ? name.trim() : null;
+        phone = (phone != null) ? phone.trim() : null;
+        role = (role != null) ? role.trim() : null;
+
+        Page<Employee> employeePage = iEmployeeService.searchEmployees(name, phone, role, pageable);
+
         mv.addObject("currentPage", page);
-        mv.addObject("employeePage", iEmployeeService.searchEmployees(name, phone, role, pageable));
-        mv.addObject("totalPage",iEmployeeService.searchEmployees(name, phone, role, pageable).getTotalPages());
-        mv.addObject("name",name);
-        mv.addObject("phone",phone);
-        mv.addObject("role",role);
+        mv.addObject("employeePage", employeePage);
+        mv.addObject("totalPage", employeePage.getTotalPages());
+        mv.addObject("name", name);
+        mv.addObject("phone", phone);
+        mv.addObject("role", role);
+
+        if (employeePage.getTotalElements() == 0) {
+            mv.addObject("messageType", "error");
+            mv.addObject("message", "Không tìm thấy kết quả phù hợp với tìm kiếm");
+        }
+
         return mv;
     }
+
 
     //Create(Tuấn Anh)
     @GetMapping("/admin/employees/create")
     public String employees(Model model) {
         model.addAttribute("employeeDTO", new EmployeeDTO());
+        model.addAttribute("roles", Role.values());
         return "dashboard/admin/employees/create-employee";
     }
 
@@ -69,18 +83,29 @@ public class EmployeeController {
                                  BindingResult bindingResult,
                                  RedirectAttributes redirectAttributes,
                                  Model model) {
+        if (iEmployeeService.existsByUsername(employeeDTO.getUsername())) {
+            bindingResult.rejectValue("username", "", "Tài khoản này đã tồn tại!");
+        }
+
+        if (iEmployeeService.existsByEmail(employeeDTO.getEmail())) {
+            bindingResult.rejectValue("email", "", "Email này đã tồn tại!");
+        }
+
+        employeeDTO.validate(employeeDTO, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("employeeDTO", employeeDTO);
+            model.addAttribute("roles", Role.values());
             return "dashboard/admin/employees/create-employee";
-        } else {
-            Employee employee = new Employee();
-            BeanUtils.copyProperties(employeeDTO, employee);
-            iEmployeeService.addEmployee(employee);
-
-            redirectAttributes.addFlashAttribute("messageType", "success");
-            redirectAttributes.addFlashAttribute("message", "Tạo thành công!");
-            return "redirect:/dashboard/admin/employees/list";
         }
+
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        iEmployeeService.addEmployee(employee);
+
+        redirectAttributes.addFlashAttribute("messageType", "success");
+        redirectAttributes.addFlashAttribute("message", "Tạo thành công!");
+        return "redirect:/dashboard/admin/employees/list";
+
     }
 
 
@@ -93,7 +118,7 @@ public class EmployeeController {
         if (employee == null) {
             redirectAttributes.addFlashAttribute("messageType", "error");
             redirectAttributes.addFlashAttribute("message", "Người dùng không tồn tại");
-            return "redirect:/employees/create";
+            return "redirect:/dashboard/admin/employees/list";
         }
 
         model.addAttribute("employee", employee);
@@ -120,8 +145,6 @@ public class EmployeeController {
 
         if (!employeeToUpdate.getEmail().equals(employeeDTO.getEmail())
                 && iEmployeeService.existsByEmail(employeeDTO.getEmail())) {
-            model.addAttribute("employee", employeeDTO);
-            model.addAttribute("roles", Role.values());
             bindingResult.rejectValue("email", "", "Email này đã tồn tại!");
         }
 
@@ -159,13 +182,6 @@ public class EmployeeController {
             }
             iEmployeeService.updateAvatar(employeeID, avatarFile);
         }
-
-        Employee updatedEmployee = iEmployeeService.getEmployeeById(employeeDTO.getEmployeeID());
-        EmployeeDTO updatedEmployeeDTO = new EmployeeDTO();
-        BeanUtils.copyProperties(updatedEmployee, updatedEmployeeDTO);
-
-        model.addAttribute("employee", updatedEmployeeDTO);
-        model.addAttribute("roles", Role.values());
 
         redirectAttributes.addFlashAttribute("messageType", "success");
         redirectAttributes.addFlashAttribute("message", "Cập nhật người dùng thành công");

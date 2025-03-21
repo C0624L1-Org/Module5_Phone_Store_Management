@@ -58,4 +58,14 @@ public class SupplierService implements ISupplierService {
 
         return supplierRepository.searchSuppliersDynamic(name, address, phone, email, pageable);
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return supplierRepository.existsByEmail(email);
+    }
+
+    @Override
+    public long countSuppliers() {
+        return supplierRepository.count();
+    }
 }

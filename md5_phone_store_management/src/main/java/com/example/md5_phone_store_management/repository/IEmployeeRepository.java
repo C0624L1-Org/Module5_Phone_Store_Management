@@ -20,19 +20,19 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
     //Read and search (a Đình Anh)
     @Query(value = "SELECT * FROM employee", nativeQuery = true)
     Page<Employee> getAllEmployees(Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1%", nativeQuery = true)
+    @Query(value = "SELECT * FROM employee WHERE full_name LIKE %?1%", nativeQuery = true)
     Page<Employee> findAllEmployeesByName(String name, Pageable pageable);
     @Query(value = "SELECT * FROM employee WHERE phone LIKE %?1%", nativeQuery = true)
     Page<Employee> findAllEmployeesByPhoneNumber(String phoneNumber, Pageable pageable);
     @Query(value = "SELECT * FROM employee WHERE role = ?1", nativeQuery = true)
     Page<Employee> findAllEmployeesByRole(String role, Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1% AND phone LIKE %?2%", nativeQuery = true)
+    @Query(value = "SELECT * FROM employee WHERE full_name  LIKE %?1% AND phone LIKE %?2%", nativeQuery = true)
     Page<Employee> findAllEmployeesByNameAndPhoneNumber(String name, String phoneNumber, Pageable pageable);
     @Query(value = "SELECT * FROM employee WHERE phone LIKE %?1% AND role = ?2", nativeQuery = true)
     Page<Employee> findAllEmployeesByPhoneNumberAndRole(String phoneNumber, String role, Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1% AND role = ?2", nativeQuery = true)
+    @Query(value = "SELECT * FROM employee WHERE full_name  LIKE %?1% AND role = ?2", nativeQuery = true)
     Page<Employee> findAllEmployeesByNameAndRole(String name, String role, Pageable pageable);
-    @Query(value = "SELECT * FROM employee WHERE fullName LIKE %?1% AND phone LIKE %?2% AND role = ?3", nativeQuery = true)
+    @Query(value = "SELECT * FROM employee WHERE full_name  LIKE %?1% AND phone LIKE %?2% AND role = ?3", nativeQuery = true)
     Page<Employee> findAllEmployeesByNameAndPhoneNumberAndRole(String name, String phoneNumber, String role, Pageable pageable);
 
 
@@ -61,8 +61,16 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
     @Query(value = "DELETE FROM employee WHERE employeeID = ?1", nativeQuery = true)
     void deleteEmployeeById(Integer id);
 
+    //Đếm
+    long count();
 
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE role = 'SalesStaff'", nativeQuery = true)
+    long countSalesStaff();
 
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE role = 'SalesPerson'", nativeQuery = true)
+    long countSalesPerson();
 
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE role = 'WarehouseStaff'", nativeQuery = true)
+    long countWarehouseStaff();
 
 }

@@ -161,4 +161,24 @@ public class EmployeeService implements IEmployeeService {
 
 
     }
+
+    @Override
+    public long countEmployee() {
+        return iEmployeeRepository.count();
+    }
+
+    @Override
+    public long countSalesStaff() {
+        return iEmployeeRepository.countSalesStaff();
+    }
+
+    @Override
+    public long countBusinessStaff() {
+        return iEmployeeRepository.countSalesPerson();
+    }
+
+    @Override
+    public long countWarehouseStaff() {
+        return iEmployeeRepository.countWarehouseStaff();
+    }
 }
