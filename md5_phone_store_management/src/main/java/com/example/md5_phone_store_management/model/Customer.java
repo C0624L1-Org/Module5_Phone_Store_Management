@@ -17,11 +17,11 @@ public class Customer {
 
     @NotBlank(message = "Họ và tên không được để trống!")
     @Size(max = 50, message = "Họ và tên không được vượt quá 50 ký tự!")
+    @Pattern(regexp = "^[\\p{L} ]+$", message = "Họ và tên chỉ được chứa chữ cái và khoảng trắng!")
     @Column(name = "full_name", length = 50, nullable = false)
     private String fullName;
 
     @Pattern(regexp = "\\d{10,15}", message = "Số điện thoại phải chứa từ 10 đến 15 chữ số!")
-//    @Unique(fieldName = "phone", message = "Số điện thoại đã tồn tại!")
     @Unique(fieldName = "phone", message = "Số điện thoại đã tồn tại!", id = @Value("#{customerID}"))
     @Column(name = "phone", length = 15)
     private String phone;
@@ -32,7 +32,6 @@ public class Customer {
 
     @Email(message = "Định dạng email không hợp lệ!")
     @Size(max = 50, message = "Email không được vượt quá 50 ký tự!")
-//    @Unique(fieldName = "email", message = "Email đã tồn tại!")
     @Unique(fieldName = "email", message = "Email đã tồn tại!",  id = @Value("#{customerID}"))
     @Column(name = "email", length = 50)
     private String email;

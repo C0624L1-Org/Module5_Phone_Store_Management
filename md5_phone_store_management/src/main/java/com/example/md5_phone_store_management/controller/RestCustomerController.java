@@ -81,17 +81,7 @@ public class RestCustomerController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/admin/customers/edit/{id}")
-    public ResponseEntity<?> getCustomer(@PathVariable Integer id) {
-        Customer customer = customerService.getCustomerByID(id);
 
-        if (customer == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonMap("error", "Khách hàng không tồn tại."));
-        }
-
-        return ResponseEntity.ok(customer);
-    }
 
 
 }

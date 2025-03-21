@@ -1,6 +1,7 @@
 package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.Customer;
+import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Gender;
 import com.example.md5_phone_store_management.model.Role;
 import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
@@ -36,6 +37,20 @@ public class CustomerController {
         model.addAttribute("customer", new Customer());
         return "dashboard/admin/customers/create-customer";
     }
+
+
+    @GetMapping("/admin/customers/showEdit/{customerID}")
+    public String showUpdateForm(@PathVariable("customerID") Integer customerID,
+                                 Model model, HttpSession session) {
+        Customer customer = customerService.getCustomerByID(customerID);
+        if (customer == null) {
+            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy khách hàng này!");
+            return "redirect:/dashboard/admin/customers/list";
+        }
+        model.addAttribute("customer", customer);
+        return "dashboard/admin/customers/update-customer";
+    }
+
 
 
     @GetMapping("/admin/customers/list")

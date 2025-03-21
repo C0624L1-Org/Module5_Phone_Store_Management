@@ -128,12 +128,9 @@
                                             <input type="text" th:field="*{fullName}" class="form-control" id="fullName"
                                                    placeholder="Nhập họ và tên" required>
                                             <div class="invalid-feedback">Vui lòng nhập họ và tên</div>
-<!--                                            <div class="text-danger" th:if="${#fields.hasErrors('fullName')}"-->
-<!--                                                 th:errors="*{fullName}"></div>-->
                                             <div class="text-danger" id="fullNameError"></div>
                                         </div>
 
-                                        <!-- Số điện thoại -->
                                         <div class="col-md-6 mb-3">
                                             <label for="phone" class="form-label">
                                                 <i class="fas fa-phone me-2"></i>Số điện thoại
@@ -141,12 +138,9 @@
                                             <input type="tel" th:field="*{phone}" class="form-control" id="phone"
                                                    placeholder="0912345678" required>
                                             <div class="invalid-feedback">Vui lòng nhập số điện thoại</div>
-<!--                                            <div class="text-danger" th:if="${#fields.hasErrors('phone')}"-->
-<!--                                                 th:errors="*{phone}"></div>-->
                                             <div class="text-danger" id="phoneError"></div>
                                         </div>
 
-                                        <!-- Email -->
                                         <div class="col-md-6 mb-3">
                                             <label for="email" class="form-label">
                                                 <i class="fas fa-envelope me-2"></i>Email
@@ -154,25 +148,19 @@
                                             <input type="email" th:field="*{email}" class="form-control" id="email"
                                                    placeholder="example@email.com" required>
                                             <div class="invalid-feedback">Vui lòng nhập email hợp lệ</div>
-<!--                                            <div class="text-danger" th:if="${#fields.hasErrors('email')}"-->
-<!--                                                 th:errors="*{email}"></div>-->
                                             <div class="text-danger" id="emailError"></div>
                                         </div>
 
-                                        <!-- Ngày sinh -->
                                         <div class="col-md-6 mb-3">
                                             <label for="dob" class="form-label">
                                                 <i class="fas fa-calendar-alt me-2"></i>Ngày sinh
                                             </label>
                                             <input type="date" th:field="*{dob}" class="form-control" id="dob" required>
                                             <div class="invalid-feedback">Vui lòng chọn ngày sinh</div>
-<!--                                            <div class="text-danger" th:if="${#fields.hasErrors('dob')}"-->
-<!--                                                 th:errors="*{dob}"></div>-->
                                             <div class="text-danger" id="dobError"></div>
 
                                         </div>
 
-                                        <!-- Địa chỉ -->
                                         <div class="col-md-12 mb-3">
                                             <label for="address" class="form-label">
                                                 <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ
@@ -180,12 +168,9 @@
                                             <textarea th:field="*{address}" class="form-control" id="address" rows="3"
                                                       placeholder="Nhập địa chỉ"></textarea>
                                             <div class="invalid-feedback">Vui lòng nhập địa chỉ</div>
-<!--                                            <div class="text-danger" th:if="${#fields.hasErrors('address')}"-->
-<!--                                                 th:errors="*{address}"></div>-->
                                             <div class="text-danger" id="addressError"></div>
                                         </div>
 
-                                        <!-- Giới tính -->
                                         <div class="col-md-6 mb-3">
                                             <label for="gender" class="form-label">
                                                 <i class="fas fa-venus-mars me-2"></i>Giới tính
@@ -197,8 +182,6 @@
                                                 <option value="Other">Khác</option>
                                             </select>
                                             <div class="invalid-feedback">Vui lòng chọn giới tính</div>
-<!--                                            <div class="text-danger" th:if="${#fields.hasErrors('gender')}"-->
-<!--                                                 th:errors="*{gender}"></div>-->
                                             <div class="text-danger" id="genderError"></div>
 
                                         </div>
