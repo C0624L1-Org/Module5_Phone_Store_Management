@@ -272,9 +272,16 @@
                                     <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
                                     <select class="form-select" id="gender" name="gender">
                                         <option value="">-- Tất cả giới tính --</option>
-                                        <option value="male" th:selected="${param.gender != null and param.gender[0] == 'male'}">Nam</option>
-                                        <option value="female" th:selected="${param.gender != null and param.gender[0] == 'female'}">Nữ</option>
-                                        <option value="other" th:selected="${param.gender != null and param.gender[0] == 'other'}">Khác</option>
+                                        <option value="male"
+                                                th:selected="${param.gender != null and param.gender[0] == 'male'}">Nam
+                                        </option>
+                                        <option value="female"
+                                                th:selected="${param.gender != null and param.gender[0] == 'female'}">Nữ
+                                        </option>
+                                        <option value="other"
+                                                th:selected="${param.gender != null and param.gender[0] == 'other'}">
+                                            Khác
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -312,39 +319,6 @@
                                 <th style="width: 200px; text-align: center;">Hành động</th>
                             </tr>
                             </thead>
-<!--                            <tbody id="customer-table-body">-->
-<!--                            <tr th:each="customer : ${customers}">-->
-<!--                                <td>-->
-<!--                                    <input type="checkbox" name="ids" th:value="${customer.customerID}"-->
-<!--                                           class="customer-checkbox" th:data-name="${customer.fullName}"-->
-<!--                                           th:data-phone="${customer.phone}">-->
-<!--                                </td>-->
-<!--                                <td th:text="${customer.fullName}"></td>-->
-<!--                                <td th:text="${#dates.format(customer.dob, 'dd-MM-yyyy') + ' ( ' + T(java.time.Period).between(customer.dob, T(java.time.LocalDate).now()).getYears() + ' tuổi )'}"></td>-->
-<!--                                <td th:text="${customer.address}"></td>-->
-<!--                                <td th:text="${customer.phone}"></td>-->
-<!--                                <td th:text="${customer.email}"></td>-->
-<!--                                <td class="text-center">-->
-<!--                                    <span th:with="gender=${#strings.toLowerCase(customer.gender)}">-->
-<!--                                        <span th:if="${gender == 'male'}" class="badge rounded-pill badge-male">Nam</span>-->
-<!--                                        <span th:if="${gender == 'female'}" class="badge rounded-pill badge-female">Nữ</span>-->
-<!--                                        <span th:if="${gender == 'other'}" class="badge rounded-pill badge-other">Khác</span>-->
-<!--                                        <span th:unless="${gender == 'male' or gender == 'female' or gender == 'other'}"-->
-<!--                                              class="badge rounded-pill badge-secondary">Không xác định</span>-->
-<!--                                    </span>-->
-<!--                                </td>-->
-<!--                                <td class="text-center" th:text="${customer.getPurchaseCount()}"></td>-->
-<!--                                <td class="text-center">-->
-<!--                                    <a th:href="@{#}" class="btn btn-light btn-action btn-view btn-sm">-->
-<!--                                        <i class="fas fa-eye me-1"></i>Lịch Sử-->
-<!--                                    </a>-->
-<!--                                    <a th:href="@{/dashboard/admin/customers/showEdit/{customerID}(customerID=${customer.customerID})}"-->
-<!--                                       class="btn btn-warning btn-edit btn-sm">-->
-<!--                                        <i class="fas fa-pen me-1"></i>Cập nhật-->
-<!--                                    </a>-->
-<!--                                </td>-->
-<!--                            </tr>-->
-<!--                            </tbody>-->
                             <tbody id="customer-table-body">
                             <tr th:each="customer : ${customerPage.content}">
                                 <td>
@@ -381,51 +355,94 @@
                         </table>
                     </div>
 
-                    <!-- Bottom -->
+
+
                     <div th:if="${customerPage != null and customerPage.content.size() > 0}"
                          class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
                         <button id="deleteSelected" class="btn btn-danger" disabled>
                             <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
                         </button>
 
-                        <nav aria-label="Pagination">
-                            <ul class="pagination mb-0">
-                                <!-- First Page -->
-                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/admin/customers/list(page=0, name=${param.name}, phone=${param.phone})}">
-                                        Trang đầu
-                                    </a>
-                                </li>
+                        <!-- Kiểm tra giá trị của cP -->
+                        <div th:if="${cP == 'list'}">
+                            <nav aria-label="Pagination">
+                                <ul class="pagination mb-0">
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/customers/list(page=0, name=${param.name}, phone=${param.phone})}">
+                                            Trang đầu
+                                        </a>
+                                    </li>
 
-                                <!-- Previous Page -->
-                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/admin/customers/list(page=${currentPage - 1}, name=${param.name}, phone=${param.phone})}">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </a>
-                                </li>
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/customers/list(page=${currentPage - 1}, name=${param.name}, phone=${param.phone})}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
 
-                                <!-- Current Page Display -->
-                                <li class="page-item active mx-2">
-                <span class="page-link">
-                    <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
-                </span>
-                                </li>
+                                    <li class="page-item active mx-2">
+                    <span class="page-link">
+                        <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
+                    </span>
+                                    </li>
 
-                                <!-- Next Page -->
-                                <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/admin/customers/list(page=${currentPage + 1}, name=${param.name}, phone=${param.phone})}">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                </li>
+                                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/customers/list(page=${currentPage + 1}, name=${param.name}, phone=${param.phone})}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
 
-                                <!-- Last Page -->
-                                <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/admin/customers/list(page=${totalPage - 1}, name=${param.name}, phone=${param.phone})}">
-                                        Trang cuối
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/customers/list(page=${totalPage - 1}, name=${param.name}, phone=${param.phone})}">
+                                            Trang cuối
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div th:if="${cP != 'list'}">
+                            <nav aria-label="Pagination">
+                                <ul class="pagination mb-0">
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/customers/search(page=0, name=${param.name}, phone=${param.phone}, gender=${param.gender})}">
+                                            Trang đầu
+                                        </a>
+                                    </li>
+
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/customers/search(page=${currentPage - 1}, name=${param.name}, phone=${param.phone}, gender=${param.gender})}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+
+                                    <li class="page-item active mx-2">
+                    <span class="page-link">
+                        <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
+                    </span>
+                                    </li>
+
+                                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/customers/search(page=${currentPage + 1}, name=${param.name}, phone=${param.phone}, gender=${param.gender})}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+
+                                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/customers/search(page=${totalPage - 1}, name=${param.name}, phone=${param.phone}, gender=${param.gender})}">
+                                            Trang cuối
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
                     </div>
 
                 </div>

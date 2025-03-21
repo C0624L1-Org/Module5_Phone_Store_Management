@@ -13,13 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.List;
+
 @Controller
 @RequestMapping("/dashboard")
 public class CustomerController {
@@ -43,10 +46,11 @@ public class CustomerController {
         model.addAttribute("customerPage", customerPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPage", customerPage.getTotalPages());
+//        xử lý sai logic tìm kiếm bị trùng toast
+        model.addAttribute("cP", "list");
 
         return "dashboard/admin/customers/list-customer";
     }
-
 
 
     @GetMapping("/admin/customers/delete")
@@ -54,7 +58,7 @@ public class CustomerController {
         for (Integer customerID : ids) {
             customerService.deleteCustomer(Collections.singletonList(customerID));
         }
-        session.setAttribute("SUCCESS_MESSAGE", "Đã Xóa " +  ids.size() + " khách hàng!");
+        session.setAttribute("SUCCESS_MESSAGE", "Đã Xóa " + ids.size() + " khách hàng!");
         return "redirect:/dashboard/admin/customers/list";
     }
 
@@ -78,46 +82,63 @@ public class CustomerController {
     }
 
 
-
-
-
-
     @GetMapping("/admin/customers/search")
-    public String searchCustomers(
+    public ModelAndView searchCustomers(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String gender,
-            Model model, HttpSession session) {
+            @RequestParam(defaultValue = "0") int page,
+            HttpSession session) {
 
-        List<Customer> customers;
+        ModelAndView mv = new ModelAndView("dashboard/admin/customers/list-customer");
+        Pageable pageable = PageRequest.of(page, 5);
+
+        // Trim các tham số tìm kiếm
+        name = (name != null) ? name.trim() : null;
+        phone = (phone != null) ? phone.trim() : null;
+        gender = (gender != null) ? gender.trim() : null;
 
         if ((name == null || name.trim().isEmpty()) &&
                 (phone == null || phone.trim().isEmpty()) &&
                 (gender == null || gender.trim().isEmpty())) {
+            mv.addObject("cP", "list");
 
-            customers = customerService.findAllCustomers();
+            Page<Customer> customerPage = customerServiceWithJpa.findAllCustomers(pageable);
+
+            mv.addObject("customerPage", customerPage);
+            mv.addObject("currentPage", page);
+            mv.addObject("totalPage", customerPage.getTotalPages());
+
+
+
             session.setAttribute("ERROR_MESSAGE", "Vui lòng nhập ít nhất một tiêu chí tìm kiếm!");
         } else {
-            System.out.println("Tên : " + name);
-            System.out.println("SĐT : " + phone);
-            System.out.println("Giới tính : " + gender);
 
-            customers = customerService.searchCustomers(name, phone, gender);
+            Page<Customer> customerPage = customerServiceWithJpa.searchCustomers(name, phone, gender, pageable);
 
-            if (customers.isEmpty()) {
+            System.out.println("Số lượng khách hàng tìm thấy: " + customerPage.getTotalElements());
+            // Thêm các thuộc tính vào ModelAndView
+            mv.addObject("customerPage", customerPage);
+            mv.addObject("currentPage", page);
+            mv.addObject("totalPage", customerPage.getTotalPages());
+            mv.addObject("name", name);
+            mv.addObject("phone", phone);
+            mv.addObject("gender", gender);
+
+            // Kiểm tra nếu không tìm thấy khách hàng
+            if (customerPage.getTotalElements() == 0) {
                 session.setAttribute("ERROR_MESSAGE", "Không tìm thấy khách hàng nào!");
             } else {
-                session.setAttribute("SUCCESS_MESSAGE", "Tìm thấy " + customers.size() + " khách hàng!");
+                if (page == 0) {
+                    session.setAttribute("SUCCESS_MESSAGE", "Tìm thấy " + customerPage.getTotalElements() + " khách hàng!");
+                } else {
+                    // Nếu trang hiện tại lớn hơn 1
+                    session.setAttribute("SUCCESS_MESSAGE", "Trang " + (page + 1) + " của " + customerPage.getTotalElements() + " khách hàng tìm thấy!");
+                }
             }
         }
-
-        model.addAttribute("customers", customers);
-        model.addAttribute("gender", gender);
-        return "dashboard/admin/customers/list-customer";
+        return mv;
     }
-
-
-
 
 
 }
