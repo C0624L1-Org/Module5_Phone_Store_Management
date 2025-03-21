@@ -292,9 +292,9 @@
                                 <th>Họ và tên</th>
                                 <th>Ngày sinh</th>
                                 <th>Địa chỉ</th>
-                                <th>Công việc</th>
+                                <th style="text-align: center">Công việc</th>
                                 <th>Số điện thoại</th>
-                                <th style="width: 200px">Hành động</th>
+                                <th style="width: 200px; text-align: center;">Hành động</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -302,7 +302,8 @@
                             <tr th:if="${employeePage.totalElements == 0}">
                                 <td colspan="7" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
                             </tr>
-                            <tr th:each="employee:${employeePage}" th:if="${employee.role?.name() != 'Admin'}">
+<!--                            <tr th:each="employee:${employeePage}" th:if="${employee.role?.name() != 'Admin'}">-->
+                            <tr th:each="employee:${employeePage}">
                                 <td class="text-center">
                                     <div class="form-check">
                                         <input class="form-check-input selectEmployee" type="checkbox"

@@ -34,12 +34,13 @@ public class EmployeeController {
     @GetMapping("/admin/employees/list")
     public ModelAndView getListEmployees(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
-        Pageable pageable =  PageRequest.of(page, 5);
+        Pageable pageable =  PageRequest.of(page, 4);
         mv.addObject("currentPage", page);
-        mv.addObject("employeePage", iEmployeeService.getAllEmployees(pageable));
+        mv.addObject("employeePage", iEmployeeService.getAllEmployeesExceptAdmin(pageable));
         mv.addObject("totalPage",iEmployeeService.getAllEmployees(pageable).getTotalPages());
         return mv;
     }
+
     @GetMapping("/admin/employees/search")
     public ModelAndView searchEmployees(@RequestParam(required = false) String name,
                                         @RequestParam(required = false) String phone,

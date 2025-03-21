@@ -7,544 +7,475 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
     <link rel="stylesheet" href="/css/fragments/navbar.css">
-    <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/common/toast.css">
     <link rel="stylesheet" href="/css/common/pagination.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <style>
+
+        /*<!--        màu cho giới-->*/
+        .badge-male {
+            background-color: #0d6efd; /* Xanh dương */
+            color: white;
+        }
+
+        .badge-female {
+            background-color: #ff69b4; /* Hồng */
+            color: white;
+        }
+
+        .badge-other {
+            background-color: #ff9800; /* Cam */
+            color: white;
+        }
+
+
+        .card-header {
+            background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);
+            color: white;
+            padding: 1.2rem 1.5rem;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .search-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+
+        .table-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+
+        .btn-action {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-view {
+            background-color: #6c8deb;
+            border-color: #6c8deb;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background-color: #4a6fdc;
+            border-color: #4a6fdc;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+        }
+
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+            font-weight: 500;
+            border-color: #454d55;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6c8deb;
+            box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);
+        }
+
+        .badge-role {
+            padding: 0.4em 0.6em;
+            font-size: 0.75em;
+            font-weight: 600;
+            border-radius: 0.375rem;
+        }
+
+        .badge-admin {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .badge-sales-staff {
+            background-color: #198754;
+            color: white;
+        }
+
+        .badge-sales-person {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .badge-warehouse {
+            background-color: #6610f2;
+            color: white;
+        }
+
+        .avatar-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .employee-name {
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        /* Checkbox */
+        .custom-checkbox {
+            position: relative;
+            padding-left: 30px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #eee;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+
+        .custom-checkbox:hover input ~ .checkmark {
+            background-color: #ccc;
+        }
+
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: #6c8deb;
+            border-color: #6c8deb;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .custom-checkbox .checkmark:after {
+            left: 6px;
+            top: 2px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+    </style>
 </head>
 <body>
 <!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
+
 <!-- Nhúng navbar -->
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<!-- Sidebar -->
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-<!-- Nội dung trong trang -->
-<div class="main-content mt-5">
-    <div class="row">
-        <main class="fade-in" id="page-title">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">DANH SÁCH KHÁCH HÀNG</h1>
-            </div>
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-            <!-- Button Thêm Khách Hàng -->
-            <button type="button" class="btn btn-success btn-md mb-3" id="add-button" onclick="showAddCustomerForm()">
-                <i class="fas fa-user-plus"></i> Thêm mới khách hàng
-            </button>
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="container-fluid py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin}">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Quản lý khách hàng</li>
+                    </ol>
+                </nav>
 
-            <!-- Search -->
-            <form action="/dashboard/admin/customers/search" class="mb-3" method="GET" id="search-form">
-                <div class="row">
-                    <div class="col-md-3">
-                        <label for="name">Tên khách hàng:</label>
-                        <input class="form-control" name="keyWord" id="name"
-                               placeholder="Tên khách hàng" type="text" th:value="${param.keyWord}">
-                        <input type="hidden" name="search-type" value="name" id="search-type-hidden">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-users me-2 text-primary"></i>
+                        Danh sách khách hàng
+                    </h2>
+
+                    <a href="/dashboard/admin/customers/add" class="btn btn-success">
+                        <i class="fas fa-user-plus me-2"></i>Thêm mới khách hàng
+                    </a>
+                </div>
+
+                <!-- Search -->
+                <div class="search-section">
+                    <form action="/dashboard/admin/customers/search" method="GET">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="name" class="form-label">Tên khách hàng</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="name" name="keyWord"
+                                           placeholder="Nhập tên khách hàng" th:value="${param.keyWord}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="phone" class="form-label">Số điện thoại</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="text" class="form-control" id="phone" name="phone"
+                                           placeholder="Nhập số điện thoại" th:value="${param.phone}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="gender" class="form-label">Giới tính</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                                    <select class="form-select" id="gender" name="gender">
+                                        <option value="">-- Tất cả giới tính --</option>
+                                        <option value="male">Nam</option>
+                                        <option value="female">Nữ</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="fas fa-search me-2"></i>Tìm kiếm
+                                </button>
+                                <a th:href="@{/dashboard/admin/customers/list}" class="btn btn-secondary">
+                                    <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Hidden form for deletion -->
+                <form id="deleteForm" action="/admin/customers/delete" method="post" style="display: none;">
+                    <input type="hidden" name="ids" id="deleteIds"/>
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                </form>
+
+                <!-- Table -->
+                <div class="table-card">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered mb-0">
+                            <thead>
+                            <tr>
+                                <th style="width: 40px">
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input" type="checkbox" id="selectAll">
+                                    </div>
+                                </th>
+                                <th>Họ và tên</th>
+                                <th>Ngày sinh / Tuổi</th>
+                                <th>Địa chỉ</th>
+                                <th>Số điện thoại</th>
+                                <th>Email</th>
+                                <th style="text-align: center">Giới tính</th>
+                                <th style="text-align: center">SLTT</th>
+                                <th style="width: 200px; text-align: center;">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody id="customer-table-body">
+                            <tr th:each="customer : ${customers}">
+                                <td>
+                                    <input type="checkbox" name="ids" th:value="${customer.customerID}"
+                                           class="customer-checkbox" th:data-name="${customer.fullName}"
+                                           th:data-phone="${customer.phone}">
+                                </td>
+                                <td th:text="${customer.fullName}"></td>
+                                <td th:text="${#dates.format(customer.dob, 'dd-MM-yyyy') + ' ( ' + T(java.time.Period).between(customer.dob, T(java.time.LocalDate).now()).getYears() + ' tuổi )'}"></td>
+                                <td th:text="${customer.address}"></td>
+                                <td th:text="${customer.phone}"></td>
+                                <td th:text="${customer.email}"></td>
+                                <td class="text-center">
+                                                <span th:with="gender=${#strings.toLowerCase(customer.gender)}">
+                                                <span th:if="${gender == 'male'}" class="badge rounded-pill badge-male">Nam</span>
+                                                    <span th:if="${gender == 'female'}" class="badge rounded-pill badge-female">Nữ</span>
+                                                <span th:if="${gender == 'other'}" class="badge rounded-pill badge-other">Khác</span>
+                                                <span th:unless="${gender == 'male' or gender == 'female' or gender == 'other'}"
+                                                         class="badge rounded-pill badge-secondary">Không xác định</span>
+                                                </span>
+                                </td>
+                                <td class="text-center" th:text="${customer.getPurchaseCount()}"></td>
+                                <td class="text-center">
+                                    <a th:href="@{#}" class="btn btn-action btn-view btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Xem
+                                    </a>
+                                    <button th:onclick="|openEditCustomerModal(${customer.customerID})|"
+                                            class="btn btn-warning btn-edit btn-sm"
+                                            th:data-id="${customer.customerID}">
+                                        <i class="fas fa-pen me-1"></i>Cập nhật
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="col-md-3">
-                        <label for="phone">Số điện thoại:</label>
-                        <input class="form-control" name="phone" id="phone"
-                               placeholder="Số điện thoại" th:value="${param.phone}" type="text">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="gender">Giới tính:</label>
-                        <select class="form-control" name="gender" id="gender">
-                            <option value="">Chọn giới tính</option>
-                            <option value="male">Nam</option>
-                            <option value="female">Nữ</option>
-                            <option value="other">Khác</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 d-flex align-items-end">
-                        <button class="btn btn-primary me-2" type="submit">
-                            <i class="fas fa-search"></i> Tìm kiếm
+
+                    <!-- Bottom -->
+                    <div th:if="${customers.size() > 0}"
+                         class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                        <button id="deleteSelected" class="btn btn-danger" disabled>
+                            <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
                         </button>
-                        <a class="btn btn-secondary" href="/dashboard/admin/customers/list" id="refresh-button">
-                            <i class="fas fa-sync-alt"></i> Làm mới
-                        </a>
-                    </div>
-                </div>
-            </form>
 
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered table-hover">
-                    <thead class="table-dark">
-                    <tr>
-                        <th><input id="selectAll" type="checkbox"></th>
-                        <th>Họ tên</th>
-                        <th>Ngày sinh / Tuổi</th>
-                        <th>Địa chỉ</th>
-                        <th>Số điện thoại</th>
-                        <th>Email</th>
-                        <th>Giới tính</th>
-                        <th>SLTT</th>
-                        <th>Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody id="customer-table-body">
-                    <tr th:each="customer : ${customers}">
-                        <td>
-                            <input type="checkbox" name="ids" th:value="${customer.customerID}"
-                                   class="customer-checkbox" th:data-name="${customer.fullName}"
-                                   th:data-phone="${customer.phone}">
-                        </td>
-                        <td th:text="${customer.fullName}"></td>
-                        <td th:text="${#dates.format(customer.dob, 'dd-MM-yyyy') + ' ( ' + T(java.time.Period).between(customer.dob, T(java.time.LocalDate).now()).getYears() + ' tuổi )'}"></td>
-                        <td th:text="${customer.address}"></td>
-                        <td th:text="${customer.phone}"></td>
-                        <td th:text="${customer.email}"></td>
-                        <td class="text-center">
-                            <span th:with="gender=${#strings.toLowerCase(customer.gender)}">
-                                <span th:if="${gender == 'male'}">Nam</span>
-                                <span th:if="${gender == 'female'}">Nữ</span>
-                                <span th:if="${gender == 'other'}">Khác</span>
-                                <span th:unless="${gender == 'male' or gender == 'female' or gender == 'other'}">Không xác định</span>
-                            </span>
-                        </td>
-                        <td class="text-center" th:text="${customer.getPurchaseCount()}"></td>
-                        <td class="text-center">
-                            <a th:href="@{#}" class="btn btn-primary btn-sm me-1">
-                                <i class="fas fa-eye"></i> Xem
-                            </a>
-                            <button th:onclick="|openEditCustomerModal(${customer.customerID})|"
-                                    class="btn btn-secondary btn-sm me-1"
-                                    th:data-id="${customer.customerID}">
-                                <i class="fas fa-pen"></i> Cập nhật
-                            </button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Delete Button -->
-            <button class="btn btn-danger btn-sm me-1" id="delete-button" disabled onclick="validateDelete()">
-                <i class="fas fa-trash-alt"></i> Xóa
-            </button>
-
-            <!-- Bootstrap Modal Xác nhận Xóa -->
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Bạn có chắc chắn muốn xóa các khách hàng sau không?</p>
-                            <table class="table table-bordered">
-                                <thead>
-                                <tr>
-                                    <th>Tên khách hàng</th>
-                                    <th>Số điện thoại</th>
-                                </tr>
-                                </thead>
-                                <tbody id="deleteTableBody"></tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="button" class="btn btn-danger" onclick="confirmDelete()">Xóa</button>
-                        </div>
+                        <!-- Pagination -->
+                        <!-- Pagination code can be added here if needed -->
                     </div>
                 </div>
             </div>
-
-            <!-- Modal thông báo khi không chọn khách hàng -->
-            <div class="modal fade" id="deleteModalNoCus" tabindex="-1" aria-labelledby="deleteModalNoCusLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="deleteModalNoCusLabel">Thông báo</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Xin vui lòng chọn khách hàng để xóa.</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Phân trang (nếu có) -->
-            <nav aria-label="Pagination" class="mt-3">
-               <p>phân trang</p>
-                <!--                <ul class="pagination justify-content-center">-->
-<!--                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">-->
-<!--                        <a class="page-link" th:href="@{/dashboard/admin/customers/search(page=${currentPage - 1}, keyWord=${param.keyWord}, search-type=${param.search-type})}">Trước</a>-->
-<!--                    </li>-->
-
-<!--                    <li class="page-item" th:if="${totalPage > 0}" th:classappend="${i == currentPage} ? 'active'"-->
-<!--                        th:each="i : ${#numbers.sequence(0, totalPage - 1)}">-->
-<!--                        <a class="page-link" th:href="@{/dashboard/admin/customers/search(page=${i}, keyWord=${param.keyWord}, search-type=${param.search-type})}" th:text="${i + 1}"></a>-->
-<!--                    </li>-->
-
-<!--                    <li class="page-item active" th:unless="${totalPage > 0}">-->
-<!--                        <a class="page-link" th:href="@{/dashboard/admin/customers/search(page=${currentPage}, keyWord=${param.keyWord}, search-type=${param.search-type})}">1</a>-->
-<!--                    </li>-->
-
-<!--                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">-->
-<!--                        <a class="page-link" th:href="@{/dashboard/admin/customers/search(page=${currentPage + 1}, keyWord=${param.keyWord}, search-type=${param.search-type})}">Sau</a>-->
-<!--                    </li>-->
-<!--                </ul>-->
-            </nav>
-        </main>
+        </div>
     </div>
-</div>
 
-<!-- Form Thêm Khách Hàng -->
-<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addCustomerModalLabel">THÊM KHÁCH HÀNG</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="add-customer-form" th:action="@{/dashboard/admin/customers/create}" method="post">
-                    <div class="mb-3">
-                        <label for="full-name" class="form-label">Họ tên:</label>
-                        <input type="text" id="full-name" name="fullName" class="form-control" required/>
-                        <p class="text-danger small" id="full-name-error"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="dob" class="form-label">Ngày sinh:</label>
-                        <input type="date" id="dob" name="dob" class="form-control" required/>
-                        <p class="text-danger small" id="dob-error"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="add-phone" class="form-label">Số điện thoại:</label>
-                        <input type="text" id="add-phone" name="phone" class="form-control" required/>
-                        <p class="text-danger small" id="phone-error"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="address" class="form-label">Địa chỉ:</label>
-                        <input type="text" id="address" name="address" class="form-control"/>
-                        <p class="text-danger small" id="address-error"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email:</label>
-                        <input type="email" id="email" name="email" class="form-control" required/>
-                        <p class="text-danger small" id="email-error"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="add-gender" class="form-label">Giới tính:</label>
-                        <select id="add-gender" name="gender" class="form-select">
-                            <option value="Male">Nam</option>
-                            <option value="Female">Nữ</option>
-                            <option value="Other">Khác</option>
-                        </select>
-                        <p class="text-danger small" id="gender-error"></p>
-                    </div>
-                    <div class="mb-3 text-center">
-                        <small class="text-muted">Tài khoản mới mặc định số lượt mua bằng 0!</small>
-                        <input type="hidden" name="purchaseCount" value="0"/>
-                    </div>
-                    <div class="d-flex justify-content-end mt-3">
-                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary">Thêm mới</button>
-                    </div>
-                </form>
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+    <!-- Modal Xác nhận Xóa -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                        Xác nhận xóa khách hàng
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="deleteMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy bỏ
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">
+                        <i class="fas fa-trash-alt me-2"></i>Đồng ý
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Form Sửa Khách Hàng -->
-<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editCustomerModalLabel">SỬA KHÁCH HÀNG</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="edit-customer-form" th:action="@{/dashboard/admin/customers/update}" method="post">
-                    <input type="hidden" id="editCustomerID" name="customerID"/>
-                    <div class="mb-3">
-                        <label for="edit-full-name" class="form-label">Họ tên:</label>
-                        <input type="text" id="edit-full-name" name="fullName" class="form-control" required/>
-                        <p class="text-danger small" id="edit-full-name-erroredit"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-dob" class="form-label">Ngày sinh:</label>
-                        <input type="date" id="edit-dob" name="dob" class="form-control" required/>
-                        <p class="text-danger small" id="edit-dob-erroredit"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-phone" class="form-label">Số điện thoại:</label>
-                        <input type="text" id="edit-phone" name="phone" class="form-control" required/>
-                        <p class="text-danger small" id="edit-phone-erroredit"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-address" class="form-label">Địa chỉ:</label>
-                        <input type="text" id="edit-address" name="address" class="form-control"/>
-                        <p class="text-danger small" id="edit-address-erroredit"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-email" class="form-label">Email:</label>
-                        <input type="email" id="edit-email" name="email" class="form-control" required/>
-                        <p class="text-danger small" id="edit-email-erroredit"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-gender" class="form-label">Giới tính:</label>
-                        <select id="edit-gender" name="gender" class="form-select">
-                            <option value="Male">Nam</option>
-                            <option value="Female">Nữ</option>
-                            <option value="Other">Khác</option>
-                        </select>
-                        <p class="text-danger small" id="edit-gender-erroredit"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-purchase-count" class="form-label text-muted">Số lượt mua:</label>
-                        <input type="number" id="edit-purchase-count" name="purchaseCount" class="form-control text-center" style="width: 100px;" disabled required/>
-                    </div>
-                    <div class="d-flex justify-content-end mt-3">
-                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary">Cập nhật</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Nhúng footer -->
-<div th:replace="~{fragments/footer :: footer}"></div>
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-<!-- Các script khác -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Script xử lý chọn và xóa -->
+<!-- Custom scripts -->
 <script>
-    // Modals
-    const addCustomerModal = new bootstrap.Modal(document.getElementById('addCustomerModal'));
-    const editCustomerModal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
-    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    const deleteModalNoCus = new bootstrap.Modal(document.getElementById('deleteModalNoCus'));
-
-    // Xử lý chọn tất cả và cập nhật trạng thái nút xóa
-    document.getElementById('selectAll').addEventListener('click', function() {
-        const checkboxes = document.querySelectorAll('.customer-checkbox');
-        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-        updateDeleteButtonState();
-    });
-
-    document.querySelectorAll('.customer-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', updateDeleteButtonState);
-    });
-
-    function updateDeleteButtonState() {
-        const selectedCustomers = document.querySelectorAll('.customer-checkbox:checked');
-        document.getElementById('delete-button').disabled = selectedCustomers.length === 0;
-    }
-
-    // Xử lý tìm kiếm
-    document.getElementById('search-form').addEventListener('submit', function(event) {
-        const genderSelect = document.getElementById('gender');
-        const nameInput = document.getElementById('name');
-        const phoneInput = document.getElementById('phone');
-        const searchTypeHidden = document.getElementById('search-type-hidden');
-
-        // Reset hidden input
-        searchTypeHidden.value = 'name';
-
-        if (genderSelect.value) {
-            event.preventDefault();
-            // Nếu tìm kiếm theo giới tính
-            window.location.href = `/dashboard/admin/customers/search?search-type=gender&keyWord=${genderSelect.value}`;
-        } else if (phoneInput.value) {
-            event.preventDefault();
-            // Nếu tìm kiếm theo số điện thoại
-            window.location.href = `/dashboard/admin/customers/search?search-type=phone&keyWord=${phoneInput.value}`;
-        } else if (nameInput.value) {
-            // Tìm kiếm theo tên (mặc định)
-            searchTypeHidden.value = 'name';
-        }
-    });
-
-    // Xử lý xóa
-    function validateDelete() {
-        const checkboxes = document.querySelectorAll('.customer-checkbox:checked');
-        if (checkboxes.length === 0) {
-            deleteModalNoCus.show();
-            return false;
-        }
-
-        const ids = Array.from(checkboxes).map(checkbox => checkbox.value);
-        document.getElementById('ids').value = ids.join(',');
-
-        const selectedCustomers = Array.from(checkboxes).map(checkbox => ({
-            name: checkbox.getAttribute('data-name'),
-            phone: checkbox.getAttribute('data-phone')
-        }));
-
-        const tableBody = document.getElementById('deleteTableBody');
-        tableBody.innerHTML = '';
-
-        selectedCustomers.forEach(customer => {
-            const row = document.createElement('tr');
-            row.innerHTML = `<td>${customer.name}</td><td>${customer.phone}</td>`;
-            tableBody.appendChild(row);
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle select all checkbox
+        document.getElementById('selectAll').addEventListener('click', function () {
+            let checkboxes = document.querySelectorAll('.customer-checkbox');
+            checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+            updateButtonState();
         });
 
-        deleteModal.show();
-    }
-
-    function confirmDelete() {
-        const form = document.createElement('form');
-        form.method = 'post';
-        form.action = '/dashboard/admin/customers/delete';
-
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'ids';
-        input.value = document.getElementById('ids').value;
-
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
-    }
-
-    // Xử lý thêm mới
-    function showAddCustomerForm() {
-        addCustomerModal.show();
-    }
-
-    // Xử lý form thêm mới
-    document.getElementById('add-customer-form').addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        const formData = new FormData(this);
-
-        // Xóa thông báo lỗi cũ
-        const errorFields = ['full-name', 'dob', 'phone', 'address', 'email', 'gender'];
-        errorFields.forEach(field => {
-            document.getElementById(`${field}-error`).innerText = '';
+        // Handle individual checkboxes
+        document.querySelectorAll('.customer-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonState);
         });
 
-        try {
-            const response = await fetch(this.action, {
-                method: 'POST',
-                body: formData,
+        // Update button state
+        function updateButtonState() {
+            let selectedCustomers = document.querySelectorAll('.customer-checkbox:checked');
+            document.getElementById('deleteSelected').disabled = selectedCustomers.length === 0;
+        }
+
+        // Handle delete button click
+        document.getElementById('deleteSelected').addEventListener('click', function () {
+            let selectedCustomers = [];
+            let selectedIds = [];
+
+            document.querySelectorAll('.customer-checkbox:checked').forEach((checkbox) => {
+                let id = checkbox.getAttribute('value');
+                let name = checkbox.getAttribute('data-name');
+                let phone = checkbox.getAttribute('data-phone');
+
+                selectedCustomers.push({id, name, phone});
+                selectedIds.push(id);
             });
 
-            if (response.redirected) {
-                window.location.href = response.url;
+            if (selectedCustomers.length === 0) {
+                alert('Vui lòng chọn ít nhất một khách hàng để xóa.');
                 return;
             }
 
-            const data = await response.json();
+            // Format message for confirmation modal
+            let deleteMessage = 'Bạn có chắc chắn muốn xóa ' +
+                (selectedCustomers.length > 1 ? 'các khách hàng' : 'khách hàng') +
+                ' sau đây?<br><br><ul class="list-group">';
 
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                for (const [field, message] of Object.entries(data.errors)) {
-                    const errorField = document.getElementById(`${field}-error`);
-                    if (errorField) {
-                        errorField.innerText = message;
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Lỗi:', error);
-        }
-    });
-
-    // Xử lý sửa khách hàng
-    async function openEditCustomerModal(customerId) {
-        try {
-            const response = await fetch(`/dashboard/admin/customers/edit/${customerId}`);
-            const data = await response.json();
-
-            if (response.ok) {
-                // Gán dữ liệu vào form
-                document.getElementById("editCustomerID").value = data.customerID;
-                document.getElementById("edit-full-name").value = data.fullName;
-                document.getElementById("edit-dob").value = data.dob;
-                document.getElementById("edit-phone").value = data.phone;
-                document.getElementById("edit-address").value = data.address;
-                document.getElementById("edit-email").value = data.email;
-                document.getElementById("edit-gender").value = data.gender;
-                document.getElementById("edit-purchase-count").value = data.purchaseCount;
-
-                // Hiển thị modal
-                editCustomerModal.show();
-            } else {
-                alert(data.error || "Không tìm thấy khách hàng.");
-            }
-        } catch (error) {
-            console.error("Lỗi tải dữ liệu:", error);
-        }
-    }
-
-    // Xử lý form sửa
-    document.getElementById('edit-customer-form').addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        const formData = new FormData(this);
-
-        // Xóa thông báo lỗi cũ
-        const errorFields = ['full-name', 'dob', 'phone', 'address', 'email', 'gender'];
-        errorFields.forEach(field => {
-            const errorElement = document.getElementById(`edit-${field}-erroredit`);
-            if (errorElement) {
-                errorElement.innerText = '';
-            }
-        });
-
-        try {
-            const response = await fetch(this.action, {
-                method: 'POST',
-                body: formData,
+            selectedCustomers.forEach(cus => {
+                deleteMessage += `<li class="list-group-item">${cus.name} <small class="text-muted">(${cus.phone})</small></li>`;
             });
 
-            if (response.redirected) {
-                window.location.href = response.url;
-                return;
-            }
+            deleteMessage += '</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>';
 
-            const data = await response.json();
+            document.getElementById('deleteMessage').innerHTML = deleteMessage;
 
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                for (const [field, message] of Object.entries(data.errors)) {
-                    const errorField = document.getElementById(`edit-${field}-erroredit`);
-                    if (errorField) {
-                        errorField.innerText = message;
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Lỗi:', error);
-        }
+            // Show delete modal
+            let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+
+            // Handle confirm delete button
+            document.getElementById('confirmDelete').onclick = function () {
+                // Join selected IDs into a comma-separated string
+                document.getElementById('deleteIds').value = selectedIds.join(',');
+                // Submit the form
+                document.getElementById('deleteForm').submit();
+            };
+        });
     });
-
-    // Form xử lý khi submit hidden
-    const deleteForm = document.createElement('form');
-    deleteForm.id = 'delete-form';
-    deleteForm.method = 'post';
-    deleteForm.action = '/dashboard/admin/customers/delete';
-    deleteForm.style.display = 'none';
-
-    const idsInput = document.createElement('input');
-    idsInput.type = 'hidden';
-    idsInput.name = 'ids';
-    idsInput.id = 'ids';
-
-    deleteForm.appendChild(idsInput);
-    document.body.appendChild(deleteForm);
 </script>
 </body>
->>>>>>> 33e659f (sửa delete employee)
 </html>

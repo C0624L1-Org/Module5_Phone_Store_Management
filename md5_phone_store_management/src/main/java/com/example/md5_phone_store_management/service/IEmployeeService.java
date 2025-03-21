@@ -12,6 +12,9 @@ import java.util.Optional;
 
 public interface IEmployeeService {
 
+    //Hậu thêm
+    Page<Employee> getAllEmployeesExceptAdmin(Pageable pageable);
+
     //Create (Tuấn Anh)
     void addEmployee(Employee employee);
 

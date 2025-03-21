@@ -73,7 +73,6 @@ public class RestCustomerController {
             response.put("status", "error");
             response.put("errors", errors);
             return ResponseEntity.badRequest().body(response);
-
         }
         customerService.addNewCustomerAjax(customer);
         session.setAttribute("SUCCESS_MESSAGE", "Thêm khách hàng thành công!");

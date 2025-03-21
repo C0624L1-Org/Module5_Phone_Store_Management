@@ -2,6 +2,8 @@ package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Gender;
+import com.example.md5_phone_store_management.model.Role;
+import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
 import com.example.md5_phone_store_management.service.CustomerService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -20,13 +22,19 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
-    @PostMapping("/admin/customers/delete")
+    @GetMapping("/admin/customers/delete")
     public String deleteCustomers(@RequestParam List<Integer> ids, HttpSession session) {
         for (Integer customerID : ids) {
             customerService.deleteCustomer(Collections.singletonList(customerID));
         }
         session.setAttribute("SUCCESS_MESSAGE", "Đã Xóa " +  ids.size() + " khách hàng!");
         return "redirect:/dashboard/admin/customers/list";
+    }
+
+    @GetMapping("/admin/customers/add")
+    public String employees(Model model) {
+        model.addAttribute("customer", new Customer());
+        return "dashboard/admin/customers/create-customer";
     }
 
 
