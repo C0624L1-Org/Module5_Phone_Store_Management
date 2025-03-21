@@ -1,11 +1,13 @@
 package com.example.md5_phone_store_management.model.dto;
 
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class SupplierDTO {
+public class SupplierDTO implements Validator {
 
     private Integer supplierID;
 
@@ -74,5 +76,15 @@ public class SupplierDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return false;
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+
     }
 }

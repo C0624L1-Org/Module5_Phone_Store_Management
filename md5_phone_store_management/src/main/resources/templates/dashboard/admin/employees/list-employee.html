@@ -259,7 +259,6 @@
                                     <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                     <select class="form-select" id="role" name="role">
                                         <option value="">-- Tất cả vai trò --</option>
-                                        <option th:selected="${param.role == 'Admin'}" th:value="Admin">Admin</option>
                                         <option th:selected="${param.role == 'SalesStaff'}" th:value="SalesStaff">Nhân viên kinh doanh</option>
                                         <option th:selected="${param.role == 'WarehouseStaff'}" th:value="WarehouseStaff">Thủ kho</option>
                                         <option th:selected="${param.role == 'SalesPerson'}" th:value="SalesPerson">Nhân viên bán hàng</option>
@@ -303,7 +302,7 @@
                             <tr th:if="${employeePage.totalElements == 0}">
                                 <td colspan="7" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
                             </tr>
-                            <tr th:each="employee:${employeePage}">
+                            <tr th:each="employee:${employeePage}" th:if="${employee.role?.name() != 'Admin'}">
                                 <td class="text-center">
                                     <div class="form-check">
                                         <input class="form-check-input selectEmployee" type="checkbox"
@@ -326,11 +325,9 @@
                                 <td class="text-center">
                     <span th:switch="${employee.role?.name()}" class="badge rounded-pill badge-role"
                           th:classappend="${
-                            employee.role?.name() == 'Admin' ? 'badge-admin' :
                             employee.role?.name() == 'SalesStaff' ? 'badge-sales-staff' :
                             employee.role?.name() == 'SalesPerson' ? 'badge-sales-person' : 'badge-warehouse'
                           }">
-                      <span th:case="'Admin'">Admin</span>
                       <span th:case="'SalesStaff'">Nhân viên kinh doanh</span>
                       <span th:case="'SalesPerson'">Nhân viên bán hàng</span>
                       <span th:case="'WarehouseStaff'">Thủ kho</span>
