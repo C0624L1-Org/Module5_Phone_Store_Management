@@ -259,9 +259,9 @@
                                     <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                     <select class="form-select" id="role" name="role">
                                         <option value="">-- Tất cả vai trò --</option>
-                                        <option th:selected="${param.role == 'SalesStaff'}" th:value="SalesStaff">Nhân viên kinh doanh</option>
-                                        <option th:selected="${param.role == 'WarehouseStaff'}" th:value="WarehouseStaff">Thủ kho</option>
-                                        <option th:selected="${param.role == 'SalesPerson'}" th:value="SalesPerson">Nhân viên bán hàng</option>
+                                        <option th:value="SalesStaff" th:selected="${role == 'SalesStaff'}">Nhân viên kinh doanh</option>
+                                        <option th:value="WarehouseStaff" th:selected="${role == 'WarehouseStaff'}">Thủ kho</option>
+                                        <option th:value="SalesPerson" th:selected="${role == 'SalesPerson'}">Nhân viên bán hàng</option>
                                     </select>
                                 </div>
                             </div>
@@ -290,10 +290,10 @@
                                     </div>
                                 </th>
                                 <th>Họ và tên</th>
-                                <th>Ngày sinh</th>
+                                <th>Số điện thoại</th>
+                                <th>Ngày sinh / Tuổi</th>
                                 <th>Địa chỉ</th>
                                 <th style="text-align: center">Công việc</th>
-                                <th>Số điện thoại</th>
                                 <th style="width: 200px; text-align: center;">Hành động</th>
                             </tr>
                             </thead>
@@ -321,7 +321,8 @@
                                         <span class="employee-name" th:text="${employee.fullName}"></span>
                                     </div>
                                 </td>
-                                <td th:text="${#temporals.format(employee.dob, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${employee.phone}"></td>
+                                <td th:text="${#temporals.format(employee.dob, 'dd-MM-yyyy')} + ' (' + ${T(java.time.Period).between(employee.dob, T(java.time.LocalDate).now()).getYears()} + ' tuổi)'"></td>
                                 <td th:text="${employee.address}"></td>
                                 <td class="text-center">
                     <span th:switch="${employee.role?.name()}" class="badge rounded-pill badge-role"
@@ -335,7 +336,6 @@
                       <span th:case="*">Không xác định</span>
                     </span>
                                 </td>
-                                <td th:text="${employee.phone}"></td>
                                 <td>
                                     <div class="d-flex gap-2 justify-content-center">
 <!--                                        <a th:href="@{#}" class="btn btn-action btn-view btn-sm">-->

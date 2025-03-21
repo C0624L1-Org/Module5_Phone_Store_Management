@@ -47,7 +47,7 @@ public class EmployeeController {
                                         @RequestParam(required = false) String role,
                                         @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
-        Pageable pageable = PageRequest.of(page, 5);
+        Pageable pageable = PageRequest.of(page, 4);
 
         name = (name != null) ? name.trim() : null;
         phone = (phone != null) ? phone.trim() : null;
@@ -64,6 +64,7 @@ public class EmployeeController {
 
         if (employeePage.getTotalElements() == 0) {
             mv.addObject("messageType", "error");
+            mv.addObject("role", role);
             mv.addObject("message", "Không tìm thấy kết quả phù hợp với tìm kiếm");
         }
 
