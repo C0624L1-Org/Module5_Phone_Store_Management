@@ -1,0 +1,88 @@
+[33m2319963[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m sưa edit cus , xóa cus
+[33mcbdb1f4[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m sưa list emplo với loai tru admin ; sửa tìm kiếm loại trừ admin; thêm mới customer xong , sửa list customer nhưng chưa có phân trang
+[33mad62ff1[m itelj broke
+[33mf5e1ced[m Merge pull request #15 from C0624L1-Org/tan-code
+[33m05006c4[m Update Vaidate Supplier and Hidden Role Admin
+[33m6e08ec8[m Update For All
+[33m52a0bc3[m Update Fragments + Css (đang hoạt động trên admin-home, list employee, update employee)
+[33m651ceaa[m Update Fragments + Css (Đang hoạt động trên admin-home, list Employee và Update employee)
+[33m5d78b40[m ửa delete employee
+[33mcdeafcd[m Cập nhật EmployeeController
+[33m2582608[m Resolve merge conflict giữa main và anh
+[33md491d41[m bs
+[33m87e381d[m Sửa lại list employee định dạng ngày/tháng/năm và tuổi, sửa lại list customer tương tự. Edit Ajax chạy được, Delete chạy được.
+[33m9f51213[m Làm mới cache và cập nhật code
+[33mf3f8827[m update pagination in employee list
+[33mab23f14[m[33m ([m[1;31morigin/anh[m[33m)[m chinh thang hang nut tim kiem va xoa tim kim thang hang cac o input
+[33m1c429d8[m suaphansearch
+[33mccbeef3[m[33m ([m[1;31morigin/tan-code[m[33m)[m Fix delete Customer
+[33mcb37ad9[m Upload Files
+[33mac5290c[m Merge Khoa-code
+[33me346109[m[33m ([m[1;31morigin/khoa-code[m[33m)[m up search supplier
+[33m2f65123[m merge main + resolve conflict
+[33m791bdf8[m merge main and resolve conflict
+[33m6536160[m up list supplier
+[33m2f3bae0[m Lấy lại
+[33m9ce57e9[m Lưu thay đổi trước khi đồng bộ với main
+[33mf596e60[m Overwrite application.properties from main
+[33m078d987[m meg hau to main w1
+[33m8b9abcd[m Update Payment VNPAY(chưa xong còn hóa đơn)
+[33m5ba82f4[m Update VNPAY(chưa xong)
+[33m124484f[m Merge pull request #12 from C0624L1-Org/tuananh
+[33m191f8d9[m[33m ([m[1;31morigin/tuananh[m[33m)[m Merge branch 'main' into tuananh
+[33m009499b[m push change password
+[33m86402df[m update detail information
+[33m6673fb5[m detail information
+[33m98d3145[m create supplier
+[33m2c688eb[m merge
+[33m218a9ed[m push code
+[33m22afaff[m Resolve conflicts
+[33m2e4e02e[m Merge pull request #4 from C0624L1-Org/chi-code
+[33m8a9128e[m edit data type of product prices, finish update product function
+[33m5aab6d3[m update sql queries for updating product function
+[33m76d5cf0[m save changes
+[33m167ed3b[m update feature
+[33m9287c89[m bosung
+[33m36cf14f[m save changes
+[33me4dd71c[m edit delete employee function
+[33mef183b5[m save changes
+[33maa17523[m commit changes
+[33m0a34a7d[m Merge pull request #11 from C0624L1-Org/tan-code
+[33mfe98445[m Update Img product
+[33m4c85de8[m Upload Image Product
+[33m1389c05[m Merge pull request #10 from C0624L1-Org/tan-code
+[33mff5f004[m merge code a Đình Anh
+[33mfe1b870[m chờ a tân sửa
+[33mcee2149[m sửa nút nhấn thêm sửa xóa customer
+[33m49869ed[m sửa lỗi tìm khách hàng
+[33mc352ca1[m Merge pull request #9 from C0624L1-Org/tan-code
+[33mc8358f1[m Update Security, Navbar, Sidebar, Footer. Update edit Employee
+[33mface799[m Update Security, Navbar, Sidebar, Footer. Update edit Employee
+[33me8b6c30[m Merge pull request #8 from C0624L1-Org/tan-code
+[33m73ab223[m merge a Đình Anh -> Product
+[33m2ce3800[m Merge pull request #7 from C0624L1-Org/tan-code
+[33m27b725f[m resolver Hậu
+[33m04c6d6c[m resolver conflic
+[33m0fbd278[m Move changes from main to khoa-code
+[33mf2bec8a[m testt
+[33m64c7084[m update login and detail infor of 4 role
+[33mcbd7065[m Merge pull request #5 from C0624L1-Org/tan-code
+[33mc1359ef[m Update All
+[33mcbf5cf2[m resolve conflict in chi-code
+[33m4765288[m delete employee
+[33m36f1b7d[m bosung
+[33mae6a83e[m Merge branch 'anh'
+[33m64c7a93[m nopbai
+[33mbc69c4f[m push login and register on main-branch
+[33mb4adc03[m login and register success
+[33m56c8711[m Lưu thay đổi trước khi rebase
+[33md5bb0a9[m Merge pull request #2 from C0624L1-Org/tan-code
+[33mdf4b227[m Merge code branch tuananh, anh. Design UI. Upload edit employee and create files config Cloudinary
+[33md27796f[m Resolve conflicts
+[33maa2e322[m Resolve conflicts
+[33m2b3e055[m Merge pull request #1 from C0624L1-Org/khoa-code
+[33mb56bc2e[m update UI
+[33mf579c71[m add file Employee controller, service and repository
+[33m12a5244[m create table Employee
+[33ma18e381[m test
+[33m548ba8c[m first commit

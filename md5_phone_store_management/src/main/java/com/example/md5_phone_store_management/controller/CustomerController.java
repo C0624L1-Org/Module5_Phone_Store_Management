@@ -62,26 +62,39 @@ public class CustomerController {
 
 
     @GetMapping("/admin/customers/search")
-    public String searchCustomers(@RequestParam("search-type") String searchType,
-                                  @RequestParam("keyWord") String keyWord,
-                                  Model model, HttpSession session ){
+    public String searchCustomers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) String gender,
+            Model model, HttpSession session) {
+
         List<Customer> customers;
-        if (searchType.equals("gender") && keyWord == null) {
+
+        if ((name == null || name.trim().isEmpty()) &&
+                (phone == null || phone.trim().isEmpty()) &&
+                (gender == null || gender.trim().isEmpty())) {
+
             customers = customerService.findAllCustomers();
+            session.setAttribute("ERROR_MESSAGE", "Vui lòng nhập ít nhất một tiêu chí tìm kiếm!");
         } else {
-            customers = customerService.searchCustomers(searchType, keyWord);
+            System.out.println("Tên : " + name);
+            System.out.println("SĐT : " + phone);
+            System.out.println("Giới tính : " + gender);
+
+            customers = customerService.searchCustomers(name, phone, gender);
+
+            if (customers.isEmpty()) {
+                session.setAttribute("ERROR_MESSAGE", "Không tìm thấy khách hàng nào!");
+            } else {
+                session.setAttribute("SUCCESS_MESSAGE", "Tìm thấy " + customers.size() + " khách hàng!");
+            }
         }
-        int totalSearchCustomers = customers.size();
+
         model.addAttribute("customers", customers);
-        if (keyWord == null || keyWord.trim().isEmpty()) {
-            session.setAttribute("ERROR_MESSAGE", "Vui lòng nhập từ khóa để tìm kiếm!");
-        } else if (totalSearchCustomers == 0) {
-            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy khách hàng nào!");
-        } else {
-            session.setAttribute("SUCCESS_MESSAGE", "Tìm thấy " + totalSearchCustomers + " khách hàng!");
-        }
+        model.addAttribute("gender", gender);
         return "dashboard/admin/customers/list-customer";
     }
+
 
 
 

@@ -25,10 +25,30 @@ public class CustomerRepository {
     private static final String SELECT_CUSTOMER_BY_ID = "SELECT * FROM customer WHERE customerID = ?";
     private static final String INSERT_CUSTOMER = "INSERT INTO customer (full_Name, phone, address, email, dob, gender, purchaseCount) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SEARCH_CUSTOMER_BY_NAME = "SELECT * FROM customer WHERE full_Name like ?";
-    private static final String SEARCH_CUSTOMER_BY_PHONE = "SELECT * FROM customer WHERE phone like ?";
-    private static final String SEARCH_CUSTOMER_BY_EMAIL = "SELECT * FROM customer WHERE email like ?";
-    private static final String SEARCH_CUSTOMER_BY_GENDER = "SELECT * FROM customer WHERE gender = ?";
+
+    //    List<Customer> customers = customerService.searchCustomers(name, phone, gender);
+    public List<Customer> searchCustomers(String name, String phone, String gender) {
+        List<Object> params = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM customer WHERE 1=1");
+
+        if (name != null && !name.isEmpty()) {
+            sql.append(" AND full_Name LIKE ?");
+            params.add("%" + name + "%");
+        }
+
+        if (phone != null && !phone.isEmpty()) {
+            sql.append(" AND phone LIKE ?");
+            params.add("%" + phone + "%");
+        }
+
+        if (gender != null && !gender.isEmpty()) {
+            sql.append(" AND gender = ?");
+            params.add(gender);
+        }
+
+        return jdbcTemplate.query(sql.toString(), params.toArray(), new CustomerRowMapper());
+    }
+
 
     // Kiểm tra số điện thoại đã tồn tại
     public boolean isPhoneExists(String phone) {
@@ -63,30 +83,6 @@ public class CustomerRepository {
         Integer newCustomerId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
         customer.setCustomerID(newCustomerId);
         return customer;
-    }
-
-
-
-    //    searchCustomers(searchType, keyWord);
-    public List<Customer> searchCustomers(String searchType, String keyWord) {
-        List<Object> params = new ArrayList<>();
-        String sql = "";
-        if (searchType.equals("name")) {
-            sql = SEARCH_CUSTOMER_BY_NAME;
-            params.add("%" + keyWord + "%");
-        } else if (searchType.equals("phone")) {
-            sql = SEARCH_CUSTOMER_BY_PHONE;
-            params.add("%" + keyWord + "%");
-        } else if (searchType.equals("email")) {
-            sql = SEARCH_CUSTOMER_BY_EMAIL;
-            params.add("%" + keyWord + "%");
-        } else if (searchType.equals("gender")) {
-            sql = SEARCH_CUSTOMER_BY_GENDER;
-            params.add(keyWord);
-        } else {
-            sql = "SELECT * FROM customer";
-        }
-        return jdbcTemplate.query(sql, params.toArray(), new CustomerRowMapper());
     }
 
 
@@ -129,7 +125,6 @@ public class CustomerRepository {
             jdbcTemplate.update(INSERT_CUSTOMER, customer.getFullName(), customer.getPhone(), customer.getAddress(), customer.getEmail(), customer.getDob(), customer.getGender().name(), customer.getPurchaseCount());
         }
     }
-
 
 
     //  ánh xạ kết quả từ ResultSet to obj Customer

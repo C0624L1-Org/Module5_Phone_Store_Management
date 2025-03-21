@@ -52,9 +52,8 @@ public class CustomerService {
         return customerRepository.saveAjax(customer);
     }
 
-
-    public List<Customer> searchCustomers(String searchType, String keyWord) {
-        return customerRepository.searchCustomers(searchType, keyWord);
+    public List<Customer> searchCustomers(String name, String phone, String gender) {
+        return customerRepository.searchCustomers( name,  phone,  gender);
     }
 
 
