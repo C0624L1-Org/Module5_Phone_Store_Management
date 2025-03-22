@@ -1,11 +1,11 @@
 package com.example.md5_phone_store_management.model.dto;
 
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 public class SupplierDTO implements Validator {
 
@@ -15,8 +15,8 @@ public class SupplierDTO implements Validator {
     @Size(max = 50, message = "Tên không được vượt quá 50 ký tự")
     private String name;
 
-    @Size(max = 500, message = "Địa chỉ không được vượt quá 500 ký tự")
     @NotBlank(message = "Địa chỉ không được để trống")
+    @Size(max = 500, message = "Địa chỉ không được vượt quá 500 ký tự")
     private String address;
 
     @NotBlank(message = "Số điện thoại không được để trống")
@@ -39,52 +39,33 @@ public class SupplierDTO implements Validator {
         this.email = email;
     }
 
-    public Integer getSupplierID() {
-        return supplierID;
-    }
-
-    public void setSupplierID(Integer supplierID) {
-        this.supplierID = supplierID;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-    this.address = address;}
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    // Getters và Setters
+    public Integer getSupplierID() { return supplierID; }
+    public void setSupplierID(Integer supplierID) { this.supplierID = supplierID; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return false;
+        return SupplierDTO.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
+        SupplierDTO supplierDTO = (SupplierDTO) target;
 
+        if (!supplierDTO.getPhone().matches("^[0-9]{10,15}$")) {
+            errors.rejectValue("phone", "error.phone", "Số điện thoại phải từ 10-15 chữ số!");
+        }
+
+        if (!supplierDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            errors.rejectValue("email", "error.email", "Email không hợp lệ!");
+        }
     }
 }

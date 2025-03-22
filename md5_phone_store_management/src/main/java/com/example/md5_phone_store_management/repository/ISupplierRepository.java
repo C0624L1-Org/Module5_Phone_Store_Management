@@ -11,27 +11,22 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ISupplierRepository extends JpaRepository<Supplier, Integer> {
 
-    // Tìm tất cả nhà cung cấp với phân trang
     @Query(value = "SELECT * FROM supplier", nativeQuery = true)
     Page<Supplier> findAll(Pageable pageable);
 
-    // Tìm nhà cung cấp theo ID
     @Query(value = "SELECT * FROM supplier WHERE supplierID = :id", nativeQuery = true)
-    Supplier findBySupplierID(Integer id);
+    Supplier findBySupplierID(@Param("id") Integer id);
 
-    // Tìm kiếm nhà cung cấp động
     @Query(value = "SELECT * FROM supplier WHERE " +
-            "(name LIKE %:name% OR :name IS NULL) AND " +
-            "(address LIKE %:address% OR :address IS NULL) AND " +
-            "(phone LIKE %:phone% OR :phone IS NULL) AND " +
-            "(email LIKE %:email% OR :email IS NULL)", nativeQuery = true)
+            "(name LIKE CONCAT('%', :name, '%') OR :name IS NULL) AND " +
+            "(address LIKE CONCAT('%', :address, '%') OR :address IS NULL) AND " +
+            "(phone LIKE CONCAT('%', :phone, '%') OR :phone IS NULL) AND " +
+            "(email LIKE CONCAT('%', :email, '%') OR :email IS NULL)", nativeQuery = true)
     Page<Supplier> searchSuppliersDynamic(@Param("name") String name, @Param("address") String address,
                                           @Param("phone") String phone, @Param("email") String email, Pageable pageable);
 
-    //Check Email
     boolean existsByEmail(String email);
 
-    // Đếm tổng số nhà cung cấp
     @Query(value = "SELECT COUNT(*) FROM supplier", nativeQuery = true)
     long countSuppliers();
 }

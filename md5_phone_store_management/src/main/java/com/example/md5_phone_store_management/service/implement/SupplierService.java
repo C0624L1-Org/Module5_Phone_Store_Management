@@ -27,19 +27,21 @@ public class SupplierService implements ISupplierService {
         return supplierRepository.findBySupplierID(id);
     }
 
-    // Lưu hoặc cập nhật nhà cung cấp (Sử dụng save)
     @Override
     public void saveSupplier(Supplier supplier) {
         supplierRepository.save(supplier);
     }
 
-    // Cập nhật thông tin nhà cung cấp (Sử dụng save)
     @Override
     public void updateSupplier(Supplier supplier) {
         supplierRepository.save(supplier);
     }
 
-    // Tìm tất cả nhà cung cấp với phân trang
+    @Override
+    public void deleteSupplier(Integer id) {
+        supplierRepository.deleteById(id);
+    }
+
     @Override
     public Page<Supplier> getAllSuppliers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -49,13 +51,6 @@ public class SupplierService implements ISupplierService {
     @Override
     public Page<Supplier> searchSuppliers(String name, String address, String phone, String email, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        // Điều kiện mặc định là "%" nếu tham số tìm kiếm là null hoặc trống
-        if (name == null || name.isEmpty()) name = "%";
-        if (address == null || address.isEmpty()) address = "%";
-        if (phone == null || phone.isEmpty()) phone = "%";
-        if (email == null || email.isEmpty()) email = "%";
-
         return supplierRepository.searchSuppliersDynamic(name, address, phone, email, pageable);
     }
 

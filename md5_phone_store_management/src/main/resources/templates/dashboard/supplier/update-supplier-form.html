@@ -116,7 +116,7 @@
 
                             <div class="p-4">
                                 <form th:action="@{/dashboard/update-supplier}" method="post" th:object="${supplierDTO}"
-                                      class="needs-validation" novalidate>
+                                      class="needs-validation" novalidate id="updateSupplierForm">
                                     <input type="hidden" th:field="*{supplierID}">
 
                                     <div class="row">
@@ -127,7 +127,7 @@
                                             </label>
                                             <input type="text" th:field="*{name}" id="name" class="form-control"
                                                    placeholder="Nhập tên nhà cung cấp">
-                                            <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                                            <div class="text-danger" th:errors="*{name}"></div>
                                         </div>
 
                                         <!-- Địa chỉ -->
@@ -137,7 +137,7 @@
                                             </label>
                                             <input type="text" th:field="*{address}" id="address" class="form-control"
                                                    placeholder="Nhập địa chỉ">
-                                            <div class="text-danger" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+                                            <div class="text-danger" th:errors="*{address}"></div>
                                         </div>
 
                                         <!-- Số điện thoại -->
@@ -147,7 +147,7 @@
                                             </label>
                                             <input type="text" th:field="*{phone}" id="phone" class="form-control"
                                                    placeholder="Nhập số điện thoại">
-                                            <div class="text-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                                            <div class="text-danger" th:errors="*{phone}"></div>
                                         </div>
 
                                         <!-- Email -->
@@ -157,7 +157,7 @@
                                             </label>
                                             <input type="email" th:field="*{email}" id="email" class="form-control"
                                                    placeholder="Nhập email">
-                                            <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                            <div class="text-danger" th:errors="*{email}"></div>
                                         </div>
                                     </div>
 
@@ -175,43 +175,44 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <!-- Modal xác nhận thay đổi -->
-    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmModalLabel">Xác nhận thay đổi</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Bạn có chắc chắn muốn thay đổi thông tin nhà cung cấp
-                    <strong th:text="${supplierDTO.name}"></strong> không?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success" id="confirmUpdate">Xác nhận</button>
+
+            <!-- Modal xác nhận thay đổi -->
+            <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="confirmModalLabel">Xác nhận thay đổi</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Bạn có chắc chắn muốn thay đổi thông tin nhà cung cấp
+                            <strong th:text="${supplierDTO.name}"></strong> không?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-success" id="confirmUpdate">Xác nhận</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Modal xác nhận hủy -->
-    <div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmCancelModalLabel">Xác nhận hủy</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Bạn có chắc chắn muốn hủy cập nhật thông tin nhà cung cấp không?
-                    Mọi thay đổi sẽ không được lưu lại.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
-                    <a href="/dashboard/suppliers" class="btn btn-danger">Hủy cập nhật</a>
+            <!-- Modal xác nhận hủy -->
+            <div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning text-white">
+                            <h5 class="modal-title" id="confirmCancelModalLabel">Xác nhận hủy</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Bạn có chắc chắn muốn hủy cập nhật thông tin nhà cung cấp không?
+                            Mọi thay đổi sẽ không được lưu lại.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+                            <a th:href="@{/dashboard/suppliers}" class="btn btn-danger">Hủy cập nhật</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -229,29 +230,22 @@
 
 <!-- Form validation script -->
 <script>
-    // invalid fields
     (function () {
-        'use strict'
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
 
-        var forms = document.querySelectorAll('.needs-validation')
-
-        // Vòng lặp ngăn chặn việc submit
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
-
-    // Submit form when confirm button is clicked
     document.getElementById("confirmUpdate").addEventListener("click", function () {
-        document.querySelector("form").submit();
+        document.getElementById("updateSupplierForm").submit();
     });
 </script>
 </body>
