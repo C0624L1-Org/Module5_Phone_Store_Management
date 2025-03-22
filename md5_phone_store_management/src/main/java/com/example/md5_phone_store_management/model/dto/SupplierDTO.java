@@ -4,10 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 
-public class SupplierDTO implements Validator {
+public class SupplierDTO {
 
     private Integer supplierID;
 
@@ -51,21 +49,21 @@ public class SupplierDTO implements Validator {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    @Override
-    public boolean supports(Class<?> clazz) {
-        return SupplierDTO.class.equals(clazz);
-    }
-
-    @Override
-    public void validate(Object target, Errors errors) {
-        SupplierDTO supplierDTO = (SupplierDTO) target;
-
-        if (!supplierDTO.getPhone().matches("^[0-9]{10,15}$")) {
-            errors.rejectValue("phone", "error.phone", "Số điện thoại phải từ 10-15 chữ số!");
-        }
-
-        if (!supplierDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            errors.rejectValue("email", "error.email", "Email không hợp lệ!");
-        }
-    }
+//    @Override
+//    public boolean supports(Class<?> clazz) {
+//        return SupplierDTO.class.equals(clazz);
+//    }
+//
+//    @Override
+//    public void validate(Object target, Errors errors) {
+//        SupplierDTO supplierDTO = (SupplierDTO) target;
+//
+//        if (!supplierDTO.getPhone().matches("^[0-9]{10,15}$")) {
+//            errors.rejectValue("phone", "error.phone", "Số điện thoại phải từ 10-15 chữ số!");
+//        }
+//
+//        if (!supplierDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+//            errors.rejectValue("email", "error.email", "Email không hợp lệ!");
+//        }
+//    }
 }

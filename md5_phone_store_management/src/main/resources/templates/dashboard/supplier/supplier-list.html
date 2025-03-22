@@ -239,24 +239,38 @@
                             </tbody>
                         </table>
                     </div>
-
                     <!-- Pagination -->
                     <div th:if="${totalPages > 1}" class="p-3">
                         <nav aria-label="Page navigation">
                             <ul class="pagination justify-content-center mb-0">
+                                <!-- Nút Trang đầu -->
                                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${currentPage - 1}, size=${size})}">
-                                        <i class="fas fa-chevron-left"></i>
+                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=0, size=${size})}">
+                                        Trang đầu
                                     </a>
                                 </li>
-                                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                                    th:classappend="${i == currentPage} ? 'active'">
-                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${i}, size=${size})}"
-                                       th:text="${i + 1}"></a>
+                                <!-- Nút Trước -->
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${currentPage - 1}, size=${size})}">
+                                        &lsaquo;
+                                    </a>
                                 </li>
+                                <!-- Hiển thị trang hiện tại -->
+                                <li class="page-item active">
+                <span class="page-link">
+                    <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPages}"></span>
+                </span>
+                                </li>
+                                <!-- Nút Sau -->
                                 <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                                     <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${currentPage + 1}, size=${size})}">
-                                        <i class="fas fa-chevron-right"></i>
+                                        &rsaquo;
+                                    </a>
+                                </li>
+                                <!-- Nút Trang cuối -->
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${totalPages - 1}, size=${size})}">
+                                        Trang cuối
                                     </a>
                                 </li>
                             </ul>

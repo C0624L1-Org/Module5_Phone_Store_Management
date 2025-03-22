@@ -51,7 +51,7 @@ public class ProductController {
                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
                          @RequestParam(name = "rangePrice", defaultValue = "1000000", required = false) int rangePrice,
                          @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
-        Pageable pageable = PageRequest.of(page, 2);
+        Pageable pageable = PageRequest.of(page, 5);
         Page<Product> listProducts = productService.findAll(pageable);
         if (searchProduct != null || searchSupplier != null || rangePrice > 0) {
             listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(searchProduct, searchSupplier, rangePrice, pageable);

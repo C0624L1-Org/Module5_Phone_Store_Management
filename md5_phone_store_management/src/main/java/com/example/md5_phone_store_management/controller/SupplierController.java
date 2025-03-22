@@ -73,7 +73,6 @@ public class SupplierController {
             bindingResult.rejectValue("email", "error.supplier", "Email đã tồn tại!");
         }
 
-        supplierDTO.validate(supplierDTO, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("supplierDTO", supplierDTO);
             return "dashboard/supplier/create-supplier";
@@ -122,7 +121,6 @@ public class SupplierController {
             bindingResult.rejectValue("email", "error.supplier", "Email đã tồn tại!");
         }
 
-        supplierDTO.validate(supplierDTO, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("supplierDTO", supplierDTO);
             return "dashboard/supplier/update-supplier-form";
