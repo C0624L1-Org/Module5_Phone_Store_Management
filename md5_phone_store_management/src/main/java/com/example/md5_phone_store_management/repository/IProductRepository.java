@@ -33,10 +33,14 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     @Query("SELECT p FROM Product p")
     Page<Product> findAll(Pageable pageable);
 
-    @Query("select p from Product p where " +
-            "(:name is null or p.name like concat('%',:name,'%')) " +
-            "and (:supplierName is null or p.supplier.name like concat('%',:supplierName,'%')) " +
-            "and (:purchasePrice is null or p.purchasePrice >= :purchasePrice)")
+//    @Query("select p from Product p where " +
+//            "(:name is null or p.name like concat('%',:name,'%')) " +
+//            "and (:supplierName is null or p.supplier.name like concat('%',:supplierName,'%')) " +
+//            "and (:purchasePrice is null or p.purchasePrice >= :purchasePrice)")
+@Query("select p from Product p where " +
+        "(:name is null or p.name like concat('%',:name,'%')) " +
+        "and (:supplierName is null or p.supplier.name like concat('%',:supplierName,'%')) " +
+        "and (:purchasePrice = 0 or p.purchasePrice <= :purchasePrice * 1000000)")
     Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(@Param("name") String name,
                                                                       @Param("supplierName") String supplierName,
                                                                       @Param("purchasePrice") double purchasePrice,
