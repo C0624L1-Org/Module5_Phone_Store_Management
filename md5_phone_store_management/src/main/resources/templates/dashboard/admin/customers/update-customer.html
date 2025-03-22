@@ -431,10 +431,10 @@
                                     </div>
 
                                     <div class="d-flex justify-content-end mt-4 gap-2">
-                                        <a th:href="@{/dashboard/admin/customers/list}" class="btn btn-cancel">
+                                        <button type="button" class="btn btn-cancel" data-bs-toggle="modal" data-bs-target="#confirmCancelModal">
                                             <i class="fas fa-times me-2"></i>Hủy bỏ
-                                        </a>
-                                        <button type="submit" class="btn btn-update">
+                                        </button>
+                                        <button type="button" class="btn btn-update" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal">
                                             <i class="fas fa-save me-2"></i>Cập nhật
                                         </button>
                                     </div>
@@ -442,6 +442,44 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Xác Nhận Cập Nhật -->
+    <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmUpdateLabel">Xác nhận cập nhật</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn cập nhật thông tin của khách hàng <strong th:text="${customer.fullName}"></strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="button" class="btn btn-success" id="confirmUpdate">Xác nhận cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Xác Nhận Hủy -->
+    <div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmCancelLabel">Xác nhận hủy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn hủy cập nhật? Dữ liệu chưa lưu sẽ bị mất.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+                    <a th:href="@{/dashboard/admin/customers/list}" class="btn btn-danger">Xác nhận hủy</a>
                 </div>
             </div>
         </div>
@@ -459,50 +497,70 @@
 
 <!-- Form validation script -->
 <script>
+    // Submit form when confirm update button is clicked
+    document.getElementById("confirmUpdate").addEventListener("click", function () {
+        // Lấy form
+        const form = document.querySelector("form");
+
+        // Kiểm tra nếu form không valid
+        if (!form.checkValidity()) {
+            // Đánh dấu form đã được validate để hiển thị lỗi
+            form.classList.add('was-validated');
+
+            // Đóng modal
+            var modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpdateModal'));
+            modal.hide();
+            return;
+        }
+
+        // Nếu form valid thì tiếp tục xử lý AJAX
+        var formData = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        // Hiển thị thông báo lỗi
+                        for (const [field, message] of Object.entries(data.errors)) {
+                            const errorDiv = document.querySelector(`#${field}Error`);
+                            if (errorDiv) {
+                                errorDiv.textContent = message; // Hiển thị thông báo lỗi
+                            }
+                        }
+                        throw new Error('Server validation failed');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === "success") {
+                    // Điều hướng đến URL mới
+                    window.location.href = data.redirectUrl;
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                // Đóng modal
+                var modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpdateModal'));
+                modal.hide();
+            });
+    });
+
     // Form validation logic
     (function () {
         'use strict'
 
         var forms = document.querySelectorAll('.needs-validation')
 
+        // Vòng lặp ngăn chặn việc submit
         Array.prototype.slice.call(forms)
             .forEach(function (form) {
                 form.addEventListener('submit', function (event) {
                     if (!form.checkValidity()) {
                         event.preventDefault()
                         event.stopPropagation()
-                    } else {
-                        event.preventDefault(); // Ngăn chặn hành vi mặc định của form
-
-                        // Gửi yêu cầu AJAX
-                        var formData = new FormData(form);
-                        fetch(form.action, {
-                            method: 'POST',
-                            body: formData,
-                        })
-                            .then(response => {
-                                if (!response.ok) {
-                                    return response.json().then(data => {
-                                        // Hiển thị thông báo lỗi
-                                        for (const [field, message] of Object.entries(data.errors)) {
-                                            const errorDiv = document.querySelector(`#${field}Error`);
-                                            if (errorDiv) {
-                                                errorDiv.textContent = message; // Hiển thị thông báo lỗi
-                                            }
-                                        }
-                                    });
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                if (data.status === "success") {
-                                    // Điều hướng đến URL mới
-                                    window.location.href = data.redirectUrl;
-                                }
-                            })
-                            .catch(error => {
-                                console.error('There was a problem with the fetch operation:', error);
-                            });
                     }
 
                     form.classList.add('was-validated')
