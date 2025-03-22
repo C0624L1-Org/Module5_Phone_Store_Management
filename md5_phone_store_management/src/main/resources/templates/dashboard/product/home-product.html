@@ -177,6 +177,7 @@
 
                 <!-- Search -->
                 <div class="search-section">
+                    <form th:action="@{/dashboard/products/search}" method="get" id="searchForm">
                     <form th:action="@{/dashboard/products/list(page=${page})}" method="get">
                         <div class="row g-3">
                             <div class="col-md-4">
@@ -293,27 +294,69 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div th:if="${listProducts.totalPages > 0}" class="p-3 bg-light border-top d-flex justify-content-center">
+                    <div th:if="${listProducts.totalPages > 0}" class="p-3 bg-light border-top d-flex justify-content-end">
                         <nav aria-label="Pagination">
                             <ul class="pagination mb-0">
+                                <!-- Nút Trang đầu -->
+                                <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
+                                    th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/search(page=0, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                        Trang đầu
+                                    </a>
+                                </li>
+                                <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
+                                    th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=0)}">
+                                        Trang đầu
+                                    </a>
+                                </li>
+
                                 <!-- Nút Previous -->
-                                <li class="page-item" th:classappend="${!listProducts.hasPrevious()} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1},searchProduct=${searchProduct},searchSupplier=${searchSupplier},rangePrice=${rangePrice})}">
+                                <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
+                                    th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.number - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
+                                    th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
 
-                                <!-- Hiển thị các số trang -->
-                                <li class="page-item" th:classappend="${listProducts.number == number} ? 'active'"
-                                    th:each="number :${#numbers.sequence(0, listProducts.totalPages - 1)}">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${number},searchProduct=${searchProduct},searchSupplier=${searchSupplier},rangePrice=${rangePrice})}"
-                                       th:text="${number + 1}"></a>
+                                <!-- Hiển thị trang hiện tại / tổng số trang -->
+                                <li class="page-item active mx-2">
+                                    <span class="page-link">
+                                        <span th:text="${listProducts.number + 1}"></span> / <span th:text="${listProducts.totalPages}"></span>
+                                    </span>
                                 </li>
 
                                 <!-- Nút Next -->
-                                <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1},searchProduct=${searchProduct},searchSupplier=${searchSupplier},rangePrice=${rangePrice})}">
+                                <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'"
+                                    th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.number + 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'"
+                                    th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+
+                                <!-- Nút Trang cuối -->
+                                <li class="page-item" th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
+                                    th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.totalPages - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                        Trang cuối
+                                    </a>
+                                </li>
+                                <li class="page-item" th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
+                                    th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.totalPages - 1})}">
+                                        Trang cuối
                                     </a>
                                 </li>
                             </ul>
