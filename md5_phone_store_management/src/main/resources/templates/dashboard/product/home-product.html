@@ -177,14 +177,14 @@
 
                 <!-- Search -->
                 <div class="search-section">
-                    <form th:action="@{/dashboard/products/search}" method="get">
+                    <form th:action="@{/dashboard/products/list(page=${page})}" method="get">
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label for="searchProduct" class="form-label">Tên sản phẩm</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
                                     <input type="text" class="form-control" id="searchProduct" name="searchProduct"
-                                           placeholder="Nhập tên sản phẩm">
+                                           placeholder="Nhập tên sản phẩm" th:value="${searchProduct}">
                                 </div>
                             </div>
 
@@ -193,15 +193,16 @@
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-building"></i></span>
                                     <input type="text" class="form-control" id="searchSupplier" name="searchSupplier"
-                                           placeholder="Nhập tên nhà cung cấp">
+                                           placeholder="Nhập tên nhà cung cấp" th:value="${searchSupplier}">
                                 </div>
                             </div>
 
                             <div class="col-md-4">
-                                <label for="myRange" class="form-label">Giá tối đa (triệu VND)</label>
+                                <label for="myRange" class="form-label">Giá mua vào tối đa (VND)</label>
                                 <div class="d-flex align-items-center">
-                                    <input type="range" min="0" max="100" value="0" class="form-range price-slider" id="myRange" name="rangePrice">
-                                    <span id="rangeValue" class="range-value-display">0</span>
+                                    <input type="range" min="1000000" max="100000000" step="500000" class="form-range price-slider" id="myRange" name="rangePrice"
+                                           th:value="${rangePrice}">
+                                    <span id="rangeValue" class="range-value-display" th:text="${#numbers.formatInteger(rangePrice,1,'POINT')}+' VND'">1000000 VND</span>
                                 </div>
                             </div>
 
@@ -297,7 +298,7 @@
                             <ul class="pagination mb-0">
                                 <!-- Nút Previous -->
                                 <li class="page-item" th:classappend="${!listProducts.hasPrevious()} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1},searchProduct=${searchProduct},searchSupplier=${searchSupplier},rangePrice=${rangePrice})}">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
@@ -305,13 +306,13 @@
                                 <!-- Hiển thị các số trang -->
                                 <li class="page-item" th:classappend="${listProducts.number == number} ? 'active'"
                                     th:each="number :${#numbers.sequence(0, listProducts.totalPages - 1)}">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${number})}"
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${number},searchProduct=${searchProduct},searchSupplier=${searchSupplier},rangePrice=${rangePrice})}"
                                        th:text="${number + 1}"></a>
                                 </li>
 
                                 <!-- Nút Next -->
                                 <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1},searchProduct=${searchProduct},searchSupplier=${searchSupplier},rangePrice=${rangePrice})}">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
