@@ -38,8 +38,8 @@ public class SupplierService implements ISupplierService {
     }
 
     @Override
-    public void deleteSupplier(Integer id) {
-        supplierRepository.deleteById(id);
+    public void deleteSupplier(List<Integer> id) {
+        supplierRepository.deleteByIdIn(id);
     }
 
     @Override

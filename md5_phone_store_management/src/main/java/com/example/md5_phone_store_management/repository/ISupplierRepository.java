@@ -4,9 +4,13 @@ import com.example.md5_phone_store_management.model.Supplier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Repository
 public interface ISupplierRepository extends JpaRepository<Supplier, Integer> {
@@ -29,4 +33,8 @@ public interface ISupplierRepository extends JpaRepository<Supplier, Integer> {
 
     @Query(value = "SELECT COUNT(*) FROM supplier", nativeQuery = true)
     long countSuppliers();
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM Supplier  s where s.supplierID in :ids ",nativeQuery = true)
+    void deleteByIdIn(@Param("ids") List<Integer> ids);
 }
