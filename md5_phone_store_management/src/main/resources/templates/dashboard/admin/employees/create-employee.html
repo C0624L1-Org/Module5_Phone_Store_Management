@@ -241,10 +241,10 @@
                   </div>
 
                   <div class="d-flex justify-content-end mt-4 gap-2">
-                    <a th:href="@{/dashboard/admin/employees/list}" class="btn btn-cancel">
+                    <button type="button" class="btn btn-cancel" data-bs-toggle="modal" data-bs-target="#confirmCancelModal">
                       <i class="fas fa-times me-2"></i>Hủy bỏ
-                    </a>
-                    <button type="submit" class="btn btn-create">
+                    </button>
+                    <button type="button" class="btn btn-create" data-bs-toggle="modal" data-bs-target="#confirmCreateModal">
                       <i class="fas fa-save me-2"></i>Tạo nhân viên
                     </button>
                   </div>
@@ -252,6 +252,44 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Xác Nhận Tạo Nhân Viên -->
+  <div class="modal fade" id="confirmCreateModal" tabindex="-1" aria-labelledby="confirmCreateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmCreateLabel">Xác nhận tạo nhân viên</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn có chắc chắn muốn tạo nhân viên mới này?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+          <button type="button" class="btn btn-success" id="confirmCreate">Xác nhận tạo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Xác Nhận Hủy -->
+  <div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmCancelLabel">Xác nhận hủy</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn có chắc chắn muốn hủy tạo nhân viên? Dữ liệu chưa lưu sẽ bị mất.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+          <a th:href="@{/dashboard/admin/employees/list}" class="btn btn-danger">Xác nhận hủy</a>
         </div>
       </div>
     </div>
@@ -269,6 +307,11 @@
 
 <!-- Form validation script -->
 <script>
+  // Submit form when confirm create button is clicked
+  document.getElementById("confirmCreate").addEventListener("click", function () {
+    document.querySelector("form").submit();
+  });
+
   // invalid fields
   (function () {
     'use strict'
