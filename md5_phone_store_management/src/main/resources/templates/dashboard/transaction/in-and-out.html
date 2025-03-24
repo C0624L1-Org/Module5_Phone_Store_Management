@@ -80,13 +80,13 @@
             <div class="container-fluid py-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                        <li class="breadcrumb-item active" aria-current="page">Quản lý nhập&xuất</li>
                     </ol>
                 </nav>
 
                 <!-- Chọn Nhập kho / Xuất kho -->
                 <div class="mb-4">
-                    <button class="btn btn-primary" th:onclick="|window.location.href='@{/dashboard/admin/transactions/listOut}'|">Nhập kho</button>
+                    <button class="btn btn-primary" th:onclick="|window.location.href='@{/dashboard/admin/transactions/listIn}'|">Nhập kho</button>
                     <button class="btn btn-secondary" th:onclick="|window.location.href='@{/dashboard/admin/transactions/listOut}'|">Xuất kho</button>
                 </div>
 

@@ -25,6 +25,11 @@ public class TransactionOutService implements ITransactionOutService {
     }
 
     @Override
+    public List<InventoryTransaction> getAllInTransactions() {
+        return transactionRepository.findAllInTransactions();
+    }
+
+    @Override
     public Optional<InventoryTransaction> getOutTransactionById(int id) {
         return Optional.ofNullable(transactionRepository.findOutTransactionById(id));
     }

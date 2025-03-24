@@ -13,16 +13,19 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<InventoryTransaction, Integer> {
 
-//    @Query(value = "SELECT * FROM inventoryTransaction WHERE transactionType = 'OUT'", nativeQuery = true)
-//    List<InventoryTransaction> findAllOutTransactions();
 
-        @Query("SELECT t FROM InventoryTransaction t " +
+    @Query("SELECT t FROM InventoryTransaction t " +
             "WHERE t.transactionType = 'OUT'")
     List<InventoryTransaction> findAllOutTransactions();
+
+    @Query("SELECT t FROM InventoryTransaction t " +
+            "WHERE t.transactionType = 'IN'")
+    List<InventoryTransaction> findAllInTransactions();
 
 
     @Query(value = "SELECT * FROM inventoryTransaction WHERE transactionID = ?1 AND transactionType = 'OUT'", nativeQuery = true)
     InventoryTransaction findOutTransactionById(int id);
+
 
     @Modifying
     @Transactional
@@ -40,4 +43,6 @@ public interface TransactionRepository extends JpaRepository<InventoryTransactio
     @Transactional
     @Query(value = "DELETE FROM inventoryTransaction WHERE transactionID = ?1 AND transactionType = 'OUT'", nativeQuery = true)
     void deleteOutTransaction(int id);
+
+
 }

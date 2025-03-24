@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface ITransactionOutService {
     List<InventoryTransaction> getAllOutTransactions();
+    List<InventoryTransaction> getAllInTransactions();
     Optional<InventoryTransaction> getOutTransactionById(int id);
     void addOutTransaction(InventoryTransaction transaction);
     void updateOutTransaction(int id, InventoryTransaction transaction);

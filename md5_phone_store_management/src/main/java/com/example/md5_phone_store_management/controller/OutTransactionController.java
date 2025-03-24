@@ -41,6 +41,30 @@ public class OutTransactionController {
     private TransactionOutService transactionOutService;
 
 
+
+
+    @GetMapping("/admin/transactions/listOut")
+    public String listOutTransactions(Model model) {
+        List<InventoryTransaction> inventoryTransactions = transactionOutService.getAllOutTransactions();
+        model.addAttribute("inventoryTransactions", inventoryTransactions);
+        return "dashboard/transaction/out/list-transaction-out";
+    }
+
+    @GetMapping("/admin/transactions/listIn")
+    public String listInTransactions(Model model) {
+        List<InventoryTransaction> inventoryTransactions = transactionOutService.getAllInTransactions();
+        model.addAttribute("inventoryTransactions", inventoryTransactions);
+        return "dashboard/transaction/in/list-transaction-in";
+    }
+
+
+
+
+
+
+
+
+
     @PostMapping("/admin/transactions/saveNew")
     public String processExport(@Valid @ModelAttribute("inventoryTransaction") InventoryTransaction transaction,
                                 BindingResult result,
@@ -86,12 +110,7 @@ public class OutTransactionController {
     }
 
 
-    @GetMapping("/admin/transactions/listOut")
-    public String listOutTransactions(Model model) {
-        List<InventoryTransaction> inventoryTransactions = transactionOutService.getAllOutTransactions();
-        model.addAttribute("inventoryTransactions", inventoryTransactions);
-        return "dashboard/transaction/out/list-transaction-out";
-    }
+
 
 
     @GetMapping("/admin/transactions/new/out/{id}")
