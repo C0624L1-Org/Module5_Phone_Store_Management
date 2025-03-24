@@ -479,7 +479,7 @@
       div.textContent = name;
       div.onclick = function () {
         input.value = name;
-        list.innerHTML = '';
+        list.innerHTML = ''; // Ẩn gợi ý sau khi chọn
       };
       list.appendChild(div);
     });
@@ -493,6 +493,7 @@
     autocomplete('supplierName', 'supplierList', supplierNames);
   }
 
+  // Ẩn danh sách gợi ý sau 200ms để tránh bị xóa trước khi click
   function hideAutocomplete(listId) {
     setTimeout(() => document.getElementById(listId).innerHTML = '', 200);
   }

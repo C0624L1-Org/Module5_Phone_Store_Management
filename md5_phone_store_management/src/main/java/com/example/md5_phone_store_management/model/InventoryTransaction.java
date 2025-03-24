@@ -38,9 +38,19 @@ public class InventoryTransaction {
     @JoinColumn(name = "employeeID", foreignKey = @ForeignKey(name = "FK_Employee"))
     private Employee employee;
 
-    // Cột totalPrice lưu vào database
     @Column(precision = 12, scale = 2)
     private BigDecimal totalPrice;
+
+    // Getters and Setters
+    @PrePersist
+    @PreUpdate
+    private void updateValuesFromProduct() {
+        if (product != null) {
+            this.quantity = product.getStockQuantity();
+            this.purchasePrice = product.getPurchasePrice();
+            this.totalPrice = purchasePrice.multiply(BigDecimal.valueOf(quantity));
+        }
+    }
 
     // Getters and Setters
     public Integer getTransactionID() {
@@ -57,6 +67,7 @@ public class InventoryTransaction {
 
     public void setProduct(Product product) {
         this.product = product;
+        updateValuesFromProduct();  // Gọi lại khi thay đổi product
     }
 
     public TransactionType getTransactionType() {
@@ -71,25 +82,12 @@ public class InventoryTransaction {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-
-    }
-
     public BigDecimal getPurchasePrice() {
         return purchasePrice;
     }
 
-    public void setPurchasePrice(BigDecimal purchasePrice) {
-        this.purchasePrice = purchasePrice;
-    }
-
     public BigDecimal getTotalPrice() {
         return totalPrice;
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice; // Lưu trực tiếp từ FE
     }
 
     public LocalDateTime getTransactionDate() {

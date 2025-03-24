@@ -34,6 +34,9 @@ public class InventoryTransactionController {
       Pageable pageable = PageRequest.of(page,5);
         Page<InventoryTransaction> transactions = inventoryTransactionService.getImportTransactions(pageable);
         modelAndView.addObject("currentPage", page);
+        List<Product> productList =productService.findAll(Pageable.unpaged()).getContent();
+        modelAndView.addObject("products",productList);
+        modelAndView.addObject("suppliers",supplierService.getSupplierList());
       modelAndView.addObject("stockInLists",transactions);
       modelAndView.addObject("totalPage",transactions.getTotalPages());
       return modelAndView;
