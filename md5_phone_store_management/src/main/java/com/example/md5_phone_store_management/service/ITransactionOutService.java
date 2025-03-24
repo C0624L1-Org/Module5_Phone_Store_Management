@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface ITransactionOutService {
     List<InventoryTransaction> getAllOutTransactions();
     List<InventoryTransaction> getAllInTransactions();
-    Optional<InventoryTransaction> getOutTransactionById(int id);
+    Optional<InventoryTransaction> getOutTransactionById(Long id);
     void addOutTransaction(InventoryTransaction transaction);
     void updateOutTransaction(int id, InventoryTransaction transaction);
     void deleteOutTransaction(int id);

@@ -41,7 +41,14 @@ public class OutTransactionController {
     private TransactionOutService transactionOutService;
 
 
-
+    @GetMapping("/admin/transactions/delete")
+    public String deleteCustomers(@RequestParam List<Integer> ids, HttpSession session) {
+        for (Integer transactionID : ids) {
+            transactionOutService.deleteOutTransaction(transactionID);
+        }
+        session.setAttribute("SUCCESS_MESSAGE", "Đã Xóa " + ids.size() + " lịch sử giao dịch!");
+        return "redirect:/dashboard/admin/transactions/listOut";
+    }
 
     @GetMapping("/admin/transactions/listOut")
     public String listOutTransactions(Model model) {
@@ -59,8 +66,12 @@ public class OutTransactionController {
 
 
 
-
-
+    @GetMapping("/admin/transactions/Out/bill/{id}")
+    public String outTransactionBill(@PathVariable("id") Long id, Model model) {
+        Optional<InventoryTransaction> inventoryTransaction = transactionOutService.getOutTransactionById(id);
+        model.addAttribute("bill", inventoryTransaction);
+        return "dashboard/transaction/out/out-bill";
+    }
 
 
 
@@ -118,17 +129,25 @@ public class OutTransactionController {
         // Luôn thêm một đối tượng InventoryTransaction mới vào model
         model.addAttribute("inventoryTransaction", new InventoryTransaction());
 
-        if (id != 0) {
+        if (id == -1) {
+            session.setAttribute("ERROR_MESSAGE", "Lỗi: Không thể tải được sản phẩm!");
+
+        } else if (id != 0) {
             Optional<Product> optionalProduct = Optional.ofNullable(productService.getProductById(Math.toIntExact(id)));
 
             if (optionalProduct.isPresent()) {
                 model.addAttribute("product", optionalProduct.get());
-                session.setAttribute("SUCCESS_MESSAGE", "Chọn thành công sản phẩm: " + optionalProduct.get().getName() + "!");
+
+                Product product = optionalProduct.get(); // Lấy đối tượng Product từ Optional
+                if (product.getStockQuantity() == 0) {
+                    session.setAttribute("ERROR_MESSAGE", "Sản phẩm đã hết hàng! Vui lòng chọn sản phẩm khác!");
+                } else {
+                    session.setAttribute("SUCCESS_MESSAGE", "Chọn thành công sản phẩm: " + optionalProduct.get().getName() + "!");
+                }
             } else {
                 session.setAttribute("ERROR_MESSAGE", "Không tìm thấy sản phẩm này!");
             }
         }
-
         return "dashboard/transaction/out/create-transaction-out";
     }
 
@@ -146,6 +165,9 @@ public class OutTransactionController {
     public String transactionDashboard(Model model) {
         return "dashboard/transaction/in-and-out";
     }
+
+
+
 
 
 }

@@ -53,7 +53,21 @@
             width: 100% !important;
             height: 100% !important;
         }
+
+
+        /*<!--                    trượt bôstrrap-->*/
+        .table-responsive {
+            position: relative;
+        }
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #212529; /* Màu nền của thead */
+            z-index: 1;
+        }
     </style>
+
+
 </head>
 
 <body>
@@ -125,37 +139,43 @@
                             </div>
 
                             <div class="col-md-2 d-flex align-items-end">
+
                                 <div class="btn-group w-100">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-search me-2"></i>Tìm kiếm
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" id="resetFilters">
-                                        <i class="fas fa-times-circle me-2"></i>Xóa
-                                    </button>
+                                    <a th:href="@{/dashboard/admin/transactions/listOut}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                                    </a>
                                 </div>
+
                             </div>
                         </form>
                     </div>
 
                     <!-- Table with fixed header and scrollable body -->
-                    <div class="table-container table-fade-in">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
+<!--                    <div class="table-container table-fade-in">-->
+<!--                        <table class="table table-striped table-hover table-bordered">-->
+<!--                            <thead class="table-dark">-->
+<!--                    trượt bôstrrap-->
+                    <div class="table-container table-fade-in" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-striped table-hover table-bordered">
+                            <thead class="table-dark sticky-top">
                             <tr>
                                 <th style="width: 50px;">
                                     <div class="form-check d-flex justify-content-center">
                                         <input class="form-check-input" type="checkbox" id="selectAll">
                                     </div>
                                 </th>
-                                <th>ID</th>
+                                <th class="text-center">ID</th>
                                 <th>Tên Sản phẩm</th>
-                                <th>Số lượng</th>
-                                <th>Giá</th>
-                                <th>Tổng Giá Tiền</th>
-                                <th>Ngày giao dịch</th>
-                                <th>Nhân viên</th>
-                                <th>Nhà cung cấp</th>
-                                <th style="width: 180px;">Thao tác</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-center">Giá</th>
+                                <th class="text-center">Tổng Giá Tiền</th>
+                                <th class="text-center">Ngày giao dịch</th>
+                                <th class="text-center">Nhân viên</th>
+                                <th class="text-center">Nhà cung cấp</th>
+                                <th class="text-center" style="width: 200px;">Thao tác</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -169,52 +189,46 @@
                                                th:data-name="${transaction.product?.name ?: 'N/A'}">
                                     </div>
                                 </td>
-                                <td th:text="${transaction.transactionID}"></td>
+                                <td class="text-center" th:text="${transaction.transactionID}"></td>
                                 <td th:text="${transaction.product?.name ?: 'N/A'}"></td>
-                                <td th:text="${transaction.quantity}"></td>
-                                <td th:text="${#numbers.formatDecimal(transaction.purchasePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
-                                <td th:text="${#numbers.formatDecimal(transaction.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
-                                <td th:text="${#temporals.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></td>
-                                <td th:text="${transaction.employee?.fullName ?: 'N/A'}"></td>
-                                <td th:text="${transaction.supplier?.name ?: 'N/A'}"></td>
-                                <td>
+                                <td class="text-center" th:text="${transaction.quantity}"></td>
+                                <td class="text-center" th:text="${#numbers.formatDecimal(transaction.purchasePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td class="text-center" th:text="${#numbers.formatDecimal(transaction.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td class="text-center" th:text="${#temporals.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></td>
+                                <td class="text-center" th:text="${transaction.employee?.fullName ?: 'N/A'}"></td>
+                                <td class="text-center" th:text="${transaction.supplier?.name ?: 'N/A'}"></td>
+                                <td class="text-center">
+
                                     <div class="btn-group">
-                                        <a th:href="@{/product/reorder/{id}(id=${transaction.transactionID})}"
+                                        <a th:href="@{/dashboard/admin/transactions/new/out/{id}(id=${transaction.product.productID ?: -1})}"
                                            class="btn btn-sm btn-secondary" data-bs-toggle="tooltip" title="Nhập lại">
                                             <i class="fas fa-sync-alt"></i> Nhập lại
                                         </a>
-                                        <a th:href="@{/product/details/{id}(id=${transaction.transactionID})}"
-                                           class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="Chi tiết">
-                                            <i class="fas fa-eye"></i> Chi tiết
-                                        </a>
+
                                         <a th:href="@{/product/edit/{id}(id=${transaction.transactionID})}"
                                            class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Sửa">
                                             <i class="fas fa-edit"></i> Sửa
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Xóa">
-                                            <i class="fas fa-trash"></i> Xóa
-                                        </button>
                                     </div>
 
 
                                 </td>
                             </tr>
-                            <tr class="collapse" id="details-[[${transaction.transactionID}]]">
-                                <td colspan="10">
-                                    <div class="p-3">
-                                        <strong>Chi tiết giao dịch:</strong>
-                                        <p>Thông tin chi tiết về giao dịch có thể được hiển thị ở đây.</p>
-                                        <!-- Add more details as needed -->
-                                    </div>
-                                </td>
-                            </tr>
-
                             <tr th:if="${#lists.isEmpty(inventoryTransactions)}">
                                 <td colspan="10" class="text-center py-4">Không tìm thấy giao dịch xuất kho nào</td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
+
+                    <div th:if="${!#lists.isEmpty(inventoryTransactions)}"
+                         class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                        <button id="deleteSelected" class="btn btn-danger" disabled>
+                            <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
+                        </button>
+<!--                        phân trang-->
+                    </div>
+
                 </div>
 
                 <div class="card shadow-sm mt-4">
@@ -238,7 +252,89 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle select all checkbox
+        document.getElementById('selectAll').addEventListener('click', function () {
+            let checkboxes = document.querySelectorAll('.transaction-checkbox');
+            checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+            updateButtonState();
+        });
 
+        // Handle individual checkboxes
+        document.querySelectorAll('.transaction-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonState);
+        });
+
+        // Update button state
+        function updateButtonState() {
+            let selectedTransactions = document.querySelectorAll('.transaction-checkbox:checked');
+            document.getElementById('deleteSelected').disabled = selectedTransactions.length === 0;
+        }
+
+        // Handle delete button click
+        document.getElementById('deleteSelected').addEventListener('click', function () {
+            let selectedTransactions = [];
+            let selectedIds = [];
+
+            document.querySelectorAll('.transaction-checkbox:checked').forEach((checkbox) => {
+                let id = checkbox.getAttribute('value');
+                let name = checkbox.getAttribute('data-name');
+
+                selectedTransactions.push({id, name});
+                selectedIds.push(id);
+            });
+
+            if (selectedTransactions.length === 0) {
+                alert('Vui lòng chọn ít nhất một giao dịch để xóa.');
+                return;
+            }
+
+            // Format message for confirmation modal
+            let deleteMessage = 'Bạn có chắc chắn muốn xóa ' +
+                (selectedTransactions.length > 1 ? 'các giao dịch' : 'giao dịch') +
+                ' xuất kho sau đây?<br><br><ul class="list-group">';
+
+            selectedTransactions.forEach(trans => {
+                deleteMessage += `<li class="list-group-item">${trans.name} <small class="text-muted">(ID: ${trans.id})</small></li>`;
+            });
+
+            deleteMessage += '</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>';
+
+            // Create or update modal content (you'll need to add the modal HTML below)
+            document.getElementById('deleteMessage').innerHTML = deleteMessage;
+
+            // Show delete modal
+            let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+
+            // Handle confirm delete button
+            document.getElementById('confirmDelete').addEventListener('click', function () {
+                // Redirect to delete endpoint with selected IDs
+                window.location.href = `/dashboard/admin/transactions/delete?ids=${selectedIds.join(',')}`;
+            });
+        });
+    });
+</script>
+
+<!-- Add this modal HTML right before the closing </body> tag -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa giao dịch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="deleteMessage">
+                <!-- Delete message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Footer -->
 <!--<footer th:replace="~{fragments/footer :: footer}"></footer>-->

@@ -30,7 +30,7 @@ public class TransactionOutService implements ITransactionOutService {
     }
 
     @Override
-    public Optional<InventoryTransaction> getOutTransactionById(int id) {
+    public Optional<InventoryTransaction> getOutTransactionById(Long id) {
         return Optional.ofNullable(transactionRepository.findOutTransactionById(id));
     }
 
@@ -78,7 +78,7 @@ public class TransactionOutService implements ITransactionOutService {
 
     @Override
     public void deleteOutTransaction(int id) {
-        InventoryTransaction transaction = transactionRepository.findOutTransactionById(id);
+        InventoryTransaction transaction = transactionRepository.findOutTransactionById((long) id);
         if (transaction != null && transaction.getTransactionType() == TransactionType.OUT) {
             transactionRepository.deleteOutTransaction(id);
         }

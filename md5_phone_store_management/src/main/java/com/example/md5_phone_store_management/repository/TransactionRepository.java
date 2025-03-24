@@ -24,7 +24,7 @@ public interface TransactionRepository extends JpaRepository<InventoryTransactio
 
 
     @Query(value = "SELECT * FROM inventoryTransaction WHERE transactionID = ?1 AND transactionType = 'OUT'", nativeQuery = true)
-    InventoryTransaction findOutTransactionById(int id);
+    InventoryTransaction findOutTransactionById(Long id);
 
 
     @Modifying

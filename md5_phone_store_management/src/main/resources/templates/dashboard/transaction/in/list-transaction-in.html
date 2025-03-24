@@ -125,9 +125,9 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-search me-2"></i>Tìm kiếm
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" id="resetFilters">
-                                        <i class="fas fa-times-circle me-2"></i>Xóa
-                                    </button>
+                                    <a th:href="@{/dashboard/admin/transactions/listIn}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                                    </a>
                                 </div>
                             </div>
                         </form>
@@ -177,7 +177,7 @@
                                     <div class="btn-group">
                                         <a th:href="@{/product/reorder/{id}(id=${transaction.transactionID})}"
                                            class="btn btn-sm btn-secondary" data-bs-toggle="tooltip" title="Nhập lại">
-                                            <i class="fas fa-sync-alt"></i> Nhập lại
+                                            <i class="fas fa-sync-alt"></i> Xuất lại
                                         </a>
                                         <a th:href="@{/product/details/{id}(id=${transaction.transactionID})}"
                                            class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="Chi tiết">
