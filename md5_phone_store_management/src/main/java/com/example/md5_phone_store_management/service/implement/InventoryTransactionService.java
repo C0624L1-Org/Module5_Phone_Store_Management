@@ -29,4 +29,9 @@ public class InventoryTransactionService implements IInventoryTransactionService
     public void deleteImportTransactions(List<Integer> ids) {
         IInventoryTransactionInRepo.deleteByIdsIn(ids);
     }
+
+    @Override
+    public InventoryTransaction getByProductIdAndSupplierId(Integer productId, Integer supplierId) {
+        return IInventoryTransactionInRepo.getByProductIdAndSupplierId(productId, supplierId);
+    }
 }
