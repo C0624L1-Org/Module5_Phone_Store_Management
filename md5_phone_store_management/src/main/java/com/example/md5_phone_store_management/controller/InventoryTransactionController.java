@@ -60,4 +60,6 @@ public class InventoryTransactionController {
         modelAndView.addObject("totalPage",  searchResults.getTotalPages());
         return modelAndView;
     }
+
+
 }
