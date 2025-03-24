@@ -11,4 +11,5 @@ public interface IInventoryTransactionService {
     Page<InventoryTransaction> getImportTransactions(Pageable pageable);
     Page<InventoryTransaction> searchImportTransactions(String productName, String supplierName, LocalDate transactionDate, Pageable pageable);
     void deleteImportTransactions(List<Integer> ids);
+    InventoryTransaction getByProductIdAndSupplierId(Integer productId, Integer supplierId);
 }

@@ -36,5 +36,9 @@ public interface IInventoryTransactionInRepo extends JpaRepository<InventoryTran
             Pageable pageable
     );
 
+    @Query("select i from InventoryTransaction i where " +
+            "i.product.productID=:productId and i.supplier.supplierID=:supplierId")
+    InventoryTransaction getByProductIdAndSupplierId(@Param("productId") int productId, @Param("supplierId")int supplierId);
+
 
 }
