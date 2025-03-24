@@ -37,23 +37,29 @@ public class ProductController {
     CloudinaryService cloudinaryService;
 
     // Tuấn Anh
-    @GetMapping("/list")
+    /*@GetMapping("/list")
     public String index(Model model,
                         @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
         Pageable pageable = PageRequest.of(page, 2);
         Page<Product> listProducts = productService.findAll(pageable);
         model.addAttribute("listProducts", listProducts);
         return "dashboard/product/home-product";
-    }
+    }*/
 
-    @GetMapping("/search")
+    @GetMapping("/list")
     public String search(Model model, @RequestParam(name = "searchProduct", required = false) String searchProduct,
                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
-                         @RequestParam(name = "rangePrice", required = false) double rangePrice,
-                         @RequestParam(name = "page", defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, 2);
-        Page<Product> listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(searchProduct, searchSupplier, rangePrice, pageable);
+                         @RequestParam(name = "rangePrice", defaultValue = "1000000", required = false) int rangePrice,
+                         @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<Product> listProducts = productService.findAll(pageable);
+        if (searchProduct != null || searchSupplier != null || rangePrice > 0) {
+            listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(searchProduct, searchSupplier, rangePrice, pageable);
+        }
         model.addAttribute("listProducts", listProducts);
+        model.addAttribute("searchProduct", searchProduct);
+        model.addAttribute("searchSupplier", searchSupplier);
+        model.addAttribute("rangePrice", rangePrice);
         return "dashboard/product/home-product";
     }
 

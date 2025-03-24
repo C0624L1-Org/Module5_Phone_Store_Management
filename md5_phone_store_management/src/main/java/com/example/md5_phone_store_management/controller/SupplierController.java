@@ -14,6 +14,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/dashboard")
 public class SupplierController {
@@ -73,7 +75,6 @@ public class SupplierController {
             bindingResult.rejectValue("email", "error.supplier", "Email đã tồn tại!");
         }
 
-        supplierDTO.validate(supplierDTO, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("supplierDTO", supplierDTO);
             return "dashboard/supplier/create-supplier";
@@ -122,7 +123,6 @@ public class SupplierController {
             bindingResult.rejectValue("email", "error.supplier", "Email đã tồn tại!");
         }
 
-        supplierDTO.validate(supplierDTO, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("supplierDTO", supplierDTO);
             return "dashboard/supplier/update-supplier-form";
@@ -138,27 +138,15 @@ public class SupplierController {
     }
 
     // Xóa nhà cung cấp - GET
-    @GetMapping("/suppliers/delete/{id}")
-    public String showDeleteSupplier(@PathVariable("id") Integer id, Model model) {
-        Supplier supplier = supplierService.getSupplier(id);
-        if (supplier == null) {
-            return "redirect:/dashboard/suppliers";
-        }
-        model.addAttribute("supplier", supplier);
-        return "dashboard/supplier/delete-supplier";
-    }
-
-    // Xóa nhà cung cấp - POST
-    @PostMapping("/suppliers/delete/{id}")
-    public String deleteSupplier(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
-        Supplier supplier = supplierService.getSupplier(id);
-        if (supplier == null) {
-            redirectAttributes.addFlashAttribute("messageType", "error");
-            redirectAttributes.addFlashAttribute("message", "Nhà cung cấp không tồn tại!");
-        } else {
-            supplierService.deleteSupplier(id);
+    @GetMapping("/suppliers/delete/{ids}")
+    public String showDeleteSupplier(@PathVariable List<Integer> ids,RedirectAttributes redirectAttributes) {
+        try {
+            supplierService.deleteSupplier(ids);
             redirectAttributes.addFlashAttribute("messageType", "success");
-            redirectAttributes.addFlashAttribute("message", "Xóa nhà cung cấp thành công!");
+            redirectAttributes.addFlashAttribute("message", "Xóa nhà cung cấp  thành công");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            redirectAttributes.addFlashAttribute("message", "Xóa nhà cung cấp không thành công");
         }
         return "redirect:/dashboard/suppliers";
     }

@@ -10,7 +10,7 @@ public interface ISupplierService {
     Supplier getSupplier(Integer id);
     void saveSupplier(Supplier supplier);
     void updateSupplier(Supplier supplier);
-    void deleteSupplier(Integer id);
+    void deleteSupplier(List<Integer> id);
     Page<Supplier> getAllSuppliers(int page, int size);
     Page<Supplier> searchSuppliers(String name, String address, String phone, String email, int page, int size);
     boolean existsByEmail(String email);

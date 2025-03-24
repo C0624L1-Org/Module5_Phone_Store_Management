@@ -198,7 +198,11 @@
                         <table class="table table-striped table-hover table-bordered mb-0">
                             <thead>
                             <tr>
-                                <th>ID</th>
+                                <th style="width: 40px">
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input" id="selectAll" type="checkbox">
+                                    </div>
+                                </th>
                                 <th>Tên nhà cung cấp</th>
                                 <th>Địa chỉ</th>
                                 <th>Điện thoại</th>
@@ -213,7 +217,14 @@
                             </tr>
                             <!-- Dữ liệu nhà cung cấp -->
                             <tr th:each="supplier : ${suppliers}">
-                                <td th:text="${supplier.supplierID}"></td>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input selectSuppliers" th:value="${supplier.supplierID}"
+                                               th:data-name="${supplier.name}"
+                                               th:data-address="${supplier.address}"
+                                               type="checkbox">
+                                    </div>
+                                </td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-building me-2 text-primary"></i>
@@ -229,34 +240,50 @@
                                            class="btn btn-warning btn-sm">
                                             <i class="fas fa-edit me-1"></i>Cập nhật
                                         </a>
-                                        <a th:href="@{/dashboard/suppliers/delete/{id}(id=${supplier.supplierID})}"
-                                           class="btn btn-danger btn-sm">
-                                            <i class="fas fa-trash-alt me-1"></i>Xóa
-                                        </a>
                                     </div>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
-
                     <!-- Pagination -->
-                    <div th:if="${totalPages > 1}" class="p-3">
+                    <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center"
+                         th:if="${totalPages > 1}">
+                        <!--Xóa-->
+                        <button class="btn btn-danger" disabled id="deleteSelected">
+                            <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
+                        </button>
+                        <!--Page-->
                         <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center mb-0">
+                            <ul class="pagination mb-0">
+                                <!-- Nút Trang đầu -->
                                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${currentPage - 1}, size=${size})}">
-                                        <i class="fas fa-chevron-left"></i>
+                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=0, size=${size})}">
+                                        Trang đầu
                                     </a>
                                 </li>
-                                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                                    th:classappend="${i == currentPage} ? 'active'">
-                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${i}, size=${size})}"
-                                       th:text="${i + 1}"></a>
+                                <!-- Nút Trước -->
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${currentPage - 1}, size=${size})}">
+                                        &lsaquo;
+                                    </a>
                                 </li>
+                                <!-- Hiển thị trang hiện tại -->
+                                <li class="page-item active">
+                <span class="page-link">
+                    <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPages}"></span>
+                </span>
+                                </li>
+                                <!-- Nút Sau -->
                                 <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                                     <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${currentPage + 1}, size=${size})}">
-                                        <i class="fas fa-chevron-right"></i>
+                                        &rsaquo;
+                                    </a>
+                                </li>
+                                <!-- Nút Trang cuối -->
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${totalPages - 1}, size=${size})}">
+                                        Trang cuối
                                     </a>
                                 </li>
                             </ul>
@@ -276,6 +303,32 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!--Modal Xóa-->
+<div aria-hidden="true" aria-labelledby="deleteModalLabel" class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                    Xác nhận xóa nhà cung cấp
+                </h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+                    <i class="fas fa-times me-2"></i>Hủy bỏ
+                </button>
+                <button class="btn btn-danger" id="confirmDelete" type="button">
+                    <i class="fas fa-trash-alt me-2"></i>Đồng ý
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 <script th:inline="javascript">
     /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', function() {
@@ -285,6 +338,67 @@
         }
     });
     /*]]>*/
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle select all checkbox
+        document.getElementById('selectAll').addEventListener('click', function () {
+            let checkboxes = document.querySelectorAll('.selectSuppliers');
+            checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+            updateButtonState();
+        });
+
+        // Handle individual checkboxes
+        document.querySelectorAll('.selectSuppliers').forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonState);
+        });
+
+        // Cập nhật trạng thái nút xóa
+        function updateButtonState() {
+            let selectedEmployees = document.querySelectorAll('.selectSuppliers:checked');
+            document.getElementById('deleteSelected').disabled = selectedEmployees.length === 0;
+        }
+
+        // Handle delete button click
+        document.getElementById('deleteSelected').addEventListener('click', function () {
+            let selectedSuppliers = [];
+            let selectedIds = [];
+
+            document.querySelectorAll('.selectSuppliers:checked').forEach((checkbox) => {
+                let id = checkbox.getAttribute('value');
+                let name = checkbox.getAttribute('data-name');
+                let address = checkbox.getAttribute('data-address');
+
+                selectedSuppliers.push({id, name, address});
+                selectedIds.push(id);
+            });
+
+            if (selectedSuppliers.length === 0) {
+                alert('Vui lòng chọn ít nhất một nhà cung cấp để xóa.');
+                return;
+            }
+
+            // Format message for confirmation modal
+            let deleteMessage = 'Bạn có chắc chắn muốn xóa ' +
+                (selectedSuppliers.length > 1 ? 'các nhà cung cấp' : 'nhà cung cấp') +
+                ' sau đây?<br><br><ul class="list-group">';
+
+            selectedSuppliers.forEach(supp => {
+                deleteMessage += `<li class="list-group-item">${supp.name} <small class="text-muted">(${supp.address})</small></li>`;
+            });
+
+            deleteMessage += '</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>';
+
+            document.getElementById('deleteMessage').innerHTML = deleteMessage;
+
+            // Show delete modal
+            let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+
+            // Handle confirm delete button
+            document.getElementById('confirmDelete').onclick = function () {
+                location.href = '/dashboard/suppliers/delete/' + selectedIds.join(',');
+            };
+        });
+    });
 </script>
 </body>
 </html>
