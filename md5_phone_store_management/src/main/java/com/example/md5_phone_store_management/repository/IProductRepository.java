@@ -42,6 +42,11 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
                                                                       @Param("purchasePrice") int purchasePrice,
                                                                       Pageable pageable);
 
+    @Query("SELECT p FROM Product p")
+    List<Product> findAllWithOutPageable();
+
+
+
     //update
     @Query(value = "SELECT * FROM product WHERE product.productID = :id", nativeQuery = true)
     Product findByProductID(@Param("id") Integer id);
@@ -74,6 +79,8 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     // Đếm tổng số sản phẩm
     @Query(value = "SELECT COUNT(*) FROM product", nativeQuery = true)
     long countProducts();
+
+
 
     // Đếm tổng số sản phẩm đã bán
 //    @Query(value = "SELECT SUM(quantity) FROM invoice_detail", nativeQuery = true)

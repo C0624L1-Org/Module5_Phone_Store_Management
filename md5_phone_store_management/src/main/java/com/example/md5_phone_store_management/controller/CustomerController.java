@@ -81,7 +81,6 @@ public class CustomerController {
         return "dashboard/admin/customers/update-customer";
     }
 
-
     @GetMapping("/admin/customers/search")
     public ModelAndView searchCustomers(
             @RequestParam(required = false) String name,

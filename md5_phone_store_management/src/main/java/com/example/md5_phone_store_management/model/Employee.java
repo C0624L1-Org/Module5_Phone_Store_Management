@@ -139,4 +139,3 @@ public class Employee {
         this.avatar = avatar;
     }
 }
-

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Danh sách Giao dịch Xuất kho</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .chart-container {
+            width: 100%;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-wrapper {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="container-fluid py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Giao dịch Xuất kho</li>
+                    </ol>
+                </nav>
+
+
+
+                <!-- Chuyển sang quản lý nhập -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="transaction-box w-100">
+                        <a href="/dashboard/warehousestaff/customers/listIn" class="text-decoration-none text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-exchange-alt me-2"></i>Danh sách Giao dịch Xuất kho
+                            </h5>
+                        </a>
+                    </div>
+                </div>
+
+                <a href="/dashboard/admin/transactions/new/out/0" class="btn btn-primary">
+                    Thêm mới
+                </a>
+
+
+
+                <div class="card shadow-sm">
+                    <!-- Filter section (always visible) -->
+                    <div class="card-body border-bottom py-3">
+                        <form class="row g-3" id="filterForm">
+                            <div class="col-md-3">
+                                <label for="productName" class="form-label">Tên sản phẩm</label>
+                                <input type="text" class="form-control" id="productName" name="productName"
+                                       placeholder="Nhập tên sản phẩm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="supplierName" class="form-label">Nhà cung cấp</label>
+                                <input type="text" class="form-control" id="supplierName" name="supplierName"
+                                       placeholder="Nhập tên nhà cung cấp">
+                            </div>
+
+                            <div class="col-md-2">
+                                <label for="startDate" class="form-label">Từ ngày</label>
+                                <input type="date" class="form-control" id="startDate" name="startDate">
+                            </div>
+
+                            <div class="col-md-2">
+                                <label for="endDate" class="form-label">Đến ngày</label>
+                                <input type="date" class="form-control" id="endDate" name="endDate">
+                            </div>
+
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="btn-group w-100">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-2"></i>Tìm kiếm
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="resetFilters">
+                                        <i class="fas fa-times-circle me-2"></i>Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Table with fixed header and scrollable body -->
+                    <div class="table-container table-fade-in">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                            <tr>
+                                <th style="width: 50px;">
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input" type="checkbox" id="selectAll">
+                                    </div>
+                                </th>
+                                <th>ID</th>
+                                <th>Tên Sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Giá</th>
+                                <th>Tổng Giá Tiền</th>
+                                <th>Ngày giao dịch</th>
+                                <th>Nhân viên</th>
+                                <th>Nhà cung cấp</th>
+                                <th style="width: 180px;">Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="transaction : ${inventoryTransactions}" data-bs-toggle="collapse"
+                                data-bs-target="#details-[[${transaction.transactionID}]]" aria-expanded="false"
+                                aria-controls="details-[[${transaction.transactionID}]]">
+                                <td>
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input transaction-checkbox" type="checkbox"
+                                               th:value="${transaction.transactionID}"
+                                               th:data-name="${transaction.product?.name ?: 'N/A'}">
+                                    </div>
+                                </td>
+                                <td th:text="${transaction.transactionID}"></td>
+                                <td th:text="${transaction.product?.name ?: 'N/A'}"></td>
+                                <td th:text="${transaction.quantity}"></td>
+                                <td th:text="${#numbers.formatDecimal(transaction.purchasePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td th:text="${#numbers.formatDecimal(transaction.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td th:text="${#temporals.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></td>
+                                <td th:text="${transaction.employee?.fullName ?: 'N/A'}"></td>
+                                <td th:text="${transaction.supplier?.name ?: 'N/A'}"></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a th:href="@{/product/reorder/{id}(id=${transaction.transactionID})}"
+                                           class="btn btn-sm btn-secondary" data-bs-toggle="tooltip" title="Nhập lại">
+                                            <i class="fas fa-sync-alt"></i> Nhập lại
+                                        </a>
+                                        <a th:href="@{/product/details/{id}(id=${transaction.transactionID})}"
+                                           class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="Chi tiết">
+                                            <i class="fas fa-eye"></i> Chi tiết
+                                        </a>
+                                        <a th:href="@{/product/edit/{id}(id=${transaction.transactionID})}"
+                                           class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Sửa">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Xóa">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </div>
+
+
+                                </td>
+                            </tr>
+                            <tr class="collapse" id="details-[[${transaction.transactionID}]]">
+                                <td colspan="10">
+                                    <div class="p-3">
+                                        <strong>Chi tiết giao dịch:</strong>
+                                        <p>Thông tin chi tiết về giao dịch có thể được hiển thị ở đây.</p>
+                                        <!-- Add more details as needed -->
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr th:if="${#lists.isEmpty(inventoryTransactions)}">
+                                <td colspan="10" class="text-center py-4">Không tìm thấy giao dịch xuất kho nào</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-light py-3">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-chart-line me-2"></i>Biểu đồ Thống kê Xuất Kho
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <div class="chart-wrapper">
+                                <canvas id="exportChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Footer -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Maps to store data
+        const monthlyData = new Map(); // For monthly totals
+        const dailyData = []; // For individual transaction points
+        const firstLastPointsByMonth = {}; // To track first and last points of each month
+
+        // Initialize monthly totals with zeros and first/last point trackers
+        for (let i = 1; i <= 12; i++) {
+            monthlyData.set(i, 0);
+            firstLastPointsByMonth[i] = {first: null, last: null};
+        }
+
+        // Process each transaction row to extract date and quantity
+        document.querySelectorAll('tbody tr:not(.collapse):not(:last-child)').forEach(row => {
+            // Skip rows without proper data
+            if (row.cells.length < 7) return;
+
+            try {
+                // Get quantity from column 4 (index 3)
+                const quantityCell = row.cells[3];
+                if (!quantityCell) return;
+                const quantity = parseInt(quantityCell.textContent.trim(), 10);
+                if (isNaN(quantity)) return;
+
+                // Get transaction date from column 7 (index 6)
+                const dateCell = row.cells[6];
+                if (!dateCell) return;
+                const dateText = dateCell.textContent.trim();
+
+                // Parse the date in format 'dd-MM-yyyy HH:mm'
+                const parts = dateText.split('-');
+                if (parts.length < 3) return;
+
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10);
+
+                // Extract year and time
+                const yearTimeParts = parts[2].split(' ');
+                const year = parseInt(yearTimeParts[0], 10);
+                const time = yearTimeParts.length > 1 ? yearTimeParts[1] : "00:00";
+
+                // Validate date parts
+                if (isNaN(day) || isNaN(month) || isNaN(year)) return;
+                if (month < 1 || month > 12 || day < 1 || day > 31) return;
+
+                // Add to monthly total
+                const currentAmount = monthlyData.get(month) || 0;
+                monthlyData.set(month, currentAmount + quantity);
+
+                // Create a point object with all needed data
+                const point = {
+                    date: new Date(year, month - 1, day), // JavaScript months are 0-indexed
+                    month: month,
+                    day: day,
+                    year: year,
+                    time: time,
+                    fullDate: `${day}-${month}-${year} ${time}`,
+                    quantity: quantity
+                };
+
+                // Store this point for daily data
+                dailyData.push(point);
+
+                // Update first/last points for this month
+                if (!firstLastPointsByMonth[month].first || point.date < firstLastPointsByMonth[month].first.date) {
+                    firstLastPointsByMonth[month].first = point;
+                }
+
+                if (!firstLastPointsByMonth[month].last || point.date > firstLastPointsByMonth[month].last.date) {
+                    firstLastPointsByMonth[month].last = point;
+                }
+            } catch (e) {
+                console.error("Error processing row:", e);
+            }
+        });
+
+        // Sort daily data by date
+        dailyData.sort((a, b) => a.date - b.date);
+
+        // Get monthly totals
+        const monthlyTotals = Array.from({length: 12}, (_, i) => monthlyData.get(i + 1) || 0);
+
+        // Create monthly labels with totals
+        const monthsWithTotals = [
+            'Tháng 1',
+            'Tháng 2',
+            'Tháng 3',
+            'Tháng 4',
+            'Tháng 5',
+            'Tháng 6',
+            'Tháng 7',
+            'Tháng 8',
+            'Tháng 9',
+            'Tháng 10',
+            'Tháng 11',
+            'Tháng 12'
+        ];
+
+        // Store all the point data with their pixel positions for tooltip handling
+        const pointPositions = [];
+
+        // Create the chart
+        const exportCtx = document.getElementById('exportChart').getContext('2d');
+        const exportChart = new Chart(exportCtx, {
+            type: 'line',
+            data: {
+                labels: monthsWithTotals,
+                datasets: [{
+                    label: 'Tổng tháng',
+                    data: monthlyTotals,
+                    backgroundColor: 'rgba(255, 99, 132, 0)',
+                    borderColor: 'rgba(255, 99, 132, 0)',
+                    borderWidth: 0,
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Số lượng',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Thời gian',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Chi tiết số lượng hàng hóa xuất kho theo tháng',
+                        font: {
+                            size: 20,
+                            weight: 'bold'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        enabled: false,
+                    }
+                },
+                onHover: function (event, elements) {
+                    const rect = exportChart.canvas.getBoundingClientRect();
+                    const x = event.clientX - rect.left;
+                    const y = event.clientY - rect.top;
+
+                    let hoveredPoint = null;
+
+                    for (const point of pointPositions) {
+                        const dx = point.x - x;
+                        const dy = point.y - y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 10) {
+                            hoveredPoint = point;
+                            break;
+                        }
+                    }
+
+                    if (hoveredPoint) {
+                        document.body.style.cursor = 'pointer';
+                    } else {
+                        document.body.style.cursor = 'default';
+                    }
+
+                    const tooltipEl = document.getElementById('chartjs-tooltip');
+
+                    if (hoveredPoint) {
+                        tooltipEl.style.opacity = 1;
+                        tooltipEl.style.left = (hoveredPoint.x + 10) + 'px';
+                        tooltipEl.style.top = (hoveredPoint.y - 10) + 'px';
+                        tooltipEl.innerHTML = `
+                        <div class="tooltip-content">
+                            <div class="date">${hoveredPoint.data.fullDate}</div>
+                            <div class="quantity">Số lượng: ${hoveredPoint.data.quantity}</div>
+                        </div>
+                    `;
+                    } else {
+                        tooltipEl.style.opacity = 0;
+                    }
+                }
+            },
+            plugins:
+
+                [{
+                    id: 'customDailyPoints',
+                    afterDraw: function (chart) {
+                        const ctx = chart.ctx;
+
+                        // Clear the previous point positions array
+                        pointPositions.length = 0;
+
+                        if (dailyData.length === 0) return;
+
+                        // Get x positions for each month
+                        const xScale = chart.scales.x;
+                        const yScale = chart.scales.y;
+                        const monthPositions = [];
+
+                        for (let i = 0; i < 12; i++) {
+                            monthPositions.push(xScale.getPixelForTick(i));
+                        }
+
+                        // Draw connected points for daily data
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = 'rgba(255, 99, 132, 1)'; // Pink line color
+                        ctx.fillStyle = 'rgba(255, 99, 132, 1)'; // Pink dot color
+
+                        ctx.beginPath();
+
+                        let isFirstPoint = true;
+
+                        // Draw connected daily points
+                        dailyData.sort((a, b) => a.date - b.date).forEach((point, index) => {
+                            // Calculate x position based on day of month
+                            const monthIndex = point.month - 1;
+
+                            // Calculate days in month for current point's month
+                            const daysInMonth = new Date(point.year, point.month, 0).getDate();
+
+                            // Calculate x position (interpolate between month positions)
+                            let xPosition;
+
+                            if (monthIndex < 11) {
+                                const currentX = monthPositions[monthIndex];
+                                const nextX = monthPositions[monthIndex + 1];
+                                const dayRatio = point.day / daysInMonth;
+                                xPosition = currentX + (nextX - currentX) * dayRatio;
+                            } else {
+                                xPosition = monthPositions[monthIndex];
+                            }
+
+                            // Calculate y position based on quantity
+                            const yPosition = yScale.getPixelForValue(point.quantity);
+
+                            // Store position for tooltip handling
+                            pointPositions.push({
+                                x: xPosition,
+                                y: yPosition,
+                                data: point
+                            });
+
+                            // Start path or continue path
+                            if (isFirstPoint) {
+                                ctx.moveTo(xPosition, yPosition);
+                                isFirstPoint = false;
+                            } else {
+                                ctx.lineTo(xPosition, yPosition);
+                            }
+
+                            // Draw pink square dot for this point
+                            ctx.fillRect(xPosition - 3, yPosition - 3, 6, 6);
+                        });
+
+                        // Stroke the line connecting all points
+                        ctx.stroke();
+
+                        // Draw dotted lines from first point to month marker
+                        ctx.setLineDash([5, 5]); // Dotted line pattern
+                        ctx.strokeStyle = 'rgba(100, 100, 100, 0.7)'; // Darker gray for dotted lines
+
+                        for (let month = 1; month <= 12; month++) {
+                            const firstPoint = firstLastPointsByMonth[month].first;
+                            if (firstPoint) {
+                                // Calculate days in month
+                                const daysInMonth = new Date(firstPoint.year, firstPoint.month, 0).getDate();
+                                const monthIndex = month - 1;
+
+                                // Calculate first point position
+                                let firstPointX;
+                                if (monthIndex < 11) {
+                                    const currentX = monthPositions[monthIndex];
+                                    const nextX = monthPositions[monthIndex + 1];
+                                    const dayRatio = firstPoint.day / daysInMonth;
+                                    firstPointX = currentX + (nextX - currentX) * dayRatio;
+                                } else {
+                                    firstPointX = monthPositions[monthIndex];
+                                }
+
+                                const firstPointY = yScale.getPixelForValue(firstPoint.quantity);
+
+                                // Draw dotted line from first point to month marker
+                                ctx.beginPath();
+                                ctx.moveTo(firstPointX, firstPointY);
+                                ctx.lineTo(monthPositions[monthIndex], yScale.getPixelForValue(0));
+                                ctx.stroke();
+                            }
+                        }
+
+                        // Reset line dash
+                        ctx.setLineDash([]);
+                    }
+                }]
+        });
+
+        // Create custom tooltip element if it doesn't exist
+        if (!document.getElementById('chartjs-tooltip')) {
+            const tooltipEl = document.createElement('div');
+            tooltipEl.id = 'chartjs-tooltip';
+            tooltipEl.style.opacity = 0;
+            tooltipEl.style.position = 'absolute';
+            tooltipEl.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            tooltipEl.style.color = 'white';
+            tooltipEl.style.padding = '10px';
+            tooltipEl.style.borderRadius = '5px';
+            tooltipEl.style.pointerEvents = 'none';
+            tooltipEl.style.zIndex = 100;
+            tooltipEl.style.transition = 'opacity 0.3s';
+            document.body.appendChild(tooltipEl);
+        }
+    });
+</script>
+</script>
+</body>
+</html>

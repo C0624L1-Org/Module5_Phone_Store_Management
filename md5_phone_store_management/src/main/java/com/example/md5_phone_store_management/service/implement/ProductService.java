@@ -99,6 +99,11 @@ public class ProductService implements IProductService {
         productRepository.deleteProductImages(product.getProductID());
     }
 
+    @Override
+    public List<Product> findAllWithOutPageable() {
+        return productRepository.findAllWithOutPageable();
+    }
+
     //Tuấn Anh
     @Override
     public Page<Product> findAll(Pageable pageable) {
