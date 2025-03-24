@@ -2,6 +2,7 @@ package com.example.md5_phone_store_management.repository;
 
 import com.example.md5_phone_store_management.model.InventoryTransaction;
 import com.example.md5_phone_store_management.model.TransactionType;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,10 +15,10 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public interface InventoryTransactionInRepo extends JpaRepository<InventoryTransaction, Integer> {
+public interface IInventoryTransactionInRepo extends JpaRepository<InventoryTransaction, Integer> {
 
     @Query("SELECT i FROM InventoryTransaction i WHERE i.transactionType = :type")
-    List<InventoryTransaction> getByTransactionType(@Param("type") TransactionType type, Pageable pageable);
+    Page<InventoryTransaction> getByTransactionType(@Param("type") TransactionType type, Pageable pageable);
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM InventoryTransaction i where i.transactionID in : ids",nativeQuery = true)
@@ -27,7 +28,7 @@ public interface InventoryTransactionInRepo extends JpaRepository<InventoryTrans
             "AND (:productName IS NULL OR LOWER(i.product.name) LIKE LOWER(CONCAT('%', :productName, '%'))) " +
             "AND (:supplierName IS NULL OR LOWER(i.product.supplier.name) LIKE LOWER(CONCAT('%', :supplierName, '%'))) " +
             "AND (:transactionDate IS NULL OR i.transactionDate = :transactionDate)")
-    List<InventoryTransaction> searchTransactions(
+    Page<InventoryTransaction> searchTransactions(
             @Param("productName") String productName,
             @Param("supplierName") String supplierName,
             @Param("transactionDate") LocalDate transactionDate,
