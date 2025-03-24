@@ -28,7 +28,7 @@ public class InventoryTransaction {
     private BigDecimal purchasePrice = BigDecimal.ZERO;
 
     @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime transactionDate = LocalDateTime.now();
+    private LocalDateTime transactionDate ;
 
     @ManyToOne
     @JoinColumn(name = "supplierID", foreignKey = @ForeignKey(name = "FK_Supplier"))
