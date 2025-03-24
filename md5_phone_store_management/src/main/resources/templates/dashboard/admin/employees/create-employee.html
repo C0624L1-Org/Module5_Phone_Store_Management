@@ -2,109 +2,346 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Thêm Nhân viên</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thêm mới nhân viên</title>
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="/css/dashboard/dashboard.css">
   <link rel="stylesheet" href="/css/fragments/navbar.css">
-  <link rel="stylesheet" href="/css/fragments/footer.css">
   <link rel="stylesheet" href="/css/fragments/sidebar.css">
+  <link rel="stylesheet" href="/css/fragments/footer.css">
   <link rel="stylesheet" href="/css/common/toast.css">
+  <link rel="stylesheet" href="/css/common/layout.css">
+
+  <style>
+    .form-section {
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+      overflow: hidden;
+    }
+
+    .form-header {
+      background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
+      color: white;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .form-control, .form-select {
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-create {
+      background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+    }
+
+    .btn-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+    }
+
+    .btn-cancel {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+    }
+
+    .btn-cancel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .input-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0.75rem;
+      color: #6c757d;
+    }
+
+    .icon-input {
+      padding-left: 2.5rem;
+    }
+  </style>
 </head>
 <body>
 <!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
+
 <!-- Nhúng navbar -->
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<!-- Sidebar -->
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-<!-- Nội dung trong trang -->
-<div class="main-content mt-5">
-  <div class="card shadow w-50 mx-auto">
-    <div class="card-header bg-primary text-white">
-      <h3 class="mb-0">Thêm mới nhân viên</h3>
-    </div>
-    <div class="card-body">
-      <form th:action="@{/dashboard/admin/employees/create}" method="post" th:object="${employeeDTO}">
-        <!-- Họ tên -->
-        <div class="mb-3">
-          <label for="fullName" class="form-label">Họ tên</label>
-          <input type="text" th:field="*{fullName}" id="fullName" class="form-control" placeholder="Nhập họ tên">
-          <p class="text-danger small" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></p>
+<div class="content-wrapper">
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <!-- Main content area -->
+    <div class="content-container">
+      <div class="container py-4">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/dashboard/admin}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/employees/list}">Quản lý nhân viên</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thêm mới nhân viên</li>
+          </ol>
+        </nav>
+
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="form-section mb-4">
+              <div class="form-header">
+                <h3 class="mb-0">
+                  <i class="fas fa-user-plus me-2"></i>
+                  Thêm mới nhân viên
+                </h3>
+                <p class="text-white-50 mt-2 mb-0">Nhập thông tin nhân viên mới</p>
+              </div>
+
+              <div class="p-4">
+                <form th:action="@{/dashboard/admin/employees/create}" method="post" th:object="${employeeDTO}"
+                      class="needs-validation" novalidate>
+
+                  <div class="row">
+                    <!-- Họ và tên -->
+                    <div class="col-md-6 mb-3">
+                      <label for="fullName" class="form-label">
+                        <i class="fas fa-user me-2"></i>Họ và tên
+                      </label>
+                      <input type="text" th:field="*{fullName}" class="form-control" id="fullName"
+                             placeholder="Nhập họ và tên">
+                      <div class="invalid-feedback">Vui lòng nhập họ và tên</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                    </div>
+
+                    <!-- Tên đăng nhập -->
+                    <div class="col-md-6 mb-3">
+                      <label for="username" class="form-label">
+                        <i class="fas fa-id-badge me-2"></i>Tên đăng nhập
+                      </label>
+                      <input type="text" th:field="*{username}" class="form-control" id="username"
+                             placeholder="Nhập tên đăng nhập">
+                      <div class="invalid-feedback">Vui lòng nhập tên đăng nhập</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6 mb-3">
+                      <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>Email
+                      </label>
+                      <input type="email" th:field="*{email}" class="form-control" id="email"
+                             placeholder="example@email.com">
+                      <div class="invalid-feedback">Vui lòng nhập email hợp lệ</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+
+                    <!-- Số điện thoại -->
+                    <div class="col-md-6 mb-3">
+                      <label for="phone" class="form-label">
+                        <i class="fas fa-phone me-2"></i>Số điện thoại
+                      </label>
+                      <input type="tel" th:field="*{phone}" class="form-control" id="phone"
+                             placeholder="0912345678">
+                      <div class="invalid-feedback">Vui lòng nhập số điện thoại</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                    </div>
+
+                    <!-- Ngày sinh -->
+                    <div class="col-md-6 mb-3">
+                      <label for="dob" class="form-label">
+                        <i class="fas fa-calendar-alt me-2"></i>Ngày sinh
+                      </label>
+                      <input type="date" th:field="*{dob}" class="form-control" id="dob">
+                      <div class="invalid-feedback">Vui lòng chọn ngày sinh</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></div>
+                    </div>
+
+                    <!-- Vai trò -->
+                    <div class="col-md-6 mb-3">
+                      <label for="role" class="form-label">
+                        <i class="fas fa-user-tag me-2"></i>Vai trò
+                      </label>
+                      <select th:field="*{role}" class="form-select" id="role">
+                        <option value="" disabled selected>-- Chọn vai trò --</option>
+                        <option th:value="SalesStaff" th:text="'Nhân viên kinh doanh'"></option>
+                        <option th:value="SalesPerson" th:text="'Nhân viên bán hàng'"></option>
+                        <option th:value="WarehouseStaff" th:text="'Nhân viên thủ kho'"></option>
+                      </select>
+                      <div class="invalid-feedback">Vui lòng chọn vai trò</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+                    </div>
+
+                    <!-- Địa chỉ -->
+                    <div class="col-md-12 mb-3">
+                      <label for="address" class="form-label">
+                        <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ
+                      </label>
+                      <textarea th:field="*{address}" class="form-control" id="address"
+                                rows="3" placeholder="Nhập địa chỉ"></textarea>
+                      <div class="invalid-feedback">Vui lòng nhập địa chỉ</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+                    </div>
+
+                    <!-- Mật khẩu -->
+                    <div class="col-md-6 mb-3">
+                      <label for="password" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Mật khẩu
+                      </label>
+                      <div class="input-group">
+                        <input type="password" th:field="*{password}" class="form-control" id="password"
+                               placeholder="Nhập mật khẩu" >
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </div>
+                      <div class="form-text">Mật khẩu phải từ 6 đến 30 ký tự!</div>
+                      <div class="invalid-feedback">Vui lòng nhập mật khẩu</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
+
+                    <!-- Avatar -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">
+                        <i class="fas fa-image me-2"></i>Avatar
+                      </label>
+                      <div class="form-control bg-light text-muted">
+                        Avatar mặc định sẽ được sử dụng
+                      </div>
+                      <div class="form-text">Nhân viên có thể cập nhật avatar sau khi tài khoản được tạo</div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end mt-4 gap-2">
+                    <button type="button" class="btn btn-cancel" data-bs-toggle="modal" data-bs-target="#confirmCancelModal">
+                      <i class="fas fa-times me-2"></i>Hủy bỏ
+                    </button>
+                    <button type="button" class="btn btn-create" data-bs-toggle="modal" data-bs-target="#confirmCreateModal">
+                      <i class="fas fa-save me-2"></i>Tạo nhân viên
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <!-- Tên đăng nhập -->
-        <div class="mb-3">
-          <label for="username" class="form-label">Tên đăng nhập</label>
-          <input type="text" th:field="*{username}" id="username" class="form-control" placeholder="Nhập tên đăng nhập">
-          <p class="text-danger small" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
-        </div>
-
-        <!-- Số điện thoại -->
-        <div class="mb-3">
-          <label for="phone" class="form-label">Số điện thoại</label>
-          <input type="tel" th:field="*{phone}" id="phone" class="form-control" placeholder="0912345678">
-          <p class="text-danger small" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></p>
-        </div>
-
-        <!-- Email -->
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" th:field="*{email}" id="email" class="form-control" placeholder="example@email.com">
-          <p class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
-        </div>
-
-        <!-- Vai trò / Phòng ban -->
-        <div class="mb-3">
-          <label for="role" class="form-label">Phòng ban / Vai trò</label>
-          <select th:field="*{role}" id="role" class="form-select">
-            <option value="" disabled selected>Chọn vai trò</option>
-            <option th:value="SalesStaff" th:text="'Nhân viên kinh doanh'"></option>
-            <option th:value="SalesPerson" th:text="'Nhân viên bán hàng'"></option>
-            <option th:value="WarehouseStaff" th:text="'Nhân viên thủ kho'"></option>
-          </select>
-          <p class="text-danger small" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></p>
-        </div>
-
-        <!-- Ngày sinh -->
-        <div class="mb-3">
-          <label for="dob" class="form-label">Ngày sinh</label>
-          <input type="date" th:field="*{dob}" id="dob" class="form-control">
-          <p class="text-danger small" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></p>
-        </div>
-
-        <!-- Địa chỉ -->
-        <div class="mb-3">
-          <label for="address" class="form-label">Địa chỉ</label>
-          <textarea th:field="*{address}" id="address" class="form-control" rows="3" placeholder="Nhập địa chỉ"></textarea>
-          <p class="text-danger small" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
-        </div>
-
-        <!-- Mật khẩu -->
-        <div class="mb-3">
-          <label for="password" class="form-label">Mật khẩu</label>
-          <input type="password" th:field="*{password}" id="password" class="form-control" placeholder="Nhập mật khẩu">
-          <p class="text-danger small" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
-        </div>
-
-
-        <button type="submit" class="btn btn-primary">Thêm nhân viên</button>
-      </form>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Nhúng footer -->
-<div th:replace="~{fragments/footer :: footer}"></div>
+  <!-- Modal Xác Nhận Tạo Nhân Viên -->
+  <div class="modal fade" id="confirmCreateModal" tabindex="-1" aria-labelledby="confirmCreateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmCreateLabel">Xác nhận tạo nhân viên</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn có chắc chắn muốn tạo nhân viên mới này?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+          <button type="button" class="btn btn-success" id="confirmCreate">Xác nhận tạo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Xác Nhận Hủy -->
+  <div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmCancelLabel">Xác nhận hủy</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn có chắc chắn muốn hủy tạo nhân viên? Dữ liệu chưa lưu sẽ bị mất.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+          <a th:href="@{/dashboard/admin/employees/list}" class="btn btn-danger">Xác nhận hủy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-<!-- Các script khác -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Form validation script -->
+<script>
+  // Submit form when confirm create button is clicked
+  document.getElementById("confirmCreate").addEventListener("click", function () {
+    document.querySelector("form").submit();
+  });
+
+  // invalid fields
+  (function () {
+    'use strict'
+
+    var forms = document.querySelectorAll('.needs-validation')
+
+    // Vòng lặp ngăn chặn việc submit
+    Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+              form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                  event.preventDefault()
+                  event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+              }, false)
+            })
+  })()
+
+  // Toggle hiển thị mật khẩu
+  const togglePassword = document.getElementById('togglePassword');
+  const password = document.getElementById('password');
+
+  togglePassword.addEventListener('click', function() {
+    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+    password.setAttribute('type', type);
+    this.querySelector('i').classList.toggle('fa-eye');
+    this.querySelector('i').classList.toggle('fa-eye-slash');
+  });
+</script>
 </body>
 </html>

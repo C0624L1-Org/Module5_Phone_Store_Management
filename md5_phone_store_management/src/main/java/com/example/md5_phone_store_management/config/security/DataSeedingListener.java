@@ -55,7 +55,7 @@ public class DataSeedingListener implements ApplicationListener<ContextRefreshed
             salesperson.setPassword(EncryptPasswordUtils.encryptPasswordUtils("salesperson"));
             salesperson.setEmail("salesperson@gmail.com");
             salesperson.setPhone("0999999997");
-            salesperson.setFullName("Sales Staff");
+            salesperson.setFullName("Sales Person");
             salesperson.setAddress("TP.HCM");
             salesperson.setRole(Role.SalesPerson);
             salesperson.setDob(LocalDate.parse("2000-01-01"));

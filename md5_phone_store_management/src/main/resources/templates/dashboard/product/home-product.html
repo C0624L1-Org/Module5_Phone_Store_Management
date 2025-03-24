@@ -2,131 +2,398 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách sản phẩm</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/fragments/navbar.css">
-    <link rel="stylesheet" href="/css/fragments/sidebar.css"/>
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
     <link rel="stylesheet" href="/css/fragments/footer.css">
-    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);
+            color: white;
+            padding: 1.2rem 1.5rem;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .search-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+
+        .table-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+
+        .btn-action {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+        }
+
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+            font-weight: 500;
+            border-color: #454d55;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            vertical-align: middle;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6c8deb;
+            box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        /* Price display styling */
+        .price-display {
+            font-weight: 500;
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+
+        .purchase-price {
+            color: #dc3545;
+        }
+
+        .selling-price {
+            color: #198754;
+        }
+
+        /* Range slider custom styling */
+        .price-slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+        }
+
+        .price-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4a6fdc;
+            cursor: pointer;
+        }
+
+        .price-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4a6fdc;
+            cursor: pointer;
+        }
+
+        .range-value-display {
+            font-weight: bold;
+            color: #4a6fdc;
+            padding: 0 8px;
+        }
+    </style>
 </head>
 <body>
 <!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
+
 <!-- Nhúng navbar -->
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<!-- Sidebar -->
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-    <div class="main-content mt-5">
-        <h2>Danh sách hàng hóa</h2>
-        <a th:href="@{/dashboard/products/create-form}" class="btn btn-success btn-md mb-3">
-            <i class="fas fa-user-plus"></i> Thêm mới sản phẩm
-        </a>
-        <form class="example" th:action="@{/dashboard/products/search}" method="get">
-            Tên hàng hóa    <input type="text" placeholder="Nhập tên hàng hóa" name="searchProduct">
-            Tên nhà cung cấp    <input type="text" placeholder="Nhập tên nhà cung cấp" name="searchSupplier">
-            <label for="myRange">Giá  <span id="rangeValue">0</span></label>
-            <input type="range" min="1" max="100" value="0" class="slider" id="myRange" name="rangePrice">
-            <button type="button" class="btn btn-secondary" onclick="resetSearch()">
-                Reset
-            </button>
-            <button type="submit">
-                <i class="fa fa-search"></i>
-            </button>
-        </form>
-        <table class="table table-bordered mt-2">
-            <thead>
-            <tr class="table-dark">
-                <!--<th><input id="selectAll" type="checkbox"></th>-->
-                <th>STT</th>
-                <th>Tên Sản Phẩm</th>
-                <th>Đơn Vị Cung Cấp</th>
-                <th>Giá Mua Vào</th>
-                <th>Giá Bán</th>
-                <th>CPU</th>
-                <th>Bộ Nhớ</th>
-                <th>Số Lượng</th>
-                <th>Hành Động</th>
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="product,index : ${listProducts}">
-                <td th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
-                <td th:text="${product.name}"></td>
-                <td th:text="${product.supplier.name}"></td>
-                <td th:text="${#numbers.formatInteger(product.purchasePrice,1,'POINT') + ' VND'}"></td>
-                <td th:text="${#numbers.formatInteger(product.sellingPrice,1,'POINT') + ' VND'}"></td>
-                <td th:text="${product.CPU}"></td>
-                <td th:text="${product.storage}"></td>
-                <td th:text="${product.stockQuantity}"></td>
-                <td>
-                    <a th:href="@{/dashboard/products/update-form/{id}(id=${product.productID})}"
-                       class="btn btn-secondary btn-sm me-1">
-                        <i class="fas fa-pen"></i> Cập Nhật
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="container-fluid py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Quản lý sản phẩm</li>
+                    </ol>
+                </nav>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-mobile-alt me-2 text-primary"></i>
+                        Danh sách sản phẩm
+                    </h2>
+
+                    <a th:href="@{/dashboard/products/create-form}" class="btn btn-success">
+                        <i class="fas fa-plus-circle me-2"></i>Thêm mới sản phẩm
                     </a>
-                </td>
-            </tr>
+                </div>
 
-            </tbody>
-        </table>
-        <!--<button th:href="@{#}" class="btn btn-danger btn-sm me-1" disabled id="deleteSelected">
-            <i class="fas fa-trash-alt"></i> Xoá
-        </button>
-        &lt;!&ndash; Bootstrap Modal Xác nhận Xóa &ndash;&gt;
-        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" style="margin-top: 150px">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- Search -->
+                <div class="search-section">
+                    <form th:action="@{/dashboard/products/search}" method="get" id="searchForm">
+                    <form th:action="@{/dashboard/products/list(page=${page})}" method="get">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="searchProduct" class="form-label">Tên sản phẩm</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
+                                    <input type="text" class="form-control" id="searchProduct" name="searchProduct"
+                                           placeholder="Nhập tên sản phẩm" th:value="${searchProduct}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="searchSupplier" class="form-label">Nhà cung cấp</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                    <input type="text" class="form-control" id="searchSupplier" name="searchSupplier"
+                                           placeholder="Nhập tên nhà cung cấp" th:value="${searchSupplier}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="myRange" class="form-label">Giá mua vào tối đa (VND)</label>
+                                <div class="d-flex align-items-center">
+                                    <input type="range" min="1000000" max="100000000" step="500000" class="form-range price-slider" id="myRange" name="rangePrice"
+                                           th:value="${rangePrice}">
+                                    <span id="rangeValue" class="range-value-display" th:text="${#numbers.formatInteger(rangePrice,1,'POINT')}+' VND'">1000000 VND</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-secondary" onclick="resetSearch()">
+                                    <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Table -->
+                <div class="table-card">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered mb-0">
+                            <thead>
+                            <tr>
+                                <th style="width: 60px">STT</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Nhà cung cấp</th>
+                                <th>Giá mua vào</th>
+                                <th>Giá bán</th>
+                                <th>CPU</th>
+                                <th>Bộ nhớ</th>
+                                <th>Số lượng</th>
+                                <th style="width: 120px">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- TH Nếu không có dữ liệu -->
+                            <tr th:if="${listProducts.totalElements == 0}">
+                                <td colspan="9" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
+                            </tr>
+                            <!-- Dữ liệu sản phẩm -->
+                            <tr th:each="product,index : ${listProducts}">
+                                <td class="text-center" th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-mobile-alt me-2 text-primary"></i>
+                                        <span class="product-name" th:text="${product.name}"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                        <span class="badge bg-info text-dark">
+                                            <i class="fas fa-building me-1"></i>
+                                            <span th:text="${product.supplier.name}"></span>
+                                        </span>
+                                </td>
+                                <td>
+                                        <span class="price-display purchase-price">
+                                            <i class="fas fa-tag me-1"></i>
+                                            <span th:text="${#numbers.formatInteger(product.purchasePrice,1,'POINT') + ' VND'}"></span>
+                                        </span>
+                                </td>
+                                <td>
+                                        <span class="price-display selling-price">
+                                            <i class="fas fa-tags me-1"></i>
+                                            <span th:text="${#numbers.formatInteger(product.sellingPrice,1,'POINT') + ' VND'}"></span>
+                                        </span>
+                                </td>
+                                <td>
+                                    <span th:text="${product.CPU}"></span>
+                                </td>
+                                <td>
+                                    <span th:text="${product.storage}"></span>
+                                </td>
+                                <td class="text-center">
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-cubes me-1"></i>
+                                            <span th:text="${product.stockQuantity}"></span>
+                                        </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center">
+                                        <a th:href="@{/dashboard/products/update-form/{id}(id=${product.productID})}"
+                                           class="btn btn-warning btn-sm">
+                                            <i class="fas fa-edit me-1"></i>Cập nhật
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="modal-body">
-                        <p id="deleteMessage"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="button" class="btn btn-danger" id="confirmDelete">Đồng ý</button>
+
+                    <!-- Pagination -->
+                    <div th:if="${listProducts.totalPages > 0}" class="p-3 bg-light border-top d-flex justify-content-end">
+                        <nav aria-label="Pagination">
+                            <ul class="pagination mb-0">
+                                <!-- Nút Trang đầu -->
+                                <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
+                                    th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/search(page=0, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                        Trang đầu
+                                    </a>
+                                </li>
+                                <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
+                                    th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=0)}">
+                                        Trang đầu
+                                    </a>
+                                </li>
+
+                                <!-- Nút Previous -->
+                                <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
+                                    th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.number - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
+                                    th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+
+                                <!-- Hiển thị trang hiện tại / tổng số trang -->
+                                <li class="page-item active mx-2">
+                                    <span class="page-link">
+                                        <span th:text="${listProducts.number + 1}"></span> / <span th:text="${listProducts.totalPages}"></span>
+                                    </span>
+                                </li>
+
+                                <!-- Nút Next -->
+                                <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'"
+                                    th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.number + 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'"
+                                    th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+
+                                <!-- Nút Trang cuối -->
+                                <li class="page-item" th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
+                                    th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.totalPages - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                        Trang cuối
+                                    </a>
+                                </li>
+                                <li class="page-item" th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
+                                    th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
+                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.totalPages - 1})}">
+                                        Trang cuối
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>
-        </div>-->
-
-        <ul class="pagination" th:if="${listProducts.totalPages>0}">
-            <li class="page-item" th:if="${listProducts.hasPrevious()}">
-                <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">Trước</a>
-            </li>
-
-            <li class="page-item" th:each="number :${#numbers.sequence(0,listProducts.totalPages - 1)}">
-                <a class="page-link" th:classappend="${listProducts.number == number} ? 'active':''"
-                   th:href="@{/dashboard/products/list(page= ${number})}" th:text="${number+1}"></a>
-            </li>
-
-            <li class="page-item" th:if="${listProducts.hasNext()}">
-                <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">Sau</a>
-            </li>
-        </ul>
+        </div>
     </div>
 
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-<!-- Nhúng footer -->
-<div th:insert="fragments/footer::footer"></div>
-
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    // Range slider functionality
     var slider = document.getElementById("myRange");
     var output = document.getElementById("rangeValue");
     output.innerText = slider.value;
-    slider.oninput = function () {
+    slider.oninput = function() {
         output.innerText = this.value;
     };
+
+    // Reset search form
+    function resetSearch() {
+        document.querySelector("form").reset();  // Reset form fields
+        window.location.href = "/dashboard/products/list";  // Redirect to product list
+    }
+
+    // Success message handling
     if ("[[${message}]]".trim() !== "") {
         Swal.fire({
             title: "Thành công!",
@@ -136,11 +403,6 @@
             showConfirmButton: false
         });
     }
-        function resetSearch() {
-        document.querySelector("form.example").reset();  // Xóa dữ liệu nhập vào
-        window.location.href = "/dashboard/products/list";   // Chuyển hướng về danh sách sản phẩm
-    }
-
 </script>
 </body>
 </html>

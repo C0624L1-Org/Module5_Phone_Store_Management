@@ -5,70 +5,91 @@
 </head>
 <body>
 <!-- Navbar Fragment -->
-<div th:fragment="navbar" class="navbar">
-    <div class="navbar-container">
-        <div class="logo">
-            <a th:href="@{/home}">
-                <img src="/img/fpt_logo.png" alt="Shop Logo">
-            </a>
-            <div class="menu-container">
-                <div class="menu-button">
-                    <i>☰</i>
-                    <span>Danh mục</span>
+<div th:fragment="navbar">
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <div class="logo">
+                <a th:href="@{/home}">
+                    <img src="/img/fpt_logo.png" alt="Shop Logo">
+                </a>
+                <div class="menu-container">
+                    <div class="menu-button">
+                        <i>☰</i>
+                        <span>Danh mục</span>
+                    </div>
+                    <!-- Dropdown Menu -->
+                    <div class="dropdown-menu">
+                        <div class="menu-item">Danh mục 1</div>
+                        <div class="menu-item">Danh mục 2</div>
+                        <div class="menu-item">Danh mục 3</div>
+                        <div class="menu-item">Danh mục 4</div>
+                    </div>
                 </div>
-                <!-- Dropdown Menu -->
-                <div class="dropdown-menu">
-                    <div class="menu-item">Danh mục 1</div>
-                    <div class="menu-item">Danh mục 2</div>
-                    <div class="menu-item">Danh mục 3</div>
-                    <div class="menu-item">Danh mục 4</div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" placeholder="Nhập tên điện thoại, máy tính, phụ kiện... cần tìm">
+                <button>🔍</button>
+            </div>
+
+            <div class="user-actions">
+                <ul>
+                    <!-- Đã đăng nhập -->
+                    <li sec:authorize="isAuthenticated()"><span class=""><small>Xin chào </small><strong th:text="${loggedEmployee.fullName}"></strong>!</span></li>
+                    <li sec:authorize="isAuthenticated()" class="nav-item dropdown">
+                        <a class="d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <img th:if="${loggedEmployee != null}"
+                                 th:src="${loggedEmployee.avatar}"
+                                 alt="avatar"
+                                 class="user-avatar">
+                        </a>
+                        <ul class="dropdown-menu" style="color: black">
+                            <li><span class="dropdown-item-text"><strong>Chức Năng</strong></span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="menu-item" th:href="@{/common/profile}"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
+                            <!--                        <li><a class="menu-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng</a></li>-->
+                            <!--                        <li><a class="menu-item" href="#"><i class="fas fa-history me-2"></i>Lịch sử đơn hàng</a></li>-->
+                            <li><a class="menu-item" th:href="@{/common/change-password}"><i class="fas fa-key me-2"></i>Đổi mật khẩu</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="menu-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </li>
+
+                    <li sec:authorize="isAuthenticated()"><a href="#" style="color: white" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+
+                    <!-- Chưa đăng nhập -->
+                    <li sec:authorize="isAnonymous()" class="nav-item">
+                        <a th:href="@{/login}" style="color: white" class="btn btn-outline-light"><i class="fas fa-sign-in-alt me-2"></i>Đăng nhập</a>
+                    </li>
+<!--                    <li sec:authorize="isAnonymous()" class="nav-item">-->
+<!--                        <a th:href="@{/register}" class="btn btn-outline-light">Đăng ký</a>-->
+<!--                    </li>-->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modal Xác nhận Đăng xuất -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Xác nhận đăng xuất</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <a th:href="@{/logout}" class="btn btn-danger">Xác nhận đăng xuất</a>
                 </div>
             </div>
         </div>
-
-        <div class="search-container">
-            <input type="text" placeholder="Nhập tên điện thoại, máy tính, phụ kiện... cần tìm">
-            <button>🔍</button>
-        </div>
-
-        <div class="user-actions">
-            <ul>
-                <!-- Đã đăng nhập -->
-                <li sec:authorize="isAuthenticated()"><span class=""><small>Xin chào </small><strong th:text="${loggedEmployee.fullName}"></strong>!</span></li>
-                <li sec:authorize="isAuthenticated()" class="nav-item dropdown">
-                    <a class="d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                        <img th:if="${loggedEmployee != null}"
-                             th:src="${loggedEmployee.avatar}"
-                             alt="avatar"
-                             class="user-avatar">
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><span class="dropdown-item-text"><strong>Chức Năng</strong></span></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="menu-item" th:href="@{/common/profile}"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
-<!--                        <li><a class="menu-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng</a></li>-->
-<!--                        <li><a class="menu-item" href="#"><i class="fas fa-history me-2"></i>Lịch sử đơn hàng</a></li>-->
-                        <li><a class="menu-item" th:href="@{/common/change-password}"><i class="fas fa-key me-2"></i>Đổi mật khẩu</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="menu-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                    </ul>
-                </li>
-
-                <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-
-                <!-- Chưa đăng nhập -->
-                <li sec:authorize="isAnonymous()" class="nav-item">
-                    <a th:href="@{/login}"><i class="fas fa-sign-in-alt me-2"></i>Đăng nhập</a>
-                </li>
-                <li sec:authorize="isAnonymous()" class="nav-item">
-                    <a th:href="@{/register}" class="btn btn-outline-light">Đăng ký</a>
-                </li>
-            </ul>
-        </div>
     </div>
-</div>
 
-<div class="overlay"></div>
+    <div class="overlay"></div>
+</div>
 
 <!-- Navbar Script -->
 <script th:fragment="navbar-script">

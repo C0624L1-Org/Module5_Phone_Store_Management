@@ -50,6 +50,12 @@ public class EmployeeService implements IEmployeeService {
         }
     }
 
+
+    public Page<Employee> getAllEmployeesExceptAdmin(Pageable pageable) {
+        return iEmployeeRepository.getAllEmployeesExceptAdmin(pageable);
+    }
+
+
     //Read and search (a Đình Anh)
     public Page<Employee> getAllEmployees(Pageable pageable) {
         return iEmployeeRepository.getAllEmployees(pageable);
@@ -160,5 +166,25 @@ public class EmployeeService implements IEmployeeService {
         return false;
 
 
+    }
+
+    @Override
+    public long countEmployee() {
+        return iEmployeeRepository.count();
+    }
+
+    @Override
+    public long countSalesStaff() {
+        return iEmployeeRepository.countSalesStaff();
+    }
+
+    @Override
+    public long countBusinessStaff() {
+        return iEmployeeRepository.countSalesPerson();
+    }
+
+    @Override
+    public long countWarehouseStaff() {
+        return iEmployeeRepository.countWarehouseStaff();
     }
 }

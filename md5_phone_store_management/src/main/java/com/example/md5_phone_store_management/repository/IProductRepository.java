@@ -36,10 +36,10 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     @Query("select p from Product p where " +
             "(:name is null or p.name like concat('%',:name,'%')) " +
             "and (:supplierName is null or p.supplier.name like concat('%',:supplierName,'%')) " +
-            "and (:purchasePrice is null or p.purchasePrice >= :purchasePrice)")
+            "and (:purchasePrice = 0 or p.purchasePrice <= :purchasePrice)")
     Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(@Param("name") String name,
                                                                       @Param("supplierName") String supplierName,
-                                                                      @Param("purchasePrice") double purchasePrice,
+                                                                      @Param("purchasePrice") int purchasePrice,
                                                                       Pageable pageable);
 
     //update
@@ -70,5 +70,17 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     @Transactional
     @Query(value = "DELETE FROM product_images WHERE product_id = ?1", nativeQuery = true)
     void deleteProductImages(Integer productID);
+
+    // Đếm tổng số sản phẩm
+    @Query(value = "SELECT COUNT(*) FROM product", nativeQuery = true)
+    long countProducts();
+
+    // Đếm tổng số sản phẩm đã bán
+//    @Query(value = "SELECT SUM(quantity) FROM invoice_detail", nativeQuery = true)
+//    Long countSoldProducts();
+
+    // Tính tổng doanh thu
+//    @Query(value = "SELECT SUM(total_amount) FROM invoice", nativeQuery = true)
+//    BigDecimal calculateTotalRevenue();
 
 }

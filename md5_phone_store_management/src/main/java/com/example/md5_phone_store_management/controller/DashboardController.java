@@ -1,5 +1,10 @@
 package com.example.md5_phone_store_management.controller;
 
+import com.example.md5_phone_store_management.service.ICustomerService;
+import com.example.md5_phone_store_management.service.IEmployeeService;
+import com.example.md5_phone_store_management.service.IProductService;
+import com.example.md5_phone_store_management.service.ISupplierService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,9 +14,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/dashboard")
 public class DashboardController {
+    @Autowired
+    private IEmployeeService iEmployeeService;
+
+    @Autowired
+    private ISupplierService iSupplierService;
+
+    @Autowired
+    private IProductService iProductService;
+
+    @Autowired
+    private ICustomerService iCustomerService;
 
     @GetMapping("/admin")
     public String admin(Model model) {
+        // Thống kê nhân viên
+        model.addAttribute("countEmployee", iEmployeeService.countEmployee());
+        model.addAttribute("countSalesStaff", iEmployeeService.countSalesStaff());
+        model.addAttribute("countBusinessStaff", iEmployeeService.countBusinessStaff());
+        model.addAttribute("countWarehouseStaff", iEmployeeService.countWarehouseStaff());
+        model.addAttribute("countCustomer", iCustomerService.countTotalCustomers());
+
+        // Thống kê nhà cung cấp
+        model.addAttribute("countSuppliers", iSupplierService.countSuppliers());
+
+        // Thống kê sản phẩm và doanh thu
+        model.addAttribute("countProducts", iProductService.countProducts());
+//        model.addAttribute("countSoldProducts", iProductService.countSoldProducts());
+//        model.addAttribute("totalRevenue", iProductService.calculateTotalRevenue());
+
         return "dashboard/admin/admin-home";
     }
 

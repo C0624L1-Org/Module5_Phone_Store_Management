@@ -99,6 +99,4 @@ public class SupplierController {
 
         return "redirect:/dashboard/suppliers";
     }
-
-
 }

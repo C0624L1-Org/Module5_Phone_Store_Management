@@ -12,7 +12,7 @@ import java.util.List;
 public interface IProductService {
     //Tuấn Anh
     Page<Product> findAll(Pageable pageable);
-    Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(String name, String supplierName, double purchasePrice, Pageable pageable);
+    Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(String name, String supplierName, int purchasePrice, Pageable pageable);
 
     //Đình Anh
     void saveProduct(Product product);
@@ -23,4 +23,12 @@ public interface IProductService {
     void updateProductWithSellingPrice(Product product);
     void saveProductImage(Product product, ProductImage productImage);
     void deleteProductImages(Product product);
+
+    // Đếm tổng số sản phẩm
+    long countProducts();
+    // Đếm tổng số sản phẩm đã bán
+//    Long countSoldProducts();
+    // Tính tổng doanh thu
+//    BigDecimal calculateTotalRevenue();
+
 }
