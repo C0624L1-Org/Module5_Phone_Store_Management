@@ -107,30 +107,30 @@
                         <i class="bi bi-arrow-up-right-circle"></i> Thêm mới xuất
                     </a>
                 </div>
-
-
-
-
-
                 <div class="card shadow-sm">
                     <!-- Filter section (always visible) -->
                     <div class="card-body border-bottom py-3">
-                        <form class="row g-3 flex-nowrap" id="filterForm">
+
+                        <form class="row g-3 flex-nowrap" id="filterForm" th:action="@{/dashboard/admin/transactions/listOut/search}" method="get">
                             <div class="col-md-3">
                                 <label for="productName" class="form-label">Tên sản phẩm</label>
-                                <input type="text" class="form-control" id="productName" name="productName" placeholder="Nhập tên sản phẩm">
+                                <input type="text" class="form-control" id="productName" name="productName"
+                                       th:value="${productName}" placeholder="Nhập tên sản phẩm">
                             </div>
                             <div class="col-md-3">
                                 <label for="supplierName" class="form-label">Nhà cung cấp</label>
-                                <input type="text" class="form-control" id="supplierName" name="supplierName" placeholder="Nhập tên nhà cung cấp">
+                                <input type="text" class="form-control" id="supplierName" name="supplierName"
+                                       th:value="${supplierName}" placeholder="Nhập tên nhà cung cấp">
                             </div>
                             <div class="col-md-2">
                                 <label for="startDate" class="form-label">Từ ngày</label>
-                                <input type="date" class="form-control" id="startDate" name="startDate">
+                                <input type="date" class="form-control" id="startDate" name="startDate"
+                                       th:value="${startDate}">
                             </div>
                             <div class="col-md-2">
                                 <label for="endDate" class="form-label">Đến ngày</label>
-                                <input type="date" class="form-control" id="endDate" name="endDate">
+                                <input type="date" class="form-control" id="endDate" name="endDate"
+                                       th:value="${endDate}">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <div class="btn-group w-100">
@@ -143,6 +143,7 @@
                                 </div>
                             </div>
                         </form>
+
                     </div>
 
 
@@ -245,6 +246,9 @@
             </div>
         </div>
     </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+
 </div>
 
 <script>
@@ -332,7 +336,7 @@
 </div>
 
 <!-- Footer -->
-<!--<footer th:replace="~{fragments/footer :: footer}"></footer>-->
+
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>

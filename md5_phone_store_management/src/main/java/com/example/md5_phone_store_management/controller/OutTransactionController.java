@@ -23,7 +23,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,32 +44,56 @@ public class OutTransactionController {
     private TransactionOutService transactionOutService;
 
 
+    @GetMapping("/admin/transactions/listOut")
+    public String listOutTransactions(Model model) {
+        List<InventoryTransaction> inventoryTransactions = transactionOutService.getAllOutTransactions();
+        model.addAttribute("inventoryTransactions", inventoryTransactions);
+        return "dashboard/transaction/out/list-transaction-out";
+    }
 
-//    @GetMapping("/admin/transactions/Out/edit/{id}/{pid}")
-//    public String outTransactionUpdate(@PathVariable("id") Long id, @PathVariable("pid") Long pid, Model model, HttpSession session) {
-//        if (id == null || id == -1) {
-//            session.setAttribute("ERROR_MESSAGE", "Lỗi! Không tìm thấy giao dịch!");
-//            return "redirect:/dashboard/admin/transactions/listOut";
-//        }
-//        InventoryTransaction inventoryTransaction = transactionOutService.getOutTransactionById(id).orElse(null);
-//        if (inventoryTransaction == null) {
-//            session.setAttribute("ERROR_MESSAGE", "Hoá đơn không tồn tại!");
-//            return "redirect:/dashboard/admin/transactions/listOut";
-//        }
-//        Product oldproduct = productService.getProductById(inventoryTransaction.getProduct().getProductID());
-//
-//        if(pid == 0) {
-//            model.addAttribute("product", oldproduct);
-//            return "redirect:/dashboard/admin/transactions/listOut";
-//        } else {
-//            Optional<Product> product = Optional.ofNullable(productService.getProductById(Math.toIntExact(pid)));
-//            model.addAttribute("product", oldproduct);
-//        }
-//        model.addAttribute("inventoryTransaction", inventoryTransaction);
-//        session.setAttribute("SUCCESS_MESSAGE", "Hóa đơn xuất kho: " + id + " !");
-//        model.addAttribute("oldProduct", oldproduct);
-//        return "dashboard/transaction/out/update-transaction-out";
-//    }
+
+    @GetMapping("/admin/transactions/listOut/search")
+    public String searchTransactions(
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) String supplierName,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            Model model,
+            HttpSession session) throws ParseException {
+
+        List<InventoryTransaction> inventoryTransactions = transactionOutService.searchTransaction(productName, supplierName, startDate, endDate);
+
+        // Check if all parameters are empty or null
+        if ((productName == null || productName.isEmpty()) &&
+                (supplierName == null || supplierName.isEmpty()) &&
+                (startDate == null || startDate.isEmpty()) &&
+                (endDate == null || endDate.isEmpty())) {
+            session.setAttribute("ERROR_MESSAGE", "Vui lòng nhập trường để tìm kiếm!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
+
+        if (inventoryTransactions.isEmpty()) {
+            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy giao dịch phù hợp!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        } else {
+            if ((productName == null || productName.isEmpty()) &&
+                    (supplierName == null || supplierName.isEmpty()) &&
+                    (startDate.isEmpty())) {
+                session.setAttribute("SUCCESS_MESSAGE", "Bạn đang tìm từ ngày " + new SimpleDateFormat("dd/MM/yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(endDate)) + " trở về!");
+            } else if ((productName == null || productName.isEmpty()) &&
+                    (supplierName == null || supplierName.isEmpty()) &&
+                    (endDate.isEmpty())) {
+                session.setAttribute("SUCCESS_MESSAGE", "Bạn đang tìm từ ngày " + new SimpleDateFormat("dd/MM/yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(startDate)) + " trở đi!");
+            }
+        }
+        model.addAttribute("inventoryTransactions", inventoryTransactions);
+        model.addAttribute("productName", productName);
+        model.addAttribute("supplierName", supplierName);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        return "dashboard/transaction/out/list-transaction-out";
+    }
+
 
     @GetMapping("/admin/transactions/Out/edit/{id}/{pid}")
     public String outTransactionUpdate(@PathVariable("id") Long id,
@@ -82,7 +109,7 @@ public class OutTransactionController {
         // Lấy giao dịch
         InventoryTransaction inventoryTransaction = transactionOutService.getOutTransactionById(id).orElse(null);
         if (inventoryTransaction == null) {
-            System.out.println("ngu nè " +  id);
+            System.out.println("ngu nè " + id);
             session.setAttribute("ERROR_MESSAGE", "Hoá đơn không tồn tại!");
             return "redirect:/dashboard/admin/transactions/listOut";
         }
@@ -94,10 +121,8 @@ public class OutTransactionController {
             return "redirect:/dashboard/admin/transactions/listOut";
         }
         Product product;
-
-        // Xử lý dựa trên pid
         if (pid == 0) {
-            // Nếu pid = 0, giữ nguyên sản phẩm cũ
+            // pid = 0 hiển thị form edit đàua tieu
             product = productService.getProductById(oldProduct.getProductID());
             if (product == null) {
                 session.setAttribute("ERROR_MESSAGE", "Sản phẩm cũ không tồn tại trong hệ thống!");
@@ -134,12 +159,6 @@ public class OutTransactionController {
         return "redirect:/dashboard/admin/transactions/listOut";
     }
 
-    @GetMapping("/admin/transactions/listOut")
-    public String listOutTransactions(Model model) {
-        List<InventoryTransaction> inventoryTransactions = transactionOutService.getAllOutTransactions();
-        model.addAttribute("inventoryTransactions", inventoryTransactions);
-        return "dashboard/transaction/out/list-transaction-out";
-    }
 
     @GetMapping("/admin/transactions/listIn")
     public String listInTransactions(Model model) {
@@ -274,9 +293,12 @@ public class OutTransactionController {
 
     @GetMapping("/warehouse/inventory")
     public String transactionDashboard(Model model) {
+        List<InventoryTransaction> transactionIn = transactionOutService.getAllInTransactions();
+        List<InventoryTransaction> transactionOut = transactionOutService.getAllOutTransactions();
+        model.addAttribute("inTra", transactionIn);
+        model.addAttribute("outTra", transactionOut);
         return "dashboard/transaction/in-and-out";
     }
-
 
 
 }

@@ -12,4 +12,5 @@ public interface ITransactionOutService {
     void addOutTransaction(InventoryTransaction transaction);
     void updateOutTransaction(int id, InventoryTransaction transaction);
     void deleteOutTransaction(int id);
+    public List<InventoryTransaction> searchTransaction(String productName, String supplierName, String startDate, String endDate);
 }

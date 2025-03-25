@@ -7,6 +7,8 @@ import com.example.md5_phone_store_management.service.ITransactionOutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -83,4 +85,16 @@ public class TransactionOutService implements ITransactionOutService {
             transactionRepository.deleteOutTransaction(id);
         }
     }
+
+    public List<InventoryTransaction> searchTransaction(String productName, String supplierName, String startDate, String endDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime start = (startDate != null && !startDate.isEmpty())
+                ? LocalDate.parse(startDate, formatter).atStartOfDay()
+                : null;
+        LocalDateTime end = (endDate != null && !endDate.isEmpty())
+                ? LocalDate.parse(endDate, formatter).atTime(23, 59, 59)
+                : null;
+        return transactionRepository.searchTransaction(productName, supplierName, start, end);
+    }
+
 }
