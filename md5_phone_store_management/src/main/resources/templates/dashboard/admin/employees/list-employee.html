@@ -326,7 +326,7 @@
                     <span th:switch="${employee.role?.name()}" class="badge rounded-pill badge-role"
                           th:classappend="${
                             employee.role?.name() == 'SalesStaff' ? 'badge-sales-staff' :
-                            employee.role?.name() == 'SalesPerson' ? 'badge-sales-person' : 'badge-warehouse'
+                            (employee.role?.name() == 'SalesPerson' ? 'badge-sales-person' : 'badge-warehouse')
                           }">
                       <span th:case="'SalesStaff'">Nhân viên kinh doanh</span>
                       <span th:case="'SalesPerson'">Nhân viên bán hàng</span>
