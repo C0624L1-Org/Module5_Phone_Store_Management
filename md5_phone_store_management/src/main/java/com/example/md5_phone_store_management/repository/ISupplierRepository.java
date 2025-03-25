@@ -16,6 +16,9 @@ import java.util.List;
 public interface ISupplierRepository extends JpaRepository<Supplier, Integer> {
 
     @Query(value = "SELECT * FROM supplier", nativeQuery = true)
+    List<Supplier> findAll(); // Thêm phương thức này để trả về List<Supplier>
+
+    @Query(value = "SELECT * FROM supplier", nativeQuery = true)
     Page<Supplier> findAll(Pageable pageable);
 
     @Query(value = "SELECT * FROM supplier WHERE supplierID = :id", nativeQuery = true)

@@ -113,4 +113,16 @@ public class InventoryTransaction {
     public void setEmployee(Employee employee) {
         this.employee = employee;
     }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setPurchasePrice(BigDecimal price) {
+        this.purchasePrice = price;
+    }
 }

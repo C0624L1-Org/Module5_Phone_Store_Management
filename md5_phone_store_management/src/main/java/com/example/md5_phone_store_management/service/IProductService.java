@@ -31,4 +31,8 @@ public interface IProductService {
     // Tính tổng doanh thu
 //    BigDecimal calculateTotalRevenue();
 
+    void save(Product product); // Thêm phương thức save
+
+
+
 }

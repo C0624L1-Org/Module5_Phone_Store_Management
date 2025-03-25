@@ -70,7 +70,7 @@
 
       <!-- Quản lý xuất nhập kho - Thủ kho, Admin -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
-        <a th:href="@{/dashboard/warehouse/inventory}" class="nav-link text-white">
+        <a th:href="@{/dashboard/warehouse-staff/inventory}" class="nav-link text-white">
           <i class="fas fa-warehouse me-2"></i>Quản lý xuất nhập kho
         </a>
       </li>

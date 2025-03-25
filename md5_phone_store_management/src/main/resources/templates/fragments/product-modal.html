@@ -1,0 +1,26 @@
+<div th:fragment="productModalContent">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Tên sản phẩm</th>
+            <th>Mã QR</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="trans : ${transactions}">
+            <td th:text="${trans.product.name}"></td>
+            <td th:text="${trans.product.qrCode}"></td>
+            <td>
+                <button type="button" class="btn btn-primary btn-sm selectProduct"
+                        th:data-name="${trans.product.name}">
+                    Chọn
+                </button>
+            </td>
+        </tr>
+        <tr th:if="${transactions.isEmpty()}">
+            <td colspan="3" class="text-center">Không có sản phẩm nào.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
