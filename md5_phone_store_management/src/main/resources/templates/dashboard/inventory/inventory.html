@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Nhập Kho</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h2>Nhập Kho</h2>
+<button onclick="openProductModal()">Chọn hàng hóa đã nhập</button>
+<button onclick="scanQRCode()">Quét mã QR</button>
+
+<div>
+    <label>Tên hàng:</label>
+    <input type="text" id="productName" readonly>
+</div>
+
+<div>
+    <label>Giá:</label>
+    <input type="text" id="productPrice" readonly>
+</div>
+
+<div>
+    <label>Hình ảnh:</label>
+    <img id="productImage" src="" width="100px">
+</div>
+
+<div>
+    <label>Số lượng:</label>
+    <input type="number" id="quantity">
+</div>
+
+<div>
+    <label>Nhà cung cấp:</label>
+    <input type="text" id="supplierName" readonly>
+    <button onclick="openSupplierModal()">Chọn NCC</button>
+</div>
+
+<button onclick="addToInventory()">Thêm vào kho</button>
+<button onclick="cancelTransaction()">Hủy</button>
+
+<script>
+    function openProductModal() {
+        $.get("/api/inventory/products", function(data) {
+            console.log(data);
+            // Hiển thị modal chọn hàng hóa
+        });
+    }
+
+    function scanQRCode() {
+        let qrCode = prompt("Nhập mã QR:");
+        $.get("/api/inventory/scan/" + qrCode, function(data) {
+            $("#productName").val(data.product.name);
+            $("#productPrice").val(data.product.price);
+            $("#productImage").attr("src", data.product.image);
+        }).fail(function(error) {
+            alert("Lỗi: " + error.responseText);
+        });
+    }
+
+    function openSupplierModal() {
+        $.get("/api/inventory/suppliers", function(data) {
+            console.log(data);
+            // Hiển thị modal chọn NCC
+        });
+    }
+
+    function addToInventory() {
+        let transaction = {
+            product: { name: $("#productName").val() },
+            quantity: $("#quantity").val(),
+            supplier: { name: $("#supplierName").val() }
+        };
+
+        $.ajax({
+            url: "/api/inventory/add",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(transaction),
+            success: function(response) {
+                alert(response);
+            },
+            error: function(error) {
+                alert("Lỗi: " + error.responseText);
+            }
+        });
+    }
+
+    function cancelTransaction() {
+        if (confirm("Bạn có muốn hủy nhập kho không?")) {
+            $.post("/api/inventory/cancel", function(response) {
+                alert(response);
+                window.history.back();
+            });
+        }
+    }
+</script>
+</body>
+</html>

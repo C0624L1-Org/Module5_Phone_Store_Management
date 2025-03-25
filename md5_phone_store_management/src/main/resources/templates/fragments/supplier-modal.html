@@ -1,0 +1,26 @@
+<div th:fragment="supplierModalContent">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Tên nhà cung cấp</th>
+            <th>Địa chỉ</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sup : ${suppliers}">
+            <td th:text="${sup.name}"></td>
+            <td th:text="${sup.address}"></td>
+            <td>
+                <button type="button" class="btn btn-primary btn-sm selectSupplier"
+                        th:data-name="${sup.name}">
+                    Chọn
+                </button>
+            </td>
+        </tr>
+        <tr th:if="${suppliers.isEmpty()}">
+            <td colspan="3" class="text-center">Không có NCC nào.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

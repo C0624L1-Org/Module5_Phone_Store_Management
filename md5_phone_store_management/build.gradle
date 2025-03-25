@@ -31,6 +31,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // thư viện generate QR code
+    implementation 'com.google.zxing:core:3.4.1'
+    implementation 'com.google.zxing:javase:3.4.1'
+
     //Khai báo dependency của thư viện Cloudinary
     implementation 'com.cloudinary:cloudinary-http44:1.34.0'
 }

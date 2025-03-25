@@ -35,5 +35,7 @@ public interface InventoryTransactionInRepo extends JpaRepository<InventoryTrans
             Pageable pageable
     );
 
+    @Query("SELECT i FROM InventoryTransaction i WHERE i.product.qrCode = :qrCode")
+    InventoryTransaction findByQRCode(@Param("qrCode") String qrCode);
 
 }
