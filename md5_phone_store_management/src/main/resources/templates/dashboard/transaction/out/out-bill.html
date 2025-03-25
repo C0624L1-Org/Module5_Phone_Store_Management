@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="/css/common/layout.css">
 
     <style>
+
         .form-section {
             background-color: #f8f9fa;
             border-radius: 10px;
@@ -54,15 +55,35 @@
             box-sizing: border-box;
             font-family: 'Times New Roman', Times, serif;
             font-size: 13px;
+            position: relative;
+            min-height: 297mm;
         }
 
-        .watermark {
+        .watermark-overlay {
             position: absolute;
-            right: 10mm;
-            bottom: 10mm;
-            color: rgba(128, 128, 128, 0.5);
-            font-size: 10px;
-            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Đảm bảo watermark không cản trở tương tác */
+            background: repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 50px,
+                    rgba(128, 128, 128, 0.1) 50px,
+                    rgba(128, 128, 128, 0.1) 52px
+            ); /* Tạo các đường chéo lặp lại với khoảng cách lớn hơn */
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .watermark-text {
+            position: absolute;
+            color: rgba(128, 128, 128, 0.5); /* Màu chữ mờ */
+            font-size: 12px;
+            transform: rotate(45deg); /* Xoay văn bản 45 độ để khớp với đường chéo */
+            white-space: nowrap; /* Đảm bảo văn bản không xuống dòng */
+            opacity: 0.5; /* Độ mờ của văn bản */
         }
 
         .product-table {
@@ -109,9 +130,17 @@
                 visibility: visible;
             }
             .invoice-container {
-                width: 210mm;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 210mm; /* Chiều rộng A4 */
+                height: 297mm; /* Chiều cao A4 */
                 padding: 15mm;
                 box-shadow: none;
+                overflow: hidden; /* Ngăn nội dung tràn ra ngoài */
+                page-break-before: always; /* Đảm bảo bắt đầu trên một trang mới */
+                page-break-after: always; /* Đảm bảo không có trang tiếp theo */
+                page-break-inside: avoid; /* Ngăn chia trang bên trong */
             }
             .action-buttons {
                 display: none;
@@ -223,9 +252,14 @@
                                     <hr>
                                     <table class="signature-table">
                                         <tr>
-                                            <td><div class="signature-space"></div>Người Lập Hóa Đơn<br>(Ký tự động)</td>
-                                            <td><div class="signature-space"></div>Bên Nhận Hàng<br>(Ký & ghi rõ họ tên)</td>
-                                            <td><div class="signature-space"></div>Bên Gửi Hàng<br>(Ký & ghi rõ họ tên)</td>
+                                            <td>
+                                                <div class="signature-space"></div>
+                                                <span style="text-align: center; font-size: 55px; font-family: 'UVN Ke Chuyen2', sans-serif;" th:if="${bill != null}" th:text="${bill.employee.fullName ?: 'N/A'}"></span>
+                                                <br><br>
+                                                Người Lập Hóa Đơn<br>(Ký tự động)
+                                            </td>
+                                            <td><div class="signature-space"></div><br><br><br><br><br>Bên Nhận Hàng<br>(Ký & ghi rõ họ tên)</td>
+                                            <td><div class="signature-space"></div><br><br><br><br><br>Bên Gửi Hàng<br>(Ký & ghi rõ họ tên)</td>
                                         </tr>
                                     </table>
                                 </div>
@@ -252,11 +286,40 @@
     }
 
     function addWatermark(text) {
-        const watermark = document.createElement('div');
-        watermark.className = 'watermark';
-        watermark.textContent = text;
-        document.getElementById('invoice').appendChild(watermark);
-        return watermark;
+        const watermarkOverlay = document.createElement('div');
+        watermarkOverlay.className = 'watermark-overlay';
+
+        // Tính toán số lượng văn bản cần lặp lại dựa trên kích thước hóa đơn
+        const invoice = document.getElementById('invoice');
+        const width = invoice.offsetWidth;
+        const height = invoice.offsetHeight;
+        const textWidth = 200; // Ước lượng chiều rộng của văn bản watermark
+        const textHeight = 20; // Ước lượng chiều cao của văn bản watermark
+        const spacing = 100; // Khoảng cách giữa các đoạn văn bản
+
+        // Tính số lượng văn bản theo chiều ngang và dọc
+        const cols = Math.ceil(width / (textWidth + spacing));
+        const rows = Math.ceil(height / (textHeight + spacing));
+
+        // Tạo các đoạn văn bản watermark và định vị chúng
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                const watermarkText = document.createElement('div');
+                watermarkText.className = 'watermark-text';
+                watermarkText.textContent = text;
+
+                // Định vị văn bản
+                const x = col * (textWidth + spacing) - (row % 2) * (textWidth / 2); // Dịch chuyển để tạo hiệu ứng chéo
+                const y = row * (textHeight + spacing);
+                watermarkText.style.left = `${x}px`;
+                watermarkText.style.top = `${y}px`;
+
+                watermarkOverlay.appendChild(watermarkText);
+            }
+        }
+
+        invoice.appendChild(watermarkOverlay);
+        return watermarkOverlay;
     }
 
     function removeWatermark(watermark) {

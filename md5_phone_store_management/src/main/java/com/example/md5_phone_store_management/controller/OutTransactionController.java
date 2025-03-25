@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,6 +63,16 @@ public class OutTransactionController {
             HttpSession session) throws ParseException {
 
         List<InventoryTransaction> inventoryTransactions = transactionOutService.searchTransaction(productName, supplierName, startDate, endDate);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+            Date start = dateFormat.parse(startDate);
+            Date end = dateFormat.parse(endDate);
+            if (end.before(start)) {
+                session.setAttribute("ERROR_MESSAGE", "Ngày kết thúc không thể nhỏ hơn ngày bắt đầu!");
+                return "redirect:/dashboard/admin/transactions/listOut";
+            }
+        }
 
         // Check if all parameters are empty or null
         if ((productName == null || productName.isEmpty()) &&
