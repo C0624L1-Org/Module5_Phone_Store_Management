@@ -41,6 +41,90 @@ public class OutTransactionController {
     private TransactionOutService transactionOutService;
 
 
+
+//    @GetMapping("/admin/transactions/Out/edit/{id}/{pid}")
+//    public String outTransactionUpdate(@PathVariable("id") Long id, @PathVariable("pid") Long pid, Model model, HttpSession session) {
+//        if (id == null || id == -1) {
+//            session.setAttribute("ERROR_MESSAGE", "Lỗi! Không tìm thấy giao dịch!");
+//            return "redirect:/dashboard/admin/transactions/listOut";
+//        }
+//        InventoryTransaction inventoryTransaction = transactionOutService.getOutTransactionById(id).orElse(null);
+//        if (inventoryTransaction == null) {
+//            session.setAttribute("ERROR_MESSAGE", "Hoá đơn không tồn tại!");
+//            return "redirect:/dashboard/admin/transactions/listOut";
+//        }
+//        Product oldproduct = productService.getProductById(inventoryTransaction.getProduct().getProductID());
+//
+//        if(pid == 0) {
+//            model.addAttribute("product", oldproduct);
+//            return "redirect:/dashboard/admin/transactions/listOut";
+//        } else {
+//            Optional<Product> product = Optional.ofNullable(productService.getProductById(Math.toIntExact(pid)));
+//            model.addAttribute("product", oldproduct);
+//        }
+//        model.addAttribute("inventoryTransaction", inventoryTransaction);
+//        session.setAttribute("SUCCESS_MESSAGE", "Hóa đơn xuất kho: " + id + " !");
+//        model.addAttribute("oldProduct", oldproduct);
+//        return "dashboard/transaction/out/update-transaction-out";
+//    }
+
+    @GetMapping("/admin/transactions/Out/edit/{id}/{pid}")
+    public String outTransactionUpdate(@PathVariable("id") Long id,
+                                       @PathVariable("pid") Long pid,
+                                       Model model,
+                                       HttpSession session) {
+        // Kiểm tra ID giao dịch
+        if (id == null || id == -1) {
+            session.setAttribute("ERROR_MESSAGE", "Lỗi! Không tìm thấy giao dịch!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
+
+        // Lấy giao dịch
+        InventoryTransaction inventoryTransaction = transactionOutService.getOutTransactionById(id).orElse(null);
+        if (inventoryTransaction == null) {
+            System.out.println("ngu nè " +  id);
+            session.setAttribute("ERROR_MESSAGE", "Hoá đơn không tồn tại!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
+
+        // Lấy sản phẩm cũ từ giao dịch
+        Product oldProduct = inventoryTransaction.getProduct();
+        if (oldProduct == null) {
+            session.setAttribute("ERROR_MESSAGE", "Sản phẩm cũ liên kết với giao dịch không tồn tại!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
+        Product product;
+
+        // Xử lý dựa trên pid
+        if (pid == 0) {
+            // Nếu pid = 0, giữ nguyên sản phẩm cũ
+            product = productService.getProductById(oldProduct.getProductID());
+            if (product == null) {
+                session.setAttribute("ERROR_MESSAGE", "Sản phẩm cũ không tồn tại trong hệ thống!");
+                return "redirect:/dashboard/admin/transactions/listOut";
+            }
+        } else {
+            // Nếu pid != 0, lấy sản phẩm mới
+            product = productService.getProductById(Math.toIntExact(pid));
+            if (product == null) {
+                session.setAttribute("ERROR_MESSAGE", "Sản phẩm mới không tồn tại!");
+                return "redirect:/dashboard/admin/transactions/listOut";
+            }
+            // Cập nhật sản phẩm mới vào giao dịch
+            inventoryTransaction.setProduct(product);
+        }
+
+        // Thêm dữ liệu vào model
+        model.addAttribute("inventoryTransaction", inventoryTransaction);
+        model.addAttribute("product", product); // Sản phẩm hiện tại (cũ hoặc mới)
+        model.addAttribute("oldProduct", oldProduct); // Sản phẩm cũ ban đầu
+        session.setAttribute("SUCCESS_MESSAGE", "Hóa đơn xuất kho: " + id + " !");
+
+        // Trả về trang chỉnh sửa
+        return "dashboard/transaction/out/update-transaction-out";
+    }
+
+
     @GetMapping("/admin/transactions/delete")
     public String deleteCustomers(@RequestParam List<Integer> ids, HttpSession session) {
         for (Integer transactionID : ids) {
@@ -65,15 +149,27 @@ public class OutTransactionController {
     }
 
 
-
     @GetMapping("/admin/transactions/Out/bill/{id}")
-    public String outTransactionBill(@PathVariable("id") Long id, Model model) {
-        Optional<InventoryTransaction> inventoryTransaction = transactionOutService.getOutTransactionById(id);
-        model.addAttribute("bill", inventoryTransaction);
-        return "dashboard/transaction/out/out-bill";
+    public String outTransactionBill(@PathVariable("id") Long id, Model model, HttpSession session) {
+        // Kiểm tra ID hợp lệ
+        if (id == -1) {
+            session.setAttribute("ERROR_MESSAGE", "Hoá đơn không tồn tại!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
+
+        // Lấy Optional từ service và ép về InventoryTransaction
+        InventoryTransaction inventoryTransaction = transactionOutService.getOutTransactionById(id).orElse(null);
+
+        // Kiểm tra kết quả
+        if (inventoryTransaction != null) {
+            model.addAttribute("bill", inventoryTransaction);
+            session.setAttribute("SUCCESS_MESSAGE", "Hóa đơn xuất kho: " + id + " !");
+            return "dashboard/transaction/out/out-bill";
+        } else {
+            session.setAttribute("ERROR_MESSAGE", "Hoá đơn không tồn tại!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
     }
-
-
 
 
     @PostMapping("/admin/transactions/saveNew")
@@ -121,9 +217,6 @@ public class OutTransactionController {
     }
 
 
-
-
-
     @GetMapping("/admin/transactions/new/out/{id}")
     public String showAddOutTransaction(@PathVariable("id") Long id, Model model, HttpSession session) {
         // Luôn thêm một đối tượng InventoryTransaction mới vào model
@@ -151,22 +244,38 @@ public class OutTransactionController {
         return "dashboard/transaction/out/create-transaction-out";
     }
 
+    @GetMapping("/admin/transactions/choose/out/product/{a}/{b}")
+    public String showAddOutTransactionProducts(@PathVariable("a") String action,
+                                                @PathVariable(value = "b", required = false) int b,
+                                                Model model, HttpSession session) {
+        // Kiểm tra nếu action là "add" và b là null hoặc trống
+        if ("add".equals(action) && (b == 0)) {
+            model.addAttribute("action", "add");
+        } else if ("edit".equals(action)) {
+            model.addAttribute("action", "edit");
+            model.addAttribute("oldId", b);
+        } else {
+            session.setAttribute("ERROR_MESSAGE", "Lỗi khi tải dữ liệu, vui lòng thao tác lại!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
 
-    @GetMapping("/admin/transactions/new/out/product")
-    public String showAddOutTransactionProducts(Model model) {
+        // Lấy danh sách sản phẩm
         List<Product> listProducts = productService.findAllWithOutPageable();
+        if (listProducts.isEmpty()) {
+            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy sản phẩm, vui lòng thêm mới!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
+
         model.addAttribute("listProducts", listProducts);
-        System.out.println("tổng " + listProducts.size());
+        System.out.println("Tổng số sản phẩm: " + listProducts.size());
+
         return "dashboard/transaction/out/list-products";
     }
-
 
     @GetMapping("/warehouse/inventory")
     public String transactionDashboard(Model model) {
         return "dashboard/transaction/in-and-out";
     }
-
-
 
 
 
