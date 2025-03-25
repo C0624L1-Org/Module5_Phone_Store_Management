@@ -1,99 +1,103 @@
 package com.example.md5_phone_store_management.controller;
+
 import com.example.md5_phone_store_management.model.InventoryTransaction;
+import com.example.md5_phone_store_management.model.Product;
 import com.example.md5_phone_store_management.model.Supplier;
 import com.example.md5_phone_store_management.service.IInventoryTransactionService;
+import com.example.md5_phone_store_management.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import java.io.File;
-import java.io.IOException;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
-@RequestMapping("/dashboard/warehouse-staff")
+@RequestMapping("/dashboard/warehouse-staff/inventory")
 public class InventoryController {
 
     @Autowired
     private IInventoryTransactionService inventoryTransactionService;
 
-    // Hiển thị giao diện nhập kho
-    @GetMapping("/inventory")
-    public String showInventoryPage(Model model,
-                                    @RequestParam(name="message", required=false) String message,
-                                    @RequestParam(name="messageType", required=false) String messageType) {
-        List<InventoryTransaction> transactions = inventoryTransactionService.getImportTransactions(Pageable.unpaged());
+    @Autowired
+    private IProductService productService;
+
+    @GetMapping("")
+    public String showImportForm(Model model) {
         List<Supplier> suppliers = inventoryTransactionService.getAllSuppliers();
-        model.addAttribute("transactions", transactions);
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+        Page<Product> productPage = productService.findAll(pageable);
+        List<Product> products = productPage.getContent();
+
         model.addAttribute("suppliers", suppliers);
-        return "dashboard/warehouse-staff/inventory";
+        model.addAttribute("products", products);
+        return "dashboard/inventory/import";
     }
 
-    // Lấy danh sách sản phẩm
-    @GetMapping("/inventory/products")
-    public String listProducts(Model model) {
-        List<InventoryTransaction> transactions = inventoryTransactionService.getImportTransactions(Pageable.unpaged());
-        model.addAttribute("transactions", transactions);
-        return "dashboard/warehouse-staff/fragments/product-modal :: productModalContent";
-    }
+    @PostMapping("")
+    public String saveImportTransaction(
+            @RequestParam("supplierId") Integer supplierId,
+            @RequestParam("productId") Integer productId,
+            @RequestParam("quantity") Integer quantity,
+            @RequestParam("purchasePrice") String purchasePrice,
+            Model model) {
 
-    // Lấy danh sách nhà cung cấp
-    @GetMapping("/inventory/suppliers")
-    public String listSuppliers(Model model) {
+        // Load lại danh sách suppliers và products để hiển thị lại form nếu có lỗi
         List<Supplier> suppliers = inventoryTransactionService.getAllSuppliers();
-        model.addAttribute("suppliers", suppliers);
-        return "dashboard/warehouse-staff/fragments/supplier-modal :: supplierModalContent";
-    }
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+        Page<Product> productPage = productService.findAll(pageable);
+        List<Product> products = productPage.getContent();
 
-    // Xử lý quét mã QR
-    @GetMapping("/inventory/scan")
-    @ResponseBody
-    public Object scanQRCode(@RequestParam("code") String code) {
-        InventoryTransaction transaction = inventoryTransactionService.findByQRCode(code);
-        if (transaction == null) {
-            return ResponseEntity.badRequest().body("Không tìm thấy sản phẩm");
+        model.addAttribute("suppliers", suppliers);
+        model.addAttribute("products", products);
+
+        // Kiểm tra thông tin đầu vào
+        if (supplierId == null || productId == null || quantity == null || purchasePrice == null || purchasePrice.trim().isEmpty()) {
+            model.addAttribute("showModal", true);
+            model.addAttribute("modalType", "error");
+            model.addAttribute("modalMessage", "Thiếu thông tin cần thiết");
+            return "dashboard/inventory/import"; // Quay lại form để nhập lại
         }
-        return transaction;
-    }
 
-    // **Tích hợp hiển thị QR Code của sản phẩm**
-    @GetMapping("/inventory/qrcode/{productId}")
-    public ResponseEntity<Resource> getQRCode(@PathVariable Integer productId) throws IOException, WriterException {
-        String qrText = "http://localhost:8080/dashboard/warehouse-staff/inventory/" + productId;
-        String qrPath = "src/main/resources/static/qrcodes/product_" + productId + ".png";
-        QRCodeGenerator.generateQRCode(qrText, qrPath);
-        File file = new File(qrPath);
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG)
-                .body(new FileSystemResource(file));
-    }
-
-    // Thêm giao dịch nhập kho
-    @PostMapping("/inventory/add")
-    public String addInventory(@ModelAttribute InventoryTransaction transaction,
-                               RedirectAttributes redirectAttributes) {
         try {
-            inventoryTransactionService.addTransaction(transaction);
-            redirectAttributes.addFlashAttribute("messageType", "success");
-            redirectAttributes.addFlashAttribute("message", "Nhập kho thành công");
-        } catch(Exception e) {
-            redirectAttributes.addFlashAttribute("messageType", "error");
-            redirectAttributes.addFlashAttribute("message", "Thiếu thông tin cần thiết");
+            // Lấy thông tin sản phẩm để hiển thị tên trong thông báo
+            Product product = productService.findAll(PageRequest.of(0, 1))
+                    .getContent()
+                    .stream()
+                    .filter(p -> p.getProductID().equals(productId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (product == null) {
+                throw new IllegalArgumentException("Sản phẩm không tồn tại");
+            }
+
+            // Thực hiện nhập kho
+            inventoryTransactionService.importProduct(productId, quantity, supplierId, purchasePrice);
+
+            // Thành công: Truyền thông báo và redirect về list sau khi đóng modal
+            model.addAttribute("showModal", true);
+            model.addAttribute("modalType", "success");
+            model.addAttribute("modalMessage", "Nhập kho " + product.getName() + " thành công");
+            model.addAttribute("redirectUrl", "/dashboard/warehouse-staff/inventory/list");
+            return "dashboard/inventory/import";
+        } catch (Exception e) {
+            // Lỗi: Hiển thị thông báo lỗi và ở lại trang nhập kho
+            model.addAttribute("showModal", true);
+            model.addAttribute("modalType", "error");
+            model.addAttribute("modalMessage", "Thiếu thông tin cần thiết hoặc lỗi: " + e.getMessage());
+            return "dashboard/inventory/import";
         }
-        return "redirect:/dashboard/warehouse-staff/inventory";
     }
 
-    // Hủy nhập kho
-    @GetMapping("/inventory/cancel")
-    public String cancelInventory(RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("messageType", "info");
-        redirectAttributes.addFlashAttribute("message", "Đã hủy nhập kho");
-        return "redirect:/dashboard/warehouse-staff/inventory";
+    @GetMapping("/list")
+    public String showInventoryList(Model model) {
+        List<InventoryTransaction> transactions = inventoryTransactionService.getImportTransactions(null);
+        model.addAttribute("transactions", transactions);
+        return "dashboard/inventory/list";
     }
 }

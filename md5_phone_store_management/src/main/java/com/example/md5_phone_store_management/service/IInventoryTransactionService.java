@@ -1,6 +1,7 @@
 package com.example.md5_phone_store_management.service;
 
 import com.example.md5_phone_store_management.model.InventoryTransaction;
+import com.example.md5_phone_store_management.model.Product;
 import com.example.md5_phone_store_management.model.Supplier;
 import org.springframework.data.domain.Pageable;
 
@@ -11,9 +12,9 @@ public interface IInventoryTransactionService {
     List<InventoryTransaction> getImportTransactions(Pageable pageable);
     List<InventoryTransaction> searchImportTransactions(String productName, String supplierName, LocalDate transactionDate, Pageable pageable);
     void deleteImportTransactions(List<Integer> ids);
-
     InventoryTransaction findByQRCode(String qrCode);
     List<Supplier> getAllSuppliers();
     void addTransaction(InventoryTransaction transaction);
-
+    void importProduct(Integer productId, Integer quantity, Integer supplierId, String purchasePrice);
+    List<Product> getProductsBySupplierId(Integer supplierId);
 }

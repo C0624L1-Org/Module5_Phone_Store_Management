@@ -126,4 +126,11 @@ public class ProductService implements IProductService {
 //    public java.math.BigDecimal calculateTotalRevenue() {
 //        return productRepository.calculateTotalRevenue();
 //    }
+
+
+    @Override
+    public void save(Product product) {
+        productRepository.save(product);
+    }
+
 }
