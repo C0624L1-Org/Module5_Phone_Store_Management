@@ -2,7 +2,6 @@ package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.Supplier;
 import com.example.md5_phone_store_management.model.dto.SupplierDTO;
-import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.implement.SupplierService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/dashboard")
@@ -20,9 +18,6 @@ public class SupplierController {
 
     @Autowired
     private SupplierService supplierService;
-
-    @Autowired
-    private IEmployeeService iEmployeeService;
 
     // Phương thức hiển thị danh sách nhà cung cấp có phân trang và tìm kiếm
     @GetMapping("/suppliers")
@@ -65,15 +60,7 @@ public class SupplierController {
     // Xử lý POST khi tạo nhà cung cấp mới
     @PostMapping("/suppliers/create")
     public String createSupplier(@Valid @ModelAttribute("supplierDTO") SupplierDTO supplierDTO,
-                                 BindingResult bindingResult,
-                                 RedirectAttributes redirectAttributes,
-                                 Model model) {
-
-        if (iEmployeeService.existsByEmail(supplierDTO.getEmail()) && supplierService.existsByEmail(supplierDTO.getEmail())) {
-            bindingResult.rejectValue("email", "", "Email này đã tồn tại!");
-        }
-
-        supplierDTO.validate(supplierDTO, bindingResult);
+                                 BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("supplierDTO", supplierDTO);
             return "dashboard/supplier/create-supplier";
@@ -83,9 +70,6 @@ public class SupplierController {
         Supplier supplier = new Supplier();
         BeanUtils.copyProperties(supplierDTO, supplier);
         supplierService.saveSupplier(supplier);
-
-        redirectAttributes.addFlashAttribute("messageType", "success");
-        redirectAttributes.addFlashAttribute("message", "Tạo nhà cung cấp thành công!");
 
         return "redirect:/dashboard/suppliers";
     }
@@ -103,14 +87,7 @@ public class SupplierController {
     // Xử lý POST khi cập nhật nhà cung cấp
     @PostMapping("/update-supplier")
     public String changeInformSupplier(@Valid @ModelAttribute("supplierDTO") SupplierDTO supplierDTO,
-                                       BindingResult bindingResult,
-                                       RedirectAttributes redirectAttributes,
-                                       Model model) {
-        if (iEmployeeService.existsByEmail(supplierDTO.getEmail()) && supplierService.existsByEmail(supplierDTO.getEmail())) {
-            bindingResult.rejectValue("email", "", "Email này đã tồn tại!");
-        }
-
-        supplierDTO.validate(supplierDTO, bindingResult);
+                                       BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("supplierDTO", supplierDTO);
             return "dashboard/supplier/update-supplier-form";
@@ -119,9 +96,6 @@ public class SupplierController {
         Supplier supplier = new Supplier();
         BeanUtils.copyProperties(supplierDTO, supplier);
         supplierService.updateSupplier(supplier);
-
-        redirectAttributes.addFlashAttribute("messageType", "success");
-        redirectAttributes.addFlashAttribute("message", "Cập nhật nhà cung cấp thành công!");
 
         return "redirect:/dashboard/suppliers";
     }

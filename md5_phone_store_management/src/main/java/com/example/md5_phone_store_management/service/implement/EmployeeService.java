@@ -50,6 +50,12 @@ public class EmployeeService implements IEmployeeService {
         }
     }
 
+
+    public Page<Employee> getAllEmployeesExceptAdmin(Pageable pageable) {
+        return iEmployeeRepository.getAllEmployeesExceptAdmin(pageable);
+    }
+
+
     //Read and search (a Đình Anh)
     public Page<Employee> getAllEmployees(Pageable pageable) {
         return iEmployeeRepository.getAllEmployees(pageable);

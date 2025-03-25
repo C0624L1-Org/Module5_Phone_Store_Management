@@ -18,6 +18,7 @@ public class Customer {
 
     @NotBlank(message = "Họ và tên không được để trống!")
     @Size(max = 50, message = "Họ và tên không được vượt quá 50 ký tự!")
+    @Pattern(regexp = "^[\\p{L} ]+$", message = "Họ và tên chỉ được chứa chữ cái và khoảng trắng!")
     @Column(name = "full_name", length = 50, nullable = false)
     private String fullName;
 

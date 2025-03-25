@@ -14,6 +14,7 @@ public interface IProductService {
     Page<Product> findAll(Pageable pageable);
     List<Product> findAllProducts();
     Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(String name, String supplierName, double purchasePrice, Pageable pageable);
+    Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(String name, String supplierName, int purchasePrice, Pageable pageable);
 
     //Đình Anh
     void saveProduct(Product product);
@@ -31,5 +32,9 @@ public interface IProductService {
 //    Long countSoldProducts();
     // Tính tổng doanh thu
 //    BigDecimal calculateTotalRevenue();
+
+    void save(Product product); // Thêm phương thức save
+
+
 
 }

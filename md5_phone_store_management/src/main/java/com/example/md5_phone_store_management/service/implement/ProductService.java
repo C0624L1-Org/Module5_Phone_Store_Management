@@ -111,7 +111,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(String name, String supplierName, double purchasePrice, Pageable pageable) {
+    public Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(String name, String supplierName, int purchasePrice, Pageable pageable) {
         return productRepository.searchProductByNameAndSupplier_NameAndPurchasePrice(name,supplierName,purchasePrice,pageable);
     }
 
@@ -132,4 +132,11 @@ public class ProductService implements IProductService {
 //    public java.math.BigDecimal calculateTotalRevenue() {
 //        return productRepository.calculateTotalRevenue();
 //    }
+
+
+    @Override
+    public void save(Product product) {
+        productRepository.save(product);
+    }
+
 }

@@ -271,7 +271,7 @@
                                         <button type="button" class="btn btn-cancel" data-bs-toggle="modal" data-bs-target="#confirmCancelModal">
                                             <i class="fas fa-times me-2"></i>Hủy bỏ
                                         </button>
-                                        <button type="submit" class="btn btn-create">
+                                        <button type="button" class="btn btn-create" data-bs-toggle="modal" data-bs-target="#confirmCreateModal">
                                             <i class="fas fa-save me-2"></i>Tạo sản phẩm
                                         </button>
                                     </div>
@@ -283,6 +283,25 @@
             </div>
         </div>
     </div>
+    <!-- Modal Xác Nhận Tạo Sản Phẩm -->
+    <div class="modal fade" id="confirmCreateModal" tabindex="-1" aria-labelledby="confirmCreateLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmCreateLabel">Xác nhận tạo sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn tạo sản phẩm mới này?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="button" class="btn btn-success" id="confirmCreate">Xác nhận tạo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Xác Nhận Hủy -->
     <div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -316,6 +335,11 @@
 
 <!-- Form validation script -->
 <script>
+    // Submit form when confirm create button is clicked
+    document.getElementById("confirmCreate").addEventListener("click", function () {
+        document.querySelector("form").submit();
+    });
+
     // invalid fields
     (function () {
         'use strict'

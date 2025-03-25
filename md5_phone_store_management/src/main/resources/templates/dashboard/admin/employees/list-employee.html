@@ -259,9 +259,15 @@
                                     <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                     <select class="form-select" id="role" name="role">
                                         <option value="">-- Tất cả vai trò --</option>
-                                        <option th:selected="${param.role == 'SalesStaff'}" th:value="SalesStaff">Nhân viên kinh doanh</option>
-                                        <option th:selected="${param.role == 'WarehouseStaff'}" th:value="WarehouseStaff">Thủ kho</option>
-                                        <option th:selected="${param.role == 'SalesPerson'}" th:value="SalesPerson">Nhân viên bán hàng</option>
+                                        <option th:value="SalesStaff" th:selected="${role == 'SalesStaff'}">Nhân viên
+                                            kinh doanh
+                                        </option>
+                                        <option th:value="WarehouseStaff" th:selected="${role == 'WarehouseStaff'}">Thủ
+                                            kho
+                                        </option>
+                                        <option th:value="SalesPerson" th:selected="${role == 'SalesPerson'}">Nhân viên
+                                            bán hàng
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -290,11 +296,11 @@
                                     </div>
                                 </th>
                                 <th>Họ và tên</th>
-                                <th>Ngày sinh</th>
-                                <th>Địa chỉ</th>
-                                <th>Công việc</th>
                                 <th>Số điện thoại</th>
-                                <th style="width: 200px">Hành động</th>
+                                <th>Ngày sinh / Tuổi</th>
+                                <th>Địa chỉ</th>
+                                <th style="text-align: center">Công việc</th>
+                                <th style="width: 200px; text-align: center;">Hành động</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -302,7 +308,8 @@
                             <tr th:if="${employeePage.totalElements == 0}">
                                 <td colspan="7" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
                             </tr>
-                            <tr th:each="employee:${employeePage}" th:if="${employee.role?.name() != 'Admin'}">
+                            <!--                            <tr th:each="employee:${employeePage}" th:if="${employee.role?.name() != 'Admin'}">-->
+                            <tr th:each="employee:${employeePage}">
                                 <td class="text-center">
                                     <div class="form-check">
                                         <input class="form-check-input selectEmployee" type="checkbox"
@@ -320,7 +327,8 @@
                                         <span class="employee-name" th:text="${employee.fullName}"></span>
                                     </div>
                                 </td>
-                                <td th:text="${#temporals.format(employee.dob, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${employee.phone}"></td>
+                                <td th:text="${#temporals.format(employee.dob, 'dd-MM-yyyy')} + ' (' + ${T(java.time.Period).between(employee.dob, T(java.time.LocalDate).now()).getYears()} + ' tuổi)'"></td>
                                 <td th:text="${employee.address}"></td>
                                 <td class="text-center">
                     <span th:switch="${employee.role?.name()}" class="badge rounded-pill badge-role"
@@ -334,12 +342,11 @@
                       <span th:case="*">Không xác định</span>
                     </span>
                                 </td>
-                                <td th:text="${employee.phone}"></td>
                                 <td>
                                     <div class="d-flex gap-2 justify-content-center">
-<!--                                        <a th:href="@{#}" class="btn btn-action btn-view btn-sm">-->
-<!--                                            <i class="fas fa-eye me-1"></i>Xem-->
-<!--                                        </a>-->
+                                        <!--                                        <a th:href="@{#}" class="btn btn-action btn-view btn-sm">-->
+                                        <!--                                            <i class="fas fa-eye me-1"></i>Xem-->
+                                        <!--                                        </a>-->
                                         <a th:href="@{/dashboard/admin/employees/edit/{employeeID}(employeeID=${employee.employeeID})}"
                                            class="btn btn-warning btn-edit btn-sm">
                                             <i class="fas fa-pen me-1"></i>Cập nhật
@@ -351,16 +358,23 @@
                         </table>
                     </div>
 
-                    <!-- Bottom -->
-                    <div th:if="${employeePage.totalElements > 0}" class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                    <div th:if="${employeePage.totalElements > 0}"
+                         class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
                         <button id="deleteSelected" class="btn btn-danger" disabled>
                             <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
                         </button>
-
                         <!-- Pagination -->
                         <nav aria-label="Pagination">
                             <ul class="pagination mb-0">
-                                <!-- Nút Previous -->
+                                <!-- Nút Trang đầu - luôn hiển thị -->
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/employees/search(page=0, name=${param.name}, phone=${param.phone}, role=${param.role})}">
+                                        Trang đầu
+                                    </a>
+                                </li>
+
+                                <!-- Nút Trước - luôn hiển thị -->
                                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                     <a class="page-link"
                                        th:href="@{/dashboard/admin/employees/search(page=${currentPage - 1}, name=${param.name}, phone=${param.phone}, role=${param.role})}">
@@ -368,25 +382,33 @@
                                     </a>
                                 </li>
 
-                                <!-- Hiển thị các số trang -->
-                                <li class="page-item" th:classappend="${i == currentPage} ? 'active'"
-                                    th:each="i : ${#numbers.sequence(0, totalPage - 1)}">
-                                    <a class="page-link"
-                                       th:href="@{/dashboard/admin/employees/search(page=${i}, name=${param.name}, phone=${param.phone}, role=${param.role})}"
-                                       th:text="${i + 1}">
-                                    </a>
+                                <!-- Hiển thị số trang hiện tại / tổng số trang -->
+                                <li class="page-item active mx-2">
+                                    <span class="page-link">
+                                    <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
+                                </span>
                                 </li>
 
-                                <!-- Nút Next -->
+                                <!-- Nút Tiếp - luôn hiển thị -->
                                 <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
                                     <a class="page-link"
                                        th:href="@{/dashboard/admin/employees/search(page=${currentPage + 1}, name=${param.name}, phone=${param.phone}, role=${param.role})}">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
+
+                                <!-- Nút Trang cuối - luôn hiển thị -->
+                                <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/employees/search(page=${totalPage - 1}, name=${param.name}, phone=${param.phone}, role=${param.role})}">
+                                        Trang cuối
+                                    </a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
+
+
                 </div>
             </div>
         </div>
@@ -430,9 +452,9 @@
 
 <!-- Custom scripts -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Handle select all checkbox
-        document.getElementById('selectAll').addEventListener('click', function() {
+        document.getElementById('selectAll').addEventListener('click', function () {
             let checkboxes = document.querySelectorAll('.selectEmployee');
             checkboxes.forEach(checkbox => checkbox.checked = this.checked);
             updateButtonState();
@@ -450,7 +472,7 @@
         }
 
         // Handle delete button click
-        document.getElementById('deleteSelected').addEventListener('click', function() {
+        document.getElementById('deleteSelected').addEventListener('click', function () {
             let selectedEmployees = [];
             let selectedIds = [];
 
@@ -486,7 +508,7 @@
             deleteModal.show();
 
             // Handle confirm delete button
-            document.getElementById('confirmDelete').onclick = function() {
+            document.getElementById('confirmDelete').onclick = function () {
                 location.href = '/dashboard/admin/employees/delete/' + selectedIds.join(',');
             };
         });

@@ -36,10 +36,11 @@ public class EmployeeController {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
         Pageable pageable =  PageRequest.of(page, 5);
         mv.addObject("currentPage", page);
-        mv.addObject("employeePage", iEmployeeService.getAllEmployees(pageable));
+        mv.addObject("employeePage", iEmployeeService.getAllEmployeesExceptAdmin(pageable));
         mv.addObject("totalPage",iEmployeeService.getAllEmployees(pageable).getTotalPages());
         return mv;
     }
+
     @GetMapping("/admin/employees/search")
     public ModelAndView searchEmployees(@RequestParam(required = false) String name,
                                         @RequestParam(required = false) String phone,
@@ -47,7 +48,11 @@ public class EmployeeController {
                                         @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
         Pageable pageable = PageRequest.of(page, 5);
-
+        if ((name == null || name.isBlank()) &&
+                (phone == null || phone.isBlank()) &&
+                (role == null || role.isBlank())) {
+            return new ModelAndView("redirect:/dashboard/admin/employees/list?page=" + page);
+        }
         name = (name != null) ? name.trim() : null;
         phone = (phone != null) ? phone.trim() : null;
         role = (role != null) ? role.trim() : null;
@@ -63,6 +68,7 @@ public class EmployeeController {
 
         if (employeePage.getTotalElements() == 0) {
             mv.addObject("messageType", "error");
+            mv.addObject("role", role);
             mv.addObject("message", "Không tìm thấy kết quả phù hợp với tìm kiếm");
         }
 
