@@ -49,7 +49,7 @@ public class ProductController {
     @GetMapping("/list")
     public String search(Model model, @RequestParam(name = "searchProduct", required = false) String searchProduct,
                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
-                         @RequestParam(name = "rangePrice", defaultValue = "1000000", required = false) int rangePrice,
+                         @RequestParam(name = "rangePrice", defaultValue = "10000000", required = false) int rangePrice,
                          @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
         Pageable pageable = PageRequest.of(page, 5);
         Page<Product> listProducts = productService.findAll(pageable);
@@ -92,7 +92,7 @@ public class ProductController {
             return "dashboard/product/create-product-form";
         }
         product.setSupplier(supplier);
-        product.setRetailPrice(new BigDecimal(0));
+        //product.setRetailPrice(new BigDecimal(0));
 
         // Nếu có file ảnh được upload
         if (imgProducts != null && !imgProducts.isEmpty()

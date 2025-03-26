@@ -177,7 +177,6 @@
 
                 <!-- Search -->
                 <div class="search-section">
-                    <form th:action="@{/dashboard/products/search}" method="get" id="searchForm">
                     <form th:action="@{/dashboard/products/list(page=${page})}" method="get">
                         <div class="row g-3">
                             <div class="col-md-4">
@@ -203,7 +202,7 @@
                                 <div class="d-flex align-items-center">
                                     <input type="range" min="1000000" max="100000000" step="500000" class="form-range price-slider" id="myRange" name="rangePrice"
                                            th:value="${rangePrice}">
-                                    <span id="rangeValue" class="range-value-display" th:text="${#numbers.formatInteger(rangePrice,1,'POINT')}+' VND'">1000000 VND</span>
+                                    <span id="rangeValue" class="range-value-display" >1000000 VND</span>
                                 </div>
                             </div>
 

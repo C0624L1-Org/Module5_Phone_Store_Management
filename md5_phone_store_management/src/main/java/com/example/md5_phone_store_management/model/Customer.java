@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "customer")
@@ -22,6 +23,7 @@ public class Customer {
     private String fullName;
 
     @Pattern(regexp = "\\d{10,15}", message = "Số điện thoại phải chứa từ 10 đến 15 chữ số!")
+//    @Unique(fieldName = "phone", message = "Số điện thoại đã tồn tại!")
     @Unique(fieldName = "phone", message = "Số điện thoại đã tồn tại!", id = @Value("#{customerID}"))
     @Column(name = "phone", length = 15)
     private String phone;
@@ -32,6 +34,7 @@ public class Customer {
 
     @Email(message = "Định dạng email không hợp lệ!")
     @Size(max = 50, message = "Email không được vượt quá 50 ký tự!")
+//    @Unique(fieldName = "email", message = "Email đã tồn tại!")
     @Unique(fieldName = "email", message = "Email đã tồn tại!",  id = @Value("#{customerID}"))
     @Column(name = "email", length = 50)
     private String email;
@@ -50,6 +53,24 @@ public class Customer {
     @Min(value = 0, message = "Số lần mua hàng không được âm!")
     @Column(name = "purchaseCount", nullable = false)
     private int purchaseCount = 0;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Invoice> invoices;
+
+    //Constructor
+    public Customer() {}
+
+    public Customer(Integer customerID, String fullName, String phone, String address, String email, Date dob, Gender gender, int purchaseCount, List<Invoice> invoices) {
+        this.customerID = customerID;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.address = address;
+        this.email = email;
+        this.dob = dob;
+        this.gender = gender;
+        this.purchaseCount = purchaseCount;
+        this.invoices = invoices;
+    }
 
     // Getters and Setters
     public Integer getCustomerID() {
@@ -114,6 +135,14 @@ public class Customer {
 
     public void setPurchaseCount(int purchaseCount) {
         this.purchaseCount = purchaseCount;
+    }
+
+    public List<Invoice> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(List<Invoice> invoices) {
+        this.invoices = invoices;
     }
 
     @Override

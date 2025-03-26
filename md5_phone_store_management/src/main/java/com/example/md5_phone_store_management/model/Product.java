@@ -35,12 +35,17 @@ public class Product {
     @JsonManagedReference
     private List<ProductImage> images;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InvoiceDetail> invoiceDetails;
+
     private Integer stockQuantity;
     private String qrCode;
 
     @ManyToOne
     @JoinColumn(name = "supplierID", foreignKey = @ForeignKey(name = "FK_product_supplier"))
     private Supplier supplier;
+
+
 
     public Product() {
     }

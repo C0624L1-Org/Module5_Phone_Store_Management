@@ -1,120 +1,366 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Bán Hàng</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Bán hàng</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css"/>
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
 </head>
 <body>
-<div class="container mt-4">
-  <div class="card">
-    <div class="card-header bg-light">
-      <h4>Bán hàng</h4>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="container-fluid py-4">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h4>Bán hàng</h4>
+                    </div>
+                    <form class="form" th:action="@{/dashboard/sales/add}" method="POST" th:object="${invoice}">
+                        <div class="card-body">
+                            <!-- Thông tin khách hàng -->
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    Thông tin khách hàng
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="btn btn-outline-secondary w-100" id="selectOldCustomer">Chọn
+                                                khách hàng
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="btn btn-outline-secondary w-100" id="scanQR" disabled>Quét mã
+                                                QR
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <input type="hidden" id="customerID" th:field="*{customer.customerID}">
+                                        <label for="hoTen" class="form-label">Họ và tên</label>
+                                        <input type="text" class="form-control" id="hoTen"
+                                               th:field="*{customer.fullName}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="soDienThoai" class="form-label">Số điện thoại</label>
+                                        <input type="tel" class="form-control" id="soDienThoai"
+                                               th:field="*{customer.phone}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="diaChi" class="form-label">Địa chỉ</label>
+                                        <input type="text" class="form-control" id="diaChi"
+                                               th:field="*{customer.address}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tuoi" class="form-label">Tuổi</label>
+                                        <input type="number" class="form-control" id="tuoi" style="width: 150px;">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">e-mail</label>
+                                        <input type="email" class="form-control" id="email"
+                                               th:field="*{customer.email}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin sản phẩm -->
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    Thông tin sản phẩm
+                                </div>
+                                <div class="card-body card-body-product">
+                                    <div class="mb-3">
+                                        <div class="btn btn-outline-secondary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#productModal" >Chọn sản phẩm
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="productID" name="productID" >
+                                    <div class="mb-3">
+                                        <label for="tenSanPham" class="form-label">Tên sản phẩm</label>
+                                        <input type="text" class="form-control" id="tenSanPham">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="donGia" class="form-label">Đơn giá</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="donGia" readonly>
+                                            <span class="input-group-text">VND</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="soLuong" class="form-label">Số lượng</label>
+                                        <input type="number" class="form-control" id="soLuong" style="width: 150px;" name="quantity">
+                                    </div>
+
+                                </div>
+                                <a class="btn btn-primary add-product-btn">+ Thêm sản phẩm</a>
+                            </div>
+
+                            <!-- Thanh toán -->
+                            <div class="mb-3">
+                                <label for="thanhTien" class="form-label">Thành tiền</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" id="thanhTien" readonly>
+                                    <span class="input-group-text">VND</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Hình thức thanh toán</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="hinhThucThanhToan"
+                                           id="theTinDung" checked>
+                                    <label class="form-check-label" for="theTinDung">
+                                        Thẻ tín dụng
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="tienMat">
+                                    <label class="form-check-label" for="tienMat">
+                                        Tiền mặt
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="inHoaDon" checked>
+                                <label class="form-check-label" for="inHoaDon">In hóa đơn</label>
+                            </div>
+                            <div th:if="${messageType == 'error' && message != null }" class="text-danger"></div>
+                            <button type="submit" class="btn btn-success">Tiến hành thanh toán</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-      <!-- Thông tin khách hàng -->
-      <div class="card mb-3">
-        <div class="card-header">
-          Thông tin khách hàng
-        </div>
-        <div class="card-body">
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <button class="btn btn-outline-secondary w-100">Chọn khách hàng cũ</button>
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <!-- Modal for Customer -->
+    <div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="customerModalLabel">Danh sách khách hàng</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tìm kiếm -->
+                    <div class="d-flex mb-3">
+                        <select id="searchType" class="form-select me-2">
+                            <option value="name">Tên khách hàng</option>
+                            <option value="phone">Số điện thoại</option>
+                            <option value="email">Email</option>
+                        </select>
+                        <input type="text" id="searchInput" class="form-control me-2" placeholder="Nhập từ khóa...">
+                        <button class="btn btn-primary" onclick="searchCustomer()">Tìm kiếm</button>
+                    </div>
+                    <!-- Danh sách khách hàng -->
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Họ và Tên</th>
+                            <th>Số điện thoại</th>
+                            <th>Địa chỉ</th>
+                            <th>Tuổi</th>
+                            <th>Email</th>
+                            <th>Chọn</th>
+                        </tr>
+                        </thead>
+                        <tbody id="customerTable">
+                        <tr th:each="customer : ${customerList}" class="customer-row"
+                            th:with="age=${customer.dob != null ? T(java.time.Period).between(customer.dob.toLocalDate(), T(java.time.LocalDate).now()).getYears() : 0}">
+                            <td th:text="${customer.fullName}" class="name"></td>
+                            <td th:text="${customer.phone}" class="phone"></td>
+                            <td th:text="${customer.address}" class="address"></td>
+                            <td th:text="${age}" class="age"></td>
+                            <td th:text="${customer.email}" class="email"></td>
+                            <td>
+                                <button class="btn btn-success btn-select-customer"
+                                        th:data-name="${customer.fullName}"
+                                        th:data-phone="${customer.phone}"
+                                        th:data-email="${customer.email}"
+                                        th:data-address="${customer.address}"
+                                        th:data-age="${age}"
+                                        th:data-id="${customer.customerID}">
+                                    Chọn
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
+
+                </div>
             </div>
-            <div class="col-md-6">
-              <button class="btn btn-outline-secondary w-100">Quét mã QR</button>
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="hoTen" class="form-label">Họ và tên</label>
-            <input type="text" class="form-control" id="hoTen">
-          </div>
-          <div class="mb-3">
-            <label for="soDienThoai" class="form-label">Số điện thoại</label>
-            <input type="tel" class="form-control" id="soDienThoai">
-          </div>
-          <div class="mb-3">
-            <label for="diaChi" class="form-label">Địa chỉ</label>
-            <input type="text" class="form-control" id="diaChi">
-          </div>
-          <div class="mb-3">
-            <label for="tuoi" class="form-label">Tuổi</label>
-            <input type="number" class="form-control" id="tuoi" style="width: 150px;">
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">e-mail</label>
-            <input type="email" class="form-control" id="email">
-          </div>
         </div>
-      </div>
-
-      <!-- Thông tin sản phẩm -->
-      <div class="card mb-3">
-        <div class="card-header">
-          Thông tin sản phẩm
-        </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <button class="btn btn-outline-secondary w-100 mb-3">Chọn sản phẩm</button>
-          </div>
-          <div class="mb-3">
-            <label for="tenSanPham" class="form-label">Tên sản phẩm</label>
-            <input type="text" class="form-control" id="tenSanPham">
-          </div>
-          <div class="mb-3">
-            <label for="donGia" class="form-label">Đơn giá</label>
-            <div class="input-group">
-              <input type="number" class="form-control" id="donGia">
-              <span class="input-group-text">VND</span>
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="soLuong" class="form-label">Số lượng</label>
-            <input type="number" class="form-control" id="soLuong" style="width: 150px;">
-          </div>
-          <button class="btn btn-primary">+ Thêm sản phẩm</button>
-        </div>
-      </div>
-
-      <!-- Thanh toán -->
-      <div class="mb-3">
-        <label for="thanhTien" class="form-label">Thành tiền</label>
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" id="thanhTien" readonly>
-          <span class="input-group-text">VND</span>
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Hình thức thanh toán</label>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="theTinDung" checked>
-          <label class="form-check-label" for="theTinDung">
-            Thẻ tín dụng
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="tienMat">
-          <label class="form-check-label" for="tienMat">
-            Tiền mặt
-          </label>
-        </div>
-      </div>
-
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="inHoaDon" checked>
-        <label class="form-check-label" for="inHoaDon">In hóa đơn</label>
-      </div>
-
-      <button type="submit" class="btn btn-success">Tiến hành thanh toán</button>
     </div>
-  </div>
+    <!-- Modal for Products -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="productModalLabel">Danh sách sản phẩm</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tìm kiếm -->
+                    <div class="d-flex mb-3">
+                        <input type="text" id="searchProductInput" class="form-control me-2" placeholder="Nhập từ khóa...">
+                        <button class="btn btn-primary" onclick="searchProduct()">Tìm kiếm</button>
+                    </div>
+                    <!-- Danh sách sản phẩm -->
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tên</th>
+                            <th>Giá</th>
+                            <th>CPU</th>
+                            <th>Lưu trữ</th>
+                            <th>Số lượng</th>
+                            <th>Chọn</th>
+                        </tr>
+                        </thead>
+                        <tbody id="productTable">
+                        <tr th:each="product, index : ${productList}" class="product-row">
+                            <td th:text="${index.count}"></td>
+                            <td th:text="${product.name}" class="name"></td>
+                            <td th:text="${product.sellingPrice}" class="price"></td>
+                            <td th:text="${product.CPU}" class="CPU"></td>
+                            <td th:text="${product.storage}" class="storage"></td>
+                            <td th:text="${product.stockQuantity}" class="stock"></td>
+                            <td>
+                                <button class="btn btn-success btn-select-product" data-bs-dismiss="modal"
+                                        th:data-name="${product.name}"
+                                        th:data-price="${product.sellingPrice}"
+                                        th:data-stock="${product.stockQuantity}"
+                                        th:data-id="${product.productID}">
+                                    Chọn
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Bootstrap JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    document.getElementById("selectOldCustomer").addEventListener('click', function () {
+        // Hiển thị modal Bootstrap
+        console.log("mở modal")
+        new bootstrap.Modal(document.getElementById("customerModal")).show();
+    });
+
+    document.querySelectorAll(".btn-select-customer").forEach(button => {
+        button.addEventListener("click", function () {
+            console.log("đã click");
+            console.log(this.getAttribute("data-name"));
+            document.querySelector("input[id='hoTen']").value = this.getAttribute("data-name");
+            document.querySelector("input[id='soDienThoai']").value = this.getAttribute("data-phone");
+            document.querySelector("input[id='email']").value = this.getAttribute("data-email");
+            document.querySelector("input[id='diaChi']").value = this.getAttribute("data-address");
+            document.querySelector("input[id='tuoi']").value = this.getAttribute("data-age");
+            document.querySelector("input[id='customerID']").value = this.getAttribute("data-id");
+            console.log(document.getElementById('hoTen').value);
+
+            // Đóng modal sau khi chọn
+            let modal = bootstrap.Modal.getInstance(document.getElementById("customerModal"));
+            modal.hide();
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Lắng nghe sự kiện khi nhấn nút chọn sản phẩm
+        document.querySelectorAll(".btn-select-product").forEach(button => {
+            button.addEventListener("click", function () {
+                let selectedProductDiv = document.querySelector(".card-body-product.active");
+
+                if (selectedProductDiv) {
+                    selectedProductDiv.querySelector("input[id='tenSanPham']").value = this.getAttribute("data-name");
+                    selectedProductDiv.querySelector("input[id='donGia']").value = this.getAttribute("data-price");
+                    selectedProductDiv.querySelector("input[id='soLuong']").value = 1; // Mặc định số lượng là 1
+                    selectedProductDiv.querySelector("input[id='productID']").value = this.getAttribute("data-id");
+                }
+                console.log()
+
+                // Ẩn modal sau khi chọn sản phẩm
+                let modal = bootstrap.Modal.getInstance(document.getElementById("productModal"));
+                modal.hide();
+            });
+        });
+
+        // Gán class 'active' vào sản phẩm đang được chọn
+        document.addEventListener("click", function (event) {
+            if (event.target.closest(".card-body-product")) {
+                document.querySelectorAll(".card-body-product").forEach(div => div.classList.remove("active"));
+                event.target.closest(".card-body-product").classList.add("active");
+            }
+        });
+
+        // Xử lý khi thêm sản phẩm mới
+        document.querySelector(".add-product-btn").addEventListener("click", function () {
+            let newProductDiv = document.createElement("div");
+            newProductDiv.classList.add("card-body", "card-body-product");
+
+            newProductDiv.innerHTML = `
+            <div class="mb-3">
+                <div class="btn btn-outline-secondary w-100 mb-3 select-product-btn" data-bs-toggle="modal" data-bs-target="#productModal">Chọn sản phẩm</div>
+            </div>
+            <input type="hidden" class="productID" id="productID" name="productID">
+            <div class="mb-3">
+                <label class="form-label">Tên sản phẩm</label>
+                <input type="text" class="form-control tenSanPham" id="tenSanPham" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Đơn giá</label>
+                <div class="input-group">
+                    <input type="number" class="form-control donGia" id="donGia" readonly>
+                    <span class="input-group-text">VND</span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Số lượng</label>
+                <input type="number" class="form-control soLuong" id="soLuong" style="width: 150px;" value="1" name="quantity">
+            </div>
+        `;
+
+            let addButton = document.querySelector(".add-product-btn");
+            addButton.parentNode.insertBefore(newProductDiv, addButton);
+        });
+    });
+
+</script>
 </body>
 </html>

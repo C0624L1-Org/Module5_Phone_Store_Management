@@ -2,6 +2,8 @@ package com.example.md5_phone_store_management.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "invoices")
 public class Invoice {
@@ -17,10 +19,17 @@ public class Invoice {
     private String transactionNo;
     private String cardType;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
+
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InvoiceDetail> invoiceDetailList;
+
     public Invoice() {
     }
 
-    public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, String bankCode, String payDate, String transactionNo, String cardType) {
+    public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, String bankCode, String payDate, String transactionNo, String cardType, Customer customer, List<InvoiceDetail> invoiceDetailList) {
         this.id = id;
         this.vnp_TxnRef = vnp_TxnRef;
         this.amount = amount;
@@ -29,6 +38,20 @@ public class Invoice {
         this.payDate = payDate;
         this.transactionNo = transactionNo;
         this.cardType = cardType;
+        this.customer = customer;
+        this.invoiceDetailList = invoiceDetailList;
+    }
+
+    public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, String bankCode, String payDate, String transactionNo, String cardType, Customer customer) {
+        this.id = id;
+        this.vnp_TxnRef = vnp_TxnRef;
+        this.amount = amount;
+        this.orderInfo = orderInfo;
+        this.bankCode = bankCode;
+        this.payDate = payDate;
+        this.transactionNo = transactionNo;
+        this.cardType = cardType;
+        this.customer = customer;
     }
 
     public Long getId() {
@@ -93,5 +116,37 @@ public class Invoice {
 
     public void setCardType(String cardType) {
         this.cardType = cardType;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public List<InvoiceDetail> getInvoiceDetailList() {
+        return invoiceDetailList;
+    }
+
+    public void setInvoiceDetailList(List<InvoiceDetail> invoiceDetailList) {
+        this.invoiceDetailList = invoiceDetailList;
+    }
+
+    @Override
+    public String toString() {
+        return "Invoice{" +
+                "id=" + id +
+                ", vnp_TxnRef='" + vnp_TxnRef + '\'' +
+                ", amount=" + amount +
+                ", orderInfo='" + orderInfo + '\'' +
+                ", bankCode='" + bankCode + '\'' +
+                ", payDate='" + payDate + '\'' +
+                ", transactionNo='" + transactionNo + '\'' +
+                ", cardType='" + cardType + '\'' +
+                ", customer=" + customer +
+                ", invoiceDetailList=" + invoiceDetailList +
+                '}';
     }
 }
