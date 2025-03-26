@@ -16,7 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -111,26 +110,24 @@ public class InventoryTransactionController {
         inventoryTransactionInRepo.save(inventoryTransaction1);
         return "redirect:/dashboard/stock-in/list";
     }
-    @PostMapping("/stock-in/delete")
+    @PostMapping("/delete")
     public String deleteImportTransactions(@RequestParam("ids") List<Integer> ids,
-                                           RedirectAttributes redirectAttributes,
+                                           Model model,
                                            @ModelAttribute("loggedEmployee") Employee loggedEmployee) {
         if (loggedEmployee == null ||
-                (!"Admin".equalsIgnoreCase(loggedEmployee.getRole().name()) &&
-                        !"WarehouseStaff".equalsIgnoreCase(loggedEmployee.getRole().name()))) {
-            redirectAttributes.addFlashAttribute("error", "Bạn không có quyền xóa giao dịch!");
-            return "redirect:/dashboard/stock-in/list";
-        }
-        if (ids == null || ids.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Vui lòng chọn ít nhất một giao dịch để xóa.");
-            return "redirect:/dashboard/stock-in/list";
-        }
-        try {
+                (!"ADMIN".equals(loggedEmployee.getRole()) && !"THỦ KHO".equals(loggedEmployee.getRole()))) {
+            model.addAttribute("error", "Bạn không có quyền xóa giao dịch!");
+            model.addAttribute("messageType", "error");
+            return "redirect:/stock-in/list";
+        }try{
             inventoryTransactionService.deleteImportTransactions(ids);
-            redirectAttributes.addFlashAttribute("message", "Xóa giao dịch thành công!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi khi xóa giao dịch.");
+            model.addAttribute("message", "Xóa giao dịch thành công!");
+            model.addAttribute("messageType", "success");
+            return "redirect:/stock-in/list";
+        }catch (Exception e) {
+            model.addAttribute("message", "Xóa giao dịch thành công!");
+            model.addAttribute("messageType", "error");
+            return "redirect:/stock-in/list";
         }
-        return "redirect:/dashboard/stock-in/list";
     }
 }
