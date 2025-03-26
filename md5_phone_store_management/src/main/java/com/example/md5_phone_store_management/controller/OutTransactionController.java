@@ -8,6 +8,7 @@ import com.example.md5_phone_store_management.model.TransactionType;
 import com.example.md5_phone_store_management.repository.IEmployeeRepository;
 import com.example.md5_phone_store_management.service.implement.CustomUserDetailsService;
 import com.example.md5_phone_store_management.service.implement.ProductService;
+import com.example.md5_phone_store_management.service.implement.SupplierService;
 import com.example.md5_phone_store_management.service.implement.TransactionOutService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -31,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+
 @Controller
 @RequestMapping("/dashboard")
 public class OutTransactionController {
@@ -43,6 +45,223 @@ public class OutTransactionController {
 
     @Autowired
     private TransactionOutService transactionOutService;
+
+    @Autowired
+    private SupplierService supplierService;
+
+    @GetMapping("/admin/transactions/search/out/product/{a}/{b}")
+    public String searchProducts(
+            @PathVariable("a") String a,
+            @PathVariable("b") String b,
+            @RequestParam(value = "nsp", required = false) String productName,
+            @RequestParam(value = "nncc", required = false) String supplierName,
+            @RequestParam(value = "sl", required = false) String stockSort,
+            @RequestParam(value = "g", required = false) String priceSort,
+            @RequestParam(value = "ch", required = false) String inStock,
+            Model model) {
+
+        // Thêm các tham số vào model để giữ trạng thái trên view
+        model.addAttribute("nsp", productName);
+        model.addAttribute("nncc", supplierName);
+        model.addAttribute("sl", stockSort); // "u" hoặc "d"
+        model.addAttribute("g", priceSort);  // "u" hoặc "d"
+        model.addAttribute("ch", inStock);   // "1" hoặc null
+        model.addAttribute("a", a);
+        model.addAttribute("b", b);
+
+        // Logic tìm kiếm sản phẩm (giả sử bạn có service)
+        // List<Product> products = productService.searchProducts(productName, supplierName, stockSort, priceSort, inStock);
+        // model.addAttribute("listProducts", products);
+
+        // Ví dụ tạm thời
+        model.addAttribute("listProducts", new ArrayList<>());
+
+        return "your-template-name"; // Tên template của bạn
+    }
+
+
+    @GetMapping("/warehouse/inventory")
+    public String transactionDashboard(Model model) {
+        List<InventoryTransaction> transactionIn = transactionOutService.getAllInTransactions();
+        List<InventoryTransaction> transactionOut = transactionOutService.getAllOutTransactions();
+        model.addAttribute("inTra", transactionIn);
+        model.addAttribute("outTra", transactionOut);
+        return "dashboard/transaction/in-and-out";
+    }
+//    dashboard/admin/transactions/search/out/product/{a}/{b}
+    @GetMapping("/admin/transactions/choose/out/product/{a}/{b}")
+    public String showAddOutTransactionProducts(@PathVariable("a") String action,
+                                                @PathVariable(value = "b", required = false) int b,
+                                                Model model, HttpSession session) {
+
+        if ("add".equals(action) && (b == 0)) {
+            model.addAttribute("supplier", supplierService.getSupplierList());
+            model.addAttribute("action", "add");
+        } else if ("edit".equals(action)) {
+            model.addAttribute("action", "edit");
+            model.addAttribute("supplier", supplierService.getSupplierList());
+            InventoryTransaction txn = transactionOutService.getOutTransactionById((long) b)
+                    .orElseThrow(() -> new RuntimeException("Transaction not found"));
+            Integer pid = txn.getProduct().getProductID();
+            model.addAttribute("pid", pid);
+            model.addAttribute("oldId", b);
+        } else {
+            session.setAttribute("ERROR_MESSAGE", "Lỗi khi tải dữ liệu, vui lòng thao tác lại!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
+
+        // Lấy danh sách sản phẩm
+        List<Product> listProducts = productService.findAllWithOutPageable();
+        if (listProducts.isEmpty()) {
+            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy sản phẩm, vui lòng thêm mới!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
+
+        model.addAttribute("listProducts", listProducts);
+        System.out.println("Tổng số sản phẩm: " + listProducts.size());
+
+        return "dashboard/transaction/out/list-products";
+    }
+
+
+    @PostMapping("/admin/transactions/updateOut")
+    public String updateTransactionOut(
+            @Valid @ModelAttribute("inventoryTransaction") InventoryTransaction newTransaction,
+            BindingResult bindingResult,
+            @RequestParam("transactionID") Long oldTransactionID,
+            RedirectAttributes redirectAttributes,
+            HttpSession session,
+            @AuthenticationPrincipal CustomUserDetailsService userDetails) {
+
+        // Kiểm tra validation
+        if (bindingResult.hasErrors()) {
+            session.setAttribute("ERROR_MESSAGE", "Dữ liệu không hợp lệ!");
+            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+        }
+
+        // Tìm giao dịch cũ
+        InventoryTransaction oldInventoryTransaction = transactionOutService
+                .getOutTransactionById(oldTransactionID)
+                .orElse(null);
+        if (oldInventoryTransaction == null) {
+            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy giao dịch cũ.");
+            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+        }
+
+        // Kiểm tra và khôi phục số lượng sản phẩm cũ
+        Product oldProduct = oldInventoryTransaction.getProduct();
+        if (oldProduct == null) {
+            session.setAttribute("ERROR_MESSAGE", "Sản phẩm cũ không tồn tại.");
+            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+        }
+        oldProduct.setStockQuantity(oldProduct.getStockQuantity() + oldInventoryTransaction.getQuantity());
+        productService.saveProduct(oldProduct);
+
+        // Kiểm tra sản phẩm mới
+        if (newTransaction.getProduct() == null || newTransaction.getProduct().getProductID() == null) {
+            System.out.println("Gỡ lỗi - Giao dịch mới: " + newTransaction);
+            System.out.println("Gỡ lỗi - Sản phẩm của giao dịch mới: " + newTransaction.getProduct());
+            session.setAttribute("ERROR_MESSAGE", "Sản phẩm mới không hợp lệ.");
+            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+        }
+
+        // Tìm và cập nhật sản phẩm mới
+        Product newProduct = productService.getProductById(newTransaction.getProduct().getProductID());
+        if (newProduct == null) {
+            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy sản phẩm mới.");
+            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+        }
+
+        // Kiểm tra số lượng tồn kho
+        if (newProduct.getStockQuantity() < newTransaction.getQuantity()) {
+            session.setAttribute("ERROR_MESSAGE", "Số lượng xuất vượt quá tồn kho!");
+            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+        }
+        newProduct.setStockQuantity(newProduct.getStockQuantity() - newTransaction.getQuantity());
+        productService.saveProduct(newProduct);
+
+        // Tạo giao dịch mới
+        InventoryTransaction updatedTransaction = new InventoryTransaction();
+        updatedTransaction.setQuantity(newTransaction.getQuantity());
+        updatedTransaction.setProduct(newProduct);
+
+        BigDecimal Price = newProduct.getSellingPrice() != null ? newProduct.getSellingPrice() : BigDecimal.ZERO;
+        updatedTransaction.setPurchasePrice(Price);
+        updatedTransaction.setTotalPrice(Price.multiply(BigDecimal.valueOf(newTransaction.getQuantity())));
+
+        updatedTransaction.setSupplier(newTransaction.getSupplier() != null ? newTransaction.getSupplier() : newProduct.getSupplier());
+
+
+        updatedTransaction.setTransactionType(TransactionType.OUT);
+        updatedTransaction.setTransactionDate(LocalDateTime.now());
+
+        // Thiết lập thông tin nhân viên
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            Optional<Employee> optionalEmployee = employeeRepository.findByUsername(username);
+            Employee employee = optionalEmployee.orElseThrow(() ->
+                    new UsernameNotFoundException("Không tìm thấy tài khoản"));
+            updatedTransaction.setEmployee(employee);
+        }
+
+        // Cập nhật giao dịch
+        try {
+            transactionOutService.updateOutTransaction(Math.toIntExact(oldTransactionID), updatedTransaction);
+            redirectAttributes.addFlashAttribute("successMessage", "Transaction updated successfully");
+            session.setAttribute("SUCCESS_MESSAGE", "Cập nhật giao dịch xuất kho " + oldTransactionID + " thành công!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("ERROR_MESSAGE", "Lỗi khi cập nhật giao dịch, vui lòng thử lại!");
+            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+        }
+    }
+
+
+    @PostMapping("/admin/transactions/saveNew")
+    public String processExport(@Valid @ModelAttribute("inventoryTransaction") InventoryTransaction transaction,
+                                BindingResult result,
+                                @RequestParam("productId") Long productId,
+                                RedirectAttributes redirectAttributes,
+                                Model model,
+                                HttpSession session,
+                                @AuthenticationPrincipal CustomUserDetailsService userDetails) {
+
+        Product product = productService.getProductById(Math.toIntExact(productId));
+        Optional<Product> optionalProduct = Optional.ofNullable(productService.getProductById(Math.toIntExact(productId)));
+
+        if (optionalProduct.isPresent()) {
+//            set lại sl
+            product.setStockQuantity(product.getStockQuantity() - transaction.getQuantity());
+            productService.saveProduct(product);
+
+//            lấy giá và số lượng xuất để lưu tổng
+            transaction.setProduct(product);
+            transaction.setPurchasePrice(product.getSellingPrice());
+            transaction.setTotalPrice(product.getSellingPrice().multiply(BigDecimal.valueOf(transaction.getQuantity())));
+            transaction.setTransactionType(TransactionType.OUT);
+            transaction.setTransactionDate(LocalDateTime.now()); // Thời gian hiện tại
+            transaction.setSupplier(product.getSupplier()); // Lấy từ product hoặc form
+            // Lấy thông tin tài khoản đang đăng nhập
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                String username = authentication.getName();
+                Optional<Employee> optionalEmployee = employeeRepository.findByUsername(username);
+                Employee employee = optionalEmployee.orElseThrow(() ->
+                        new UsernameNotFoundException("Không tìm thấy tài khoản"));
+                transaction.setEmployee(employee);
+            }
+
+            transactionOutService.addOutTransaction(transaction);
+            session.setAttribute("SUCCESS_MESSAGE", "Lưu lịch sử xuất kho thành công!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        } else {
+            session.setAttribute("ERROR_MESSAGE", "Lỗi không thể lưu!");
+            return "redirect:/dashboard/admin/transactions/new/out/0";
+        }
+
+    }
 
 
     @GetMapping("/admin/transactions/listOut")
@@ -202,51 +421,6 @@ public class OutTransactionController {
     }
 
 
-    @PostMapping("/admin/transactions/saveNew")
-    public String processExport(@Valid @ModelAttribute("inventoryTransaction") InventoryTransaction transaction,
-                                BindingResult result,
-                                @RequestParam("productId") Long productId,
-                                RedirectAttributes redirectAttributes,
-                                Model model,
-                                HttpSession session,
-                                @AuthenticationPrincipal CustomUserDetailsService userDetails) {
-//        CustomUserDetails
-        Product product = productService.getProductById(Math.toIntExact(productId));
-        Optional<Product> optionalProduct = Optional.ofNullable(productService.getProductById(Math.toIntExact(productId)));
-
-        if (optionalProduct.isPresent()) {
-//            set lại sl
-            product.setStockQuantity(product.getStockQuantity() - transaction.getQuantity());
-            productService.saveProduct(product);
-
-//            lấy giá và số lượng xuất để lưu tổng
-            transaction.setProduct(product);
-            transaction.setPurchasePrice(product.getPurchasePrice());
-            transaction.setTotalPrice(product.getPurchasePrice().multiply(BigDecimal.valueOf(transaction.getQuantity())));
-            transaction.setTransactionType(TransactionType.OUT);
-            transaction.setTransactionDate(LocalDateTime.now()); // Thời gian hiện tại
-            transaction.setSupplier(product.getSupplier()); // Lấy từ product hoặc form
-            // Lấy thông tin tài khoản đang đăng nhập
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.isAuthenticated()) {
-                String username = authentication.getName();
-                Optional<Employee> optionalEmployee = employeeRepository.findByUsername(username);
-                Employee employee = optionalEmployee.orElseThrow(() ->
-                        new UsernameNotFoundException("Không tìm thấy tài khoản"));
-                transaction.setEmployee(employee);
-            }
-
-            transactionOutService.addOutTransaction(transaction);
-            session.setAttribute("SUCCESS_MESSAGE", "Lưu lịch sử xuất kho thành công!");
-            return "redirect:/dashboard/admin/transactions/listOut";
-        } else {
-            session.setAttribute("ERROR_MESSAGE", "Lỗi không thể lưu!");
-            return "redirect:/dashboard/admin/transactions/new/out/0";
-        }
-
-    }
-
-
     @GetMapping("/admin/transactions/new/out/{id}")
     public String showAddOutTransaction(@PathVariable("id") Long id, Model model, HttpSession session) {
         // Luôn thêm một đối tượng InventoryTransaction mới vào model
@@ -272,43 +446,6 @@ public class OutTransactionController {
             }
         }
         return "dashboard/transaction/out/create-transaction-out";
-    }
-
-    @GetMapping("/admin/transactions/choose/out/product/{a}/{b}")
-    public String showAddOutTransactionProducts(@PathVariable("a") String action,
-                                                @PathVariable(value = "b", required = false) int b,
-                                                Model model, HttpSession session) {
-        // Kiểm tra nếu action là "add" và b là null hoặc trống
-        if ("add".equals(action) && (b == 0)) {
-            model.addAttribute("action", "add");
-        } else if ("edit".equals(action)) {
-            model.addAttribute("action", "edit");
-            model.addAttribute("oldId", b);
-        } else {
-            session.setAttribute("ERROR_MESSAGE", "Lỗi khi tải dữ liệu, vui lòng thao tác lại!");
-            return "redirect:/dashboard/admin/transactions/listOut";
-        }
-
-        // Lấy danh sách sản phẩm
-        List<Product> listProducts = productService.findAllWithOutPageable();
-        if (listProducts.isEmpty()) {
-            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy sản phẩm, vui lòng thêm mới!");
-            return "redirect:/dashboard/admin/transactions/listOut";
-        }
-
-        model.addAttribute("listProducts", listProducts);
-        System.out.println("Tổng số sản phẩm: " + listProducts.size());
-
-        return "dashboard/transaction/out/list-products";
-    }
-
-    @GetMapping("/warehouse/inventory")
-    public String transactionDashboard(Model model) {
-        List<InventoryTransaction> transactionIn = transactionOutService.getAllInTransactions();
-        List<InventoryTransaction> transactionOut = transactionOutService.getAllOutTransactions();
-        model.addAttribute("inTra", transactionIn);
-        model.addAttribute("outTra", transactionOut);
-        return "dashboard/transaction/in-and-out";
     }
 
 

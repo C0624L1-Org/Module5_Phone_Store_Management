@@ -15,6 +15,20 @@
     <link rel="stylesheet" href="/css/common/layout.css">
     <!-- Inline CSS -->
     <style>
+
+        .btn-update.disabled {
+            background: #d3d3d3;
+            color: #6c757d;
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
+        .btn-update.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+
         .form-section {
             background-color: #f8f9fa;
             border-radius: 10px;
@@ -113,6 +127,11 @@
         .btn-select-product.no-data:hover {
             transform: translateY(-2px);
         }
+
+        .table-rounded th, .table-rounded td {
+            border: none;
+        }
+
     </style>
 </head>
 <body>
@@ -125,8 +144,10 @@
             <div class="container py-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a></li>
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listOut}">Giao dịch Xuất kho</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a>
+                        </li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listOut}">Giao dịch Xuất
+                            kho</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa xuất kho</li>
                     </ol>
                 </nav>
@@ -158,7 +179,8 @@
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <div>
                                                     <button class="btn btn-select-product has-data" disabled>
-                                                        <i class="fas fa-check me-2"></i> Đã chọn: <span th:text="${product.name}"></span>
+                                                        <i class="fas fa-check me-2"></i> Đã chọn: <span
+                                                            th:text="${product.name}"></span>
                                                     </button>
 
                                                     <a th:href="@{/dashboard/admin/transactions/choose/out/product/edit/{id}(id=${inventoryTransaction.transactionID})}"
@@ -168,19 +190,50 @@
                                                 </div>
 
                                                 <div>
-                                                    <label for="oldProductName" class="form-label d-block">
-                                                        <i class="fas fa-history me-2"></i> Tên sản phẩm cũ
-                                                    </label>
-                                                    <input type="text" class="form-control" id="oldProductName" name="oldProductName"
-                                                           th:value="${oldProduct.name}" readonly>
+                                                    <table class="table table-rounded">
+                                                        <thead>
+                                                        <tr>
+                                                            <th scope="col" class="text-center">
+                                                                <i class="fas fa-history"></i> Hoá đơn cũ
+                                                            </th>
+                                                            <th scope="col" class="text-center">
+                                                                <i class="fas fa-history me-2"></i> SL trước xuất
+                                                            </th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <input type="text" class="form-control"
+                                                                       id="oldProductName" name="oldProductName"
+                                                                       th:value="${oldProduct.name}" readonly>
+                                                                <input type="text" class="form-control"
+                                                                       id="oldProductQuantity" name="oldProductQuantity"
+                                                                       th:value="${inventoryTransaction.getQuantity()}"
+                                                                       readonly>
+                                                                <input type="hidden"
+                                                                       id="oldProductId"
+                                                                       name="oldProductId"
+                                                                       th:value="${oldProduct.productID}">
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control"
+                                                                       id="oldProductQuantityBF"
+                                                                       name="oldProductQuantityBF"
+                                                                       th:value="${inventoryTransaction.getQuantity() + oldProduct.getStockQuantity()}"
+                                                                       readonly>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
+
                                             </div>
 
+                                            <input type="hidden" id="productId" name="product.productID"
+                                                   th:value="${product.productID}">
 
-
-                                            <input type="hidden" id="productId" name="productId" th:value="${product.productID}">
                                         </div>
-
 
 
                                         <!-- Tên sản phẩm -->
@@ -197,7 +250,8 @@
                                             <label for="supplierName" class="form-label">
                                                 <i class="fas fa-building me-2"></i>Tên nhà cung cấp
                                             </label>
-                                            <input type="text" class="form-control" id="supplierName" name="supplierName"
+                                            <input type="text" class="form-control" id="supplierName"
+                                                   name="supplierName"
                                                    th:value="${product.supplier.name}" readonly>
                                         </div>
 
@@ -206,7 +260,8 @@
                                             <label for="stockQuantity" class="form-label">
                                                 <i class="fas fa-cubes me-2"></i>Số lượng còn lại
                                             </label>
-                                            <input type="number" class="form-control" id="stockQuantity" name="stockQuantity"
+                                            <input type="number" class="form-control" id="stockQuantity"
+                                                   name="stockQuantity"
                                                    th:value="${product.stockQuantity}" readonly>
                                         </div>
 
@@ -222,21 +277,24 @@
                                             <div class="text-danger" id="quantityError"></div>
                                         </div>
 
-                                        <!-- Giá sản phẩm -->
                                         <div class="col-md-6 mb-3">
                                             <label for="productPrice" class="form-label">
                                                 <i class="fas fa-dollar-sign me-2"></i>Giá sản phẩm
                                             </label>
-                                            <input type="number" class="form-control" id="productPrice" name="productPrice"
-                                                   th:value="${product.sellingPrice}" readonly>
+                                            <input type="text" class="form-control" id="productPrice"
+                                                   name="productPrice"
+                                                   th:attr="value=${product.sellingPrice != null ? #numbers.formatDecimal(product.sellingPrice, 0, 'COMMA', 0, 'POINT') + ' đ' : 'N/A'}"
+                                                   readonly>
                                         </div>
+
 
                                         <!-- Tổng thanh toán -->
                                         <div class="col-md-6 mb-3">
                                             <label for="totalAmount" class="form-label">
                                                 <i class="fas fa-money-bill-wave me-2"></i>Tổng thanh toán
                                             </label>
-                                            <input type="text" class="form-control" id="totalAmount" name="totalAmount" readonly>
+                                            <input type="text" class="form-control" id="totalAmount" name="totalAmount"
+                                                   readonly>
                                         </div>
 
                                         <!-- Hidden field for transaction type -->
@@ -254,6 +312,8 @@
                                     </div>
                                 </form>
                             </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -308,51 +368,103 @@
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VND";
     }
 
-    // Hàm tính tổng thanh toán
+    // Hàm kiểm tra và cập nhật trạng thái nút Cập nhật
+    function updateButtonState() {
+        const updateButton = document.getElementById("updateButton");
+        const quantityInput = document.getElementById("quantity");
+        const stockQuantity = parseInt(document.getElementById("stockQuantity")?.value) || 0;
+        const oldProductQuantityBF = parseInt(document.getElementById("oldProductQuantityBF")?.value) || 0;
+        const exportQuantity = parseInt(quantityInput.value) || 0;
+        const oldProductId = document.getElementById("oldProductId")?.value;
+        const productId = document.getElementById("productId")?.value;
+        const isSameProduct = oldProductId === productId;
+
+        if (isSameProduct) {
+            if (exportQuantity > 0 && exportQuantity <= oldProductQuantityBF) {
+                updateButton.classList.remove("disabled");
+                updateButton.disabled = false;
+            } else {
+                updateButton.classList.add("disabled");
+                updateButton.disabled = true;
+            }
+        } else {
+            if (exportQuantity > 0 && exportQuantity <= stockQuantity) {
+                updateButton.classList.remove("disabled");
+                updateButton.disabled = false;
+            } else {
+                updateButton.classList.add("disabled");
+                updateButton.disabled = true;
+            }
+        }
+    }
+
+    // Hàm tính tổng thanh toán và validate
     function calculateTotalAmount() {
         const stockQuantity = parseInt(document.getElementById("stockQuantity")?.value) || 0;
+        const oldProductQuantityBF = parseInt(document.getElementById("oldProductQuantityBF")?.value) || 0;
         const exportQuantity = parseInt(document.getElementById("quantity")?.value) || 0;
-        const productPrice = parseFloat(document.getElementById("productPrice")?.value) || 0;
+        const productPriceString = document.getElementById("productPrice")?.value || "0";
+        const oldProductId = document.getElementById("oldProductId")?.value;
+        const productId = document.getElementById("productId")?.value;
+        const isSameProduct = oldProductId === productId;
+
+        function convertVNDToNumber(vndString) {
+            const numberString = vndString.replace(/\./g, '').replace(/,/g, '').replace(/đ/g, '').trim();
+            return parseFloat(numberString) || 0;
+        }
+
+        const productPrice = convertVNDToNumber(productPriceString);
         const totalAmountField = document.getElementById("totalAmount");
         const quantityError = document.getElementById("quantityError");
         const quantityFeedback = document.getElementById("quantityFeedback");
+        const quantityInput = document.getElementById("quantity");
 
         if (exportQuantity !== "") {
             if (stockQuantity === 0) {
-                document.getElementById("quantity").setCustomValidity("Sản phẩm đã hết hàng, không thể xuất kho");
+                quantityInput.setCustomValidity("Sản phẩm đã hết hàng, không thể xuất kho");
                 quantityError.textContent = "Sản phẩm đã hết hàng, không thể xuất kho";
                 quantityFeedback.textContent = "Sản phẩm đã hết hàng, không thể xuất kho";
-            } else if (exportQuantity > stockQuantity) {
-                document.getElementById("quantity").setCustomValidity("Số lượng xuất không thể lớn hơn số lượng tồn kho");
-                quantityError.textContent = "Số lượng xuất không thể lớn hơn số lượng tồn kho";
-                quantityFeedback.textContent = "Số lượng xuất không thể lớn hơn số lượng tồn kho";
             } else if (exportQuantity <= 0) {
-                document.getElementById("quantity").setCustomValidity("Số lượng xuất phải lớn hơn 0");
+                quantityInput.setCustomValidity("Số lượng xuất phải lớn hơn 0");
                 quantityError.textContent = "Số lượng xuất phải lớn hơn 0";
                 quantityFeedback.textContent = "Số lượng xuất phải lớn hơn 0";
+            } else if (isSameProduct && exportQuantity > oldProductQuantityBF) {
+                quantityInput.setCustomValidity("Vui lòng nhập ít hơn hoặc bằng số lượng hàng trước khi xuất");
+                quantityError.textContent = "Vui lòng nhập ít hơn hoặc bằng số lượng hàng trước khi xuất";
+                quantityFeedback.textContent = "Vui lòng nhập ít hơn hoặc bằng số lượng hàng trước khi xuất";
+            } else if (!isSameProduct && exportQuantity > stockQuantity) {
+                quantityInput.setCustomValidity("Vui lòng nhập ít hơn hoặc bằng số lượng tồn kho");
+                quantityError.textContent = "Vui lòng nhập ít hơn hoặc bằng số lượng tồn kho";
+                quantityFeedback.textContent = "Vui lòng nhập ít hơn hoặc bằng số lượng tồn kho";
             } else {
-                document.getElementById("quantity").setCustomValidity("");
+                quantityInput.setCustomValidity("");
                 quantityError.textContent = "";
                 quantityFeedback.textContent = "";
             }
         } else {
-            document.getElementById("quantity").setCustomValidity("");
+            quantityInput.setCustomValidity("");
             quantityError.textContent = "";
             quantityFeedback.textContent = "";
         }
 
         const totalAmount = productPrice * exportQuantity;
-        totalAmountField.value = exportQuantity > 0 && exportQuantity <= stockQuantity ? formatVND(totalAmount) : "";
+        totalAmountField.value = exportQuantity > 0 &&
+        ((isSameProduct && exportQuantity <= oldProductQuantityBF) ||
+            (!isSameProduct && exportQuantity <= stockQuantity)) ? formatVND(totalAmount) : "";
+
+        updateButtonState();
     }
 
     document.getElementById("updateButton").addEventListener("click", function () {
-        const form = document.querySelector("form");
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return;
+        if (!this.disabled) {
+            const form = document.querySelector("form");
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+            const modal = new bootstrap.Modal(document.getElementById('confirmUpdateModal'));
+            modal.show();
         }
-        const modal = new bootstrap.Modal(document.getElementById('confirmUpdateModal'));
-        modal.show();
     });
 
     document.getElementById("confirmUpdate").addEventListener("click", function () {
@@ -385,8 +497,19 @@
         calculateTotalAmount();
     });
 
-    // Tính tổng ngay khi trang được tải
+    // Thêm thông báo xanh lá khi sản phẩm không thay đổi
     window.addEventListener("load", function () {
+        const oldProductId = document.getElementById("oldProductId")?.value;
+        const productId = document.getElementById("productId")?.value;
+        const table = document.querySelector(".table-rounded");
+
+        if (oldProductId === productId) {
+            const alertDiv = document.createElement("div");
+            alertDiv.className = "alert alert-success mb-2";
+            alertDiv.textContent = "Bạn đang sửa giao dịch với sản phẩm cũ!";
+            table.insertAdjacentElement("beforebegin", alertDiv);
+        }
+
         calculateTotalAmount();
     });
 </script>

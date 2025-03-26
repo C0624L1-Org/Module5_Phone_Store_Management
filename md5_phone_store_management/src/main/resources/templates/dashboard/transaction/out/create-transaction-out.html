@@ -257,15 +257,17 @@
                                             <div class="text-danger" id="quantityError"></div>
                                         </div>
 
-                                        <!-- Giá sản phẩm -->
+
+
                                         <div class="col-md-6 mb-3">
                                             <label for="productPrice" class="form-label">
                                                 <i class="fas fa-dollar-sign me-2"></i>Giá sản phẩm
                                             </label>
-                                            <input type="number" class="form-control" id="productPrice" name="productPrice"
-                                                   th:value="${product != null ? product.sellingPrice : ''}" readonly
-                                                   placeholder="Chưa chọn sản phẩm">
+                                            <input type="text" class="form-control" id="productPrice" name="productPrice"
+                                                   th:value="${product != null && product.sellingPrice != null ? #numbers.formatDecimal(product.sellingPrice, 0, 'COMMA', 0, 'POINT') + ' đ' : 'N/A'}"
+                                                   readonly>
                                         </div>
+
 
                                         <!-- Tổng thanh toán -->
                                         <div class="col-md-6 mb-3">
@@ -275,7 +277,7 @@
                                             <input type="text" class="form-control" id="totalAmount" name="totalAmount" readonly>
                                         </div>
 
-                                        <!-- Hidden field for transaction type -->
+
                                         <input type="hidden" name="type" value="OUT">
                                     </div>
 
@@ -343,9 +345,32 @@
 
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     function formatVND(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VND";
+    }
+
+    // Hàm kiểm tra và cập nhật trạng thái nút Lưu
+    function updateSaveButtonState() {
+        const saveButton = document.getElementById("saveButton");
+        const quantityInput = document.getElementById("quantity");
+        const stockQuantity = parseInt(document.getElementById("stockQuantity")?.value) || 0;
+        const exportQuantity = parseInt(quantityInput.value) || 0;
+        const hasProduct = document.getElementById("productId")?.value !== "";
+
+        if (!hasProduct) {
+            saveButton.classList.add("disabled");
+            saveButton.disabled = true;
+        } else {
+            if (exportQuantity > 0 && exportQuantity <= stockQuantity) {
+                saveButton.classList.remove("disabled");
+                saveButton.disabled = false;
+            } else {
+                saveButton.classList.add("disabled");
+                saveButton.disabled = true;
+            }
+        }
     }
 
     document.getElementById("saveButton").addEventListener("click", function () {
@@ -388,24 +413,36 @@
     document.getElementById("quantity").addEventListener("input", function () {
         const stockQuantity = parseInt(document.getElementById("stockQuantity")?.value) || 0;
         const exportQuantity = parseInt(this.value) || 0;
-        const productPrice = parseFloat(document.getElementById("productPrice")?.value) || 0;
+        const productPriceString = document.getElementById("productPrice")?.value || "0";
+        const hasProduct = document.getElementById("productId")?.value !== "";
+
+        function convertVNDToNumber(vndString) {
+            const numberString = vndString.replace(/\./g, '').replace(/,/g, '').replace(/đ/g, '').trim();
+            return parseFloat(numberString) || 0;
+        }
+
+        const productPrice = convertVNDToNumber(productPriceString);
         const totalAmountField = document.getElementById("totalAmount");
         const quantityError = document.getElementById("quantityError");
         const quantityFeedback = document.getElementById("quantityFeedback");
 
         if (this.value !== "") {
-            if (stockQuantity === 0) {
+            if (!hasProduct) {
+                this.setCustomValidity("Vui lòng chọn sản phẩm trước");
+                quantityError.textContent = "Vui lòng chọn sản phẩm trước";
+                quantityFeedback.textContent = "Vui lòng chọn sản phẩm trước";
+            } else if (stockQuantity === 0) {
                 this.setCustomValidity("Sản phẩm đã hết hàng, không thể xuất kho");
                 quantityError.textContent = "Sản phẩm đã hết hàng, không thể xuất kho";
                 quantityFeedback.textContent = "Sản phẩm đã hết hàng, không thể xuất kho";
-            } else if (exportQuantity > stockQuantity) {
-                this.setCustomValidity("Số lượng xuất không thể lớn hơn số lượng tồn kho");
-                quantityError.textContent = "Số lượng xuất không thể lớn hơn số lượng tồn kho";
-                quantityFeedback.textContent = "Số lượng xuất không thể lớn hơn số lượng tồn kho";
             } else if (exportQuantity <= 0) {
                 this.setCustomValidity("Số lượng xuất phải lớn hơn 0");
                 quantityError.textContent = "Số lượng xuất phải lớn hơn 0";
                 quantityFeedback.textContent = "Số lượng xuất phải lớn hơn 0";
+            } else if (exportQuantity > stockQuantity) {
+                this.setCustomValidity("Vui lòng nhập số lượng ít hơn hoặc bằng số lượng tồn kho");
+                quantityError.textContent = "Vui lòng nhập số lượng ít hơn hoặc bằng số lượng tồn kho";
+                quantityFeedback.textContent = "Vui lòng nhập số lượng ít hơn hoặc bằng số lượng tồn kho";
             } else {
                 this.setCustomValidity("");
                 quantityError.textContent = "";
@@ -418,7 +455,14 @@
         }
 
         const totalAmount = productPrice * exportQuantity;
-        totalAmountField.value = exportQuantity > 0 && exportQuantity <= stockQuantity ? formatVND(totalAmount) : "";
+        totalAmountField.value = hasProduct && exportQuantity > 0 && exportQuantity <= stockQuantity ? formatVND(totalAmount) : "";
+
+        updateSaveButtonState();
+    });
+
+    // Gọi hàm khi trang được tải để thiết lập trạng thái ban đầu
+    document.addEventListener("DOMContentLoaded", function() {
+        updateSaveButtonState();
     });
 </script>
 </body>
