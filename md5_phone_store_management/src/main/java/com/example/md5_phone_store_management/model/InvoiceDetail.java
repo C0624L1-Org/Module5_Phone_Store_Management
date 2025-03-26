@@ -72,7 +72,7 @@ public class InvoiceDetail {
                 ", quantity=" + quantity +
                 ", totalPrice=" + totalPrice +
                 ", invoice=" + invoice +
-                ", product=" + product +
+                ", product=" + product.toString() +
                 '}';
     }
 }

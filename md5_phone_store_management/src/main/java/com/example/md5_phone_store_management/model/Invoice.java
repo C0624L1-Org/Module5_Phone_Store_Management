@@ -29,6 +29,19 @@ public class Invoice {
     public Invoice() {
     }
 
+    public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, String bankCode, String payDate, String transactionNo, String cardType, Customer customer, List<InvoiceDetail> invoiceDetailList) {
+        this.id = id;
+        this.vnp_TxnRef = vnp_TxnRef;
+        this.amount = amount;
+        this.orderInfo = orderInfo;
+        this.bankCode = bankCode;
+        this.payDate = payDate;
+        this.transactionNo = transactionNo;
+        this.cardType = cardType;
+        this.customer = customer;
+        this.invoiceDetailList = invoiceDetailList;
+    }
+
     public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, String bankCode, String payDate, String transactionNo, String cardType, Customer customer) {
         this.id = id;
         this.vnp_TxnRef = vnp_TxnRef;

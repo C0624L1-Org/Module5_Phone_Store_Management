@@ -42,7 +42,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <div class="btn btn-outline-secondary w-100" id="selectOldCustomer">Chọn
-                                                khách hàng cũ
+                                                khách hàng
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -84,12 +84,12 @@
                                 <div class="card-header">
                                     Thông tin sản phẩm
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body card-body-product">
                                     <div class="mb-3">
-                                        <div class="btn btn-outline-secondary w-100 mb-3" id="selectOldProduct">Chọn sản
-                                            phẩm
+                                        <div class="btn btn-outline-secondary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#productModal" >Chọn sản phẩm
                                         </div>
                                     </div>
+                                    <input type="hidden" id="productID" name="productID" >
                                     <div class="mb-3">
                                         <label for="tenSanPham" class="form-label">Tên sản phẩm</label>
                                         <input type="text" class="form-control" id="tenSanPham">
@@ -97,16 +97,17 @@
                                     <div class="mb-3">
                                         <label for="donGia" class="form-label">Đơn giá</label>
                                         <div class="input-group">
-                                            <input type="number" class="form-control" id="donGia">
+                                            <input type="number" class="form-control" id="donGia" readonly>
                                             <span class="input-group-text">VND</span>
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="soLuong" class="form-label">Số lượng</label>
-                                        <input type="number" class="form-control" id="soLuong" style="width: 150px;">
+                                        <input type="number" class="form-control" id="soLuong" style="width: 150px;" name="quantity">
                                     </div>
-                                    <button class="btn btn-primary">+ Thêm sản phẩm</button>
+
                                 </div>
+                                <a class="btn btn-primary add-product-btn">+ Thêm sản phẩm</a>
                             </div>
 
                             <!-- Thanh toán -->
@@ -138,7 +139,7 @@
                                 <input type="checkbox" class="form-check-input" id="inHoaDon" checked>
                                 <label class="form-check-label" for="inHoaDon">In hóa đơn</label>
                             </div>
-
+                            <div th:if="${messageType == 'error' && message != null }" class="text-danger"></div>
                             <button type="submit" class="btn btn-success">Tiến hành thanh toán</button>
                         </div>
                     </form>
@@ -210,6 +211,62 @@
             </div>
         </div>
     </div>
+    <!-- Modal for Products -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="productModalLabel">Danh sách sản phẩm</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tìm kiếm -->
+                    <div class="d-flex mb-3">
+                        <input type="text" id="searchProductInput" class="form-control me-2" placeholder="Nhập từ khóa...">
+                        <button class="btn btn-primary" onclick="searchProduct()">Tìm kiếm</button>
+                    </div>
+                    <!-- Danh sách sản phẩm -->
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tên</th>
+                            <th>Giá</th>
+                            <th>CPU</th>
+                            <th>Lưu trữ</th>
+                            <th>Số lượng</th>
+                            <th>Chọn</th>
+                        </tr>
+                        </thead>
+                        <tbody id="productTable">
+                        <tr th:each="product, index : ${productList}" class="product-row">
+                            <td th:text="${index.count}"></td>
+                            <td th:text="${product.name}" class="name"></td>
+                            <td th:text="${product.sellingPrice}" class="price"></td>
+                            <td th:text="${product.CPU}" class="CPU"></td>
+                            <td th:text="${product.storage}" class="storage"></td>
+                            <td th:text="${product.stockQuantity}" class="stock"></td>
+                            <td>
+                                <button class="btn btn-success btn-select-product" data-bs-dismiss="modal"
+                                        th:data-name="${product.name}"
+                                        th:data-price="${product.sellingPrice}"
+                                        th:data-stock="${product.stockQuantity}"
+                                        th:data-id="${product.productID}">
+                                    Chọn
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Nhúng script navbar -->
@@ -241,6 +298,66 @@
             // Đóng modal sau khi chọn
             let modal = bootstrap.Modal.getInstance(document.getElementById("customerModal"));
             modal.hide();
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Lắng nghe sự kiện khi nhấn nút chọn sản phẩm
+        document.querySelectorAll(".btn-select-product").forEach(button => {
+            button.addEventListener("click", function () {
+                let selectedProductDiv = document.querySelector(".card-body-product.active");
+
+                if (selectedProductDiv) {
+                    selectedProductDiv.querySelector("input[id='tenSanPham']").value = this.getAttribute("data-name");
+                    selectedProductDiv.querySelector("input[id='donGia']").value = this.getAttribute("data-price");
+                    selectedProductDiv.querySelector("input[id='soLuong']").value = 1; // Mặc định số lượng là 1
+                    selectedProductDiv.querySelector("input[id='productID']").value = this.getAttribute("data-id");
+                }
+                console.log()
+
+                // Ẩn modal sau khi chọn sản phẩm
+                let modal = bootstrap.Modal.getInstance(document.getElementById("productModal"));
+                modal.hide();
+            });
+        });
+
+        // Gán class 'active' vào sản phẩm đang được chọn
+        document.addEventListener("click", function (event) {
+            if (event.target.closest(".card-body-product")) {
+                document.querySelectorAll(".card-body-product").forEach(div => div.classList.remove("active"));
+                event.target.closest(".card-body-product").classList.add("active");
+            }
+        });
+
+        // Xử lý khi thêm sản phẩm mới
+        document.querySelector(".add-product-btn").addEventListener("click", function () {
+            let newProductDiv = document.createElement("div");
+            newProductDiv.classList.add("card-body", "card-body-product");
+
+            newProductDiv.innerHTML = `
+            <div class="mb-3">
+                <div class="btn btn-outline-secondary w-100 mb-3 select-product-btn" data-bs-toggle="modal" data-bs-target="#productModal">Chọn sản phẩm</div>
+            </div>
+            <input type="hidden" class="productID" id="productID" name="productID">
+            <div class="mb-3">
+                <label class="form-label">Tên sản phẩm</label>
+                <input type="text" class="form-control tenSanPham" id="tenSanPham" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Đơn giá</label>
+                <div class="input-group">
+                    <input type="number" class="form-control donGia" id="donGia" readonly>
+                    <span class="input-group-text">VND</span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Số lượng</label>
+                <input type="number" class="form-control soLuong" id="soLuong" style="width: 150px;" value="1" name="quantity">
+            </div>
+        `;
+
+            let addButton = document.querySelector(".add-product-btn");
+            addButton.parentNode.insertBefore(newProductDiv, addButton);
         });
     });
 

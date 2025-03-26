@@ -5,7 +5,8 @@ import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.dto.InvoiceResponseDTO;
 import com.example.md5_phone_store_management.model.dto.PaymentResDTO;
 import com.example.md5_phone_store_management.repository.InvoiceRepository;
-import com.example.md5_phone_store_management.service.InvoiceService;
+import com.example.md5_phone_store_management.service.IInvoiceService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ import java.util.*;
 public class PaymentRestController {
 
     @Autowired
-    private InvoiceService invoiceService;
+    private IInvoiceService invoiceService;
 
     @GetMapping("/create-payment")
     public ResponseEntity<?> createPayment(HttpServletRequest request) throws UnsupportedEncodingException {
