@@ -12,6 +12,10 @@ public interface ICustomerService {
     Integer countTotalCustomers();
 
     Page<Customer> searchCustomers(String name, String phone, String gender, Pageable pageable);
+
+    Customer findCustomerById(Integer id);
+
+    Customer saveCustomer(Customer customer);
 }
 
 

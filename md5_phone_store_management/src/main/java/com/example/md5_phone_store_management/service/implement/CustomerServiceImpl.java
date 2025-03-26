@@ -46,6 +46,16 @@ public class CustomerServiceImpl implements ICustomerService {
         }
     }
 
+    @Override
+    public Customer findCustomerById(Integer id) {
+        return customerRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Customer saveCustomer(Customer customer) {
+        return customerRepository.save(customer);
+    }
+
 
 //public Page<Employee> searchEmployees(String name, String phone, String role, Pageable pageable) {
 //    boolean hasName = name != null && !name.isEmpty();
