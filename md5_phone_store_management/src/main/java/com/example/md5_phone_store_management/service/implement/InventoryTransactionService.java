@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,8 +37,18 @@ public class InventoryTransactionService implements IInventoryTransactionService
     }
 
     @Override
-    public Page<InventoryTransaction> searchImportTransactions(String productName, String supplierName, LocalDate transactionDate, Pageable pageable) {
-        return inventoryTransactionInRepo.searchTransactions(productName, supplierName, transactionDate, TransactionType.IN, pageable);
+    public Page<InventoryTransaction> searchImportTransactions(
+            String productName, String supplierName, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+
+        LocalDateTime startDateTime = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime endDateTime = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
+
+        if (startDateTime != null && endDateTime == null) {
+            endDateTime = LocalDateTime.now();
+        }
+
+        return inventoryTransactionInRepo.searchTransactions(
+                productName, supplierName, startDateTime, endDateTime, TransactionType.IN, pageable);
     }
 
     @Override

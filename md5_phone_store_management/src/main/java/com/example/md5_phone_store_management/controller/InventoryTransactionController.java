@@ -1,9 +1,6 @@
 package com.example.md5_phone_store_management.controller;
 
-import com.example.md5_phone_store_management.model.InventoryTransaction;
-import com.example.md5_phone_store_management.model.Product;
-import com.example.md5_phone_store_management.model.Supplier;
-import com.example.md5_phone_store_management.model.TransactionType;
+import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.repository.IInventoryTransactionInRepo;
 import com.example.md5_phone_store_management.service.IInventoryTransactionService;
 import com.example.md5_phone_store_management.service.IProductService;
@@ -56,22 +53,31 @@ public class InventoryTransactionController {
     public ModelAndView searchImportTransactions(
             @RequestParam(name = "productName", required = false) String productName,
             @RequestParam(name = "supplierName", required = false) String supplierName,
-            @RequestParam(name = "transactionDate", required = false) String transactionDateStr,
+            @RequestParam(name = "startDate", required = false) String startDateStr,
+            @RequestParam(name = "endDate", required = false) String endDateStr,
             @RequestParam(name = "page", defaultValue = "0") int page) {
         ModelAndView modelAndView = new ModelAndView("/dashboard/stock-in/stock-in-list");
         Pageable pageable = PageRequest.of(page, 5);
-        LocalDate transactionDate = null;
-        if (transactionDateStr != null && !transactionDateStr.isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            transactionDate = LocalDate.parse(transactionDateStr, formatter);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        if (startDateStr != null && !startDateStr.isEmpty()) {
+            startDate = LocalDate.parse(startDateStr, formatter);
         }
-       Page<InventoryTransaction> searchResults = inventoryTransactionService.searchImportTransactions(productName, supplierName, transactionDate, pageable);
-       List<Product> productList =productService.findAll(Pageable.unpaged()).getContent();
-        modelAndView.addObject("products",productList);
-        modelAndView.addObject("suppliers",supplierService.getSupplierList());
+        if (endDateStr != null && !endDateStr.isEmpty()) {
+            endDate = LocalDate.parse(endDateStr, formatter);
+        }
+        Page<InventoryTransaction> searchResults = inventoryTransactionService.searchImportTransactions(
+                productName, supplierName, startDate, endDate, pageable);
+        List<Product> productList = productService.findAll(Pageable.unpaged()).getContent();
+
+        modelAndView.addObject("products", productList);
+        modelAndView.addObject("suppliers", supplierService.getSupplierList());
         modelAndView.addObject("currentPage", page);
         modelAndView.addObject("stockInLists", searchResults);
-        modelAndView.addObject("totalPage",  searchResults.getTotalPages());
+        modelAndView.addObject("totalPage", searchResults.getTotalPages());
+
         return modelAndView;
     }
 
@@ -104,5 +110,24 @@ public class InventoryTransactionController {
         inventoryTransactionInRepo.save(inventoryTransaction1);
         return "redirect:/dashboard/stock-in/list";
     }
-
+    @PostMapping("/delete")
+    public String deleteImportTransactions(@RequestParam("ids") List<Integer> ids,
+                                           Model model,
+                                           @ModelAttribute("loggedEmployee") Employee loggedEmployee) {
+        if (loggedEmployee == null ||
+                (!"ADMIN".equals(loggedEmployee.getRole()) && !"THỦ KHO".equals(loggedEmployee.getRole()))) {
+            model.addAttribute("error", "Bạn không có quyền xóa giao dịch!");
+            model.addAttribute("messageType", "error");
+            return "redirect:/stock-in/list";
+        }try{
+            inventoryTransactionService.deleteImportTransactions(ids);
+            model.addAttribute("message", "Xóa giao dịch thành công!");
+            model.addAttribute("messageType", "success");
+            return "redirect:/stock-in/list";
+        }catch (Exception e) {
+            model.addAttribute("message", "Xóa giao dịch thành công!");
+            model.addAttribute("messageType", "error");
+            return "redirect:/stock-in/list";
+        }
+    }
 }
