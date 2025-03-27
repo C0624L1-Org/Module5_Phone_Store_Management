@@ -36,7 +36,6 @@ public class InventoryTransactionService implements IInventoryTransactionService
         return inventoryTransactionInRepo.getByTransactionType(TransactionType.IN, pageable);
     }
 
-    @Override
     public Page<InventoryTransaction> searchImportTransactions(
             String productName, String supplierName, LocalDate startDate, LocalDate endDate, Pageable pageable) {
 

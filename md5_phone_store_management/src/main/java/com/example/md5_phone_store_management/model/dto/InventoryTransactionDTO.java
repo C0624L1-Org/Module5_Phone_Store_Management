@@ -17,7 +17,7 @@ public class InventoryTransactionDTO {
     private Integer quantity;
 
     @NotNull(message = "Giá nhập không được để trống")
-    @Min(value = 0, message = "Giá nhập phải lớn hơn 0")
+    @Min(value = 1, message = "Giá nhập phải lớn hơn 0")
     private BigDecimal purchasePrice;
 
     @NotNull(message = "Nhân viên thực hiện không được để trống")
