@@ -34,4 +34,13 @@ public interface IProductService {
     // Tính tổng doanh thu
 //    BigDecimal calculateTotalRevenue();
 
+
+    List<Product> searchProductToChoose(
+            String productName,
+            String supplierName,
+            String stockSort,
+            String priceSort,
+            String inStockStatus
+    );
+
 }

@@ -48,37 +48,80 @@ public class OutTransactionController {
 
     @Autowired
     private SupplierService supplierService;
+    
 
-    @GetMapping("/admin/transactions/search/out/product/{a}/{b}")
+    @GetMapping({
+            "/admin/transactions/search/out/product",
+            "/admin/transactions/search/out/product/{a}",
+            "/admin/transactions/search/out/product/{a}/{b}"
+    })
     public String searchProducts(
-            @PathVariable("a") String a,
-            @PathVariable("b") String b,
+            @PathVariable(value = "a", required = false) String action,
+            @PathVariable(value = "b", required = false) String b,
             @RequestParam(value = "nsp", required = false) String productName,
             @RequestParam(value = "nncc", required = false) String supplierName,
             @RequestParam(value = "sl", required = false) String stockSort,
             @RequestParam(value = "g", required = false) String priceSort,
             @RequestParam(value = "ch", required = false) String inStock,
-            Model model) {
+            Model model,
+            HttpSession session) {
 
-        // Thêm các tham số vào model để giữ trạng thái trên view
+        // Validate and set default values if parameters are null
+        stockSort = stockSort == null ? "" : (stockSort.equals("u") ? "ASC" : (stockSort.equals("d") ? "DESC" : ""));
+        priceSort = priceSort == null ? "" : (priceSort.equals("u") ? "ASC" : (priceSort.equals("d") ? "DESC" : ""));
+        inStock = inStock == null ? "outStock" : (inStock.equals("1") ? "inStock" : "outStock");
+
+        // Nếu không có action, mặc định là "add"
+        if (action == null) {
+            action = "add";
+        }
+
+        if ("edit".equals(action)) {
+            if (b == null || b.isEmpty()) {
+                session.setAttribute("ERROR_MESSAGE", "Thiếu ID giao dịch để chỉnh sửa!");
+                return "redirect:/dashboard/admin/transactions/listOut";
+            }
+            model.addAttribute("action", "edit");
+            model.addAttribute("supplier", supplierService.getSupplierList());
+
+            InventoryTransaction txn = transactionOutService.getOutTransactionById(Long.parseLong(b))
+                    .orElseThrow(() -> new RuntimeException("Transaction not found"));
+
+            Integer pid = txn.getProduct().getProductID();
+            model.addAttribute("pid", pid);
+            model.addAttribute("oldId", b);
+        } else if ("add".equals(action)) {
+            model.addAttribute("action", "add");
+            model.addAttribute("supplier", supplierService.getSupplierList());
+        } else {
+            session.setAttribute("ERROR_MESSAGE", "Lỗi khi tải dữ liệu, vui lòng thao tác lại!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
+
+        // Add parameters to model to maintain state
         model.addAttribute("nsp", productName);
         model.addAttribute("nncc", supplierName);
-        model.addAttribute("sl", stockSort); // "u" hoặc "d"
-        model.addAttribute("g", priceSort);  // "u" hoặc "d"
-        model.addAttribute("ch", inStock);   // "1" hoặc null
-        model.addAttribute("a", a);
-        model.addAttribute("b", b);
+        model.addAttribute("sl", stockSort);
+        model.addAttribute("g", priceSort);
+        model.addAttribute("ch", inStock);
+        model.addAttribute("a", action);
+        if (b != null) {
+            model.addAttribute("b", b);
+        }
 
-        // Logic tìm kiếm sản phẩm (giả sử bạn có service)
-        // List<Product> products = productService.searchProducts(productName, supplierName, stockSort, priceSort, inStock);
-        // model.addAttribute("listProducts", products);
+        // Fetch product list
+        List<Product> listProducts = productService.searchProductToChoose(
+                productName, supplierName, stockSort, priceSort, inStock
+        );
 
-        // Ví dụ tạm thời
-        model.addAttribute("listProducts", new ArrayList<>());
+        if (listProducts.isEmpty()) {
+            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy sản phẩm, vui lòng thêm mới!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        }
 
-        return "your-template-name"; // Tên template của bạn
+        model.addAttribute("listProducts", listProducts);
+        return "dashboard/transaction/out/list-products";
     }
-
 
     @GetMapping("/warehouse/inventory")
     public String transactionDashboard(Model model) {

@@ -4,6 +4,8 @@ import com.example.md5_phone_store_management.model.Product;
 import com.example.md5_phone_store_management.model.ProductImage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +18,29 @@ import java.util.List;
 
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Integer> {
+
+
+    @Query("SELECT p FROM Product p " +
+            "WHERE (:productName IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%'))) " +
+            "AND (:supplierName IS NULL OR LOWER(p.supplier.name) LIKE LOWER(CONCAT('%', :supplierName, '%'))) " +
+            "AND (:inStockStatus IS NULL " +
+            "     OR (:inStockStatus = 'inStock' AND p.stockQuantity > 0) " +
+            "     OR (:inStockStatus = 'outStock' AND p.stockQuantity = 0)) " +
+            "ORDER BY " +
+            "CASE WHEN :stockSort = 'ASC' THEN p.stockQuantity END ASC, " +
+            "CASE WHEN :stockSort = 'DESC' THEN p.stockQuantity END DESC, " +
+            "CASE WHEN :priceSort = 'ASC' THEN p.sellingPrice END ASC, " +
+            "CASE WHEN :priceSort = 'DESC' THEN p.sellingPrice END DESC")
+    List<Product> searchProductToChoose(
+            @Param("productName") String productName,
+            @Param("supplierName") String supplierName,
+            @Param("stockSort") String stockSort,
+            @Param("priceSort") String priceSort,
+            @Param("inStockStatus") String inStockStatus
+    );
+
+
+
 
     // Đình Anh: Sửa lại truy vấn INSERT, bỏ trường image
     @Modifying
@@ -79,6 +104,7 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     // Đếm tổng số sản phẩm
     @Query(value = "SELECT COUNT(*) FROM product", nativeQuery = true)
     long countProducts();
+
 
 
 
