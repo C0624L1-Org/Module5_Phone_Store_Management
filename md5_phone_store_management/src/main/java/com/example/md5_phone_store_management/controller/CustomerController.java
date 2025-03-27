@@ -3,9 +3,11 @@ package com.example.md5_phone_store_management.controller;
 import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Gender;
+import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.Role;
 import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
 import com.example.md5_phone_store_management.service.CustomerService;
+import com.example.md5_phone_store_management.service.IInvoiceService;
 import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +34,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerServiceImpl customerServiceWithJpa;
+
+    @Autowired
+    private IInvoiceService invoiceService;
 
 
     @GetMapping("/admin/customers/list")
@@ -79,6 +84,36 @@ public class CustomerController {
         }
         model.addAttribute("customer", customer);
         return "dashboard/admin/customers/update-customer";
+    }
+
+    /**
+     * Xem danh sách hóa đơn của khách hàng
+     */
+    @GetMapping("/admin/customers/{customerID}/invoices")
+    public String viewCustomerInvoices(@PathVariable("customerID") Integer customerID,
+                                       @RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size,
+                                       RedirectAttributes redirectAttributes,
+                                       Model model,
+                                       HttpSession session) {
+        // Tìm khách hàng
+        Customer customer = customerService.getCustomerByID(customerID);
+        if (customer == null) {
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy khách hàng này!");
+            return "redirect:/dashboard/admin/customers/list";
+        }
+
+        // Lấy danh sách hóa đơn của khách hàng
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Invoice> invoicePage = invoiceService.findByCustomerId(customerID, pageable);
+
+        model.addAttribute("customer", customer);
+        model.addAttribute("invoicePage", invoicePage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPage", invoicePage.getTotalPages());
+
+        return "dashboard/admin/customers/customer-invoices";
     }
 
 

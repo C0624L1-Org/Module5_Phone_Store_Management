@@ -1,10 +1,9 @@
 package com.example.md5_phone_store_management.service;
 
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
+
+import com.example.md5_phone_store_management.model.Customer;
 
 public interface ICustomerService {
     Page<Customer> findAllCustomers(Pageable pageable);
@@ -16,6 +15,9 @@ public interface ICustomerService {
     Customer findCustomerById(Integer id);
 
     Customer saveCustomer(Customer customer);
+
+    // Phương thức cập nhật trực tiếp số lần mua hàng
+    void updatePurchaseCount(Integer customerId, int newCount);
 }
 
 

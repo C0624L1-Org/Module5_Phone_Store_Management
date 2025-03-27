@@ -1,8 +1,18 @@
 package com.example.md5_phone_store_management.model;
 
-import jakarta.persistence.*;
-
+import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "invoices")
@@ -131,7 +141,36 @@ public class Invoice {
     }
 
     public void setInvoiceDetailList(List<InvoiceDetail> invoiceDetailList) {
+        if (this.invoiceDetailList != null) {
+            this.invoiceDetailList.forEach(detail -> detail.setInvoice(null));
+        }
+
         this.invoiceDetailList = invoiceDetailList;
+
+        if (invoiceDetailList != null) {
+            invoiceDetailList.forEach(detail -> detail.setInvoice(this));
+        }
+    }
+
+    /**
+     * Helper method to add an invoice detail and maintain the bidirectional relationship
+     */
+    public void addInvoiceDetail(InvoiceDetail detail) {
+        if (invoiceDetailList == null) {
+            invoiceDetailList = new ArrayList<>();
+        }
+        invoiceDetailList.add(detail);
+        detail.setInvoice(this);
+    }
+
+    /**
+     * Helper method to remove an invoice detail and maintain the bidirectional relationship
+     */
+    public void removeInvoiceDetail(InvoiceDetail detail) {
+        if (invoiceDetailList != null) {
+            invoiceDetailList.remove(detail);
+            detail.setInvoice(null);
+        }
     }
 
     @Override
@@ -145,8 +184,8 @@ public class Invoice {
                 ", payDate='" + payDate + '\'' +
                 ", transactionNo='" + transactionNo + '\'' +
                 ", cardType='" + cardType + '\'' +
-                ", customer=" + customer +
-                ", invoiceDetailList=" + invoiceDetailList +
+                ", customer=" + (customer != null ? customer.getCustomerID() : null) +
+                ", invoiceDetailCount=" + (invoiceDetailList != null ? invoiceDetailList.size() : 0) +
                 '}';
     }
 }

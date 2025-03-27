@@ -342,7 +342,8 @@
                                 </td>
                                 <td class="text-center" th:text="${customer.getPurchaseCount()}"></td>
                                 <td class="text-center">
-                                    <a th:href="@{#}" class="btn btn-light btn-action btn-view btn-sm">
+                                    <a th:href="@{/dashboard/admin/customers/{customerID}/invoices(customerID=${customer.customerID})}"
+                                       class="btn btn-light btn-action btn-view btn-sm">
                                         <i class="fas fa-eye me-1"></i>Lịch Sử
                                     </a>
                                     <a th:href="@{/dashboard/admin/customers/showEdit/{customerID}(customerID=${customer.customerID})}"

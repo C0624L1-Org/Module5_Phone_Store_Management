@@ -26,6 +26,10 @@ public interface IProductService {
     void saveProductImage(Product product, ProductImage productImage);
     void deleteProductImages(Product product);
 
+    // Cập nhật số lượng tồn kho trực tiếp
+    void updateStockQuantity(Integer productId, int newStockQuantity);
+
+
     // Đếm tổng số sản phẩm
     long countProducts();
     // Đếm tổng số sản phẩm đã bán
@@ -35,6 +39,7 @@ public interface IProductService {
 
     void save(Product product); // Thêm phương thức save
 
+    Product findById(Integer id);
 
 
 }
