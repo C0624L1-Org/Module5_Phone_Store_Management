@@ -51,6 +51,7 @@ public class Product {
     private List<InvoiceDetail> invoiceDetails;
 
     private Integer stockQuantity;
+
     private String qrCode;
 
     @ManyToOne

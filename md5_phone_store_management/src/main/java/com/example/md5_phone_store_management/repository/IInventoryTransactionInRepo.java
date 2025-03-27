@@ -41,11 +41,9 @@ public interface IInventoryTransactionInRepo extends JpaRepository<InventoryTran
             Pageable pageable
     );
 
-    // Từ nhánh HEAD
     @Query("SELECT i FROM InventoryTransaction i WHERE i.product.productID = :productId AND i.supplier.supplierID = :supplierId")
     InventoryTransaction getByProductIdAndSupplierId(@Param("productId") Integer productId, @Param("supplierId") Integer supplierId);
 
-    // Từ nhánh khoa-code
     @Query("SELECT i FROM InventoryTransaction i WHERE i.product.qrCode = :qrCode")
     InventoryTransaction findByQRCode(@Param("qrCode") String qrCode);
 }
