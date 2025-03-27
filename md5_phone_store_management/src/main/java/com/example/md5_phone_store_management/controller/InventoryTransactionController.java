@@ -85,10 +85,9 @@ public class InventoryTransactionController {
 
     @GetMapping("stock-in/update")
     public String update(Model model,
-                         @RequestParam(name = "productId") int productId,
-                         @RequestParam(name = "supplierId") int supplierId) {
+                         @RequestParam(name = "stockInId") int stockInId) {
         List<Supplier> supplierList = supplierService.getSupplierList();
-        InventoryTransaction inventoryTransaction = inventoryTransactionService.getByProductIdAndSupplierId(productId, supplierId);
+        InventoryTransaction inventoryTransaction = inventoryTransactionService.findById(stockInId);
         model.addAttribute("inventoryTransaction", inventoryTransaction);
         model.addAttribute("supplierList", supplierList);
         return "dashboard/stock-in/stock-in-update";

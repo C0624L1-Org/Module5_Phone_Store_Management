@@ -165,7 +165,7 @@
                 <td th:text="${#numbers.formatDecimal(stock.totalPrice, 0, 'COMMA', 2, 'POINT') + ' VNĐ'}"></td>
                 <td>
                   <div class="d-flex gap-2 justify-content-center">
-                    <a th:href="@{/dashboard/warehouse-staff/inventory/update(productId=${stock.product.productID}, supplierId=${stock.supplier.supplierID})}"
+                    <a th:href="@{/dashboard/warehouse-staff/inventory/update(stockInId=${stock.transactionID})}"
                        class="btn btn-warning btn-edit btn-sm">
                       <i class="fas fa-pen me-1"></i>Cập nhật
                     </a>
