@@ -38,8 +38,8 @@ public class SupplierService implements ISupplierService {
     }
 
     @Override
-    public void deleteSupplier(List<Integer> id) {
-        supplierRepository.deleteByIdIn(id);
+    public void deleteSupplier(List<Integer> ids) {
+        supplierRepository.deleteByIdIn(ids);
     }
 
     @Override
@@ -61,6 +61,8 @@ public class SupplierService implements ISupplierService {
 
     @Override
     public long countSuppliers() {
-        return supplierRepository.count();
+        return supplierRepository.countSuppliers();
     }
+
+
 }
