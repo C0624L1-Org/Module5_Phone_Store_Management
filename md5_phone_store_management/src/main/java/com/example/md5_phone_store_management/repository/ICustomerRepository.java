@@ -53,4 +53,12 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
 
     @Query(value = "SELECT * FROM customer WHERE full_Name LIKE CONCAT('%',:name,'%') AND phone LIKE CONCAT('%',:phone,'%') AND gender = :gender", nativeQuery = true)
     Page<Customer> findByNameAndPhoneAndGender(@Param("name") String name, @Param("phone") String phone, @Param("gender") String gender, Pageable pageable);
+
+    /**
+     * Tìm kiếm khách hàng theo tên HOẶC điện thoại HOẶC email
+     */
+    @Query(value = "SELECT * FROM customer WHERE (:name IS NULL OR full_Name LIKE CONCAT('%', :name, '%')) " +
+            "OR (:phone IS NULL OR phone LIKE CONCAT('%', :phone, '%')) " +
+            "OR (:email IS NULL OR email LIKE CONCAT('%', :email, '%'))", nativeQuery = true)
+    Page<Customer> findByNameOrPhoneOrEmail(@Param("name") String name, @Param("phone") String phone, @Param("email") String email, Pageable pageable);
 }

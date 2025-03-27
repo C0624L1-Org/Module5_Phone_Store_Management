@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -121,6 +122,104 @@ public class SalesController {
         }
 
         return ResponseEntity.ok(customers);
+    }
+
+    /**
+     * API endpoint để tìm kiếm khách hàng theo tên, email hoặc số điện thoại
+     */
+    @GetMapping("/customers/search")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> searchCustomersAdvanced(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Customer> customers;
+            
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                // Tìm kiếm kết hợp theo tên, số điện thoại hoặc email
+                String searchTerm = keyword.trim();
+                
+                // Tìm kiếm trong repository
+                customers = iCustomerService.searchCustomersByNameOrPhoneOrEmail(searchTerm, searchTerm, searchTerm, pageable);
+            } else {
+                customers = iCustomerService.findAllCustomers(pageable);
+            }
+            
+            // Chuyển đổi dữ liệu sang format phù hợp với frontend
+            List<Map<String, Object>> customerList = customers.getContent().stream()
+                .map(customer -> {
+                    Map<String, Object> customerMap = new HashMap<>();
+                    customerMap.put("id", customer.getCustomerID());
+                    customerMap.put("fullName", customer.getFullName());
+                    customerMap.put("phone", customer.getPhone());
+                    customerMap.put("email", customer.getEmail());
+                    customerMap.put("address", customer.getAddress());
+                    customerMap.put("purchaseCount", customer.getPurchaseCount());
+                    return customerMap;
+                })
+                .collect(Collectors.toList());
+            
+            response.put("status", "success");
+            response.put("customers", customerList);
+            response.put("currentPage", page);
+            response.put("totalItems", customers.getTotalElements());
+            response.put("totalPages", customers.getTotalPages());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "Lỗi khi tìm kiếm khách hàng: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
+    /**
+     * API để tìm kiếm khách hàng theo số điện thoại
+     */
+    @GetMapping("/customers/search-by-phone")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> searchCustomerByPhone(@RequestParam String phone) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            if (phone == null || phone.trim().isEmpty()) {
+                response.put("status", "error");
+                response.put("message", "Số điện thoại không được để trống");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Tìm khách hàng theo số điện thoại
+            Pageable pageable = PageRequest.of(0, 1);
+            Page<Customer> customerPage = iCustomerService.searchCustomers(null, phone, null, pageable);
+            
+            if (!customerPage.isEmpty()) {
+                Customer customer = customerPage.getContent().get(0);
+                Map<String, Object> customerData = new HashMap<>();
+                customerData.put("id", customer.getCustomerID());
+                customerData.put("fullName", customer.getFullName());
+                customerData.put("phone", customer.getPhone());
+                customerData.put("email", customer.getEmail());
+                customerData.put("address", customer.getAddress());
+                customerData.put("purchaseCount", customer.getPurchaseCount());
+                
+                response.put("status", "success");
+                response.put("customer", customerData);
+            } else {
+                response.put("status", "not_found");
+                response.put("message", "Không tìm thấy khách hàng với số điện thoại: " + phone);
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "Lỗi khi tìm kiếm khách hàng: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
     }
 
     @GetMapping("/search-products")
@@ -467,7 +566,7 @@ public class SalesController {
                 invoice.getBankCode() : "CASH";
         model.addAttribute("bankCode", bankCode);
 
-        // Sử dụng loại thẻ từ hóa đơn 
+        // Sử dụng loại thẻ từ hóa đơn
         String cardType = invoice.getCardType() != null && !invoice.getCardType().isEmpty() ?
                 invoice.getCardType() : "CASH";
         model.addAttribute("cardType", cardType);
