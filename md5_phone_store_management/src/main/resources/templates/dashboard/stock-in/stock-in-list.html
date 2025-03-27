@@ -249,7 +249,7 @@
             Danh sách sản phẩm trong kho
           </h2>
 
-          <a th:href="@{/dashboard/}" class="btn btn-success">
+          <a th:href="@{/dashboard/warehouse-staff/inventory}" class="btn btn-success">
             <i class="fas fa-user-plus me-2"></i>Nhập Kho
           </a>
         </div>
@@ -257,36 +257,51 @@
         <div class="search-section">
           <form action="/dashboard/stock-in/search" method="GET">
             <div class="row g-3">
+              <!-- Tên sản phẩm -->
               <div class="col-md-3 position-relative">
                 <label for="productName" class="form-label">Tên sản phẩm</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="fas fa-box"></i></span>
                   <input type="text" class="form-control" id="productName" name="productName"
-                         placeholder="Nhập tên sản phẩm" th:value="${param.productName}" onkeyup="autocompleteProduct()" onblur="hideAutocomplete('productList')">
+                         placeholder="Nhập tên sản phẩm" th:value="${param.productName}"
+                         onkeyup="autocompleteProduct()" onblur="hideAutocomplete('productList')">
                   <div id="productList" class="autocomplete-list"></div>
                 </div>
               </div>
 
+              <!-- Nhà cung cấp -->
               <div class="col-md-3 position-relative">
-                <label for="supplierName" class="form-label">Nhà Sản Xuất</label>
+                <label for="supplierName" class="form-label">Nhà cung cấp</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="fas fa-industry"></i></span>
                   <input type="text" class="form-control" id="supplierName" name="supplierName"
-                         placeholder="Nhập tên nhà cung cấp" th:value="${param.supplierName}" onkeyup="autocompleteSupplier()" onblur="hideAutocomplete('supplierList')">
+                         placeholder="Nhập tên nhà cung cấp" th:value="${param.supplierName}"
+                         onkeyup="autocompleteSupplier()" onblur="hideAutocomplete('supplierList')">
                   <div id="supplierList" class="autocomplete-list"></div>
                 </div>
               </div>
 
+              <!-- Ngày bắt đầu -->
               <div class="col-md-3">
-                <label for="transactionDate" class="form-label">Ngày Nhập</label>
+                <label for="startDate" class="form-label">Từ ngày</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                  <input type="date" id="transactionDate" name="transactionDate" class="form-control" th:value="${param.transactionDate}">
+                  <input type="date" id="startDate" name="startDate" class="form-control" th:value="${param.startDate}">
                 </div>
               </div>
 
-              <div class="col-md-3 d-flex align-items-end gap-2">
-                <button type="submit" class="btn btn-primary flex-grow-1">
+              <!-- Ngày kết thúc -->
+              <div class="col-md-3">
+                <label for="endDate" class="form-label">Đến ngày</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                  <input type="date" id="endDate" name="endDate" class="form-control" th:value="${param.endDate}">
+                </div>
+              </div>
+
+              <!-- Nút tìm kiếm & xóa bộ lọc -->
+              <div class="col-md-12 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary">
                   <i class="fas fa-search me-2"></i>Tìm kiếm
                 </button>
                 <a th:href="@{/dashboard/stock-in/list}" class="btn btn-secondary">
@@ -327,10 +342,11 @@
               <tr th:each="stock,l:${stockInLists}">
                 <td class="text-center">
                   <div class="form-check">
-                    <input class="form-check-input selectEmployee" type="checkbox"
+                    <input class="form-check-input selectInventoryTransaction" type="checkbox"
                            th:value="${stock.transactionID}"
-                           th:data-product="${stock.product}"
-                           th:data-quantity="${stock.quantity}">
+                           th:data-product="${stock.product.name}"
+                           th:data-suppliers="${stock.supplier.name}"
+                           th:data-date="${stock.transactionDate}">
                   </div>
                 </td>
                 <td th:text="${l.count}"></td>
@@ -373,41 +389,60 @@
             <!-- Pagination -->
             <nav aria-label="Pagination">
               <ul class="pagination mb-0">
-                <!-- Nút Trang đầu - luôn hiển thị -->
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                   <a class="page-link"
-                     th:href="@{/dashboard/admin/employees/search(page=0, name=${param.name}, phone=${param.phone}, role=${param.role})}">
+                     th:if="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
+                     th:href="@{/dashboard/stock-in/list(page=0)}">
+                    Trang đầu
+                  </a>
+                  <a class="page-link"
+                     th:unless="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
+                     th:href="@{/dashboard/stock-in/search(page=0, productName=${param.productName}, supplierName=${param.supplierName}, transactionDate=${param.transactionDate})}">
                     Trang đầu
                   </a>
                 </li>
 
-                <!-- Nút Trước - luôn hiển thị -->
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                   <a class="page-link"
-                     th:href="@{/dashboard/admin/employees/search(page=${currentPage - 1}, name=${param.name}, phone=${param.phone}, role=${param.role})}">
+                     th:if="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
+                     th:href="@{/dashboard/stock-in/list(page=${currentPage - 1})}">
+                    <i class="fas fa-chevron-left"></i>
+                  </a>
+                  <a class="page-link"
+                     th:unless="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
+                     th:href="@{/dashboard/stock-in/search(page=${currentPage - 1}, productName=${param.productName}, supplierName=${param.supplierName}, transactionDate=${param.transactionDate})}">
                     <i class="fas fa-chevron-left"></i>
                   </a>
                 </li>
 
-                <!-- Hiển thị số trang hiện tại / tổng số trang -->
                 <li class="page-item active mx-2">
-                                    <span class="page-link">
-                                    <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
-                                </span>
+            <span class="page-link">
+                <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
+            </span>
                 </li>
 
-                <!-- Nút Tiếp - luôn hiển thị -->
                 <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
                   <a class="page-link"
-                     th:href="@{/dashboard/admin/employees/search(page=${currentPage + 1}, name=${param.name}, phone=${param.phone}, role=${param.role})}">
+                     th:if="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
+                     th:href="@{/dashboard/stock-in/list(page=${currentPage + 1})}">
+                    <i class="fas fa-chevron-right"></i>
+                  </a>
+                  <a class="page-link"
+                     th:unless="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
+                     th:href="@{/dashboard/stock-in/search(page=${currentPage + 1}, productName=${param.productName}, supplierName=${param.supplierName}, transactionDate=${param.transactionDate})}">
                     <i class="fas fa-chevron-right"></i>
                   </a>
                 </li>
 
-                <!-- Nút Trang cuối - luôn hiển thị -->
                 <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
                   <a class="page-link"
-                     th:href="@{/dashboard/admin/employees/search(page=${totalPage - 1}, name=${param.name}, phone=${param.phone}, role=${param.role})}">
+                     th:if="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
+                     th:href="@{/dashboard/stock-in/list(page=${totalPage - 1})}">
+                    Trang cuối
+                  </a>
+                  <a class="page-link"
+                     th:unless="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
+                     th:href="@{/dashboard/stock-in/search(page=${totalPage - 1}, productName=${param.productName}, supplierName=${param.supplierName}, transactionDate=${param.transactionDate})}">
                     Trang cuối
                   </a>
                 </li>
@@ -431,7 +466,7 @@
         <div class="modal-header">
           <h5 class="modal-title" id="deleteModalLabel">
             <i class="fas fa-exclamation-triangle text-danger me-2"></i>
-            Xác nhận xóa nhân viên
+            Xác nhận xóa nhập kho
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -501,64 +536,83 @@
 
   //modal xóa
   document.addEventListener('DOMContentLoaded', function () {
-    // Handle select all checkbox
-    document.getElementById('selectAll').addEventListener('click', function () {
-      let checkboxes = document.querySelectorAll('.selectEmployee');
-      checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const deleteSelectedButton = document.getElementById('deleteSelected');
+    const confirmDeleteButton = document.getElementById('confirmDelete');
+    const deleteMessageContainer = document.getElementById('deleteMessage');
+    let selectedIds = [];
+
+    // ✅ Chọn / Bỏ chọn tất cả checkbox
+    selectAllCheckbox.addEventListener('click', function () {
+      document.querySelectorAll('.selectInventoryTransaction').forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
       updateButtonState();
     });
 
-    // Handle individual checkboxes
-    document.querySelectorAll('.selectEmployee').forEach(checkbox => {
+    // ✅ Cập nhật trạng thái nút xóa khi thay đổi checkbox
+    document.querySelectorAll('.selectInventoryTransaction').forEach(checkbox => {
       checkbox.addEventListener('change', updateButtonState);
     });
 
-    // Cập nhật trạng thái nút xóa
     function updateButtonState() {
-      let selectedEmployees = document.querySelectorAll('.selectEmployee:checked');
-      document.getElementById('deleteSelected').disabled = selectedEmployees.length === 0;
+      selectedIds = Array.from(document.querySelectorAll('.selectInventoryTransaction:checked'))
+              .map(checkbox => checkbox.value);
+      deleteSelectedButton.disabled = selectedIds.length === 0;
     }
 
-    // Handle delete button click
-    document.getElementById('deleteSelected').addEventListener('click', function () {
-      let selectedEmployees = [];
-      let selectedIds = [];
+    // ✅ Xử lý khi nhấn nút "Xóa đã chọn"
+    deleteSelectedButton.addEventListener('click', function () {
+      let selectedTransactions = [];
 
-      document.querySelectorAll('.selectEmployee:checked').forEach((checkbox) => {
+      document.querySelectorAll('.selectInventoryTransaction:checked').forEach((checkbox) => {
         let id = checkbox.getAttribute('value');
-        let name = checkbox.getAttribute('data-name');
-        let address = checkbox.getAttribute('data-address');
+        let product = checkbox.getAttribute('data-product');
+        let supplier = checkbox.getAttribute('data-suppliers');
+        let date = checkbox.getAttribute('data-date');
 
-        selectedEmployees.push({id, name, address});
-        selectedIds.push(id);
+        selectedTransactions.push({ id, product, supplier, date });
       });
 
-      if (selectedEmployees.length === 0) {
-        alert('Vui lòng chọn ít nhất một nhân viên để xóa.');
+      if (selectedTransactions.length === 0) {
+        alert('Vui lòng chọn ít nhất một giao dịch để xóa.');
         return;
       }
 
-      // Format message for confirmation modal
-      let deleteMessage = 'Bạn có chắc chắn muốn xóa ' +
-              (selectedEmployees.length > 1 ? 'các nhân viên' : 'nhân viên') +
-              ' sau đây?<br><br><ul class="list-group">';
-
-      selectedEmployees.forEach(emp => {
-        deleteMessage += `<li class="list-group-item">${emp.name} <small class="text-muted">(${emp.address})</small></li>`;
+      // ✅ Hiển thị danh sách giao dịch trong modal
+      let deleteMessage = `<p>Bạn có chắc chắn muốn xóa ${selectedTransactions.length} giao dịch sau?</p><ul class="list-group">`;
+      selectedTransactions.forEach(trx => {
+        deleteMessage += `<li class="list-group-item">
+                                  <strong>${trx.product}</strong> - Nhà cung cấp: ${trx.supplier}, Ngày: ${trx.date}
+                                </li>`;
       });
+      deleteMessage += '</ul><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>';
 
-      deleteMessage += '</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>';
+      deleteMessageContainer.innerHTML = deleteMessage;
 
-      document.getElementById('deleteMessage').innerHTML = deleteMessage;
-
-      // Show delete modal
+      // ✅ Hiển thị modal xác nhận
       let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
       deleteModal.show();
+    });
 
-      // Handle confirm delete button
-      document.getElementById('confirmDelete').onclick = function () {
-        location.href = '/dashboard/admin/employees/delete/' + selectedIds.join(',');
-      };
+    // ✅ Xử lý khi xác nhận xóa
+    confirmDeleteButton.addEventListener('click', function () {
+      fetch('/stock-in/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ ids: selectedIds })
+      }).then(response => {
+        if (response.ok) {
+          window.location.reload();
+        } else {
+          alert('Lỗi khi xóa giao dịch. Vui lòng thử lại!');
+        }
+      }).catch(error => {
+        console.error('Lỗi:', error);
+        alert('Lỗi khi xóa giao dịch.');
+      });
     });
   });
 </script>
