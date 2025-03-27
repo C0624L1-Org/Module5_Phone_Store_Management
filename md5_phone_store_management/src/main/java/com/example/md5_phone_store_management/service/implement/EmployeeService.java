@@ -32,10 +32,13 @@ public class EmployeeService implements IEmployeeService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
-
     @Override
     public void addEmployee(Employee employee) {
         try {
+            if (employee.getFullName() == null || employee.getFullName().trim().isEmpty()) {
+                throw new RuntimeException("Họ và tên không được để trống!");
+            }
+
             if (!employee.getPassword().startsWith("$2a$")) {
                 employee.setPassword(EncryptPasswordUtils.encryptPasswordUtils(employee.getPassword()));
             }
@@ -49,6 +52,7 @@ public class EmployeeService implements IEmployeeService {
             throw new RuntimeException("Có lỗi khi thêm người dùng : " + e.getMessage());
         }
     }
+
 
 
     public Page<Employee> getAllEmployeesExceptAdmin(Pageable pageable) {
