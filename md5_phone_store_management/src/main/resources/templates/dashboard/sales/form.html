@@ -4,13 +4,133 @@
     <meta charset="UTF-8">
     <title>Bán hàng</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/fragments/navbar.css">
     <link rel="stylesheet" href="/css/fragments/sidebar.css"/>
     <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <!-- jQuery trước Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap-datepicker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);
+            color: white;
+            padding: 1.2rem 1.5rem;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .search-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+
+        .table-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+
+        .product-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+
+        .product-section.active {
+            border-color: #4a6fdc;
+            background-color: #f0f4ff;
+        }
+
+        .remove-product {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: #dc3545;
+            font-size: 1.2rem;
+        }
+
+        .customer-badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            margin-left: 5px;
+        }
+
+        .customer-badge.regular {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .customer-badge.new {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+            font-weight: 500;
+            border-color: #454d55;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            vertical-align: middle;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6c8deb;
+            box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);
+        }
+
+        .btn-action {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+        }
+    </style>
 </head>
 <body>
 <!-- Hiển thị thông báo -->
@@ -27,242 +147,451 @@
         <!-- Main content -->
         <div class="content-container">
             <div class="container-fluid py-4">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <h4>Bán hàng</h4>
-                    </div>
-                    <form class="form" th:action="@{/dashboard/sales/add}" method="POST" th:object="${invoice}">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Bán hàng</li>
+                    </ol>
+                </nav>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-shopping-cart me-2 text-primary"></i>
+                        Bán hàng
+                    </h2>
+                </div>
+
+                <form class="form" id="salesForm" th:action="@{/dashboard/sales/add}" method="POST" th:object="${invoice}">
+                    <!-- Thông tin khách hàng -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-user me-2"></i>Thông tin khách hàng</h5>
+                        </div>
                         <div class="card-body">
-                            <!-- Thông tin khách hàng -->
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    Thông tin khách hàng
-                                </div>
-                                <div class="card-body">
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <div class="btn btn-outline-secondary w-100" id="selectOldCustomer">Chọn
-                                                khách hàng
+                            <!-- Giữ lại các input fields ẩn cho form submit -->
+                            <div class="d-none">
+                                <input type="hidden" id="customerID" th:field="*{customer.customerID}">
+                                <input type="text" id="hoTen" th:field="*{customer.fullName}">
+                                <input type="tel" id="soDienThoai" th:field="*{customer.phone}">
+                                <input type="email" id="email" th:field="*{customer.email}">
+                                <input type="text" id="diaChi" th:field="*{customer.address}">
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <!-- Tab navigation -->
+                                    <ul class="nav nav-tabs mb-3" id="customerTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="returningCustomerTab" data-bs-toggle="tab" data-bs-target="#old-customer" type="button" role="tab" aria-controls="old-customer" aria-selected="true">
+                                                <i class="fas fa-user-check me-2"></i>Khách hàng cũ (Đã từng mua hàng)
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="existingCustomerTab" data-bs-toggle="tab" data-bs-target="#existing-customer" type="button" role="tab" aria-controls="existing-customer" aria-selected="false">
+                                                <i class="fas fa-users me-2"></i>Tất cả khách hàng
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button type="button" class="btn btn-success w-100" id="newCustomerBtn" data-bs-toggle="modal" data-bs-target="#newCustomerModal">
+                                                <i class="fas fa-user-plus me-2"></i>Tạo khách hàng mới
+                                            </button>
+                                        </li>
+                                    </ul>
+
+                                    <!-- Tab content -->
+                                    <div class="tab-content" id="customerTabContent">
+                                        <!-- Khách hàng cũ tab -->
+                                        <div class="tab-pane fade show active" id="old-customer" role="tabpanel" aria-labelledby="returningCustomerTab">
+                                            <div class="mb-3">
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                                    <input type="text" class="form-control" id="returningCustomerPhone" placeholder="Nhập số điện thoại khách hàng...">
+                                                    <button type="button" class="btn btn-primary" id="btnSearchReturningCustomer">
+                                                        <i class="fas fa-search me-2"></i>Tìm
+                                                    </button>
+                                                </div>
+                                                <div class="form-text">Nhập số điện thoại khách hàng để tìm kiếm</div>
+                                            </div>
+
+                                            <div class="table-responsive mt-3" style="max-height: 300px;">
+                                                <table class="table table-hover table-striped">
+                                                    <thead class="table-dark sticky-top">
+                                                    <tr>
+                                                        <th>Họ và Tên</th>
+                                                        <th>Số điện thoại</th>
+                                                        <th>Số lần mua</th>
+                                                        <th>Chọn</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="oldCustomerTableBody">
+                                                    <tr th:each="customer : ${customerList}" th:if="${customer.purchaseCount > 0}" class="old-customer-row">
+                                                        <td th:text="${customer.fullName}"></td>
+                                                        <td th:text="${customer.phone}"></td>
+                                                        <td>
+                                                            <span class="badge bg-success" th:text="${customer.purchaseCount}"></span>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-success btn-select-customer"
+                                                                    th:data-name="${customer.fullName}"
+                                                                    th:data-phone="${customer.phone}"
+                                                                    th:data-email="${customer.email}"
+                                                                    th:data-address="${customer.address}"
+                                                                    th:data-purchase="${customer.purchaseCount}"
+                                                                    th:data-id="${customer.customerID}">
+                                                                <i class="fas fa-check me-1"></i> Chọn
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="btn btn-outline-secondary w-100" id="scanQR" disabled>Quét mã
-                                                QR
+
+                                        <!-- Tất cả khách hàng tab -->
+                                        <div class="tab-pane fade" id="existing-customer" role="tabpanel" aria-labelledby="existingCustomerTab">
+                                            <div class="mb-3">
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                                    <input type="text" class="form-control" id="searchExistingCustomer" placeholder="Tìm kiếm khách hàng...">
+                                                    <button type="button" class="btn btn-primary" id="searchExistingCustomerBtn">
+                                                        <i class="fas fa-search me-2"></i>Tìm
+                                                    </button>
+                                                </div>
+                                                <div class="form-text">Tìm kiếm theo tên, số điện thoại hoặc email</div>
+                                            </div>
+
+                                            <div class="table-responsive mt-3" style="max-height: 300px;">
+                                                <table class="table table-hover table-striped">
+                                                    <thead class="table-dark sticky-top">
+                                                    <tr>
+                                                        <th>Họ và Tên</th>
+                                                        <th>Số điện thoại</th>
+                                                        <th>Email</th>
+                                                        <th>Chọn</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="existingCustomerTableBody">
+                                                    <tr th:each="customer : ${customerList}" class="existing-customer-row">
+                                                        <td th:text="${customer.fullName}"></td>
+                                                        <td th:text="${customer.phone}"></td>
+                                                        <td th:text="${customer.email}"></td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-success btn-select-customer"
+                                                                    th:data-name="${customer.fullName}"
+                                                                    th:data-phone="${customer.phone}"
+                                                                    th:data-email="${customer.email}"
+                                                                    th:data-address="${customer.address}"
+                                                                    th:data-purchase="${customer.purchaseCount}"
+                                                                    th:data-id="${customer.customerID}">
+                                                                <i class="fas fa-check me-1"></i> Chọn
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <input type="hidden" id="customerID" th:field="*{customer.customerID}">
-                                        <label for="hoTen" class="form-label">Họ và tên</label>
-                                        <input type="text" class="form-control" id="hoTen"
-                                               th:field="*{customer.fullName}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="soDienThoai" class="form-label">Số điện thoại</label>
-                                        <input type="tel" class="form-control" id="soDienThoai"
-                                               th:field="*{customer.phone}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="diaChi" class="form-label">Địa chỉ</label>
-                                        <input type="text" class="form-control" id="diaChi"
-                                               th:field="*{customer.address}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="tuoi" class="form-label">Tuổi</label>
-                                        <input type="number" class="form-control" id="tuoi" style="width: 150px;">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label">e-mail</label>
-                                        <input type="email" class="form-control" id="email"
-                                               th:field="*{customer.email}">
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Thông tin sản phẩm -->
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    Thông tin sản phẩm
-                                </div>
-                                <div class="card-body card-body-product">
-                                    <div class="mb-3">
-                                        <div class="btn btn-outline-secondary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#productModal" >Chọn sản phẩm
+                            <div id="selectedCustomerInfo" class="mt-3 d-none">
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Khách hàng đã chọn</h6>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Họ và tên:</strong> <span id="selectedName"></span></p>
+                                            <p class="mb-1"><strong>Số điện thoại:</strong> <span id="selectedPhone"></span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Email:</strong> <span id="selectedEmail"></span></p>
+                                            <p class="mb-1"><strong>Địa chỉ:</strong> <span id="selectedAddress"></span></p>
                                         </div>
                                     </div>
-                                    <input type="hidden" id="productID" name="productID" >
+                                    <p class="mb-0 mt-2" id="customerPurchaseInfo"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin sản phẩm -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-mobile-alt me-2"></i>Thông tin sản phẩm</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="productsContainer">
+                                <div class="product-section active">
                                     <div class="mb-3">
-                                        <label for="tenSanPham" class="form-label">Tên sản phẩm</label>
-                                        <input type="text" class="form-control" id="tenSanPham">
+                                        <button type="button" class="btn btn-outline-primary w-100 mb-3 select-product-btn" data-bs-toggle="modal" data-bs-target="#productModal">
+                                            <i class="fas fa-mobile-alt me-2"></i> Chọn sản phẩm
+                                        </button>
+                                        <i class="fas fa-times-circle remove-product d-none"></i>
                                     </div>
+                                    <input type="hidden" class="productID" name="productID">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Tên sản phẩm</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
+                                                    <input type="text" class="form-control tenSanPham" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Đơn giá</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                                    <input type="number" class="form-control donGia" readonly>
+                                                    <span class="input-group-text">VND</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Số lượng</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-cubes"></i></span>
+                                                    <input type="number" class="form-control soLuong" min="1" value="1" name="quantity" onchange="calculateTotal()">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="stock-info text-muted mt-4">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Còn <span class="available-stock">0</span> sản phẩm trong kho
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary mt-3 add-product-btn">
+                                <i class="fas fa-plus-circle me-2"></i> Thêm sản phẩm
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tổng tiền và thanh toán -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Thanh toán</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="donGia" class="form-label">Đơn giá</label>
+                                        <label for="thanhTien" class="form-label">Thành tiền</label>
                                         <div class="input-group">
-                                            <input type="number" class="form-control" id="donGia" readonly>
+                                            <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+                                            <input type="text" class="form-control" id="thanhTien" readonly>
                                             <span class="input-group-text">VND</span>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="soLuong" class="form-label">Số lượng</label>
-                                        <input type="number" class="form-control" id="soLuong" style="width: 150px;" name="quantity">
+                                        <label class="form-label">Hình thức thanh toán</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="paymentMethod"
+                                                   id="vnpay" value="vnpay" checked>
+                                            <label class="form-check-label" for="vnpay">
+                                                <i class="fas fa-credit-card me-2"></i> VNPay
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="paymentMethod" id="cash" value="cash">
+                                            <label class="form-check-label" for="cash">
+                                                <i class="fas fa-money-bill-alt me-2"></i> Tiền mặt
+                                            </label>
+                                        </div>
                                     </div>
-
-                                </div>
-                                <a class="btn btn-primary add-product-btn">+ Thêm sản phẩm</a>
-                            </div>
-
-                            <!-- Thanh toán -->
-                            <div class="mb-3">
-                                <label for="thanhTien" class="form-label">Thành tiền</label>
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control" id="thanhTien" readonly>
-                                    <span class="input-group-text">VND</span>
                                 </div>
                             </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Hình thức thanh toán</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="hinhThucThanhToan"
-                                           id="theTinDung" checked>
-                                    <label class="form-check-label" for="theTinDung">
-                                        Thẻ tín dụng
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="tienMat">
-                                    <label class="form-check-label" for="tienMat">
-                                        Tiền mặt
-                                    </label>
-                                </div>
+                            <div th:if="${messageType == 'error' && message != null}" class="alert alert-danger" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i> <span th:text="${message}"></span>
                             </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="inHoaDon" checked>
-                                <label class="form-check-label" for="inHoaDon">In hóa đơn</label>
+                            <div th:if="${messageType == 'success' && message != null}" class="alert alert-success" role="alert">
+                                <i class="fas fa-check-circle me-2"></i> <span th:text="${message}"></span>
                             </div>
-                            <div th:if="${messageType == 'error' && message != null }" class="text-danger"></div>
-                            <button type="submit" class="btn btn-success">Tiến hành thanh toán</button>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-shopping-cart me-2"></i> Tiến hành thanh toán
+                            </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
     <!-- Footer -->
     <footer th:replace="~{fragments/footer :: footer}"></footer>
-    <!-- Modal for Customer -->
-    <div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="customerModalLabel">Danh sách khách hàng</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Tìm kiếm -->
-                    <div class="d-flex mb-3">
-                        <select id="searchType" class="form-select me-2">
-                            <option value="name">Tên khách hàng</option>
-                            <option value="phone">Số điện thoại</option>
-                            <option value="email">Email</option>
-                        </select>
-                        <input type="text" id="searchInput" class="form-control me-2" placeholder="Nhập từ khóa...">
-                        <button class="btn btn-primary" onclick="searchCustomer()">Tìm kiếm</button>
-                    </div>
-                    <!-- Danh sách khách hàng -->
-                    <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th>Họ và Tên</th>
-                            <th>Số điện thoại</th>
-                            <th>Địa chỉ</th>
-                            <th>Tuổi</th>
-                            <th>Email</th>
-                            <th>Chọn</th>
-                        </tr>
-                        </thead>
-                        <tbody id="customerTable">
-                        <tr th:each="customer : ${customerList}" class="customer-row"
-                            th:with="age=${customer.dob != null ? T(java.time.Period).between(customer.dob.toLocalDate(), T(java.time.LocalDate).now()).getYears() : 0}">
-                            <td th:text="${customer.fullName}" class="name"></td>
-                            <td th:text="${customer.phone}" class="phone"></td>
-                            <td th:text="${customer.address}" class="address"></td>
-                            <td th:text="${age}" class="age"></td>
-                            <td th:text="${customer.email}" class="email"></td>
-                            <td>
-                                <button class="btn btn-success btn-select-customer"
-                                        th:data-name="${customer.fullName}"
-                                        th:data-phone="${customer.phone}"
-                                        th:data-email="${customer.email}"
-                                        th:data-address="${customer.address}"
-                                        th:data-age="${age}"
-                                        th:data-id="${customer.customerID}">
-                                    Chọn
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
-
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- Modal for Products -->
     <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="productModalLabel">Danh sách sản phẩm</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="productModalLabel">
+                        <i class="fas fa-mobile-alt me-2"></i>Danh sách sản phẩm
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Tìm kiếm -->
-                    <div class="d-flex mb-3">
-                        <input type="text" id="searchProductInput" class="form-control me-2" placeholder="Nhập từ khóa...">
-                        <button class="btn btn-primary" onclick="searchProduct()">Tìm kiếm</button>
+                    <div class="search-section mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" id="searchProductInput" class="form-control" placeholder="Nhập tên sản phẩm...">
+                            <button type="button" class="btn btn-primary" id="searchProductBtn">
+                                <i class="fas fa-search me-2"></i>Tìm
+                            </button>
+                        </div>
+                        <div class="form-text">Tìm kiếm theo tên sản phẩm</div>
                     </div>
-                    <!-- Danh sách sản phẩm -->
-                    <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Tên</th>
-                            <th>Giá</th>
-                            <th>CPU</th>
-                            <th>Lưu trữ</th>
-                            <th>Số lượng</th>
-                            <th>Chọn</th>
-                        </tr>
-                        </thead>
-                        <tbody id="productTable">
-                        <tr th:each="product, index : ${productList}" class="product-row">
-                            <td th:text="${index.count}"></td>
-                            <td th:text="${product.name}" class="name"></td>
-                            <td th:text="${product.sellingPrice}" class="price"></td>
-                            <td th:text="${product.CPU}" class="CPU"></td>
-                            <td th:text="${product.storage}" class="storage"></td>
-                            <td th:text="${product.stockQuantity}" class="stock"></td>
-                            <td>
-                                <button class="btn btn-success btn-select-product" data-bs-dismiss="modal"
-                                        th:data-name="${product.name}"
-                                        th:data-price="${product.sellingPrice}"
-                                        th:data-stock="${product.stockQuantity}"
-                                        th:data-id="${product.productID}">
-                                    Chọn
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
 
+                    <!-- Danh sách sản phẩm -->
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>#</th>
+                                <th>Tên</th>
+                                <th>Giá</th>
+                                <th>CPU</th>
+                                <th>Lưu trữ</th>
+                                <th>Số lượng</th>
+                                <th>Chọn</th>
+                            </tr>
+                            </thead>
+                            <tbody id="productTable">
+                            <tr th:each="product, index : ${productList}" class="product-row">
+                                <td th:text="${index.count}"></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-mobile-alt me-2 text-primary"></i>
+                                        <span th:text="${product.name}" class="name"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-tag me-1"></i>
+                                        <span th:text="${#numbers.formatInteger(product.sellingPrice,1,'POINT')} + ' VND'" class="price"></span>
+                                    </span>
+                                </td>
+                                <td th:text="${product.CPU}" class="CPU"></td>
+                                <td th:text="${product.storage}" class="storage"></td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-cubes me-1"></i>
+                                        <span th:text="${product.stockQuantity}" class="stock"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-success btn-select-product"
+                                            th:disabled="${product.stockQuantity <= 0}"
+                                            th:data-name="${product.name}"
+                                            th:data-price="${product.sellingPrice}"
+                                            th:data-stock="${product.stockQuantity}"
+                                            th:data-id="${product.productID}">
+                                        <i class="fas fa-check me-1"></i> Chọn
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modal Khách hàng mới -->
+    <div class="modal fade" id="newCustomerModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="newCustomerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="newCustomerModalLabel">
+                        <i class="fas fa-user-plus me-2"></i>Đăng ký khách hàng mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newCustomerForm" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="newFullName" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="newFullName" name="fullName" required>
+                                </div>
+                                <div class="invalid-feedback">Vui lòng nhập họ và tên</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="newPhone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="tel" class="form-control" id="newPhone" name="phone" required>
+                                </div>
+                                <div class="invalid-feedback">Vui lòng nhập số điện thoại</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="newEmail" class="form-label">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="newEmail" name="email">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="newDob" class="form-label">Ngày sinh</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    <input type="date" class="form-control" id="newDob" name="dob">
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="newAddress" class="form-label">Địa chỉ</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                    <input type="text" class="form-control" id="newAddress" name="address">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="newGender" class="form-label">Giới tính</label>
+                                <select class="form-select" id="newGender" name="gender">
+                                    <option value="" selected>-- Chọn giới tính --</option>
+                                    <option value="Male">Nam</option>
+                                    <option value="Female">Nữ</option>
+                                    <option value="Other">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="alert alert-danger d-none" id="newCustomerError">
+                        <i class="fas fa-exclamation-circle me-2"></i> <span id="newCustomerErrorMessage"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy bỏ
+                    </button>
+                    <button type="button" class="btn btn-success" id="saveNewCustomer">
+                        <i class="fas fa-save me-2"></i>Lưu và chọn khách hàng
+                    </button>
                 </div>
             </div>
         </div>
@@ -274,93 +603,459 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Bootstrap JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Khai báo biến global
+    let newCustomerModal;
 
-    document.getElementById("selectOldCustomer").addEventListener('click', function () {
-        // Hiển thị modal Bootstrap
-        console.log("mở modal")
-        new bootstrap.Modal(document.getElementById("customerModal")).show();
-    });
-
-    document.querySelectorAll(".btn-select-customer").forEach(button => {
-        button.addEventListener("click", function () {
-            console.log("đã click");
-            console.log(this.getAttribute("data-name"));
-            document.querySelector("input[id='hoTen']").value = this.getAttribute("data-name");
-            document.querySelector("input[id='soDienThoai']").value = this.getAttribute("data-phone");
-            document.querySelector("input[id='email']").value = this.getAttribute("data-email");
-            document.querySelector("input[id='diaChi']").value = this.getAttribute("data-address");
-            document.querySelector("input[id='tuoi']").value = this.getAttribute("data-age");
-            document.querySelector("input[id='customerID']").value = this.getAttribute("data-id");
-            console.log(document.getElementById('hoTen').value);
-
-            // Đóng modal sau khi chọn
-            let modal = bootstrap.Modal.getInstance(document.getElementById("customerModal"));
-            modal.hide();
+    // Hàm tính tổng tiền đơn hàng
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('.product-section').forEach(productDiv => {
+            const price = parseFloat(productDiv.querySelector('.donGia').value) || 0;
+            const quantity = parseInt(productDiv.querySelector('.soLuong').value) || 0;
+            total += price * quantity;
         });
-    });
+        document.getElementById('thanhTien').value = new Intl.NumberFormat('vi-VN').format(total);
+    }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // Lắng nghe sự kiện khi nhấn nút chọn sản phẩm
-        document.querySelectorAll(".btn-select-product").forEach(button => {
-            button.addEventListener("click", function () {
-                let selectedProductDiv = document.querySelector(".card-body-product.active");
+    // Hàm tìm kiếm khách hàng/sản phẩm
+    function searchItems(inputId, tableId, rowSelector) {
+        const keyword = document.getElementById(inputId).value.toLowerCase();
+        document.querySelectorAll(`#${tableId} ${rowSelector}`).forEach(row => {
+            const nameEl = row.querySelector('td:nth-child(1)');
+            const phoneEl = row.querySelector('td:nth-child(2)');
+            const emailEl = row.querySelector('td:nth-child(3)');
 
-                if (selectedProductDiv) {
-                    selectedProductDiv.querySelector("input[id='tenSanPham']").value = this.getAttribute("data-name");
-                    selectedProductDiv.querySelector("input[id='donGia']").value = this.getAttribute("data-price");
-                    selectedProductDiv.querySelector("input[id='soLuong']").value = 1; // Mặc định số lượng là 1
-                    selectedProductDiv.querySelector("input[id='productID']").value = this.getAttribute("data-id");
-                }
-                console.log()
+            const name = nameEl?.textContent.toLowerCase() || '';
+            const phone = phoneEl?.textContent.toLowerCase() || '';
+            const email = emailEl?.textContent.toLowerCase() || '';
 
-                // Ẩn modal sau khi chọn sản phẩm
-                let modal = bootstrap.Modal.getInstance(document.getElementById("productModal"));
-                modal.hide();
-            });
+            row.style.display = (name.includes(keyword) || phone.includes(keyword) || email.includes(keyword)) ? '' : 'none';
         });
+    }
 
-        // Gán class 'active' vào sản phẩm đang được chọn
-        document.addEventListener("click", function (event) {
-            if (event.target.closest(".card-body-product")) {
-                document.querySelectorAll(".card-body-product").forEach(div => div.classList.remove("active"));
-                event.target.closest(".card-body-product").classList.add("active");
+    // Hàm chọn khách hàng
+    function selectCustomer(customer) {
+        // Cập nhật form fields
+        document.getElementById('customerID').value = customer.id;
+        document.getElementById('hoTen').value = customer.name;
+        document.getElementById('soDienThoai').value = customer.phone;
+        document.getElementById('email').value = customer.email || '';
+        document.getElementById('diaChi').value = customer.address || '';
+
+        // Cập nhật UI hiển thị
+        document.getElementById('selectedName').textContent = customer.name;
+        document.getElementById('selectedPhone').textContent = customer.phone;
+        document.getElementById('selectedEmail').textContent = customer.email || 'Không có';
+        document.getElementById('selectedAddress').textContent = customer.address || 'Không có';
+
+        // Hiển thị thông tin số lần mua
+        const purchaseCount = parseInt(customer.purchase || 0);
+        document.getElementById('customerPurchaseInfo').innerHTML = purchaseCount > 0
+            ? `<span class="badge bg-success me-2">Khách hàng thân thiết</span>Đã mua <strong>${purchaseCount}</strong> lần tại cửa hàng.`
+            : `<span class="badge bg-info me-2">Khách hàng mới</span>Chưa có lịch sử mua hàng.`;
+
+        // Hiển thị vùng thông tin khách hàng đã chọn
+        document.getElementById('selectedCustomerInfo').classList.remove('d-none');
+    }
+
+    // Hàm chọn sản phẩm
+    function selectProduct(productBtn) {
+        const selectedProductDiv = document.querySelector(".product-section.active");
+        if (!selectedProductDiv) return;
+
+        const name = productBtn.getAttribute("data-name");
+        const price = productBtn.getAttribute("data-price");
+        const stock = productBtn.getAttribute("data-stock");
+        const id = productBtn.getAttribute("data-id");
+
+        selectedProductDiv.querySelector(".tenSanPham").value = name;
+        selectedProductDiv.querySelector(".donGia").value = price;
+        selectedProductDiv.querySelector(".soLuong").value = 1;
+        selectedProductDiv.querySelector(".productID").value = id;
+
+        selectedProductDiv.querySelector(".available-stock").textContent = stock;
+        selectedProductDiv.querySelector(".soLuong").setAttribute("max", stock);
+
+        selectedProductDiv.querySelector(".remove-product").classList.remove("d-none");
+        calculateTotal();
+
+        bootstrap.Modal.getInstance(document.getElementById("productModal"))?.hide();
+    }
+
+    // Hàm hiển thị thông báo toast
+    // function showToast(type, title, message) {
+    //     Swal.fire({
+    //         icon: type === 'success' ? 'success' : type === 'error' ? 'error' : 'info',
+    //         title: title,
+    //         text: message,
+    //         toast: true,
+    //         position: 'top-end',
+    //         showConfirmButton: false,
+    //         timer: 3000,
+    //         timerProgressBar: true
+    //     });
+    // }
+
+    // Hàm đăng ký khách hàng mới
+    function registerNewCustomer() {
+        const form = document.getElementById('newCustomerForm');
+
+        // Kiểm tra validation cơ bản
+        const fullName = form.querySelector('#newFullName').value.trim();
+        const phone = form.querySelector('#newPhone').value.trim();
+
+        if (!fullName) {
+            showToast('error', 'Lỗi', 'Vui lòng nhập họ và tên');
+            return;
+        }
+
+        if (!phone) {
+            showToast('error', 'Lỗi', 'Vui lòng nhập số điện thoại');
+            return;
+        }
+
+        // Hiển thị loading
+        Swal.fire({
+            title: 'Đang xử lý',
+            text: 'Đang đăng ký khách hàng mới...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
             }
         });
 
-        // Xử lý khi thêm sản phẩm mới
-        document.querySelector(".add-product-btn").addEventListener("click", function () {
-            let newProductDiv = document.createElement("div");
-            newProductDiv.classList.add("card-body", "card-body-product");
+        // Sử dụng jQuery ajax
+        $.ajax({
+            url: '/dashboard/admin/customers/api/create',
+            type: 'POST',
+            data: {
+                fullName: fullName,
+                phone: phone,
+                email: form.querySelector('#newEmail').value || '',
+                dob: form.querySelector('#newDob').value || '',
+                address: form.querySelector('#newAddress').value || '',
+                gender: form.querySelector('#newGender').value || '',
+                purchaseCount: '0'
+            },
+            dataType: 'json',
+            success: function(data) {
+                // Đóng loading
+                Swal.close();
 
-            newProductDiv.innerHTML = `
-            <div class="mb-3">
-                <div class="btn btn-outline-secondary w-100 mb-3 select-product-btn" data-bs-toggle="modal" data-bs-target="#productModal">Chọn sản phẩm</div>
-            </div>
-            <input type="hidden" class="productID" id="productID" name="productID">
-            <div class="mb-3">
-                <label class="form-label">Tên sản phẩm</label>
-                <input type="text" class="form-control tenSanPham" id="tenSanPham" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Đơn giá</label>
-                <div class="input-group">
-                    <input type="number" class="form-control donGia" id="donGia" readonly>
-                    <span class="input-group-text">VND</span>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Số lượng</label>
-                <input type="number" class="form-control soLuong" id="soLuong" style="width: 150px;" value="1" name="quantity">
-            </div>
-        `;
+                // Ẩn modal và reset form
+                if (newCustomerModal) {
+                    newCustomerModal.hide();
+                }
+                form.reset();
 
-            let addButton = document.querySelector(".add-product-btn");
-            addButton.parentNode.insertBefore(newProductDiv, addButton);
+                // Check if we have a customerId in the response, which indicates success
+                if (data.customerId) {
+                    const customerId = data.customerId;
+
+                    // Cập nhật UI và chọn khách hàng mới
+                    selectCustomer({
+                        id: customerId,
+                        name: fullName,
+                        phone: phone,
+                        email: form.querySelector('#newEmail').value || '',
+                        address: form.querySelector('#newAddress').value || '',
+                        purchase: 0
+                    });
+
+                    // Thêm khách hàng vào bảng
+                    const newRow = document.createElement('tr');
+                    newRow.className = 'existing-customer-row';
+                    newRow.innerHTML = `
+                    <td>${fullName}</td>
+                    <td>${phone}</td>
+                    <td>${form.querySelector('#newEmail').value || ''}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-success btn-select-customer"
+                                data-id="${data.customerId}"
+                                data-name="${fullName}"
+                                data-phone="${phone}"
+                                data-email="${form.querySelector('#newEmail').value || ''}"
+                                data-address="${form.querySelector('#newAddress').value || ''}"
+                                data-purchase="0">
+                            <i class="fas fa-check me-1"></i> Chọn
+                        </button>
+                    </td>
+                    `;
+
+                    // Thêm sự kiện cho nút chọn
+                    const selectBtn = newRow.querySelector('.btn-select-customer');
+                    selectBtn.addEventListener('click', function() {
+                        const customer = {
+                            id: this.getAttribute('data-id'),
+                            name: this.getAttribute('data-name'),
+                            phone: this.getAttribute('data-phone'),
+                            email: this.getAttribute('data-email'),
+                            address: this.getAttribute('data-address'),
+                            purchase: this.getAttribute('data-purchase')
+                        };
+                        selectCustomer(customer);
+                    });
+
+                    // Thêm vào bảng khách hàng hiện có
+                    const existingCustomerTableBody = document.getElementById('existingCustomerTableBody');
+                    if (existingCustomerTableBody) {
+                        existingCustomerTableBody.insertBefore(newRow, existingCustomerTableBody.firstChild);
+                    }
+
+                    // Hiển thị thông báo thành công
+                    showToast('success', 'Thành công', 'Đã đăng ký khách hàng mới thành công');
+                } else {
+                    // Nếu response không có customerId
+                    const errorMsg = data.message || 'Lỗi không xác định khi đăng ký khách hàng mới';
+
+                    // Hiển thị lỗi cụ thể trong form
+                    const errorMessage = document.getElementById('newCustomerErrorMessage');
+                    const errorAlert = document.getElementById('newCustomerError');
+
+                    if (errorMessage && errorAlert) {
+                        errorMessage.textContent = errorMsg;
+                        errorAlert.classList.remove('d-none');
+                    }
+
+                    // Hiển thị toast lỗi
+                    showToast('error', 'Lỗi', errorMsg);
+                }
+            },
+            error: function(xhr, status, error) {
+                // Đóng loading
+                Swal.close();
+
+                // Hiển thị lỗi cụ thể
+                const errorMessage = document.getElementById('newCustomerErrorMessage');
+                const errorAlert = document.getElementById('newCustomerError');
+
+                if (errorMessage && errorAlert) {
+                    errorMessage.textContent = 'Lỗi khi đăng ký khách hàng: ' + error;
+                    errorAlert.classList.remove('d-none');
+                }
+
+                // Hiển thị toast lỗi
+                showToast('error', 'Lỗi đăng ký', 'Đã xảy ra lỗi khi đăng ký khách hàng mới');
+            }
         });
-    });
+    }
 
+    // Khởi tạo khi trang đã load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Khởi tạo modal
+        newCustomerModal = new bootstrap.Modal(document.getElementById('newCustomerModal'));
+
+        // Sự kiện tìm kiếm khách hàng cũ
+        document.getElementById('btnSearchReturningCustomer').addEventListener('click', function() {
+            const phone = document.getElementById('returningCustomerPhone').value.trim();
+            if (!phone) {
+                showToast('error', 'Lỗi', 'Vui lòng nhập số điện thoại để tìm kiếm');
+                return;
+            }
+
+            // Hiển thị loading
+            Swal.fire({
+                title: 'Đang tìm kiếm',
+                text: 'Đang tìm kiếm khách hàng...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch(`/dashboard/sales/customers/search-by-phone?phone=${encodeURIComponent(phone)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Đóng loading
+                    Swal.close();
+
+                    if (data.status === 'success') {
+                        const customer = data.customer;
+                        selectCustomer({
+                            id: customer.id,
+                            name: customer.fullName,
+                            phone: customer.phone,
+                            email: customer.email,
+                            address: customer.address,
+                            purchase: customer.purchaseCount
+                        });
+                        showToast('success', 'Thành công', 'Đã tìm thấy khách hàng: ' + customer.fullName);
+                    } else if (data.status === 'not_found') {
+                        // Hiển thị xác nhận bằng SweetAlert cho việc đăng ký mới
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Không tìm thấy',
+                            text: 'Không tìm thấy khách hàng với số điện thoại này. Bạn có muốn đăng ký mới không?',
+                            showCancelButton: true,
+                            confirmButtonText: 'Đăng ký mới',
+                            cancelButtonText: 'Hủy'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Chuyển số điện thoại đã tìm kiếm vào form đăng ký mới
+                                document.getElementById('newPhone').value = phone;
+                                // Hiển thị modal đăng ký khách hàng mới
+                                newCustomerModal.show();
+                            }
+                        });
+                    } else {
+                        showToast('error', 'Lỗi', data.message || 'Đã xảy ra lỗi khi tìm kiếm khách hàng');
+                    }
+                })
+                .catch(error => {
+                    // Đóng loading
+                    Swal.close();
+                    console.error('Error:', error);
+                    showToast('error', 'Lỗi kết nối', 'Không thể kết nối đến máy chủ');
+                });
+        });
+
+        // Sự kiện tìm kiếm tất cả khách hàng
+        document.getElementById('searchExistingCustomerBtn').addEventListener('click', function() {
+            searchItems('searchExistingCustomer', 'existingCustomerTableBody', 'tr');
+        });
+
+        // Sự kiện tìm kiếm sản phẩm
+        document.getElementById('searchProductBtn').addEventListener('click', function() {
+            const keyword = document.getElementById('searchProductInput').value.toLowerCase();
+            document.querySelectorAll('#productTable tr').forEach(row => {
+                const nameEl = row.querySelector('.name');
+                if (nameEl) {
+                    const name = nameEl.textContent.toLowerCase();
+                    row.style.display = name.includes(keyword) ? '' : 'none';
+                }
+            });
+        });
+
+        // Sự kiện chọn khách hàng
+        document.querySelectorAll('.btn-select-customer').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const customer = {
+                    id: this.getAttribute('data-id'),
+                    name: this.getAttribute('data-name'),
+                    phone: this.getAttribute('data-phone'),
+                    email: this.getAttribute('data-email'),
+                    address: this.getAttribute('data-address'),
+                    purchase: this.getAttribute('data-purchase')
+                };
+                selectCustomer(customer);
+            });
+        });
+
+        // Sự kiện chọn sản phẩm
+        document.querySelectorAll('.btn-select-product').forEach(btn => {
+            btn.addEventListener('click', function() {
+                selectProduct(this);
+            });
+        });
+
+        // Sự kiện thêm sản phẩm
+        document.querySelector('.add-product-btn').addEventListener('click', function() {
+            const productsContainer = document.getElementById('productsContainer');
+            const productSections = productsContainer.querySelectorAll('.product-section');
+
+            // Đánh dấu tất cả các section hiện tại là không active
+            productSections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Tạo section mới
+            const newSection = document.createElement('div');
+            newSection.className = 'product-section active';
+            newSection.innerHTML = `
+                <div class="mb-3">
+                    <button type="button" class="btn btn-outline-primary w-100 mb-3 select-product-btn" data-bs-toggle="modal" data-bs-target="#productModal">
+                        <i class="fas fa-mobile-alt me-2"></i> Chọn sản phẩm
+                    </button>
+                    <i class="fas fa-times-circle remove-product"></i>
+                </div>
+                <input type="hidden" class="productID" name="productID">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Tên sản phẩm</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
+                                <input type="text" class="form-control tenSanPham" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Đơn giá</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                <input type="number" class="form-control donGia" readonly>
+                                <span class="input-group-text">VND</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Số lượng</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-cubes"></i></span>
+                                <input type="number" class="form-control soLuong" min="1" value="1" name="quantity" onchange="calculateTotal()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stock-info text-muted mt-4">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Còn <span class="available-stock">0</span> sản phẩm trong kho
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Thêm section mới vào container
+            productsContainer.appendChild(newSection);
+
+            // Thêm sự kiện cho nút chọn sản phẩm mới
+            newSection.querySelector('.select-product-btn').addEventListener('click', function() {
+                // Đánh dấu tất cả các section là không active
+                document.querySelectorAll('.product-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                // Đánh dấu section hiện tại là active
+                newSection.classList.add('active');
+            });
+
+            // Thêm sự kiện cho nút xóa sản phẩm
+            newSection.querySelector('.remove-product').addEventListener('click', function() {
+                newSection.remove();
+                calculateTotal();
+
+                // Nếu không còn section nào, thêm một section mới
+                if (document.querySelectorAll('.product-section').length === 0) {
+                    document.querySelector('.add-product-btn').click();
+                }
+            });
+        });
+
+        // Sự kiện xóa sản phẩm cho các nút xóa hiện có
+        document.querySelectorAll('.remove-product').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const section = this.closest('.product-section');
+                section.remove();
+                calculateTotal();
+
+                // Nếu không còn section nào, thêm một section mới
+                if (document.querySelectorAll('.product-section').length === 0) {
+                    document.querySelector('.add-product-btn').click();
+                }
+            });
+        });
+
+        // Sự kiện đăng ký khách hàng mới
+        document.getElementById('saveNewCustomer').addEventListener('click', registerNewCustomer);
+
+        // Tính tổng tiền ban đầu
+        calculateTotal();
+    });
 </script>
 </body>
 </html>

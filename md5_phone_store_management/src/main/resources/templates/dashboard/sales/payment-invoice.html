@@ -1,24 +1,254 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hóa đơn thanh toán</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css"/>
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+    
+    <style>
+        .invoice-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+        
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #d82027;
+            padding-bottom: 20px;
+        }
+        
+        .invoice-header h1 {
+            color: #d82027;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .invoice-details {
+            margin-bottom: 30px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .invoice-details p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .invoice-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        .invoice-items th {
+            background-color: #343a40;
+            color: white;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            padding: 12px;
+        }
+        
+        .invoice-items td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .invoice-items tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .total {
+            text-align: right;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+            color: #d82027;
+        }
+        
+        .invoice-footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+        }
+        
+        .actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .actions a {
+            display: inline-block;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 0 10px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .actions a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .actions .print {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .actions .download {
+            background-color: #d82027;
+            color: white;
+        }
+        
+        .actions .back {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        @media print {
+            .navbar, .footer, .actions, .toast-container, .sidebar {
+                display: none !important;
+            }
+            
+            body {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .invoice-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 15px !important;
+                max-width: 100% !important;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1>Hóa đơn thanh toán</h1>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
 
-    <div class="invoice-details">
-        <p><strong>Mã giao dịch:</strong> <span th:text="${transactionId}"></span></p>
-        <p><strong>Số tiền:</strong> <span th:text="${#numbers.formatCurrency(amount)}"></span>VND</p>
-        <p><strong>Thông tin đơn hàng:</strong> <span th:text="${orderInfo}"></span></p>
-        <p><strong>Ngày thanh toán:</strong> <span th:text="${#dates.format(payDate, 'dd/MM/yyyy HH:mm')}"></span></p>
-        <p><strong>Mã ngân hàng:</strong> <span th:text="${bankCode}"></span></p>
-        <p><strong>Loại thẻ:</strong> <span th:text="${cardType}"></span></p>
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="container-fluid py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/customers/list}">Quản lý khách hàng</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/customers/list}">Lịch sử hóa đơn</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Hóa đơn thanh toán</li>
+                    </ol>
+                </nav>
+                
+                <div class="invoice-container">
+                    <div class="invoice-header">
+                        <h1>HÓA ĐƠN THANH TOÁN</h1>
+                        <p>Cửa hàng điện thoại</p>
+                    </div>
+
+                    <div class="invoice-details">
+                        <p><strong><i class="fas fa-file-invoice me-2"></i>Mã giao dịch:</strong> <span th:text="${transactionId}"></span></p>
+                        <p><strong><i class="fas fa-money-bill-wave me-2"></i>Số tiền:</strong> <span th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')}"></span> VND</p>
+                        <p><strong><i class="fas fa-info-circle me-2"></i>Thông tin đơn hàng:</strong> <span th:text="${orderInfo}"></span></p>
+                        <p><strong><i class="fas fa-calendar-alt me-2"></i>Ngày thanh toán:</strong> <span th:text="${#dates.format(payDate, 'dd/MM/yyyy HH:mm')}"></span></p>
+                        <p>
+                            <strong><i class="fas fa-credit-card me-2"></i>Phương thức thanh toán:</strong> 
+                            <span th:if="${bankCode == 'CASH'}" class="badge bg-success">Tiền mặt</span>
+                            <span th:unless="${bankCode == 'CASH'}" class="badge bg-primary">VNPay - <span th:text="${bankCode}"></span></span>
+                        </p>
+                        <p th:if="${cardType != null && cardType != 'CASH'}">
+                            <strong><i class="fas fa-credit-card me-2"></i>Loại thẻ:</strong> 
+                            <span class="badge bg-info" th:text="${cardType}"></span>
+                        </p>
+                    </div>
+
+                    <div th:if="${invoice != null && invoice.invoiceDetailList != null && !invoice.invoiceDetailList.empty}">
+                        <h3><i class="fas fa-shopping-cart me-2"></i>Chi tiết sản phẩm</h3>
+                        <div class="table-responsive">
+                            <table class="invoice-items table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Đơn giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Thành tiền</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="item, index : ${invoice.invoiceDetailList}">
+                                    <td class="text-center" th:text="${index.count}"></td>
+                                    <td th:text="${item.product.name}"></td>
+                                    <td class="text-end" th:text="${#numbers.formatDecimal(item.product.sellingPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+                                    <td class="text-center" th:text="${item.quantity}"></td>
+                                    <td class="text-end" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="total">
+                            <i class="fas fa-calculator me-2"></i>Tổng cộng: <span th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')}"></span> VND
+                        </div>
+                    </div>
+
+                    <div class="invoice-footer">
+                        <p><i class="fas fa-heart me-1"></i> Cảm ơn quý khách đã mua hàng tại cửa hàng chúng tôi!</p>
+                        <p><i class="fas fa-phone me-1"></i> Mọi thắc mắc xin liên hệ: 0123 456 789</p>
+                    </div>
+
+                    <div class="actions">
+                        <a href="javascript:window.print()" class="print"><i class="fas fa-print me-2"></i>In hóa đơn</a>
+                        <a th:href="@{/dashboard/sales/download-invoice-pdf/{id}(id=${invoice.id})}" class="download"><i class="fas fa-file-pdf me-2"></i>Tải PDF</a>
+                        <a th:href="@{/dashboard/sales/form}" class="back"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <a th:href="@{/}">Quay lại trang chủ</a>
+    
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/common/toast.js"></script>
 </body>
 </html>

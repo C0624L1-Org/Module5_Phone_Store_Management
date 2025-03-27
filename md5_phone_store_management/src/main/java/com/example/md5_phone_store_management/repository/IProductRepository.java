@@ -1,7 +1,8 @@
 package com.example.md5_phone_store_management.repository;
 
-import com.example.md5_phone_store_management.model.Product;
-import com.example.md5_phone_store_management.model.ProductImage;
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.List;
+import com.example.md5_phone_store_management.model.Product;
 
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Integer> {
@@ -55,14 +55,14 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
             "p.camera = ?5, p.selfie = ?6, p.CPU = ?7, p.storage = ?8, p.detailedDescription = ?9 " +
             "WHERE p.productID = ?1", nativeQuery = true)
     void updateProduct(Integer productID,
-                          String name,
-                          BigDecimal sellingPrice,
-                          String screenSize,
-                          String camera,
-                          String selfie,
-                          String cpu,
-                          String storage,
-                          String description);
+                       String name,
+                       BigDecimal sellingPrice,
+                       String screenSize,
+                       String camera,
+                       String selfie,
+                       String cpu,
+                       String storage,
+                       String description);
 
     @Modifying
     @Transactional
@@ -81,4 +81,22 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     // Phương thức mới: Lấy sản phẩm theo supplierId
     @Query("SELECT p FROM Product p WHERE p.supplier.supplierID = :supplierId")
     List<Product> findBySupplierId(@Param("supplierId") Integer supplierId);
+
+    // Cập nhật số lượng tồn kho trực tiếp
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE product SET stockQuantity = :stockQuantity WHERE productID = :productId", nativeQuery = true)
+    void updateStockQuantity(@Param("productId") Integer productId, @Param("stockQuantity") int stockQuantity);
+
+    // Các phương thức tìm kiếm
+    @Query(value = "SELECT * FROM product " +
+            "WHERE (:name IS NULL OR name LIKE CONCAT('%',:name,'%')) " +
+            "AND (:supplier IS NULL OR supplier.name LIKE CONCAT('%',:supplier,'%')) " +
+            "AND (:price = 0 OR purchasePrice <= :price)",
+            nativeQuery = true)
+    Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(
+            @Param("name") String name,
+            @Param("supplier") String supplier,
+            @Param("price") double price,
+            Pageable pageable);
 }
