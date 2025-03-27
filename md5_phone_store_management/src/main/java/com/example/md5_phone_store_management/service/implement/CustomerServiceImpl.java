@@ -1,14 +1,17 @@
 package com.example.md5_phone_store_management.service.implement;
 
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.repository.ICustomerRepository;
-import com.example.md5_phone_store_management.service.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.md5_phone_store_management.model.Customer;
+import com.example.md5_phone_store_management.repository.ICustomerRepository;
+import com.example.md5_phone_store_management.service.ICustomerService;
 
 @Service
+@Transactional
 public class CustomerServiceImpl implements ICustomerService {
 
     @Autowired
@@ -56,6 +59,11 @@ public class CustomerServiceImpl implements ICustomerService {
         return customerRepository.save(customer);
     }
 
+    @Override
+    @Transactional
+    public void updatePurchaseCount(Integer customerId, int newCount) {
+        customerRepository.updatePurchaseCountById(customerId, newCount);
+    }
 
 //public Page<Employee> searchEmployees(String name, String phone, String role, Pageable pageable) {
 //    boolean hasName = name != null && !name.isEmpty();

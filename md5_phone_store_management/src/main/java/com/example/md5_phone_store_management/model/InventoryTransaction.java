@@ -73,7 +73,7 @@ public class InventoryTransaction {
 
     public void setProduct(Product product) {
         this.product = product;
-        updateValuesFromProduct();  // Gọi lại khi thay đổi product
+        updateValuesFromProduct();
     }
 
     public TransactionType getTransactionType() {

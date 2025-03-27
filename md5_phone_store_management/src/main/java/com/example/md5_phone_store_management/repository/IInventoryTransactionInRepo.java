@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -28,12 +29,14 @@ public interface IInventoryTransactionInRepo extends JpaRepository<InventoryTran
     @Query("SELECT i FROM InventoryTransaction i " +
             "WHERE i.transactionType = :transactionType " +
             "AND (:productName IS NULL OR LOWER(i.product.name) LIKE LOWER(CONCAT('%', :productName, '%'))) " +
-            "AND (:supplierName IS NULL OR LOWER(i.product.supplier.name) LIKE LOWER(CONCAT('%', :supplierName, '%'))) " +
-            "AND (:transactionDate IS NULL OR i.transactionDate = :transactionDate)")
+            "AND (:supplierName IS NULL OR LOWER(i.supplier.name) LIKE LOWER(CONCAT('%', :supplierName, '%'))) " +
+            "AND (:startDate IS NULL OR i.transactionDate >= :startDate) " +
+            "AND (:endDate IS NULL OR i.transactionDate <= :endDate OR (:startDate IS NOT NULL AND :endDate IS NULL AND i.transactionDate <= CURRENT_TIMESTAMP))")
     Page<InventoryTransaction> searchTransactions(
             @Param("productName") String productName,
             @Param("supplierName") String supplierName,
-            @Param("transactionDate") LocalDate transactionDate,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
             @Param("transactionType") TransactionType transactionType,
             Pageable pageable
     );
