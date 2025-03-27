@@ -1,7 +1,8 @@
 package com.example.md5_phone_store_management.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.math.BigDecimal;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -9,31 +10,27 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "product_images")
-public class ProductImage {
+public class InvoiceDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String imageUrl;
-    private String description;
+    private Integer quantity;
+
+    @Column(columnDefinition = "decimal(15,0)")
+    private BigDecimal totalPrice;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoice_id")
+    private Invoice invoice;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    @JsonBackReference
     private Product product;
 
-    public ProductImage() {
-    }
-
-    public ProductImage(String imageUrl, String description, Product product) {
-        this.imageUrl = imageUrl;
-        this.description = description;
-        this.product = product;
-    }
+    public InvoiceDetail() {}
 
     public Long getId() {
         return id;
@@ -43,20 +40,28 @@ public class ProductImage {
         this.id = id;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public Integer getQuantity() {
+        return quantity;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
-    public String getDescription() {
-        return description;
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 
     public Product getProduct() {
@@ -69,10 +74,11 @@ public class ProductImage {
 
     @Override
     public String toString() {
-        return "ProductImage{" +
+        return "InvoiceDetail{" +
                 "id=" + id +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", description='" + description + '\'' +
+                ", quantity=" + quantity +
+                ", totalPrice=" + totalPrice +
+                ", invoice=" + (invoice != null ? invoice.getId() : null) +
                 ", product=" + (product != null ? product.getProductID() : null) +
                 '}';
     }

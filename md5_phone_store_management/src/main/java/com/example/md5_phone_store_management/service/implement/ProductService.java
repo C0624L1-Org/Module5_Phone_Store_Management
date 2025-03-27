@@ -1,21 +1,24 @@
 package com.example.md5_phone_store_management.service.implement;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.md5_phone_store_management.model.Product;
 import com.example.md5_phone_store_management.model.ProductImage;
 import com.example.md5_phone_store_management.repository.IProductRepository;
 import com.example.md5_phone_store_management.service.CloudinaryService;
 import com.example.md5_phone_store_management.service.IProductService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
+@Transactional
 public class ProductService implements IProductService {
     @Autowired
     IProductRepository productRepository;
@@ -99,11 +102,23 @@ public class ProductService implements IProductService {
         productRepository.deleteProductImages(product.getProductID());
     }
 
+    @Override
+    @Transactional
+    public void updateStockQuantity(Integer productId, int newStockQuantity) {
+        productRepository.updateStockQuantity(productId, newStockQuantity);
+    }
+
     //Tuấn Anh
     @Override
     public Page<Product> findAll(Pageable pageable) {
         return productRepository.findAll(pageable);
     }
+
+    @Override
+    public List<Product> findAllProducts() {
+        return productRepository.findAllProducts();
+    }
+
     @Override
     public Page<Product> searchProductByNameAndSupplier_NameAndPurchasePrice(String name, String supplierName, int purchasePrice, Pageable pageable) {
         return productRepository.searchProductByNameAndSupplier_NameAndPurchasePrice(name,supplierName,purchasePrice,pageable);
@@ -131,6 +146,11 @@ public class ProductService implements IProductService {
     @Override
     public void save(Product product) {
         productRepository.save(product);
+    }
+
+    @Override
+    public Product findById(Integer id) {
+        return productRepository.findByProductID(id);
     }
 
 }

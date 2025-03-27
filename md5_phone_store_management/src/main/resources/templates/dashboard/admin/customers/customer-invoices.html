@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch sử hóa đơn</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);
+            color: white;
+            padding: 1.2rem 1.5rem;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .table-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+
+        .customer-info {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+
+        .customer-info h4 {
+            color: #4a6fdc;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4a6fdc;
+            padding-bottom: 0.5rem;
+        }
+
+        .badge-cash {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-vnpay {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .btn-view {
+            background-color: #6c8deb;
+            border-color: #6c8deb;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background-color: #4a6fdc;
+            border-color: #4a6fdc;
+        }
+
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+            font-weight: 500;
+            border-color: #454d55;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .back-button {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="container-fluid py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/customers/list}">Quản lý khách hàng</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Lịch sử hóa đơn</li>
+                    </ol>
+                </nav>
+
+                <div class="back-button">
+                    <a th:href="@{/dashboard/admin/customers/list}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách khách hàng
+                    </a>
+                </div>
+
+                <div class="customer-info">
+                    <h4><i class="fas fa-user-circle me-2"></i>Thông tin khách hàng</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Họ tên:</strong> <span th:text="${customer.fullName}"></span></p>
+                            <p><strong>Email:</strong> <span th:text="${customer.email ?: 'Không có'}"></span></p>
+                            <p><strong>Số điện thoại:</strong> <span th:text="${customer.phone}"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Địa chỉ:</strong> <span th:text="${customer.address ?: 'Không có'}"></span></p>
+                            <p><strong>Giới tính:</strong>
+                                <span th:with="gender=${#strings.toLowerCase(customer.gender)}">
+                                    <span th:if="${gender == 'male'}" class="badge bg-primary">Nam</span>
+                                    <span th:if="${gender == 'female'}" class="badge bg-danger">Nữ</span>
+                                    <span th:if="${gender == 'other'}" class="badge bg-warning">Khác</span>
+                                </span>
+                            </p>
+                            <p><strong>Số lần mua hàng:</strong> <span th:text="${customer.purchaseCount}"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-receipt me-2 text-primary"></i>
+                        Lịch sử hóa đơn
+                    </h2>
+                </div>
+
+                <!-- Table -->
+                <div class="table-card">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered mb-0">
+                            <thead>
+                            <tr>
+                                <th style="width: 80px">Mã HĐ</th>
+                                <th>Ngày thanh toán</th>
+                                <th>Tổng tiền</th>
+                                <th>Thông tin đơn hàng</th>
+                                <th style="text-align: center">Phương thức</th>
+                                <th style="width: 150px; text-align: center;">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${invoicePage.content.empty}">
+                                <td colspan="6" class="text-center py-4">
+                                    <i class="fas fa-receipt fa-3x mb-3 text-muted"></i>
+                                    <p class="text-muted">Khách hàng chưa có hóa đơn nào</p>
+                                </td>
+                            </tr>
+                            <tr th:each="invoice : ${invoicePage.content}">
+                                <td th:text="${invoice.id}"></td>
+                                <td>
+                                    <!-- Hiển thị ngày với format mặc định, JavaScript sẽ định dạng lại sau -->
+                                    <span th:attr="data-date=${invoice.payDate}" class="date-format">
+                                            <span th:text="${invoice.payDate != null && !invoice.payDate.isEmpty() ? invoice.payDate : 'Không có'}"></span>
+                                        </span>
+                                </td>
+                                <td th:text="${#numbers.formatDecimal(invoice.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+                                <td th:text="${invoice.orderInfo}"></td>
+                                <td class="text-center">
+                                        <span th:if="${invoice.bankCode == null || invoice.bankCode == '' || invoice.bankCode == 'CASH' || #strings.equalsIgnoreCase(invoice.bankCode, 'CASH')}" class="badge bg-success">
+                                            <i class="fas fa-money-bill-wave me-1"></i>Tiền mặt
+                                        </span>
+                                    <span th:unless="${invoice.bankCode == null || invoice.bankCode == '' || invoice.bankCode == 'CASH' || #strings.equalsIgnoreCase(invoice.bankCode, 'CASH')}" class="badge bg-primary">
+                                            <i class="fas fa-credit-card me-1"></i>VNPay - <span th:text="${invoice.bankCode}"></span>
+                                        </span>
+                                </td>
+                                <td class="text-center">
+                                    <a th:href="@{/dashboard/sales/invoice-pdf/{id}(id=${invoice.id})}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Phân trang -->
+                    <div th:if="${invoicePage != null and !invoicePage.content.empty}"
+                         class="p-3 bg-light border-top d-flex justify-content-end align-items-center">
+                        <nav aria-label="Pagination">
+                            <ul class="pagination mb-0">
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/customers/{customerID}/invoices(customerID=${customer.customerID}, page=0)}">
+                                        Trang đầu
+                                    </a>
+                                </li>
+
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/customers/{customerID}/invoices(customerID=${customer.customerID}, page=${currentPage - 1})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+
+                                <li class="page-item active mx-2">
+                                    <span class="page-link">
+                                        <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
+                                    </span>
+                                </li>
+
+                                <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/customers/{customerID}/invoices(customerID=${customer.customerID}, page=${currentPage + 1})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+
+                                <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/customers/{customerID}/invoices(customerID=${customer.customerID}, page=${totalPage - 1})}">
+                                        Trang cuối
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/common/toast.js"></script>
+
+<!-- JavaScript để định dạng ngày giờ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lấy tất cả các phần tử có class 'date-format'
+        const dateElements = document.querySelectorAll('.date-format');
+
+        // Xử lý từng phần tử
+        dateElements.forEach(function(element) {
+            const dateString = element.getAttribute('data-date');
+
+            // Nếu không có ngày hoặc chuỗi rỗng, không làm gì cả
+            if (!dateString || dateString.trim() === '') {
+                return;
+            }
+
+            // Kiểm tra nếu là định dạng yyyyMMddHHmmss (14 ký tự số)
+            if (dateString.length === 14 && /^\d+$/.test(dateString)) {
+                const year = dateString.substring(0, 4);
+                const month = dateString.substring(4, 6);
+                const day = dateString.substring(6, 8);
+                const hour = dateString.substring(8, 10);
+                const minute = dateString.substring(10, 12);
+
+                // Định dạng lại: dd/MM/yyyy HH:mm
+                const formattedDate = day + '/' + month + '/' + year + ' ' + hour + ':' + minute;
+
+                // Thay thế nội dung của phần tử
+                element.innerHTML = formattedDate;
+            }
+        });
+    });
+</script>
+</body>
+</html>

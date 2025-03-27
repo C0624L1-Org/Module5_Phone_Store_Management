@@ -121,26 +121,26 @@ public class InventoryController {
     }
 
     // Tìm kiếm giao dịch nhập kho
-    @GetMapping("/search")
-    public ModelAndView searchImportTransactions(
-            @RequestParam(name = "productName", required = false) String productName,
-            @RequestParam(name = "supplierName", required = false) String supplierName,
-            @RequestParam(name = "transactionDate", required = false) String transactionDateStr,
-            @RequestParam(name = "page", defaultValue = "0") int page) {
-        ModelAndView modelAndView = new ModelAndView("dashboard/inventory/list");
-        Pageable pageable = PageRequest.of(page, 5);
-        LocalDate transactionDate = null;
-        if (transactionDateStr != null && !transactionDateStr.isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            transactionDate = LocalDate.parse(transactionDateStr, formatter);
-        }
-
-        Page<InventoryTransaction> searchResults = inventoryTransactionService.searchImportTransactions(productName, supplierName, transactionDate, pageable);
-        modelAndView.addObject("currentPage", page);
-        modelAndView.addObject("transactions", searchResults.getContent());
-        modelAndView.addObject("totalPage", searchResults.getTotalPages());
-        return modelAndView;
-    }
+//    @GetMapping("/search")
+//    public ModelAndView searchImportTransactions(
+//            @RequestParam(name = "productName", required = false) String productName,
+//            @RequestParam(name = "supplierName", required = false) String supplierName,
+//            @RequestParam(name = "transactionDate", required = false) String transactionDateStr,
+//            @RequestParam(name = "page", defaultValue = "0") int page) {
+//        ModelAndView modelAndView = new ModelAndView("dashboard/inventory/list");
+//        Pageable pageable = PageRequest.of(page, 5);
+//        LocalDate transactionDate = null;
+//        if (transactionDateStr != null && !transactionDateStr.isEmpty()) {
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//            transactionDate = LocalDate.parse(transactionDateStr, formatter);
+//        }
+//
+//        Page<InventoryTransaction> searchResults = inventoryTransactionService.searchImportTransactions(productName, supplierName, transactionDate, pageable);
+//        modelAndView.addObject("currentPage", page);
+//        modelAndView.addObject("transactions", searchResults.getContent());
+//        modelAndView.addObject("totalPage", searchResults.getTotalPages());
+//        return modelAndView;
+//    }
 
     // Hiển thị form cập nhật giao dịch
     @GetMapping("/update")

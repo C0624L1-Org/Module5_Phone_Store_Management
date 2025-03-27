@@ -1,10 +1,22 @@
 package com.example.md5_phone_store_management.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "product")
@@ -35,12 +47,17 @@ public class Product {
     @JsonManagedReference
     private List<ProductImage> images;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InvoiceDetail> invoiceDetails;
+
     private Integer stockQuantity;
     private String qrCode;
 
     @ManyToOne
     @JoinColumn(name = "supplierID", foreignKey = @ForeignKey(name = "FK_product_supplier"))
     private Supplier supplier;
+
+
 
     public Product() {
     }
@@ -195,11 +212,11 @@ public class Product {
                 ", screenSize='" + screenSize + '\'' +
                 ", camera='" + camera + '\'' +
                 ", selfie='" + selfie + '\'' +
-                ", detailedDescription='" + detailedDescription + '\'' +
-                ", images=" + images +
+                ", detailedDescription='" + (detailedDescription != null ? detailedDescription.substring(0, Math.min(detailedDescription.length(), 50)) + "..." : null) + '\'' +
+                ", imagesCount=" + (images != null ? images.size() : 0) +
                 ", stockQuantity=" + stockQuantity +
                 ", qrCode='" + qrCode + '\'' +
-                ", supplier=" + supplier +
+                ", supplier=" + (supplier != null ? supplier.getSupplierID() : null) +
                 '}';
     }
 }
