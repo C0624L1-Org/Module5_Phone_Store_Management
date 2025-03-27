@@ -50,6 +50,11 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
+    public Page<Customer> searchCustomersByNameOrPhoneOrEmail(String name, String phone, String email, Pageable pageable) {
+        return customerRepository.findByNameOrPhoneOrEmail(name, phone, email, pageable);
+    }
+
+    @Override
     public Customer findCustomerById(Integer id) {
         return customerRepository.findById(id).orElse(null);
     }
