@@ -2,7 +2,6 @@ package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.repository.IInventoryTransactionInRepo;
-import com.example.md5_phone_store_management.repository.ISupplierRepository;
 import com.example.md5_phone_store_management.service.IInventoryTransactionService;
 import com.example.md5_phone_store_management.service.IProductService;
 import com.example.md5_phone_store_management.service.ISupplierService;
@@ -42,55 +41,21 @@ public class InventoryTransactionController {
     private IProductService productService;
     @Autowired
     private IInventoryTransactionInRepo inventoryTransactionInRepo;
-    @Autowired
-    private ISupplierRepository supplierRepository;
 
 
     @GetMapping("stock-in/list")
     public ModelAndView importController(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
         ModelAndView modelAndView = new ModelAndView("/dashboard/stock-in/stock-in-list");
-      Pageable pageable = PageRequest.of(page,5);
+        Pageable pageable = PageRequest.of(page,5);
         Page<InventoryTransaction> transactions = inventoryTransactionService.getImportTransactions(pageable);
         modelAndView.addObject("currentPage", page);
         List<Product> productList =productService.findAll(Pageable.unpaged()).getContent();
         modelAndView.addObject("products",productList);
         modelAndView.addObject("suppliers",supplierService.getSupplierList());
-      modelAndView.addObject("stockInLists",transactions);
-      modelAndView.addObject("totalPage",transactions.getTotalPages());
-      return modelAndView;
+        modelAndView.addObject("stockInLists",transactions);
+        modelAndView.addObject("totalPage",transactions.getTotalPages());
+        return modelAndView;
     }
-<<<<<<< HEAD
-
-//    @GetMapping("/stock-in/search")
-//    public ModelAndView searchImportTransactions(
-//            @RequestParam(name = "productName", required = false) String productName,
-//            @RequestParam(name = "supplierName", required = false) String supplierName,
-//            @RequestParam(name = "transactionDate", required = false) String transactionDateStr,
-//            @RequestParam(name = "page", defaultValue = "0") int page) {
-//        ModelAndView modelAndView = new ModelAndView("/dashboard/stock-in/stock-in-list");
-//        Pageable pageable = PageRequest.of(page, 5);
-//        LocalDate transactionDate = null;
-//        if (transactionDateStr != null && !transactionDateStr.isEmpty()) {
-//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Định dạng phù hợp với input date
-//            transactionDate = LocalDate.parse(transactionDateStr, formatter);
-//        }
-//        Page<InventoryTransaction> searchResults = inventoryTransactionService.searchImportTransactions(productName, supplierName, transactionDate, pageable);
-//        modelAndView.addObject("currentPage", page);
-//        modelAndView.addObject("stockInLists", searchResults);
-//        modelAndView.addObject("totalPage", searchResults.getTotalPages());
-//        modelAndView.addObject("products", productService.findAll(Pageable.unpaged()).getContent());
-//        modelAndView.addObject("suppliers", supplierService.getSupplierList());
-//        return modelAndView;
-//    }
-
-    @GetMapping("stock-in/update")
-    public String update(Model model,
-                         @RequestParam(name = "stockInId") int stockInId) {
-        List<Supplier> supplierList = supplierService.getSupplierList();
-        InventoryTransaction inventoryTransaction = inventoryTransactionService.findById(stockInId);
-        model.addAttribute("inventoryTransaction", inventoryTransaction);
-        model.addAttribute("supplierList", supplierList);
-=======
     @GetMapping("/stock-in/search")
     public ModelAndView searchImportTransactions(
             @RequestParam(name = "productName", required = false) String productName,
@@ -128,54 +93,31 @@ public class InventoryTransactionController {
 
     @GetMapping("stock-in/update")
     public String update(Model model,
-                         @RequestParam(name = "productId") int productId,
-                         @RequestParam(name = "supplierId") int supplierId){
+                         @RequestParam(name="inventionId") int inventionId) {
         List<Supplier> supplierList = supplierService.getSupplierList();
-        InventoryTransaction inventoryTransaction = inventoryTransactionService.getByProductIdAndSupplierId(productId, supplierId);
+        InventoryTransaction inventoryTransaction = inventoryTransactionService.findById(inventionId);
         model.addAttribute("inventoryTransaction",inventoryTransaction);
         model.addAttribute("supplierList",supplierList);
->>>>>>> origin/main
         return "dashboard/stock-in/stock-in-update";
     }
 
     @PostMapping("stock-in/update")
     public String update(Model model,
-<<<<<<< HEAD
-                         @RequestParam(name = "inventoryTransactionId") int inventoryTransactionId,
+                         @RequestParam(name ="inventoryTransactionId") int inventoryTransactionId,
                          @RequestParam(name = "quantity") int quantity,
-                         @RequestParam(name = "purchasePrice") int purchasePrice,
-                         @RequestParam(name = "supplier") int supplier
+                         @RequestParam(name = "purchasePrice") BigDecimal purchasePrice,
+                         @RequestParam(name="supplierId") int supplierId
                          ) {
-        InventoryTransaction inventoryTransaction =inventoryTransactionService.findById(inventoryTransactionId);
+
+        InventoryTransaction inventoryTransaction = inventoryTransactionService.findById(inventoryTransactionId);
         inventoryTransaction.setQuantity(quantity);
-        inventoryTransaction.setTransactionType(TransactionType.IN);
-        inventoryTransaction.setTransactionDate(LocalDateTime.now());
-        inventoryTransaction.setPurchasePrice(BigDecimal.valueOf(purchasePrice));
-        BigDecimal totalPrice = BigDecimal.valueOf(inventoryTransaction.getQuantity())
-                .multiply(inventoryTransaction.getPurchasePrice());
+        inventoryTransaction.setPurchasePrice(purchasePrice);
+        inventoryTransaction.setTotalPrice(purchasePrice.multiply(BigDecimal.valueOf(quantity)));
 
-        inventoryTransaction.setTotalPrice(totalPrice);
-        inventoryTransaction.setSupplier(supplierRepository.findById(supplier).get());
+        inventoryTransaction.setSupplier(supplierService.getSupplier(supplierId));
+
         inventoryTransactionService.addTransaction(inventoryTransaction);
-
-=======
-                         @Valid @ModelAttribute("inventoryTransaction") InventoryTransaction inventoryTransaction,
-                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "dashboard/stock-in/stock-in-update";
-        }
-        InventoryTransaction inventoryTransaction1 = new InventoryTransaction();
-        BeanUtils.copyProperties(inventoryTransaction,inventoryTransaction1);
-        inventoryTransaction1.setTransactionDate(LocalDateTime.now());
-        BigDecimal totalPrice = BigDecimal.valueOf(inventoryTransaction1.getQuantity()) // Chuyển Integer thành BigDecimal
-                .multiply(inventoryTransaction1.getPurchasePrice()); // Nhân với BigDecimal
-
-        inventoryTransaction1.setTotalPrice(totalPrice);
-        inventoryTransaction1.setTransactionType(TransactionType.IN);
-        inventoryTransactionInRepo.save(inventoryTransaction1);
->>>>>>> origin/main
         return "redirect:/dashboard/stock-in/list";
-
     }
     @PostMapping("/stock-in/delete")
     @PreAuthorize("hasAnyRole('Admin', 'WarehouseStaff')")

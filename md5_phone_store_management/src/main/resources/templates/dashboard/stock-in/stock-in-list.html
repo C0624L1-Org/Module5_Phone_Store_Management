@@ -368,15 +368,8 @@
                 <td th:text="${#numbers.formatDecimal(stock.totalPrice, 0, 'COMMA', 2, 'POINT') + ' VNĐ'}"></td>
                 <td>
                   <div class="d-flex gap-2 justify-content-center">
-<<<<<<< HEAD
-                    <a th:href="@{/dashboard/stock-in/update(stockInId=${stock.transactionID})}"
-=======
-                    <!--                                        <a th:href="@{#}" class="btn btn-action btn-view btn-sm">-->
-                    <!--                                            <i class="fas fa-eye me-1"></i>Xem-->
-                    <!--                                        </a>-->
-                    <a th:href="@{/dashboard/stock-in/update(productId=${stock.product.productID}
-                    ,supplierId=${stock.supplier.supplierID})}"
->>>>>>> origin/main
+
+                    <a th:href="@{/dashboard/stock-in/update(inventionId=${stock.transactionID})}"
                        class="btn btn-warning btn-edit btn-sm">
                       <i class="fas fa-pen me-1"></i>Cập nhật
                     </a>
