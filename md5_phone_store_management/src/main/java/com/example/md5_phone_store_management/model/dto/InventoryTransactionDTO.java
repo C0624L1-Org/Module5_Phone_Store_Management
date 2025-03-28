@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class InventoryTransactionDTO {
     @NotNull(message = "Mã sản phẩm không được để trống")
@@ -24,7 +25,7 @@ public class InventoryTransactionDTO {
     private Integer employeeID = 1; // Giá trị mặc định là 1
 
     private String transactionType = "IN"; // Mặc định là nhập kho
-
+    private LocalDateTime transactionDate; // Thêm trường này
     // Getters và Setters
     public Integer getProductID() { return productID; }
     public void setProductID(Integer productID) { this.productID = productID; }
@@ -38,4 +39,6 @@ public class InventoryTransactionDTO {
     public void setEmployeeID(Integer employeeID) { this.employeeID = employeeID; }
     public String getTransactionType() { return transactionType; }
     public void setTransactionType(String transactionType) { this.transactionType = transactionType; }
+    public LocalDateTime getTransactionDate() { return transactionDate; }
+    public void setTransactionDate(LocalDateTime transactionDate) { this.transactionDate = transactionDate; }
 }

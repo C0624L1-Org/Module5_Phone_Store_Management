@@ -41,19 +41,14 @@ public class InventoryTransaction {
     @Column(precision = 12, scale = 2)
     private BigDecimal totalPrice;
 
-    // Getters and Setters
     @PrePersist
     @PreUpdate
     private void updateValuesFromProduct() {
-        if (product != null) {
-            System.out.println("Before update - Product stockQuantity: " + product.getStockQuantity());
-            System.out.println("Before update - Entered quantity: " + this.quantity);
-
+        // Chỉ áp dụng cho xuất kho, không ghi đè khi nhập kho
+        if (transactionType == TransactionType.OUT && product != null) {
             this.quantity = product.getStockQuantity();
             this.purchasePrice = product.getPurchasePrice();
             this.totalPrice = purchasePrice.multiply(BigDecimal.valueOf(quantity));
-
-            System.out.println("After update - InventoryTransaction quantity: " + this.quantity);
         }
     }
 

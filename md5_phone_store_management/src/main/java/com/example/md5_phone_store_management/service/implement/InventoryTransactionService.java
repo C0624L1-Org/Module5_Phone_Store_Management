@@ -1,9 +1,7 @@
 package com.example.md5_phone_store_management.service.implement;
 
-import com.example.md5_phone_store_management.model.InventoryTransaction;
-import com.example.md5_phone_store_management.model.Product;
-import com.example.md5_phone_store_management.model.Supplier;
-import com.example.md5_phone_store_management.model.TransactionType;
+import com.example.md5_phone_store_management.model.*;
+import com.example.md5_phone_store_management.repository.IEmployeeRepository;
 import com.example.md5_phone_store_management.repository.IInventoryTransactionInRepo;
 import com.example.md5_phone_store_management.repository.ISupplierRepository;
 import com.example.md5_phone_store_management.repository.IProductRepository;
@@ -31,11 +29,15 @@ public class InventoryTransactionService implements IInventoryTransactionService
     @Autowired
     private IProductRepository productRepository;
 
+    @Autowired
+    private IEmployeeRepository employeeRepository;
+
     @Override
     public Page<InventoryTransaction> getImportTransactions(Pageable pageable) {
         return inventoryTransactionInRepo.getByTransactionType(TransactionType.IN, pageable);
     }
 
+    @Override
     public Page<InventoryTransaction> searchImportTransactions(
             String productName, String supplierName, LocalDate startDate, LocalDate endDate, Pageable pageable) {
 
@@ -77,27 +79,58 @@ public class InventoryTransactionService implements IInventoryTransactionService
 
     @Override
     @Transactional
-    public void importProduct(Integer productId, Integer quantity, Integer supplierId, String purchasePrice) {
-        Product product = productRepository.findByProductID(productId);
-        if (product == null) {
-            throw new IllegalArgumentException("Product not found");
-        }
-        if (!product.getSupplier().getSupplierID().equals(supplierId)) {
-            throw new IllegalArgumentException("Selected product does not belong to the selected supplier");
+    public InventoryTransaction importProduct(Integer productId, Integer quantity, Integer supplierId, String purchasePrice) {
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Số lượng phải lớn hơn 0");
         }
 
-        BigDecimal price = new BigDecimal(purchasePrice);
+        Product product = productRepository.findByProductID(productId);
+        if (product == null) {
+            throw new IllegalArgumentException("Sản phẩm không tồn tại");
+        }
+
+        if (!product.getSupplier().getSupplierID().equals(supplierId)) {
+            throw new IllegalArgumentException("Sản phẩm không thuộc nhà cung cấp đã chọn");
+        }
+
+        BigDecimal price;
+        try {
+            price = new BigDecimal(purchasePrice);
+            if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("Giá nhập phải lớn hơn 0");
+            }
+            BigDecimal maxPrice = new BigDecimal("99999999.99");
+            if (price.compareTo(maxPrice) > 0) {
+                throw new IllegalArgumentException("Giá nhập vượt quá giới hạn tối đa (99999999.99)");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Giá nhập không hợp lệ: " + purchasePrice);
+        }
+
         InventoryTransaction transaction = new InventoryTransaction();
         transaction.setProduct(product);
         transaction.setTransactionType(TransactionType.IN);
         transaction.setQuantity(quantity);
         transaction.setPurchasePrice(price);
         transaction.setTotalPrice(price.multiply(BigDecimal.valueOf(quantity)));
-        transaction.setSupplier(new Supplier() {{ setSupplierID(supplierId); }});
+        transaction.setSupplier(supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new IllegalArgumentException("Nhà cung cấp không tồn tại")));
+        transaction.setTransactionDate(LocalDateTime.now()); // Tự động gán thời gian hiện tại
 
-        inventoryTransactionInRepo.save(transaction);
+        Integer employeeId = 1; // Giá trị mặc định
+        Employee employee = employeeRepository.findByEmployeeID(employeeId);
+        if (employee == null) {
+            throw new IllegalArgumentException("Nhân viên không tồn tại trong database");
+        }
+        transaction.setEmployee(employee);
+
+        // Lưu và trả về đối tượng đã lưu - Sử dụng inventoryTransactionInRepo thay vì inventoryTransactionRepository
+        InventoryTransaction savedTransaction = inventoryTransactionInRepo.save(transaction);
+
         product.setStockQuantity(product.getStockQuantity() + quantity);
         productRepository.save(product);
+
+        return savedTransaction;
     }
 
     @Override
