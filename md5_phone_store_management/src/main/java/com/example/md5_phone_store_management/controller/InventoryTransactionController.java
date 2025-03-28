@@ -46,15 +46,15 @@ public class InventoryTransactionController {
     @GetMapping("stock-in/list")
     public ModelAndView importController(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
         ModelAndView modelAndView = new ModelAndView("/dashboard/stock-in/stock-in-list");
-      Pageable pageable = PageRequest.of(page,5);
+        Pageable pageable = PageRequest.of(page,5);
         Page<InventoryTransaction> transactions = inventoryTransactionService.getImportTransactions(pageable);
         modelAndView.addObject("currentPage", page);
         List<Product> productList =productService.findAll(Pageable.unpaged()).getContent();
         modelAndView.addObject("products",productList);
         modelAndView.addObject("suppliers",supplierService.getSupplierList());
-      modelAndView.addObject("stockInLists",transactions);
-      modelAndView.addObject("totalPage",transactions.getTotalPages());
-      return modelAndView;
+        modelAndView.addObject("stockInLists",transactions);
+        modelAndView.addObject("totalPage",transactions.getTotalPages());
+        return modelAndView;
     }
     @GetMapping("/stock-in/search")
     public ModelAndView searchImportTransactions(
@@ -93,10 +93,9 @@ public class InventoryTransactionController {
 
     @GetMapping("stock-in/update")
     public String update(Model model,
-                         @RequestParam(name = "productId") int productId,
-                         @RequestParam(name = "supplierId") int supplierId){
+                         @RequestParam(name="inventionId") int inventionId) {
         List<Supplier> supplierList = supplierService.getSupplierList();
-        InventoryTransaction inventoryTransaction = inventoryTransactionService.getByProductIdAndSupplierId(productId, supplierId);
+        InventoryTransaction inventoryTransaction = inventoryTransactionService.findById(inventionId);
         model.addAttribute("inventoryTransaction",inventoryTransaction);
         model.addAttribute("supplierList",supplierList);
         return "dashboard/stock-in/stock-in-update";
@@ -104,20 +103,20 @@ public class InventoryTransactionController {
 
     @PostMapping("stock-in/update")
     public String update(Model model,
-                         @Valid @ModelAttribute("inventoryTransaction") InventoryTransaction inventoryTransaction,
-                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "dashboard/stock-in/stock-in-update";
-        }
-        InventoryTransaction inventoryTransaction1 = new InventoryTransaction();
-        BeanUtils.copyProperties(inventoryTransaction,inventoryTransaction1);
-        inventoryTransaction1.setTransactionDate(LocalDateTime.now());
-        BigDecimal totalPrice = BigDecimal.valueOf(inventoryTransaction1.getQuantity()) // Chuyển Integer thành BigDecimal
-                .multiply(inventoryTransaction1.getPurchasePrice()); // Nhân với BigDecimal
+                         @RequestParam(name ="inventoryTransactionId") int inventoryTransactionId,
+                         @RequestParam(name = "quantity") int quantity,
+                         @RequestParam(name = "purchasePrice") BigDecimal purchasePrice,
+                         @RequestParam(name="supplierId") int supplierId
+                         ) {
 
-        inventoryTransaction1.setTotalPrice(totalPrice);
-        inventoryTransaction1.setTransactionType(TransactionType.IN);
-        inventoryTransactionInRepo.save(inventoryTransaction1);
+        InventoryTransaction inventoryTransaction = inventoryTransactionService.findById(inventoryTransactionId);
+        inventoryTransaction.setQuantity(quantity);
+        inventoryTransaction.setPurchasePrice(purchasePrice);
+        inventoryTransaction.setTotalPrice(purchasePrice.multiply(BigDecimal.valueOf(quantity)));
+
+        inventoryTransaction.setSupplier(supplierService.getSupplier(supplierId));
+
+        inventoryTransactionService.addTransaction(inventoryTransaction);
         return "redirect:/dashboard/stock-in/list";
     }
     @PostMapping("/stock-in/delete")

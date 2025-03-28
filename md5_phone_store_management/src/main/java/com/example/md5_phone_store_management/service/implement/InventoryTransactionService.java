@@ -137,4 +137,9 @@ public class InventoryTransactionService implements IInventoryTransactionService
     public List<Product> getProductsBySupplierId(Integer supplierId) {
         return productRepository.findBySupplierId(supplierId);
     }
+
+    @Override
+    public InventoryTransaction findById(Integer id) {
+        return inventoryTransactionInRepo.findById(id).get();
+    }
 }

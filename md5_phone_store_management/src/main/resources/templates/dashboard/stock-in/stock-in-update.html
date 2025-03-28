@@ -237,10 +237,10 @@
                 </nav>
 
             <div>
-                <form th:action="@{/dashboard/stock-in/update}" method="post" th:object="${inventoryTransaction}" class="p-4 shadow-lg rounded bg-white">
+                <form th:action="@{/dashboard/stock-in/update}" method="post" th:object="${inventoryTransaction}"  class="p-4 shadow-lg rounded bg-white">
                     <h4 class="mb-4 text-primary">Update Stock Information</h4>
-                    <input type="hidden" name="inventoryTransactionId" th:field="*{transactionID}">
-                    <input type="hidden" name="inventoryTransactionProductId" th:field="*{product}">
+                    <input type="hidden" name="inventoryTransactionId" th:value="${inventoryTransaction.transactionID}">
+
                     <div class="row mb-3">
                         <label for="productName" class="col-sm-3 col-form-label fw-bold">Product Name:</label>
                         <div class="col-sm-9">
@@ -251,21 +251,21 @@
                     <div class="row mb-3">
                         <label for="quantity" class="col-sm-3 col-form-label fw-bold">Quantity:</label>
                         <div class="col-sm-9">
-                            <input th:field="*{quantity}" type="number" class="form-control" id="quantity" name="quantity" min="1" required>
+                            <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <label for="purchasePrice" class="col-sm-3 col-form-label fw-bold">Purchase Price:</label>
                         <div class="col-sm-9">
-                            <input th:field="*{purchasePrice}" type="number" class="form-control" id="purchasePrice" name="purchasePrice" step="0.01" required>
+                            <input  type="number" class="form-control" id="purchasePrice" name="purchasePrice" step="0.01" required>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <label class="col-sm-3 col-form-label fw-bold">Supplier:</label>
                         <div class="col-sm-9">
-                            <select th:field="*{supplier}" class="form-select">
+                            <select  name="supplierId" class="form-select">
                                 <option th:each="supplier : ${supplierList}" th:value="${supplier.supplierID}" th:text="${supplier.name}"></option>
                             </select>
                         </div>

@@ -19,4 +19,8 @@ public interface IInventoryTransactionService {
     void addTransaction(InventoryTransaction transaction);
     InventoryTransaction importProduct(Integer productId, Integer quantity, Integer supplierId, String purchasePrice);
     List<Product> getProductsBySupplierId(Integer supplierId);
+
+    InventoryTransaction findById(Integer id);
+
+
 }
