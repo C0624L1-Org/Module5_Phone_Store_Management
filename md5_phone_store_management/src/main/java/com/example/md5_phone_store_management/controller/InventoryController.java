@@ -2,23 +2,18 @@ package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.model.dto.InventoryTransactionDTO;
-import com.example.md5_phone_store_management.repository.IInventoryTransactionInRepo;
-import com.example.md5_phone_store_management.service.IEmployeeService;
+import com.example.md5_phone_store_management.repository.IProductRepository;
 import com.example.md5_phone_store_management.service.IInventoryTransactionService;
-import com.example.md5_phone_store_management.service.IProductService;
-import com.example.md5_phone_store_management.service.ISupplierService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -29,26 +24,20 @@ public class InventoryController {
     private IInventoryTransactionService inventoryTransactionService;
 
     @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IEmployeeService employeeService;
-
-    @Autowired
-    private IInventoryTransactionInRepo inventoryTransactionInRepo;
+    private IProductRepository productRepository;
 
     @GetMapping("")
-    public String showImportForm(Model model) {
+    public String showImportForm(Model model, HttpSession session) {
         List<Supplier> suppliers = inventoryTransactionService.getAllSuppliers();
-        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
-        Page<Product> productPage = productService.findAll(pageable);
-        List<Product> products = productPage.getContent();
+        List<Product> products = productRepository.findAll();
+        InventoryTransactionDTO inventoryTransactionDTO = new InventoryTransactionDTO();
+        Integer employeeId = (Integer) session.getAttribute("employeeID");
+        inventoryTransactionDTO.setEmployeeID(employeeId != null ? employeeId : 1);
+
         model.addAttribute("suppliers", suppliers);
         model.addAttribute("products", products);
-        model.addAttribute("inventoryTransactionDTO", new InventoryTransactionDTO());
+        model.addAttribute("inventoryTransactionDTO", inventoryTransactionDTO);
+
         return "dashboard/inventory/import";
     }
 
@@ -56,67 +45,41 @@ public class InventoryController {
     public String saveImportTransaction(
             @Valid @ModelAttribute("inventoryTransactionDTO") InventoryTransactionDTO inventoryTransactionDTO,
             BindingResult bindingResult,
-            Model model) {
-
-        List<Supplier> suppliers = inventoryTransactionService.getAllSuppliers();
-        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
-        Page<Product> productPage = productService.findAll(pageable);
-        List<Product> products = productPage.getContent();
-
-        model.addAttribute("suppliers", suppliers);
-        model.addAttribute("products", products);
+            Model model,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
 
         if (bindingResult.hasErrors()) {
+            model.addAttribute("suppliers", inventoryTransactionService.getAllSuppliers());
+            model.addAttribute("products", productRepository.findAll());
             model.addAttribute("showModal", true);
             model.addAttribute("modalType", "error");
-            model.addAttribute("modalMessage", "Dữ liệu nhập không hợp lệ: " + bindingResult.getAllErrors().toString());
-            return "dashboard/inventory/import";
-        }
-
-        if (inventoryTransactionDTO.getQuantity() <= 0 || inventoryTransactionDTO.getQuantity() > 500) {
-            model.addAttribute("showModal", true);
-            model.addAttribute("modalType", "error");
-            model.addAttribute("modalMessage", "Số lượng phải từ 1 đến 500");
+            model.addAttribute("modalMessage", "Dữ liệu nhập không hợp lệ");
             return "dashboard/inventory/import";
         }
 
         try {
-            Product product = productService.getProductById(inventoryTransactionDTO.getProductID());
-            if (product == null) {
-                throw new IllegalArgumentException("Sản phẩm không tồn tại với ID: " + inventoryTransactionDTO.getProductID());
-            }
+            // Gọi service để lưu và lấy đối tượng giao dịch đã lưu
+            InventoryTransaction savedTransaction = inventoryTransactionService.importProduct(
+                    inventoryTransactionDTO.getProductID(),
+                    inventoryTransactionDTO.getQuantity(),
+                    inventoryTransactionDTO.getSupplierID(),
+                    inventoryTransactionDTO.getPurchasePrice().toString()
+            );
 
-            Supplier supplier = supplierService.getSupplier(inventoryTransactionDTO.getSupplierID());
-            if (supplier == null) {
-                throw new IllegalArgumentException("Nhà cung cấp không tồn tại với ID: " + inventoryTransactionDTO.getSupplierID());
-            }
+            // Định dạng ngày để hiển thị
+            String formattedDate = savedTransaction.getTransactionDate()
+                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
 
-            Integer employeeId = inventoryTransactionDTO.getEmployeeID();
-            if (employeeId == null) {
-                throw new IllegalArgumentException("Mã nhân viên không được để trống");
-            }
-            Employee employee = employeeService.getEmployeeById(employeeId);
-            if (employee == null) {
-                throw new IllegalArgumentException("Nhân viên không tồn tại với ID: " + employeeId);
-            }
-
-            InventoryTransaction transaction = new InventoryTransaction();
-            transaction.setProduct(product);
-            transaction.setSupplier(supplier);
-            transaction.setQuantity(inventoryTransactionDTO.getQuantity());
-            transaction.setPurchasePrice(inventoryTransactionDTO.getPurchasePrice());
-            transaction.setTotalPrice(inventoryTransactionDTO.getPurchasePrice().multiply(BigDecimal.valueOf(inventoryTransactionDTO.getQuantity())));
-            transaction.setTransactionDate(LocalDateTime.now());
-            transaction.setTransactionType(TransactionType.IN);
-            transaction.setEmployee(employee);
-
-            inventoryTransactionService.addTransaction(transaction);
-            product.setStockQuantity(product.getStockQuantity() + inventoryTransactionDTO.getQuantity());
-            productService.save(product);
-
-            return "redirect:/dashboard/stock-in/list?success=true";
+            redirectAttributes.addFlashAttribute("showModal", true);
+            redirectAttributes.addFlashAttribute("modalType", "success");
+            redirectAttributes.addFlashAttribute("modalMessage",
+                    "Nhập kho thành công vào ngày: " + formattedDate);
+            return "redirect:/dashboard/stock-in/list";
 
         } catch (Exception e) {
+            model.addAttribute("suppliers", inventoryTransactionService.getAllSuppliers());
+            model.addAttribute("products", productRepository.findAll());
             model.addAttribute("showModal", true);
             model.addAttribute("modalType", "error");
             model.addAttribute("modalMessage", "Lỗi khi nhập kho: " + e.getMessage());

@@ -75,4 +75,5 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
     @Query(value = "SELECT COUNT(*) FROM employee WHERE role = 'WarehouseStaff'", nativeQuery = true)
     long countWarehouseStaff();
 
+    Employee findByEmployeeID(Integer employeeID);
 }
