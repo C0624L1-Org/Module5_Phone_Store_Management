@@ -89,6 +89,7 @@ public class EmployeeController {
                                  BindingResult bindingResult,
                                  RedirectAttributes redirectAttributes,
                                  Model model) {
+        System.out.println(employeeDTO.getFullName());
         if (iEmployeeService.existsByUsername(employeeDTO.getUsername())) {
             bindingResult.rejectValue("username", "", "Tài khoản này đã tồn tại!");
         }
