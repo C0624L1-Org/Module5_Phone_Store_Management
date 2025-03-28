@@ -11,6 +11,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/dashboard")
@@ -32,7 +37,6 @@ public class SupplierController {
 
         Page<Supplier> suppliers;
 
-        // Kiểm tra nếu các trường tìm kiếm bị trống thì chỉ hiển thị tất cả các nhà cung cấp
         if (name.isEmpty() && address.isEmpty() && phone.isEmpty() && email.isEmpty()) {
             suppliers = supplierService.getAllSuppliers(page, size);
         } else {
@@ -57,7 +61,6 @@ public class SupplierController {
         return "dashboard/supplier/create-supplier";
     }
 
-    // Xử lý POST khi tạo nhà cung cấp mới
     @PostMapping("/suppliers/create")
     public String createSupplier(@Valid @ModelAttribute("supplierDTO") SupplierDTO supplierDTO,
                                  BindingResult bindingResult, Model model) {
@@ -66,7 +69,6 @@ public class SupplierController {
             return "dashboard/supplier/create-supplier";
         }
 
-        // Chuyển dữ liệu từ DTO sang entity
         Supplier supplier = new Supplier();
         BeanUtils.copyProperties(supplierDTO, supplier);
         supplierService.saveSupplier(supplier);
@@ -84,7 +86,6 @@ public class SupplierController {
         return "dashboard/supplier/update-supplier-form";
     }
 
-    // Xử lý POST khi cập nhật nhà cung cấp
     @PostMapping("/update-supplier")
     public String changeInformSupplier(@Valid @ModelAttribute("supplierDTO") SupplierDTO supplierDTO,
                                        BindingResult bindingResult, Model model) {
@@ -99,4 +100,26 @@ public class SupplierController {
 
         return "redirect:/dashboard/suppliers";
     }
+
+    // Phương thức xóa nhà cung cấp
+    @GetMapping("/suppliers/delete/{ids}")
+    public String deleteSuppliers(@PathVariable("ids") String ids, RedirectAttributes redirectAttributes) {
+        try {
+            List<Integer> idList = Arrays.stream(ids.split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+
+            supplierService.deleteSupplier(idList);
+
+            redirectAttributes.addFlashAttribute("message", "Xóa nhà cung cấp thành công!");
+            redirectAttributes.addFlashAttribute("messageType", "success");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "Lỗi khi xóa nhà cung cấp: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("messageType", "error");
+        }
+
+        return "redirect:/dashboard/suppliers";
+    }
+
+
 }
