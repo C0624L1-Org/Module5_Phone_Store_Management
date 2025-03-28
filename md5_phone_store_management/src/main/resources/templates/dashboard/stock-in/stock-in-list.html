@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="_csrf" content="${_csrf.token}"/>
-  <meta name="_csrf_header" content="${_csrf.headerName}"/>
+  <meta name="_csrf" content="your-csrf-token-here"/>
+  <meta name="_csrf_header" content="X-CSRF-TOKEN"/>
   <title>Quản lý Nhập Kho</title>
 
   <!-- Bootstrap CSS -->
@@ -392,60 +392,57 @@
             <!-- Pagination -->
             <nav aria-label="Pagination">
               <ul class="pagination mb-0">
+                <!-- Trang đầu -->
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                   <a class="page-link"
-                     th:if="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
-                     th:href="@{/dashboard/stock-in/list(page=0)}">
-                    Trang đầu
-                  </a>
-                  <a class="page-link"
-                     th:unless="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
-                     th:href="@{/dashboard/stock-in/search(page=0, productName=${param.productName}, supplierName=${param.supplierName}, transactionDate=${param.transactionDate})}">
+                     th:href="${#strings.isEmpty(productName) and #strings.isEmpty(supplierName)
+                            and #strings.isEmpty(startDate) and #strings.isEmpty(endDate)}
+                            ? @{/dashboard/stock-in/list(page=0)}
+                            : @{/dashboard/stock-in/search(page=0, productName=${productName},
+                            supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
                     Trang đầu
                   </a>
                 </li>
 
+                <!-- Trang trước -->
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                   <a class="page-link"
-                     th:if="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
-                     th:href="@{/dashboard/stock-in/list(page=${currentPage - 1})}">
-                    <i class="fas fa-chevron-left"></i>
-                  </a>
-                  <a class="page-link"
-                     th:unless="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
-                     th:href="@{/dashboard/stock-in/search(page=${currentPage - 1}, productName=${param.productName}, supplierName=${param.supplierName}, transactionDate=${param.transactionDate})}">
+                     th:href="${#strings.isEmpty(productName) and #strings.isEmpty(supplierName)
+                            and #strings.isEmpty(startDate) and #strings.isEmpty(endDate)}
+                            ? @{/dashboard/stock-in/list(page=${currentPage - 1})}
+                            : @{/dashboard/stock-in/search(page=${currentPage - 1}, productName=${productName},
+                            supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
                     <i class="fas fa-chevron-left"></i>
                   </a>
                 </li>
 
+                <!-- Hiển thị số trang -->
                 <li class="page-item active mx-2">
-            <span class="page-link">
-                <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
-            </span>
+                <span class="page-link">
+                    <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
+                </span>
                 </li>
 
+                <!-- Trang tiếp theo -->
                 <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
                   <a class="page-link"
-                     th:if="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
-                     th:href="@{/dashboard/stock-in/list(page=${currentPage + 1})}">
-                    <i class="fas fa-chevron-right"></i>
-                  </a>
-                  <a class="page-link"
-                     th:unless="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
-                     th:href="@{/dashboard/stock-in/search(page=${currentPage + 1}, productName=${param.productName}, supplierName=${param.supplierName}, transactionDate=${param.transactionDate})}">
+                     th:href="${#strings.isEmpty(productName) and #strings.isEmpty(supplierName)
+                            and #strings.isEmpty(startDate) and #strings.isEmpty(endDate)}
+                            ? @{/dashboard/stock-in/list(page=${currentPage + 1})}
+                            : @{/dashboard/stock-in/search(page=${currentPage + 1}, productName=${productName},
+                            supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
                     <i class="fas fa-chevron-right"></i>
                   </a>
                 </li>
 
+                <!-- Trang cuối -->
                 <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
                   <a class="page-link"
-                     th:if="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
-                     th:href="@{/dashboard/stock-in/list(page=${totalPage - 1})}">
-                    Trang cuối
-                  </a>
-                  <a class="page-link"
-                     th:unless="${param.productName == null and param.supplierName == null and param.transactionDate == null}"
-                     th:href="@{/dashboard/stock-in/search(page=${totalPage - 1}, productName=${param.productName}, supplierName=${param.supplierName}, transactionDate=${param.transactionDate})}">
+                     th:href="${#strings.isEmpty(productName) and #strings.isEmpty(supplierName)
+                            and #strings.isEmpty(startDate) and #strings.isEmpty(endDate)}
+                            ? @{/dashboard/stock-in/list(page=${totalPage - 1})}
+                            : @{/dashboard/stock-in/search(page=${totalPage - 1}, productName=${productName},
+                            supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
                     Trang cuối
                   </a>
                 </li>
@@ -541,6 +538,8 @@
 
   //modal xóa
   document.addEventListener('DOMContentLoaded', function () {
+    let selectedIds = []; // Đưa selectedIds ra ngoài để giữ giá trị
+
     document.getElementById('selectAll').addEventListener('click', function () {
       let checkboxes = document.querySelectorAll('.selectInventoryTransaction');
       checkboxes.forEach(checkbox => checkbox.checked = this.checked);
@@ -557,11 +556,11 @@
     }
 
     document.getElementById('deleteSelected').addEventListener('click', function () {
-      let selectedIds = [];
+      selectedIds = []; // Reset danh sách khi nhấn xóa
       let transactionDetails = [];
 
       document.querySelectorAll('.selectInventoryTransaction:checked').forEach((checkbox) => {
-        let id = checkbox.getAttribute('value');
+        let id = Number(checkbox.getAttribute('value')); // Ép kiểu về số
         let product = checkbox.getAttribute('data-product');
         let supplier = checkbox.getAttribute('data-suppliers');
         let date = checkbox.getAttribute('data-date');
@@ -580,8 +579,8 @@
       let deleteMessage = `Bạn có chắc chắn muốn xóa ${transactionDetails.length} giao dịch sau đây?<br><br><ul class="list-group">`;
       transactionDetails.forEach(tran => {
         deleteMessage += `<li class="list-group-item"><strong>Sản phẩm:</strong> ${tran.product} <br>
-                              <small class="text-muted">Nhà cung cấp: ${tran.supplier}</small> <br>
-                              <small class="text-muted">Ngày nhập: ${tran.date}</small></li>`;
+                                  <small class="text-muted">Nhà cung cấp: ${tran.supplier}</small> <br>
+                                  <small class="text-muted">Ngày nhập: ${tran.date}</small></li>`;
       });
 
       deleteMessage += `</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>`;
@@ -589,73 +588,63 @@
 
       let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
       deleteModal.show();
+    });
 
-      document.getElementById('confirmDelete').onclick = function () {
-        let csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
-        let csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+    document.getElementById('confirmDelete').addEventListener('click', function () {
+      if (selectedIds.length === 0) {
+        alert("Không có giao dịch nào được chọn để xóa!");
+        return;
+      }
 
-        if (!csrfTokenMeta || !csrfHeaderMeta) {
-          alert("Không tìm thấy CSRF token!");
-          console.error("CSRF token hoặc header bị thiếu!");
-          return;
-        }
+      let csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+      let csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
 
-        let csrfToken = csrfTokenMeta.getAttribute('content');
-        let csrfHeader = csrfHeaderMeta.getAttribute('content');
+      if (!csrfTokenMeta || !csrfHeaderMeta) {
+        alert("Không tìm thấy CSRF token!");
+        console.error("CSRF token hoặc header bị thiếu!");
+        return;
+      }
 
-        if (!csrfToken || !csrfHeader) {
-          alert("CSRF Token hoặc Header không hợp lệ!");
-          console.error("CSRF Token hoặc Header có giá trị null hoặc undefined.");
-          return;
-        }
+      let csrfToken = csrfTokenMeta.getAttribute('content');
+      let csrfHeader = csrfHeaderMeta.getAttribute('content');
 
-        console.log("CSRF Token:", csrfToken);
-        console.log("CSRF Header:", csrfHeader);
+      console.log("CSRF Token:", csrfToken);
+      console.log("CSRF Header:", csrfHeader);
+      console.log("Selected IDs:", selectedIds);
 
-        let url = '/dashboard/stock-in/delete';
+      let url = '/dashboard/stock-in/delete';
 
-        // Kiểm tra URL hợp lệ trước khi gửi request
-        try {
-          new URL(url, window.location.origin);
-        } catch (error) {
-          console.error("URL không hợp lệ:", error);
-          alert("Lỗi: URL yêu cầu không hợp lệ!");
-          return;
-        }
-
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            [csrfHeader]: csrfToken,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ ids: selectedIds }) // Chuyển thành JSON thay vì FormData
-        })
-                .then(response => {
-                  if (!response.ok) {
-                    throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  if (data.success) {
-                    document.getElementById('deleteMessage').innerHTML =
-                            `<div class="alert alert-success">${data.message}</div>`;
-                    setTimeout(() => window.location.href = "/dashboard/stock-in/list", 2000);
-                  } else {
-                    document.getElementById('deleteMessage').innerHTML =
-                            `<div class="alert alert-danger">${data.message || "Xóa thất bại!"}</div>`;
-                  }
-                })
-                .catch(error => {
-                  console.error("Lỗi khi thực hiện fetch:", error);
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          [csrfHeader]: csrfToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ids: selectedIds.map(id => Number(id)) })
+      })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+                }
+                return response.json();
+              })
+              .then(data => {
+                if (data.success) {
                   document.getElementById('deleteMessage').innerHTML =
-                          `<div class="alert alert-danger">Lỗi khi gửi yêu cầu: ${error.message}</div>`;
-                });
-      };
+                          `<div class="alert alert-success">${data.message}</div>`;
+                  setTimeout(() => window.location.href = "/dashboard/stock-in/list", 2000);
+                } else {
+                  document.getElementById('deleteMessage').innerHTML =
+                          `<div class="alert alert-danger">${data.message || "Xóa thất bại!"}</div>`;
+                }
+              })
+              .catch(error => {
+                console.error("Lỗi khi thực hiện fetch:", error);
+                document.getElementById('deleteMessage').innerHTML =
+                        `<div class="alert alert-danger">Lỗi khi gửi yêu cầu: ${error.message}</div>`;
+              });
     });
   });
-
 </script>
   </body>
 </html>

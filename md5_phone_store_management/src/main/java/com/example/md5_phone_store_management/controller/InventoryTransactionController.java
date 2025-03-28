@@ -79,12 +79,15 @@ public class InventoryTransactionController {
                 productName, supplierName, startDate, endDate, pageable);
         List<Product> productList = productService.findAll(Pageable.unpaged()).getContent();
 
-        modelAndView.addObject("products", productList);
-        modelAndView.addObject("suppliers", supplierService.getSupplierList());
+        modelAndView.addObject("productName", productName);
+        modelAndView.addObject("supplierName", supplierName);
+        modelAndView.addObject("startDate", startDateStr);
+        modelAndView.addObject("endDate", endDateStr);
         modelAndView.addObject("currentPage", page);
-        modelAndView.addObject("stockInLists", searchResults);
         modelAndView.addObject("totalPage", searchResults.getTotalPages());
-
+        modelAndView.addObject("stockInLists", searchResults);
+        modelAndView.addObject("products", productService.findAll(Pageable.unpaged()).getContent());
+        modelAndView.addObject("suppliers", supplierService.getSupplierList());
         return modelAndView;
     }
 
@@ -121,8 +124,10 @@ public class InventoryTransactionController {
     @PreAuthorize("hasAnyRole('Admin', 'WarehouseStaff')")
     @ResponseBody
     public ResponseEntity<Map<String, String>> deleteImportTransactions(
-            @RequestParam("ids") List<Integer> ids) {
+            @RequestBody Map<String, List<Integer>> requestBody) {
         Map<String, String> response = new HashMap<>();
+
+        List<Integer> ids = requestBody.get("ids");
 
         if (ids == null || ids.isEmpty()) {
             response.put("success", "false");
