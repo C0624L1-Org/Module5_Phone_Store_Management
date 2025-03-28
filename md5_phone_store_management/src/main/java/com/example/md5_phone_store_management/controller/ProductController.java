@@ -49,12 +49,14 @@ public class ProductController {
     @GetMapping("/list")
     public String search(Model model, @RequestParam(name = "searchProduct", required = false) String searchProduct,
                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
-                         @RequestParam(name = "rangePrice", defaultValue = "10000000", required = false) int rangePrice,
+                         @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
                          @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
         Pageable pageable = PageRequest.of(page, 5);
         Page<Product> listProducts = productService.findAll(pageable);
-        if (searchProduct != null || searchSupplier != null || rangePrice > 0) {
+        if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0)) {
             listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(searchProduct, searchSupplier, rangePrice, pageable);
+        } else {
+            listProducts = productService.findAll(pageable);
         }
         model.addAttribute("listProducts", listProducts);
         model.addAttribute("searchProduct", searchProduct);

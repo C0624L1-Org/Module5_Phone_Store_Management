@@ -18,18 +18,47 @@
     <link rel="stylesheet" href="/css/common/pagination.css">
     <link rel="stylesheet" href="/css/common/layout.css">
 
-    <!-- jQuery trước Bootstrap -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap-datepicker -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-
     <style>
         .card-header {
             background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);
             color: white;
             padding: 1.2rem 1.5rem;
             border-radius: 10px 10px 0 0;
+        }
+
+        /* CSS cho phân trang */
+        .pagination {
+            margin-bottom: 0;
+        }
+
+        .pagination .page-link {
+            color: #4a6fdc;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            margin: 0 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #4a6fdc;
+            color: white;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #fff;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            color: #4a6fdc;
+        }
+
+        .pagination .page-item.active .page-link:hover {
+            background-color: #4a6fdc;
+            color: white;
         }
 
         .search-section {
@@ -205,12 +234,12 @@
                                             <div class="mb-3">
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                                    <input type="text" class="form-control" id="returningCustomerPhone" placeholder="Nhập số điện thoại khách hàng...">
+                                                    <input type="text" class="form-control" id="returningCustomerPhone" placeholder="Nhập tên, email hoặc số điện thoại khách hàng...">
                                                     <button type="button" class="btn btn-primary" id="btnSearchReturningCustomer">
                                                         <i class="fas fa-search me-2"></i>Tìm
                                                     </button>
                                                 </div>
-                                                <div class="form-text">Nhập số điện thoại khách hàng để tìm kiếm</div>
+                                                <div class="form-text">Nhập tên, email hoặc số điện thoại khách hàng để tìm kiếm</div>
                                             </div>
 
                                             <div class="table-responsive mt-3" style="max-height: 300px;">
@@ -244,6 +273,33 @@
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                            </div>
+
+                                            <!-- Phân trang cho khách hàng cũ -->
+                                            <div class="d-flex justify-content-center mt-3">
+                                                <nav id="returningCustomerPagination" aria-label="Phân trang khách hàng cũ">
+                                                    <ul class="pagination pagination-sm">
+                                                        <li class="page-item disabled">
+                                                            <a class="page-link" href="#" aria-label="Previous">
+                                                                <span aria-hidden="true">&laquo;</span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="page-item active">
+                                                            <a class="page-link" href="#">1</a>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="#">2</a>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="#">3</a>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="#" aria-label="Next">
+                                                                <span aria-hidden="true">&raquo;</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </nav>
                                             </div>
                                         </div>
 
@@ -289,6 +345,33 @@
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                            </div>
+
+                                            <!-- Phân trang cho tất cả khách hàng -->
+                                            <div class="d-flex justify-content-center mt-3">
+                                                <nav id="existingCustomerPagination" aria-label="Phân trang tất cả khách hàng">
+                                                    <ul class="pagination pagination-sm">
+                                                        <li class="page-item disabled">
+                                                            <a class="page-link" href="#" aria-label="Previous">
+                                                                <span aria-hidden="true">&laquo;</span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="page-item active">
+                                                            <a class="page-link" href="#">1</a>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="#">2</a>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="#">3</a>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="#" aria-label="Next">
+                                                                <span aria-hidden="true">&raquo;</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </nav>
                                             </div>
                                         </div>
                                     </div>
@@ -684,105 +767,87 @@
         bootstrap.Modal.getInstance(document.getElementById("productModal"))?.hide();
     }
 
-    // Hàm hiển thị thông báo toast
-    // function showToast(type, title, message) {
-    //     Swal.fire({
-    //         icon: type === 'success' ? 'success' : type === 'error' ? 'error' : 'info',
-    //         title: title,
-    //         text: message,
-    //         toast: true,
-    //         position: 'top-end',
-    //         showConfirmButton: false,
-    //         timer: 3000,
-    //         timerProgressBar: true
-    //     });
-    // }
-
     // Hàm đăng ký khách hàng mới
     function registerNewCustomer() {
         const form = document.getElementById('newCustomerForm');
 
         // Kiểm tra validation cơ bản
-        const fullName = form.querySelector('#newFullName').value.trim();
-        const phone = form.querySelector('#newPhone').value.trim();
-
-        if (!fullName) {
-            showToast('error', 'Lỗi', 'Vui lòng nhập họ và tên');
-            return;
-        }
-
-        if (!phone) {
-            showToast('error', 'Lỗi', 'Vui lòng nhập số điện thoại');
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
             return;
         }
 
         // Hiển thị loading
         Swal.fire({
-            title: 'Đang xử lý',
-            text: 'Đang đăng ký khách hàng mới...',
+            title: 'Đang xử lý...',
+            text: 'Vui lòng chờ trong giây lát',
             allowOutsideClick: false,
-            didOpen: () => {
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            willOpen: () => {
                 Swal.showLoading();
             }
         });
 
-        // Sử dụng jQuery ajax
-        $.ajax({
-            url: '/dashboard/admin/customers/api/create',
-            type: 'POST',
-            data: {
-                fullName: fullName,
-                phone: phone,
-                email: form.querySelector('#newEmail').value || '',
-                dob: form.querySelector('#newDob').value || '',
-                address: form.querySelector('#newAddress').value || '',
-                gender: form.querySelector('#newGender').value || '',
-                purchaseCount: '0'
-            },
-            dataType: 'json',
-            success: function(data) {
-                // Đóng loading
-                Swal.close();
+        // Lấy dữ liệu từ form
+        const formData = new FormData(form);
+        formData.append('purchaseCount', '0');
 
-                // Ẩn modal và reset form
-                if (newCustomerModal) {
-                    newCustomerModal.hide();
+        // Gọi API để tạo khách hàng mới
+        fetch('/dashboard/admin/customers/api/create', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
-                form.reset();
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success' && data.customerId) {
+                    // Đóng loading
+                    Swal.close();
 
-                // Check if we have a customerId in the response, which indicates success
-                if (data.customerId) {
-                    const customerId = data.customerId;
+                    // Ẩn modal và reset form
+                    if (newCustomerModal) {
+                        newCustomerModal.hide();
+                    }
+                    form.reset();
+                    form.classList.remove('was-validated');
 
                     // Cập nhật UI và chọn khách hàng mới
-                    selectCustomer({
-                        id: customerId,
-                        name: fullName,
-                        phone: phone,
-                        email: form.querySelector('#newEmail').value || '',
-                        address: form.querySelector('#newAddress').value || '',
+                    const customerData = {
+                        id: data.customerId,
+                        name: formData.get('fullName'),
+                        phone: formData.get('phone'),
+                        email: formData.get('email') || '',
+                        address: formData.get('address') || '',
                         purchase: 0
-                    });
+                    };
+
+                    // Chọn khách hàng mới
+                    selectCustomer(customerData);
 
                     // Thêm khách hàng vào bảng
                     const newRow = document.createElement('tr');
                     newRow.className = 'existing-customer-row';
                     newRow.innerHTML = `
-                    <td>${fullName}</td>
-                    <td>${phone}</td>
-                    <td>${form.querySelector('#newEmail').value || ''}</td>
+                    <td>${customerData.name}</td>
+                    <td>${customerData.phone}</td>
+                    <td>${customerData.email}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-success btn-select-customer"
-                                data-id="${data.customerId}"
-                                data-name="${fullName}"
-                                data-phone="${phone}"
-                                data-email="${form.querySelector('#newEmail').value || ''}"
-                                data-address="${form.querySelector('#newAddress').value || ''}"
+                                data-id="${customerData.id}"
+                                data-name="${customerData.name}"
+                                data-phone="${customerData.phone}"
+                                data-email="${customerData.email}"
+                                data-address="${customerData.address}"
                                 data-purchase="0">
                             <i class="fas fa-check me-1"></i> Chọn
                         </button>
                     </td>
-                    `;
+                `;
 
                     // Thêm sự kiện cho nút chọn
                     const selectBtn = newRow.querySelector('.btn-select-customer');
@@ -807,39 +872,27 @@
                     // Hiển thị thông báo thành công
                     showToast('success', 'Thành công', 'Đã đăng ký khách hàng mới thành công');
                 } else {
-                    // Nếu response không có customerId
-                    const errorMsg = data.message || 'Lỗi không xác định khi đăng ký khách hàng mới';
-
-                    // Hiển thị lỗi cụ thể trong form
-                    const errorMessage = document.getElementById('newCustomerErrorMessage');
-                    const errorAlert = document.getElementById('newCustomerError');
-
-                    if (errorMessage && errorAlert) {
-                        errorMessage.textContent = errorMsg;
-                        errorAlert.classList.remove('d-none');
-                    }
-
-                    // Hiển thị toast lỗi
-                    showToast('error', 'Lỗi', errorMsg);
+                    throw new Error(data.message || 'Lỗi không xác định khi đăng ký khách hàng mới');
                 }
-            },
-            error: function(xhr, status, error) {
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
                 // Đóng loading
                 Swal.close();
 
-                // Hiển thị lỗi cụ thể
+                // Hiển thị lỗi trong form
                 const errorMessage = document.getElementById('newCustomerErrorMessage');
                 const errorAlert = document.getElementById('newCustomerError');
 
                 if (errorMessage && errorAlert) {
-                    errorMessage.textContent = 'Lỗi khi đăng ký khách hàng: ' + error;
+                    errorMessage.textContent = error.message || 'Lỗi khi đăng ký khách hàng';
                     errorAlert.classList.remove('d-none');
                 }
 
-                // Hiển thị toast lỗi
-                showToast('error', 'Lỗi đăng ký', 'Đã xảy ra lỗi khi đăng ký khách hàng mới');
-            }
-        });
+                // Hiển thị thông báo lỗi
+                showToast('error', 'Lỗi', error.message || 'Lỗi khi đăng ký khách hàng');
+            });
     }
 
     // Khởi tạo khi trang đã load
@@ -847,74 +900,283 @@
         // Khởi tạo modal
         newCustomerModal = new bootstrap.Modal(document.getElementById('newCustomerModal'));
 
-        // Sự kiện tìm kiếm khách hàng cũ
-        document.getElementById('btnSearchReturningCustomer').addEventListener('click', function() {
-            const phone = document.getElementById('returningCustomerPhone').value.trim();
-            if (!phone) {
-                showToast('error', 'Lỗi', 'Vui lòng nhập số điện thoại để tìm kiếm');
+        // Reset form và ẩn thông báo lỗi khi đóng modal
+        document.getElementById('newCustomerModal').addEventListener('hidden.bs.modal', function () {
+            const form = document.getElementById('newCustomerForm');
+            form.reset();
+            form.classList.remove('was-validated');
+            document.getElementById('newCustomerError').classList.add('d-none');
+        });
+
+        // Sự kiện đăng ký khách hàng mới
+        document.getElementById('saveNewCustomer').addEventListener('click', registerNewCustomer);
+
+        // Hàm hiển thị toast message
+        function showToast(type, title, message) {
+            const toastContainer = document.querySelector('.toast-container');
+
+            // Tạo toast element
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.style.display = 'flex';
+
+            // Thêm nội dung cho toast
+            toast.innerHTML = `
+                <i class="fa-solid fa-${type === 'success' ? 'circle-check' : 'circle-xmark'} toast-icon"></i>
+                <div class="toast-content">
+                    <div class="toast-title"><strong>${title}</strong></div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="close-btn">&times;</button>
+            `;
+
+            // Thêm toast vào container
+            toastContainer.appendChild(toast);
+
+            // Thêm event listener cho nút đóng
+            toast.querySelector('.close-btn').addEventListener('click', () => {
+                toast.style.display = 'none';
+                setTimeout(() => toast.remove(), 300);
+            });
+
+            // Auto hide sau 3 giây
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Hàm cập nhật phân trang
+        function updatePagination(paginationId, currentPage, totalPages, loadFunction) {
+            const paginationElement = document.getElementById(paginationId);
+            const paginationList = paginationElement.querySelector('ul');
+
+            if (totalPages <= 1) {
+                paginationElement.classList.add('d-none');
                 return;
             }
 
-            // Hiển thị loading
-            Swal.fire({
-                title: 'Đang tìm kiếm',
-                text: 'Đang tìm kiếm khách hàng...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
+            paginationElement.classList.remove('d-none');
+            paginationList.innerHTML = '';
 
-            fetch(`/dashboard/sales/customers/search-by-phone?phone=${encodeURIComponent(phone)}`)
+            // Nút Previous
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 0 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `
+                <a class="page-link" href="javascript:void(0);" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            `;
+            if (currentPage > 0) {
+                prevLi.querySelector('a').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loadFunction(currentPage - 1);
+                });
+            }
+            paginationList.appendChild(prevLi);
+
+            // Các trang
+            const maxPagesToShow = 5;
+            let startPage = Math.max(0, currentPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(totalPages - 1, startPage + maxPagesToShow - 1);
+
+            // Điều chỉnh lại startPage nếu cần
+            if (endPage - startPage + 1 < maxPagesToShow && startPage > 0) {
+                startPage = Math.max(0, endPage - maxPagesToShow + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageLi = document.createElement('li');
+                pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                pageLi.innerHTML = `<a class="page-link" href="javascript:void(0);">${i + 1}</a>`;
+                if (i !== currentPage) {
+                    pageLi.querySelector('a').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        loadFunction(i);
+                    });
+                }
+                paginationList.appendChild(pageLi);
+            }
+
+            // Nút Next
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages - 1 ? 'disabled' : ''}`;
+            nextLi.innerHTML = `
+                <a class="page-link" href="javascript:void(0);" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            `;
+            if (currentPage < totalPages - 1) {
+                nextLi.querySelector('a').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loadFunction(currentPage + 1);
+                });
+            }
+            paginationList.appendChild(nextLi);
+        }
+
+        // Hàm load khách hàng cũ với phân trang
+        function loadReturningCustomers(page = 0) {
+            // Hiển thị loading
+            const tableBody = document.getElementById('oldCustomerTableBody');
+            tableBody.innerHTML = '<tr><td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải...</td></tr>';
+
+            const keyword = document.getElementById('returningCustomerPhone').value.trim();
+
+            // Gọi API để lấy danh sách khách hàng cũ (purchaseCount > 0)
+            fetch(`/dashboard/sales/customers/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=5`)
                 .then(response => response.json())
                 .then(data => {
-                    // Đóng loading
-                    Swal.close();
-
                     if (data.status === 'success') {
-                        const customer = data.customer;
-                        selectCustomer({
-                            id: customer.id,
-                            name: customer.fullName,
-                            phone: customer.phone,
-                            email: customer.email,
-                            address: customer.address,
-                            purchase: customer.purchaseCount
-                        });
-                        showToast('success', 'Thành công', 'Đã tìm thấy khách hàng: ' + customer.fullName);
-                    } else if (data.status === 'not_found') {
-                        // Hiển thị xác nhận bằng SweetAlert cho việc đăng ký mới
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Không tìm thấy',
-                            text: 'Không tìm thấy khách hàng với số điện thoại này. Bạn có muốn đăng ký mới không?',
-                            showCancelButton: true,
-                            confirmButtonText: 'Đăng ký mới',
-                            cancelButtonText: 'Hủy'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Chuyển số điện thoại đã tìm kiếm vào form đăng ký mới
-                                document.getElementById('newPhone').value = phone;
-                                // Hiển thị modal đăng ký khách hàng mới
-                                newCustomerModal.show();
-                            }
-                        });
+                        tableBody.innerHTML = '';
+
+                        // Lọc khách hàng có purchaseCount > 0
+                        const returningCustomers = data.customers.filter(customer => customer.purchaseCount > 0);
+
+                        if (returningCustomers.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="4" class="text-center">Không tìm thấy khách hàng nào</td></tr>';
+                            document.getElementById('returningCustomerPagination').classList.add('d-none');
+                        } else {
+                            // Render danh sách khách hàng
+                            returningCustomers.forEach(customer => {
+                                const row = document.createElement('tr');
+                                row.className = 'old-customer-row';
+                                row.innerHTML = `
+                                    <td>${customer.fullName}</td>
+                                    <td>${customer.phone}</td>
+                                    <td>
+                                        <span class="badge bg-success">${customer.purchaseCount}</span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-success btn-select-customer"
+                                                data-id="${customer.id}"
+                                                data-name="${customer.fullName}"
+                                                data-phone="${customer.phone}"
+                                                data-email="${customer.email || ''}"
+                                                data-address="${customer.address || ''}"
+                                                data-purchase="${customer.purchaseCount}">
+                                            <i class="fas fa-check me-1"></i> Chọn
+                                        </button>
+                                    </td>
+                                `;
+
+                                row.querySelector('.btn-select-customer').addEventListener('click', function() {
+                                    const customerData = {
+                                        id: this.getAttribute('data-id'),
+                                        name: this.getAttribute('data-name'),
+                                        phone: this.getAttribute('data-phone'),
+                                        email: this.getAttribute('data-email'),
+                                        address: this.getAttribute('data-address'),
+                                        purchase: this.getAttribute('data-purchase')
+                                    };
+                                    selectCustomer(customerData);
+                                });
+
+                                tableBody.appendChild(row);
+                            });
+
+                            // Cập nhật pagination
+                            updatePagination('returningCustomerPagination', data.currentPage, data.totalPages, loadReturningCustomers);
+                        }
                     } else {
-                        showToast('error', 'Lỗi', data.message || 'Đã xảy ra lỗi khi tìm kiếm khách hàng');
+                        tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Lỗi: ${data.message}</td></tr>`;
                     }
                 })
                 .catch(error => {
-                    // Đóng loading
-                    Swal.close();
                     console.error('Error:', error);
-                    showToast('error', 'Lỗi kết nối', 'Không thể kết nối đến máy chủ');
+                    tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Lỗi kết nối đến máy chủ</td></tr>`;
                 });
+        }
+
+        // Hàm load tất cả khách hàng với phân trang
+        function loadAllCustomers(page = 0) {
+            // Hiển thị loading
+            const tableBody = document.getElementById('existingCustomerTableBody');
+            tableBody.innerHTML = '<tr><td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải...</td></tr>';
+
+            const keyword = document.getElementById('searchExistingCustomer').value.trim();
+
+            // Gọi API để lấy danh sách tất cả khách hàng
+            fetch(`/dashboard/sales/customers/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=5`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        tableBody.innerHTML = '';
+
+                        if (data.customers.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="4" class="text-center">Không tìm thấy khách hàng nào</td></tr>';
+                            document.getElementById('existingCustomerPagination').classList.add('d-none');
+                        } else {
+                            // Render danh sách khách hàng
+                            data.customers.forEach(customer => {
+                                const row = document.createElement('tr');
+                                row.className = 'existing-customer-row';
+                                row.innerHTML = `
+                                    <td>${customer.fullName}</td>
+                                    <td>${customer.phone}</td>
+                                    <td>${customer.email || ''}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-success btn-select-customer"
+                                                data-id="${customer.id}"
+                                                data-name="${customer.fullName}"
+                                                data-phone="${customer.phone}"
+                                                data-email="${customer.email || ''}"
+                                                data-address="${customer.address || ''}"
+                                                data-purchase="${customer.purchaseCount}">
+                                            <i class="fas fa-check me-1"></i> Chọn
+                                        </button>
+                                    </td>
+                                `;
+
+                                row.querySelector('.btn-select-customer').addEventListener('click', function() {
+                                    const customerData = {
+                                        id: this.getAttribute('data-id'),
+                                        name: this.getAttribute('data-name'),
+                                        phone: this.getAttribute('data-phone'),
+                                        email: this.getAttribute('data-email'),
+                                        address: this.getAttribute('data-address'),
+                                        purchase: this.getAttribute('data-purchase')
+                                    };
+                                    selectCustomer(customerData);
+                                });
+
+                                tableBody.appendChild(row);
+                            });
+
+                            // Cập nhật pagination
+                            updatePagination('existingCustomerPagination', data.currentPage, data.totalPages, loadAllCustomers);
+                        }
+                    } else {
+                        tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Lỗi: ${data.message}</td></tr>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Lỗi kết nối đến máy chủ</td></tr>`;
+                });
+        }
+
+        // Sự kiện tìm kiếm khách hàng cũ
+        document.getElementById('btnSearchReturningCustomer').addEventListener('click', function() {
+            loadReturningCustomers(0);
         });
 
         // Sự kiện tìm kiếm tất cả khách hàng
         document.getElementById('searchExistingCustomerBtn').addEventListener('click', function() {
-            searchItems('searchExistingCustomer', 'existingCustomerTableBody', 'tr');
+            loadAllCustomers(0);
         });
+
+        // Load dữ liệu ban đầu khi chuyển tab
+        document.getElementById('existingCustomerTab').addEventListener('shown.bs.tab', function (e) {
+            loadAllCustomers(0);
+        });
+
+        document.getElementById('returningCustomerTab').addEventListener('shown.bs.tab', function (e) {
+            loadReturningCustomers(0);
+        });
+
+        // Load dữ liệu ban đầu khi trang tải xong
+        loadReturningCustomers(0);
 
         // Sự kiện tìm kiếm sản phẩm
         document.getElementById('searchProductBtn').addEventListener('click', function() {
@@ -1050,12 +1312,13 @@
             });
         });
 
-        // Sự kiện đăng ký khách hàng mới
-        document.getElementById('saveNewCustomer').addEventListener('click', registerNewCustomer);
-
         // Tính tổng tiền ban đầu
         calculateTotal();
     });
 </script>
+
+<!-- jQuery Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </body>
 </html>

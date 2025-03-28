@@ -92,10 +92,8 @@ public class RestCustomerController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * API endpoint để tạo khách hàng mới từ trang bán hàng
-     * Yêu cầu các trường: fullName, phone, email, dob, address, gender, purchaseCount
-     */
+    /** API endpoint để tạo khách hàng mới từ trang bán hàng */
+
     @PostMapping("/api/create-customer")
     public ResponseEntity<Map<String, Object>> apiCreateCustomer(
             @RequestParam String fullName,

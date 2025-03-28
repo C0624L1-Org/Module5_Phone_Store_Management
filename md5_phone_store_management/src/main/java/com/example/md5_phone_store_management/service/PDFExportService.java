@@ -59,7 +59,7 @@ public class PDFExportService {
             Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.BLACK);
             Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
             Font smallBold = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.BLACK);
-            Font redFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(216, 32, 39)); // Màu đỏ của dự án
+            Font redFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(216, 32, 39));
 
             // Khởi tạo writer
             PdfWriter.getInstance(document, out);
