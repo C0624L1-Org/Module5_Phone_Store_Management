@@ -8,9 +8,13 @@ import com.example.md5_phone_store_management.service.ISupplierService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,7 +26,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/dashboard")
@@ -112,25 +118,31 @@ public class InventoryTransactionController {
         return "redirect:/dashboard/stock-in/list";
     }
     @PostMapping("/stock-in/delete")
-    public String deleteImportTransactions(@RequestParam("ids") List<Integer> ids,
-                                           RedirectAttributes redirectAttributes,
-                                           @ModelAttribute("loggedEmployee") Employee loggedEmployee) {
-        if (loggedEmployee == null ||
-                (!"Admin".equalsIgnoreCase(loggedEmployee.getRole().name()) &&
-                        !"WarehouseStaff".equalsIgnoreCase(loggedEmployee.getRole().name()))) {
-            redirectAttributes.addFlashAttribute("error", "Bạn không có quyền xóa giao dịch!");
-            return "redirect:/dashboard/stock-in/list";
-        }
+    @PreAuthorize("hasAnyRole('Admin', 'WarehouseStaff')")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> deleteImportTransactions(
+            @RequestParam("ids") List<Integer> ids) {
+        Map<String, String> response = new HashMap<>();
+
         if (ids == null || ids.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Vui lòng chọn ít nhất một giao dịch để xóa.");
-            return "redirect:/dashboard/stock-in/list";
+            response.put("success", "false");
+            response.put("message", "Vui lòng chọn ít nhất một giao dịch để xóa.");
+            return ResponseEntity.badRequest().body(response);
         }
+
         try {
             inventoryTransactionService.deleteImportTransactions(ids);
-            redirectAttributes.addFlashAttribute("message", "Xóa giao dịch thành công!");
+            response.put("success", "true");
+            response.put("message", "Xóa giao dịch thành công!");
+            return ResponseEntity.ok(response);
+        } catch (DataAccessException e) {
+            response.put("success", "false");
+            response.put("message", "Không thể xóa do lỗi dữ liệu.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi khi xóa giao dịch.");
+            response.put("success", "false");
+            response.put("message", "Lỗi hệ thống khi xóa giao dịch.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        return "redirect:/dashboard/stock-in/list";
     }
 }

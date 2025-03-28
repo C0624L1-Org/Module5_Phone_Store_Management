@@ -385,9 +385,10 @@
 
           <div th:if="${stockInLists.totalElements > 0}"
                class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
-            <button id="deleteSelected" class="btn btn-danger" disabled>
-              <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
-            </button>
+              <button id="deleteSelected" class="btn btn-danger" disabled>
+                <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
+              </button>
+
             <!-- Pagination -->
             <nav aria-label="Pagination">
               <ul class="pagination mb-0">
@@ -460,28 +461,34 @@
 
   <!-- Footer -->
   <footer th:replace="~{fragments/footer :: footer}"></footer>
-  <form id="deleteForm" action="/stock-in/delete" method="POST">
-    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
-    <input type="hidden" name="ids" id="deleteIds" />
+  <form id="deleteForm" action="/dashboard/stock-in/delete" method="post">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="ids" id="selectedTransactionIds">
   </form>
-  <!-- Modal Xác nhận Xóa -->
   <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+          <h5 class="modal-title" id="deleteModalLabel">
+            <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+            Xác nhận xóa giao dịch
+          </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div id="deleteMessage"></div>
+          <p id="deleteMessage"></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-          <!--  Nút này mới thực sự gửi form -->
-          <button type="button" id="confirmDelete" class="btn btn-danger">Xác nhận xóa</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Hủy bỏ
+          </button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">
+            <i class="fas fa-trash-alt me-2"></i>Đồng ý
+          </button>
         </div>
       </div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -528,41 +535,30 @@
     autocomplete('supplierName', 'supplierList', supplierNames);
   }
 
-  // Ẩn danh sách gợi ý sau 200ms để tránh bị xóa trước khi click
   function hideAutocomplete(listId) {
     setTimeout(() => document.getElementById(listId).innerHTML = '', 200);
   }
 
   //modal xóa
   document.addEventListener('DOMContentLoaded', function () {
-    const selectAllCheckbox = document.getElementById('selectAll');
-    const deleteSelectedButton = document.getElementById('deleteSelected');
-    const confirmDeleteButton = document.getElementById('confirmDelete');
-    const deleteMessageContainer = document.getElementById('deleteMessage');
-    const deleteForm = document.getElementById('deleteForm'); // 🔹 Form gửi request
-    let selectedIds = [];
-
-    // Bỏ chọn tất cả checkbox
-    selectAllCheckbox.addEventListener('click', function () {
-      document.querySelectorAll('.selectInventoryTransaction').forEach(checkbox => {
-        checkbox.checked = selectAllCheckbox.checked;
-      });
+    document.getElementById('selectAll').addEventListener('click', function () {
+      let checkboxes = document.querySelectorAll('.selectInventoryTransaction');
+      checkboxes.forEach(checkbox => checkbox.checked = this.checked);
       updateButtonState();
     });
 
-    // Cập nhật trạng thái nút xóa khi thay đổi checkbox
     document.querySelectorAll('.selectInventoryTransaction').forEach(checkbox => {
       checkbox.addEventListener('change', updateButtonState);
     });
 
     function updateButtonState() {
-      selectedIds = getSelectedTransactionIds();
-      deleteSelectedButton.disabled = selectedIds.length === 0;
+      let selectedTransactions = document.querySelectorAll('.selectInventoryTransaction:checked');
+      document.getElementById('deleteSelected').disabled = selectedTransactions.length === 0;
     }
 
-    //  Xử lý khi nhấn nút "Xóa đã chọn"
-    deleteSelectedButton.addEventListener('click', function () {
-      let selectedTransactions = [];
+    document.getElementById('deleteSelected').addEventListener('click', function () {
+      let selectedIds = [];
+      let transactionDetails = [];
 
       document.querySelectorAll('.selectInventoryTransaction:checked').forEach((checkbox) => {
         let id = checkbox.getAttribute('value');
@@ -570,53 +566,94 @@
         let supplier = checkbox.getAttribute('data-suppliers');
         let date = checkbox.getAttribute('data-date');
 
-        selectedTransactions.push({ id, product, supplier, date });
+        transactionDetails.push({ id, product, supplier, date });
+        selectedIds.push(id);
       });
 
-      if (selectedTransactions.length === 0) {
+      if (selectedIds.length === 0) {
         alert('Vui lòng chọn ít nhất một giao dịch để xóa.');
         return;
       }
 
+      console.log("Selected IDs:", selectedIds);
 
-      let deleteMessage = `<p>Bạn có chắc chắn muốn xóa ${selectedTransactions.length} giao dịch sau?</p><ul class="list-group">`;
-      selectedTransactions.forEach(trx => {
-        deleteMessage += `<li class="list-group-item">
-                                      <strong>${trx.product}</strong> - Nhà cung cấp: ${trx.supplier}, Ngày: ${trx.date}
-                                    </li>`;
+      let deleteMessage = `Bạn có chắc chắn muốn xóa ${transactionDetails.length} giao dịch sau đây?<br><br><ul class="list-group">`;
+      transactionDetails.forEach(tran => {
+        deleteMessage += `<li class="list-group-item"><strong>Sản phẩm:</strong> ${tran.product} <br>
+                              <small class="text-muted">Nhà cung cấp: ${tran.supplier}</small> <br>
+                              <small class="text-muted">Ngày nhập: ${tran.date}</small></li>`;
       });
-      deleteMessage += '</ul><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>';
 
-      deleteMessageContainer.innerHTML = deleteMessage;
+      deleteMessage += `</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>`;
+      document.getElementById('deleteMessage').innerHTML = deleteMessage;
 
       let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
       deleteModal.show();
+
+      document.getElementById('confirmDelete').onclick = function () {
+        let csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+        let csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+
+        if (!csrfTokenMeta || !csrfHeaderMeta) {
+          alert("Không tìm thấy CSRF token!");
+          console.error("CSRF token hoặc header bị thiếu!");
+          return;
+        }
+
+        let csrfToken = csrfTokenMeta.getAttribute('content');
+        let csrfHeader = csrfHeaderMeta.getAttribute('content');
+
+        if (!csrfToken || !csrfHeader) {
+          alert("CSRF Token hoặc Header không hợp lệ!");
+          console.error("CSRF Token hoặc Header có giá trị null hoặc undefined.");
+          return;
+        }
+
+        console.log("CSRF Token:", csrfToken);
+        console.log("CSRF Header:", csrfHeader);
+
+        let url = '/dashboard/stock-in/delete';
+
+        // Kiểm tra URL hợp lệ trước khi gửi request
+        try {
+          new URL(url, window.location.origin);
+        } catch (error) {
+          console.error("URL không hợp lệ:", error);
+          alert("Lỗi: URL yêu cầu không hợp lệ!");
+          return;
+        }
+
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            [csrfHeader]: csrfToken,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ids: selectedIds }) // Chuyển thành JSON thay vì FormData
+        })
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  if (data.success) {
+                    document.getElementById('deleteMessage').innerHTML =
+                            `<div class="alert alert-success">${data.message}</div>`;
+                    setTimeout(() => window.location.href = "/dashboard/stock-in/list", 2000);
+                  } else {
+                    document.getElementById('deleteMessage').innerHTML =
+                            `<div class="alert alert-danger">${data.message || "Xóa thất bại!"}</div>`;
+                  }
+                })
+                .catch(error => {
+                  console.error("Lỗi khi thực hiện fetch:", error);
+                  document.getElementById('deleteMessage').innerHTML =
+                          `<div class="alert alert-danger">Lỗi khi gửi yêu cầu: ${error.message}</div>`;
+                });
+      };
     });
-
-    confirmDeleteButton.addEventListener('click', function () {
-      if (selectedIds.length === 0) {
-        alert("Vui lòng chọn ít nhất một giao dịch để xóa.");
-        return;
-      }
-
-      document.querySelectorAll('#deleteForm input[name="ids"]').forEach(input => input.remove());
-
-      //  Tạo input hidden riêng cho từng ID
-      selectedIds.forEach(id => {
-        let inputField = document.createElement('input');
-        inputField.type = 'hidden';
-        inputField.name = 'ids';
-        inputField.value = id;
-        deleteForm.appendChild(inputField);
-      });
-
-      deleteForm.submit();
-    });
-
-    function getSelectedTransactionIds() {
-      return Array.from(document.querySelectorAll('.selectInventoryTransaction:checked'))
-              .map(checkbox => checkbox.value);
-    }
   });
 
 </script>

@@ -11,6 +11,11 @@ public interface ICustomerService {
     Integer countTotalCustomers();
 
     Page<Customer> searchCustomers(String name, String phone, String gender, Pageable pageable);
+    
+    /**
+     * Tìm kiếm khách hàng theo tên HOẶC số điện thoại HOẶC email (OR logic)
+     */
+    Page<Customer> searchCustomersByNameOrPhoneOrEmail(String name, String phone, String email, Pageable pageable);
 
     Customer findCustomerById(Integer id);
 
