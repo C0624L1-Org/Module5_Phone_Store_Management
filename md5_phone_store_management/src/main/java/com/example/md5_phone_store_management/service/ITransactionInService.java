@@ -28,4 +28,5 @@ public interface ITransactionInService {
     InventoryTransaction findById(Integer id);
 
     void editTransactionById(int inventoryTransactionId, InventoryTransaction transaction);
+    InventoryTransaction findByInventoryTransactionId(Integer id);
 }

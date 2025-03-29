@@ -142,22 +142,21 @@
                                         <input class="form-check-input" type="checkbox" id="selectAll">
                                     </div>
                                 </th>
-                                <th class="text-center">ID</th>
+                                <th class="text-center">STT</th>
                                 <th>Tên Sản phẩm</th>
                                 <th class="text-center">Số lượng</th>
                                 <th class="text-center">Giá</th>
                                 <th class="text-center">Tổng Giá Tiền</th>
                                 <th class="text-center">Ngày giao dịch</th>
-                                <th class="text-center">Nhân viên</th>
                                 <th class="text-center">Nhà cung cấp</th>
-                                <th class="text-center" style="width: 320px;">Thao tác</th>
+                                <th class="text-center" style="width: 300px;">Thao tác</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr th:if="${stockInLists.totalElements == 0}">
                                 <td colspan="10" class="text-center py-4">Không tìm thấy giao dịch nhập kho nào</td>
                             </tr>
-                            <tr th:each="stock : ${stockInLists}">
+                            <tr th:each="stock,l : ${stockInLists}">
                                 <td>
                                     <div class="form-check d-flex justify-content-center">
                                         <input class="form-check-input selectInventoryTransaction" type="checkbox"
@@ -167,21 +166,16 @@
                                                th:data-date="${stock.transactionDate}">
                                     </div>
                                 </td>
-                                <td class="text-center" th:text="${stock.transactionID}"></td>
+                                <td class="text-center" th:text="${l.count}"></td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img th:if="${stock.product.images != null}" th:src="${stock.product.images}"
-                                             alt="Avatar" class="avatar-sm me-2">
-                                        <img th:unless="${stock.product.images != null}" src="/img/default-avt.png"
-                                             alt="Default Avatar" class="avatar-sm me-2">
                                         <span th:text="${stock.product.name ?: 'N/A'}"></span>
                                     </div>
                                 </td>
                                 <td class="text-center" th:text="${stock.quantity}"></td>
                                 <td class="text-center" th:text="${#numbers.formatDecimal(stock.purchasePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
                                 <td class="text-center" th:text="${#numbers.formatDecimal(stock.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
-                                <td class="text-center" th:text="${#temporals.format(stock.transactionDate, 'dd-MM-yyyy HH:mm')}"></td>
-                                <td class="text-center" th:text="${stock.employee?.fullName ?: 'N/A'}"></td>
+                                <td class="text-center" th:text="${#temporals.format(stock.transactionDate, 'dd-MM-yyyy')}"></td>
                                 <td class="text-center" th:text="${stock.supplier?.name ?: 'N/A'}"></td>
                                 <td class="text-center">
                                     <div class="btn-group">
@@ -195,7 +189,11 @@
                                            data-bs-toggle="tooltip" title="Sửa">
                                             <i class="fas fa-edit me-1"></i> <span>Sửa</span>
                                         </a>
-
+                                        <a th:href="@{/dashboard/admin/transactions/view/{id}(id=${stock.transactionID})}"
+                                           class="btn btn-sm btn-info me-2 d-flex align-items-center"
+                                           data-bs-toggle="tooltip" title="Chi tiết">
+                                            <i class="fas fa-eye me-1"></i> <span>Chi tiết</span>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
