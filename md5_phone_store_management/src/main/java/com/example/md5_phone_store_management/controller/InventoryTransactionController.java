@@ -36,20 +36,20 @@ public class InventoryTransactionController {
     @Autowired
     private IInventoryTransactionInRepo inventoryTransactionInRepo;
 
-
     @GetMapping("stock-in/list")
-    public ModelAndView importController(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
+    public ModelAndView importController(@RequestParam(name = "page", defaultValue = "0", required = false) int page) {
         ModelAndView modelAndView = new ModelAndView("/dashboard/stock-in/stock-in-list");
-      Pageable pageable = PageRequest.of(page,5);
+        Pageable pageable = PageRequest.of(page, 5);
         Page<InventoryTransaction> transactions = inventoryTransactionService.getImportTransactions(pageable);
         modelAndView.addObject("currentPage", page);
-        List<Product> productList =productService.findAll(Pageable.unpaged()).getContent();
-        modelAndView.addObject("products",productList);
-        modelAndView.addObject("suppliers",supplierService.getSupplierList());
-      modelAndView.addObject("stockInLists",transactions);
-      modelAndView.addObject("totalPage",transactions.getTotalPages());
-      return modelAndView;
+        List<Product> productList = productService.findAll(Pageable.unpaged()).getContent();
+        modelAndView.addObject("products", productList);
+        modelAndView.addObject("suppliers", supplierService.getSupplierList());
+        modelAndView.addObject("stockInList", transactions); // Đổi từ stockInLists thành stockInList
+        modelAndView.addObject("totalPage", transactions.getTotalPages()); // Đổi từ totalPage thành totalPages
+        return modelAndView;
     }
+
     @GetMapping("/stock-in/search")
     public ModelAndView searchImportTransactions(
             @RequestParam(name = "productName", required = false) String productName,
@@ -76,20 +76,19 @@ public class InventoryTransactionController {
         modelAndView.addObject("products", productList);
         modelAndView.addObject("suppliers", supplierService.getSupplierList());
         modelAndView.addObject("currentPage", page);
-        modelAndView.addObject("stockInLists", searchResults);
-        modelAndView.addObject("totalPage", searchResults.getTotalPages());
-
+        modelAndView.addObject("stockInList", searchResults); // Đổi từ stockInLists thành stockInList
+        modelAndView.addObject("totalPage", searchResults.getTotalPages()); // Đổi từ totalPage thành totalPages
         return modelAndView;
     }
 
     @GetMapping("stock-in/update")
     public String update(Model model,
                          @RequestParam(name = "productId") int productId,
-                         @RequestParam(name = "supplierId") int supplierId){
+                         @RequestParam(name = "supplierId") int supplierId) {
         List<Supplier> supplierList = supplierService.getSupplierList();
         InventoryTransaction inventoryTransaction = inventoryTransactionService.getByProductIdAndSupplierId(productId, supplierId);
-        model.addAttribute("inventoryTransaction",inventoryTransaction);
-        model.addAttribute("supplierList",supplierList);
+        model.addAttribute("inventoryTransaction", inventoryTransaction);
+        model.addAttribute("supplierList", supplierList);
         return "dashboard/stock-in/stock-in-update";
     }
 
@@ -101,16 +100,16 @@ public class InventoryTransactionController {
             return "dashboard/stock-in/stock-in-update";
         }
         InventoryTransaction inventoryTransaction1 = new InventoryTransaction();
-        BeanUtils.copyProperties(inventoryTransaction,inventoryTransaction1);
+        BeanUtils.copyProperties(inventoryTransaction, inventoryTransaction1);
         inventoryTransaction1.setTransactionDate(LocalDateTime.now());
-        BigDecimal totalPrice = BigDecimal.valueOf(inventoryTransaction1.getQuantity()) // Chuyển Integer thành BigDecimal
-                .multiply(inventoryTransaction1.getPurchasePrice()); // Nhân với BigDecimal
-
+        BigDecimal totalPrice = BigDecimal.valueOf(inventoryTransaction1.getQuantity())
+                .multiply(inventoryTransaction1.getPurchasePrice());
         inventoryTransaction1.setTotalPrice(totalPrice);
         inventoryTransaction1.setTransactionType(TransactionType.IN);
         inventoryTransactionInRepo.save(inventoryTransaction1);
         return "redirect:/dashboard/stock-in/list";
     }
+
     @PostMapping("/stock-in/delete")
     public String deleteImportTransactions(@RequestParam("ids") List<Integer> ids,
                                            RedirectAttributes redirectAttributes,

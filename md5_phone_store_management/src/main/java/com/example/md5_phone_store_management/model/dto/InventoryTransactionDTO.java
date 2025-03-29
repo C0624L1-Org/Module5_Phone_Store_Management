@@ -22,7 +22,7 @@ public class InventoryTransactionDTO {
     private BigDecimal purchasePrice;
 
     @NotNull(message = "Nhân viên thực hiện không được để trống")
-    private Integer employeeID = 1; // Giá trị mặc định là 1
+    private Integer employeeID ;
 
     private String transactionType = "IN"; // Mặc định là nhập kho
     private LocalDateTime transactionDate; // Thêm trường này
