@@ -245,7 +245,8 @@
                             th:classappend="${product.stockQuantity == 0} ? 'text-danger fw-bold' : ''">
                         </td>
                         <td>
-                            <a th:if="${action == 'add'}"
+
+                            <a th:if="${action == 'add' && product.stockQuantity > 0}"
                                th:href="@{/dashboard/admin/transactions/new/out/{id}(id=${product.productID})}"
                                class="btn btn-sm btn-success"
                                th:classappend="${product.stockQuantity == 0} ? 'disabled' : ''"
@@ -253,17 +254,21 @@
                                 <i class="fas fa-check me-2"></i> Chọn Thêm
                             </a>
 
-                            <a th:href="${product.stockQuantity == 0
-            ? '/dashboard/admin/transactions/new/in/' + product.productID
-            : '/dashboard/admin/transactions/Out/edit/' + oldId + '/' + product.productID}"
-                               class="btn btn-sm"
-                               th:classappend="${product.stockQuantity == 0
-                    ? 'btn-warning'
-                    : (pid == product.productID ? 'btn-primary' : 'btn-success')}"
-                               th:text="${product.stockQuantity == 0 ? 'Nhập Hàng' : (pid == product.productID ? 'Hiện tại' : 'Chọn Sửa')}">
-                                <i class="fas" th:classappend="${product.stockQuantity == 0 ? 'fa-plus' : 'fa-check'}"></i>
+                            <!-- Nút Nhập Hàng hiển thị khi hết hàng, không phụ thuộc action -->
+                            <a th:if="${product.stockQuantity == 0}"
+                               th:href="@{/dashboard/admin/transactions/new/in/{id}(id=${product.productID})}"
+                               class="btn btn-sm btn-warning">
+                                <i class="fas fa-plus"></i> Nhập Hàng
                             </a>
 
+                            <!-- Nút Hiện tại/Chọn Sửa chỉ hiển thị khi action == 'edit' và không hết hàng -->
+                            <a th:if="${action == 'edit' && product.stockQuantity > 0}"
+                               th:href="@{/dashboard/admin/transactions/Out/edit/{oldId}/{id}(oldId=${oldId},id=${product.productID})}"
+                               class="btn btn-sm"
+                               th:classappend="${pid == product.productID ? 'btn-primary' : 'btn-success'}"
+                               th:text="${pid == product.productID ? 'Hiện tại' : 'Chọn Sửa'}">
+                                <i class="fas fa-check"></i>
+                            </a>
 
                         </td>
 
