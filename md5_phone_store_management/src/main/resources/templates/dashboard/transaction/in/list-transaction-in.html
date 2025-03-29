@@ -210,42 +210,84 @@
                         <nav aria-label="Pagination">
                             <ul class="pagination mb-0">
                                 <!-- Nút Trang đầu - luôn hiển thị -->
-                                <li class="page-item" th:classappend="${stockInLists.number == 0} ? 'disabled'">
+                                <th:block th:if="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
                                     <a class="page-link"
-                                       th:href="@{/dashboard/admin/transactions/listIn/search(page=0, size=${stockInLists.size}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
+                                       th:href="@{/dashboard/admin/transactions/listIn(page=0, size=${stockInLists.size})}">
                                         Trang đầu
                                     </a>
+                                </th:block>
+                                <th:block th:unless="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                    <a class="page-link" th:href="@{/dashboard/admin/transactions/listIn/search(page=0, size=${stockInLists.size},
+                     productName=${param.productName}, supplierName=${param.supplierName},
+                     startDate=${param.startDate}, endDate=${param.endDate})}">
+                                        Trang đầu
+                                    </a>
+                                </th:block>
                                 </li>
 
                                 <!-- Nút Trước - luôn hiển thị -->
                                 <li class="page-item" th:classappend="${stockInLists.number == 0} ? 'disabled'">
-                                    <a class="page-link"
-                                       th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.number - 1}, size=${stockInLists.size}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </a>
+                                    <th:block th:if="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listIn(page=${stockInLists.number - 1}, size=${stockInLists.size})}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </th:block>
+                                    <th:block th:unless="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link" th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.number - 1}, size=${stockInLists.size},
+                     productName=${param.productName}, supplierName=${param.supplierName},
+                     startDate=${param.startDate}, endDate=${param.endDate})}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </th:block>
                                 </li>
-
-                                <!-- Hiển thị số trang hiện tại / tổng số trang -->
+                                <!-- Hiển thị số trang -->
                                 <li class="page-item active mx-2">
-                                    <span class="page-link">
-                                        <span th:text="${stockInLists.number + 1}"></span> / <span th:text="${stockInLists.totalPages}"></span>
-                                    </span>
+                                     <span class="page-link">
+                 <span th:text="${stockInLists.number + 1}"></span> / <span th:text="${stockInLists.totalPages}"></span>
+             </span>
                                 </li>
 
                                 <!-- Nút Tiếp - luôn hiển thị -->
                                 <li class="page-item" th:classappend="${stockInLists.number + 1 >= stockInLists.totalPages} ? 'disabled'">
-                                    <a class="page-link"
-                                       th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.number + 1}, size=${stockInLists.size}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
+                                    <th:block th:if="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listIn(page=${stockInLists.number + 1}, size=${stockInLists.size})}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </th:block>
+                                    <th:block th:unless="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link" th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.number + 1}, size=${stockInLists.size},
+                     productName=${param.productName}, supplierName=${param.supplierName},
+                     startDate=${param.startDate}, endDate=${param.endDate})}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </th:block>
                                 </li>
 
                                 <!-- Nút Trang cuối - luôn hiển thị -->
                                 <li class="page-item" th:classappend="${stockInLists.number + 1 >= stockInLists.totalPages} ? 'disabled'">
-                                    <a class="page-link"
-                                       th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.totalPages - 1}, size=${stockInLists.size}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
-                                        Trang cuối
-                                    </a>
+                                    <th:block th:if="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listIn(page=${stockInLists.totalPages - 1}, size=${stockInLists.size})}">
+                                            Trang cuối
+                                        </a>
+                                    </th:block>
+                                    <th:block th:unless="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link" th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.totalPages - 1}, size=${stockInLists.size},
+                     productName=${param.productName}, supplierName=${param.supplierName},
+                     startDate=${param.startDate}, endDate=${param.endDate})}">
+                                            Trang cuối
+                                        </a>
+                                    </th:block>
                                 </li>
                             </ul>
                         </nav>
@@ -272,6 +314,44 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript">
+    let products = /*[[${products}]]*/ [];
+    let suppliers = /*[[${suppliers}]]*/ [];
+    let productNames = products.map(p => p.name).filter(name => name);
+    let supplierNames = suppliers.map(s => s.name).filter(name => name);
+
+    function autocomplete(inputId, listId, dataArray) {
+        let input = document.getElementById(inputId);
+        let list = document.getElementById(listId);
+
+        let value = input.value.trim().toLowerCase();
+        list.innerHTML = '';  // Xóa kết quả cũ
+        if (!value) return;
+
+        let filtered = dataArray.filter(name => name.toLowerCase().includes(value));
+
+        filtered.forEach(name => {
+            let div = document.createElement('div');
+            div.classList.add('autocomplete-item');
+            div.textContent = name;
+            div.onclick = function () {
+                input.value = name;
+                list.innerHTML = ''; // Ẩn gợi ý sau khi chọn
+            };
+            list.appendChild(div);
+        });
+    }
+
+    function autocompleteProduct() {
+        autocomplete('productName', 'productList', productNames);
+    }
+
+    function autocompleteSupplier() {
+        autocomplete('supplierName', 'supplierList', supplierNames);
+    }
+
+    function hideAutocomplete(listId) {
+        setTimeout(() => document.getElementById(listId).innerHTML = '', 200);
+    }
     document.addEventListener('DOMContentLoaded', function () {
         // Handle select all checkbox
         document.getElementById('selectAll').addEventListener('click', function () {
