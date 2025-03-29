@@ -441,6 +441,50 @@ public class OutTransactionController {
         return "dashboard/transaction/out/create-transaction-out";
     }
 
+    @PostMapping("/admin/transactions/saveNew")
+    public String processExport(@Valid @ModelAttribute("inventoryTransaction") InventoryTransaction transaction,
+                                BindingResult result,
+                                @RequestParam("productId") Long productId,
+                                RedirectAttributes redirectAttributes,
+                                Model model,
+                                HttpSession session,
+                                @AuthenticationPrincipal CustomUserDetailsService userDetails) {
+//        CustomUserDetails
+        Product product = productService.getProductById(Math.toIntExact(productId));
+        Optional<Product> optionalProduct = Optional.ofNullable(productService.getProductById(Math.toIntExact(productId)));
+
+        if (optionalProduct.isPresent()) {
+//            set lại sl
+            product.setStockQuantity(product.getStockQuantity() - transaction.getQuantity());
+            productService.saveProduct(product);
+
+//            lấy giá và số lượng xuất để lưu tổng
+            transaction.setProduct(product);
+            transaction.setPurchasePrice(product.getPurchasePrice());
+            transaction.setTotalPrice(product.getPurchasePrice().multiply(BigDecimal.valueOf(transaction.getQuantity())));
+            transaction.setTransactionType(TransactionType.OUT);
+            transaction.setTransactionDate(LocalDateTime.now()); // Thời gian hiện tại
+            transaction.setSupplier(product.getSupplier()); // Lấy từ product hoặc form
+            // Lấy thông tin tài khoản đang đăng nhập
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                String username = authentication.getName();
+                Optional<Employee> optionalEmployee = employeeRepository.findByUsername(username);
+                Employee employee = optionalEmployee.orElseThrow(() ->
+                        new UsernameNotFoundException("Không tìm thấy tài khoản"));
+                transaction.setEmployee(employee);
+            }
+
+            transactionOutService.addOutTransaction(transaction);
+            session.setAttribute("SUCCESS_MESSAGE", "Lưu lịch sử xuất kho thành công!");
+            return "redirect:/dashboard/admin/transactions/listOut";
+        } else {
+            session.setAttribute("ERROR_MESSAGE", "Lỗi không thể lưu!");
+            return "redirect:/dashboard/admin/transactions/new/out/0";
+        }
+
+    }
+
 
 }
 
