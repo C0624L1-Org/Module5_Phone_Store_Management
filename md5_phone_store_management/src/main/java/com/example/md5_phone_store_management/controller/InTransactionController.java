@@ -134,8 +134,14 @@ public class InTransactionController {
 
         return "dashboard/transaction/in/create-transaction-in";
     }
-
-
+    @GetMapping("/admin/transactions/view/{id}")
+public ModelAndView showEditInTransaction(@PathVariable("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("dashboard/transaction/in/view-in");
+        modelAndView.addObject("InventoryTransaction", transactionInService.findByInventoryTransactionId(id));
+        modelAndView.addObject("products", productService.findAllProducts());
+        modelAndView.addObject("suppliers", supplierService.getSupplierList());
+        return modelAndView;
+    }
     @PostMapping("/admin/transaction/saveNew")
     public String processImport(
             @Valid @ModelAttribute("inventoryTransaction") InventoryTransaction transaction,
