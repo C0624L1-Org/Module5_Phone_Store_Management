@@ -160,9 +160,11 @@
                             <tr th:each="stock : ${stockInLists}">
                                 <td>
                                     <div class="form-check d-flex justify-content-center">
-                                        <input class="form-check-input transaction-checkbox" type="checkbox"
+                                        <input class="form-check-input selectInventoryTransaction" type="checkbox"
                                                th:value="${stock.transactionID}"
-                                               th:data-name="${stock.product.name ?: 'N/A'}">
+                                               th:data-product="${stock.product.name}"
+                                               th:data-suppliers="${stock.supplier.name}"
+                                               th:data-date="${stock.transactionDate}">
                                     </div>
                                 </td>
                                 <td class="text-center" th:text="${stock.transactionID}"></td>
@@ -296,22 +298,45 @@
             </div>
         </div>
     </div>
-
     <!-- Footer -->
     <footer th:replace="~{fragments/footer :: footer}"></footer>
-
-    <!-- Form for delete -->
     <form id="deleteForm" action="/dashboard/stock-in/delete" method="post">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
         <input type="hidden" name="ids" id="selectedTransactionIds">
     </form>
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                        Xác nhận xóa giao dịch
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="deleteMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy bỏ
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">
+                        <i class="fas fa-trash-alt me-2"></i>Đồng ý
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
-
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
 <script th:inline="javascript">
     let products = /*[[${products}]]*/ [];
@@ -352,99 +377,119 @@
     function hideAutocomplete(listId) {
         setTimeout(() => document.getElementById(listId).innerHTML = '', 200);
     }
+
+    //modal xóa
     document.addEventListener('DOMContentLoaded', function () {
-        // Handle select all checkbox
+        let selectedIds = []; // Đưa selectedIds ra ngoài để giữ giá trị
+
         document.getElementById('selectAll').addEventListener('click', function () {
-            let checkboxes = document.querySelectorAll('.transaction-checkbox');
+            let checkboxes = document.querySelectorAll('.selectInventoryTransaction');
             checkboxes.forEach(checkbox => checkbox.checked = this.checked);
             updateButtonState();
         });
 
-        // Handle individual checkboxes
-        document.querySelectorAll('.transaction-checkbox').forEach(checkbox => {
+        document.querySelectorAll('.selectInventoryTransaction').forEach(checkbox => {
             checkbox.addEventListener('change', updateButtonState);
         });
 
-        // Update button state
         function updateButtonState() {
-            let selectedTransactions = document.querySelectorAll('.transaction-checkbox:checked');
+            let selectedTransactions = document.querySelectorAll('.selectInventoryTransaction:checked');
             document.getElementById('deleteSelected').disabled = selectedTransactions.length === 0;
         }
 
-        // Handle delete button click
         document.getElementById('deleteSelected').addEventListener('click', function () {
-            let selectedTransactions = [];
-            let selectedIds = [];
+            selectedIds = []; // Reset danh sách khi nhấn xóa
+            let transactionDetails = [];
 
-            document.querySelectorAll('.transaction-checkbox:checked').forEach((checkbox) => {
-                let id = checkbox.getAttribute('value');
-                let name = checkbox.getAttribute('data-name');
-                selectedTransactions.push({id, name});
+            document.querySelectorAll('.selectInventoryTransaction:checked').forEach((checkbox) => {
+                let id = Number(checkbox.getAttribute('value')); // Ép kiểu về số
+                let product = checkbox.getAttribute('data-product');
+                let supplier = checkbox.getAttribute('data-suppliers');
+                let date = checkbox.getAttribute('data-date');
+
+                transactionDetails.push({ id, product, supplier, date });
                 selectedIds.push(id);
             });
 
-            if (selectedTransactions.length === 0) {
+            if (selectedIds.length === 0) {
                 alert('Vui lòng chọn ít nhất một giao dịch để xóa.');
                 return;
             }
 
-            // Format message for confirmation modal
-            let deleteMessage = 'Bạn có chắc chắn muốn xóa ' +
-                (selectedTransactions.length > 1 ? 'các giao dịch' : 'giao dịch') +
-                ' nhập kho sau đây?<br><br><ul class="list-group">';
+            console.log("Selected IDs:", selectedIds);
 
-            selectedTransactions.forEach(trans => {
-                deleteMessage += `<li class="list-group-item">${trans.name} <small class="text-muted">(ID: ${trans.id})</small></li>`;
+            let deleteMessage = `Bạn có chắc chắn muốn xóa ${transactionDetails.length} giao dịch sau đây?<br><br><ul class="list-group">`;
+            transactionDetails.forEach(tran => {
+                deleteMessage += `<li class="list-group-item"><strong>Sản phẩm:</strong> ${tran.product} <br>
+                                  <small class="text-muted">Nhà cung cấp: ${tran.supplier}</small> <br>
+                                  <small class="text-muted">Ngày nhập: ${tran.date}</small></li>`;
             });
 
-            deleteMessage += '</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>';
-
+            deleteMessage += `</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>`;
             document.getElementById('deleteMessage').innerHTML = deleteMessage;
 
-            // Show delete modal
             let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             deleteModal.show();
+        });
 
-            // Handle confirm delete button (only bind once)
-            const confirmDeleteBtn = document.getElementById('confirmDelete');
-            confirmDeleteBtn.onclick = null; // Clear any existing listeners
-            confirmDeleteBtn.addEventListener('click', function () {
-                if (selectedIds.length === 0) {
-                    alert("Không có giao dịch nào được chọn để xóa!");
-                    return;
-                }
+        document.getElementById('confirmDelete').addEventListener('click', function () {
+            if (selectedIds.length === 0) {
+                alert("Không có giao dịch nào được chọn để xóa!");
+                return;
+            }
 
-                // Redirect to delete endpoint with selected IDs
-                window.location.href = `/dashboard/admin/transaction/delete?ids=${selectedIds.join(',')}`;
-            });
+            let csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+            let csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+
+            if (!csrfTokenMeta || !csrfHeaderMeta) {
+                alert("Không tìm thấy CSRF token!");
+                console.error("CSRF token hoặc header bị thiếu!");
+                return;
+            }
+
+            let csrfToken = csrfTokenMeta.getAttribute('content');
+            let csrfHeader = csrfHeaderMeta.getAttribute('content');
+
+            console.log("CSRF Token:", csrfToken);
+            console.log("CSRF Header:", csrfHeader);
+            console.log("Selected IDs:", selectedIds);
+
+            let url = '/dashboard/admin/transactions/listIn/delete';
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    [csrfHeader]: csrfToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ids: selectedIds.map(id => Number(id)) })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('deleteMessage').innerHTML =
+                            `<div class="alert alert-success">${data.message}</div>`;
+                        setTimeout(() => window.location.href = "/dashboard/admin/transactions/listIn", 2000);
+                    } else {
+                        document.getElementById('deleteMessage').innerHTML =
+                            `<div class="alert alert-danger">${data.message || "Xóa thất bại!"}</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi khi thực hiện fetch:", error);
+                    document.getElementById('deleteMessage').innerHTML =
+                        `<div class="alert alert-danger">Lỗi khi gửi yêu cầu: ${error.message}</div>`;
+                });
         });
     });
 </script>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">
-                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
-                    Xác nhận xóa giao dịch
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="deleteMessage">
-                <!-- Delete message will be inserted here -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Hủy bỏ
-                </button>
-                <button type="button" class="btn btn-danger" id="confirmDelete">
-                    <i class="fas fa-trash-alt me-2"></i>Đồng ý
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Footer -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </div>
 </body>
 </html>
