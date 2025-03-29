@@ -13,12 +13,16 @@ import com.example.md5_phone_store_management.service.implement.TransactionOutSe
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +30,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +55,28 @@ public class OutTransactionController {
 
     @Autowired
     private SupplierService supplierService;
-    
+
+
+
+    @GetMapping("/admin/transactions/listOut")
+    public ModelAndView listOutTransactions(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
+        ModelAndView modelAndView = new ModelAndView("dashboard/transaction/out/list-transaction-out");
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<InventoryTransaction> transactions = transactionOutService.getAllOutTransactionsPage(pageable);
+        modelAndView.addObject("inventoryTransactions", transactions);
+        modelAndView.addObject("currentPage", page);
+        modelAndView.addObject("totalPage", transactions.getTotalPages());
+        List<Product> productList = productService.findAll(Pageable.unpaged()).getContent();
+        modelAndView.addObject("products", productList);
+        modelAndView.addObject("suppliers", supplierService.getSupplierList());
+
+        return modelAndView;
+    }
+
+
+
+
 
     @GetMapping({
             "/admin/transactions/search/out/product",
@@ -131,7 +159,8 @@ public class OutTransactionController {
         model.addAttribute("outTra", transactionOut);
         return "dashboard/transaction/in-and-out";
     }
-//    dashboard/admin/transactions/search/out/product/{a}/{b}
+
+    //    dashboard/admin/transactions/search/out/product/{a}/{b}
     @GetMapping("/admin/transactions/choose/out/product/{a}/{b}")
     public String showAddOutTransactionProducts(@PathVariable("a") String action,
                                                 @PathVariable(value = "b", required = false) int b,
@@ -167,6 +196,7 @@ public class OutTransactionController {
     }
 
 
+
     @PostMapping("/admin/transactions/updateOut")
     public String updateTransactionOut(
             @Valid @ModelAttribute("inventoryTransaction") InventoryTransaction newTransaction,
@@ -182,190 +212,123 @@ public class OutTransactionController {
             return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
         }
 
-        // Tìm giao dịch cũ
-        InventoryTransaction oldInventoryTransaction = transactionOutService
-                .getOutTransactionById(oldTransactionID)
-                .orElse(null);
-        if (oldInventoryTransaction == null) {
-            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy giao dịch cũ.");
-            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
-        }
+        try {
+            // Tìm giao dịch cũ
+            InventoryTransaction oldInventoryTransaction = transactionOutService
+                    .getOutTransactionById(oldTransactionID)
+                    .orElse(null);
+            if (oldInventoryTransaction == null) {
+                session.setAttribute("ERROR_MESSAGE", "Không tìm thấy giao dịch cũ.");
+                return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+            }
 
-        // Kiểm tra và khôi phục số lượng sản phẩm cũ
-        Product oldProduct = oldInventoryTransaction.getProduct();
-        if (oldProduct == null) {
-            session.setAttribute("ERROR_MESSAGE", "Sản phẩm cũ không tồn tại.");
-            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
-        }
-        oldProduct.setStockQuantity(oldProduct.getStockQuantity() + oldInventoryTransaction.getQuantity());
-        productService.saveProduct(oldProduct);
+            // Kiểm tra và khôi phục số lượng sản phẩm cũ
+            Product oldProduct = oldInventoryTransaction.getProduct();
+            if (oldProduct == null) {
+                session.setAttribute("ERROR_MESSAGE", "Sản phẩm cũ không tồn tại.");
+                return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+            }
+            oldProduct.setStockQuantity(oldProduct.getStockQuantity() + oldInventoryTransaction.getQuantity());
+            productService.saveProduct(oldProduct);
 
-        // Kiểm tra sản phẩm mới
-        if (newTransaction.getProduct() == null || newTransaction.getProduct().getProductID() == null) {
-            System.out.println("Gỡ lỗi - Giao dịch mới: " + newTransaction);
-            System.out.println("Gỡ lỗi - Sản phẩm của giao dịch mới: " + newTransaction.getProduct());
-            session.setAttribute("ERROR_MESSAGE", "Sản phẩm mới không hợp lệ.");
-            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
-        }
+            // Kiểm tra sản phẩm mới
+            if (newTransaction.getProduct() == null || newTransaction.getProduct().getProductID() == null) {
+                session.setAttribute("ERROR_MESSAGE", "Sản phẩm mới không hợp lệ.");
+                return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+            }
 
-        // Tìm và cập nhật sản phẩm mới
-        Product newProduct = productService.getProductById(newTransaction.getProduct().getProductID());
-        if (newProduct == null) {
-            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy sản phẩm mới.");
-            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
-        }
+            Product newProduct = productService.getProductById(newTransaction.getProduct().getProductID());
+            if (newProduct == null) {
+                session.setAttribute("ERROR_MESSAGE", "Không tìm thấy sản phẩm mới.");
+                return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+            }
 
-        // Kiểm tra số lượng tồn kho
-        if (newProduct.getStockQuantity() < newTransaction.getQuantity()) {
-            session.setAttribute("ERROR_MESSAGE", "Số lượng xuất vượt quá tồn kho!");
-            return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
-        }
-        newProduct.setStockQuantity(newProduct.getStockQuantity() - newTransaction.getQuantity());
-        productService.saveProduct(newProduct);
+            if (newProduct.getStockQuantity() < newTransaction.getQuantity()) {
+                session.setAttribute("ERROR_MESSAGE", "Số lượng xuất vượt quá tồn kho!");
+                return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+            }
+            newProduct.setStockQuantity(newProduct.getStockQuantity() - newTransaction.getQuantity());
+            productService.saveProduct(newProduct);
 
-        // Tạo giao dịch mới
-        InventoryTransaction updatedTransaction = new InventoryTransaction();
-        updatedTransaction.setQuantity(newTransaction.getQuantity());
-        updatedTransaction.setProduct(newProduct);
+            // Tạo giao dịch mới
+            InventoryTransaction updatedTransaction = new InventoryTransaction();
+            updatedTransaction.setQuantity(newTransaction.getQuantity());
+            updatedTransaction.setProduct(newProduct);
 
-        BigDecimal Price = newProduct.getSellingPrice() != null ? newProduct.getSellingPrice() : BigDecimal.ZERO;
-        updatedTransaction.setPurchasePrice(Price);
-        updatedTransaction.setTotalPrice(Price.multiply(BigDecimal.valueOf(newTransaction.getQuantity())));
+            BigDecimal Price = newProduct.getSellingPrice() != null ? newProduct.getSellingPrice() : BigDecimal.ZERO;
+            updatedTransaction.setPurchasePrice(Price);
+            updatedTransaction.setTotalPrice(Price.multiply(BigDecimal.valueOf(newTransaction.getQuantity())));
+            updatedTransaction.setSupplier(newTransaction.getSupplier() != null ? newTransaction.getSupplier() : newProduct.getSupplier());
+            updatedTransaction.setTransactionType(TransactionType.OUT);
+            updatedTransaction.setTransactionDate(LocalDateTime.now());
 
-        updatedTransaction.setSupplier(newTransaction.getSupplier() != null ? newTransaction.getSupplier() : newProduct.getSupplier());
-
-
-        updatedTransaction.setTransactionType(TransactionType.OUT);
-        updatedTransaction.setTransactionDate(LocalDateTime.now());
-
-        // Thiết lập thông tin nhân viên
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+            // Thiết lập thông tin nhân viên
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                session.setAttribute("ERROR_MESSAGE", "Không thể xác thực người dùng!");
+                return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
+            }
             String username = authentication.getName();
             Optional<Employee> optionalEmployee = employeeRepository.findByUsername(username);
             Employee employee = optionalEmployee.orElseThrow(() ->
-                    new UsernameNotFoundException("Không tìm thấy tài khoản"));
+                    new UsernameNotFoundException("Không tìm thấy tài khoản: " + username));
             updatedTransaction.setEmployee(employee);
-        }
 
-        // Cập nhật giao dịch
-        try {
+            // Cập nhật giao dịch
             transactionOutService.updateOutTransaction(Math.toIntExact(oldTransactionID), updatedTransaction);
             redirectAttributes.addFlashAttribute("successMessage", "Transaction updated successfully");
             session.setAttribute("SUCCESS_MESSAGE", "Cập nhật giao dịch xuất kho " + oldTransactionID + " thành công!");
             return "redirect:/dashboard/admin/transactions/listOut";
+
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("ERROR_MESSAGE", "Lỗi khi cập nhật giao dịch, vui lòng thử lại!");
+            session.setAttribute("ERROR_MESSAGE", "Lỗi khi cập nhật giao dịch: " + e.getMessage());
             return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
         }
     }
 
 
-    @PostMapping("/admin/transactions/saveNew")
-    public String processExport(@Valid @ModelAttribute("inventoryTransaction") InventoryTransaction transaction,
-                                BindingResult result,
-                                @RequestParam("productId") Long productId,
-                                RedirectAttributes redirectAttributes,
-                                Model model,
-                                HttpSession session,
-                                @AuthenticationPrincipal CustomUserDetailsService userDetails) {
-
-        Product product = productService.getProductById(Math.toIntExact(productId));
-        Optional<Product> optionalProduct = Optional.ofNullable(productService.getProductById(Math.toIntExact(productId)));
-
-        if (optionalProduct.isPresent()) {
-//            set lại sl
-            product.setStockQuantity(product.getStockQuantity() - transaction.getQuantity());
-            productService.saveProduct(product);
-
-//            lấy giá và số lượng xuất để lưu tổng
-            transaction.setProduct(product);
-            transaction.setPurchasePrice(product.getSellingPrice());
-            transaction.setTotalPrice(product.getSellingPrice().multiply(BigDecimal.valueOf(transaction.getQuantity())));
-            transaction.setTransactionType(TransactionType.OUT);
-            transaction.setTransactionDate(LocalDateTime.now()); // Thời gian hiện tại
-            transaction.setSupplier(product.getSupplier()); // Lấy từ product hoặc form
-            // Lấy thông tin tài khoản đang đăng nhập
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.isAuthenticated()) {
-                String username = authentication.getName();
-                Optional<Employee> optionalEmployee = employeeRepository.findByUsername(username);
-                Employee employee = optionalEmployee.orElseThrow(() ->
-                        new UsernameNotFoundException("Không tìm thấy tài khoản"));
-                transaction.setEmployee(employee);
-            }
-
-            transactionOutService.addOutTransaction(transaction);
-            session.setAttribute("SUCCESS_MESSAGE", "Lưu lịch sử xuất kho thành công!");
-            return "redirect:/dashboard/admin/transactions/listOut";
-        } else {
-            session.setAttribute("ERROR_MESSAGE", "Lỗi không thể lưu!");
-            return "redirect:/dashboard/admin/transactions/new/out/0";
-        }
-
-    }
-
-
-    @GetMapping("/admin/transactions/listOut")
-    public String listOutTransactions(Model model) {
-        List<InventoryTransaction> inventoryTransactions = transactionOutService.getAllOutTransactions();
-        model.addAttribute("inventoryTransactions", inventoryTransactions);
-        return "dashboard/transaction/out/list-transaction-out";
-    }
-
-
     @GetMapping("/admin/transactions/listOut/search")
-    public String searchTransactions(
-            @RequestParam(required = false) String productName,
-            @RequestParam(required = false) String supplierName,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            Model model,
-            HttpSession session) throws ParseException {
+    public ModelAndView searchTransactionsP(
+            @RequestParam(name = "productName", required = false) String productName,
+            @RequestParam(name = "supplierName", required = false) String supplierName,
+            @RequestParam(name = "startDate", required = false) String startDateStr,
+            @RequestParam(name = "endDate", required = false) String endDateStr,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
 
-        List<InventoryTransaction> inventoryTransactions = transactionOutService.searchTransaction(productName, supplierName, startDate, endDate);
+        ModelAndView modelAndView = new ModelAndView("dashboard/transaction/out/list-transaction-out");
+        Pageable pageable = PageRequest.of(page, 5);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
-            Date start = dateFormat.parse(startDate);
-            Date end = dateFormat.parse(endDate);
-            if (end.before(start)) {
-                session.setAttribute("ERROR_MESSAGE", "Ngày kết thúc không thể nhỏ hơn ngày bắt đầu!");
-                return "redirect:/dashboard/admin/transactions/listOut";
-            }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+
+        if (startDateStr != null && !startDateStr.isEmpty()) {
+            startDate = LocalDate.parse(startDateStr, formatter);
+        }
+        if (endDateStr != null && !endDateStr.isEmpty()) {
+            endDate = LocalDate.parse(endDateStr, formatter);
         }
 
-        // Check if all parameters are empty or null
-        if ((productName == null || productName.isEmpty()) &&
-                (supplierName == null || supplierName.isEmpty()) &&
-                (startDate == null || startDate.isEmpty()) &&
-                (endDate == null || endDate.isEmpty())) {
-            session.setAttribute("ERROR_MESSAGE", "Vui lòng nhập trường để tìm kiếm!");
-            return "redirect:/dashboard/admin/transactions/listOut";
-        }
+        Page<InventoryTransaction> searchResults = transactionOutService.searchExportTransactions(
+                productName, supplierName, startDate, endDate, pageable);
+        List<Product> productList = productService.findAll(Pageable.unpaged()).getContent();
 
-        if (inventoryTransactions.isEmpty()) {
-            session.setAttribute("ERROR_MESSAGE", "Không tìm thấy giao dịch phù hợp!");
-            return "redirect:/dashboard/admin/transactions/listOut";
-        } else {
-            if ((productName == null || productName.isEmpty()) &&
-                    (supplierName == null || supplierName.isEmpty()) &&
-                    (startDate.isEmpty())) {
-                session.setAttribute("SUCCESS_MESSAGE", "Bạn đang tìm từ ngày " + new SimpleDateFormat("dd/MM/yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(endDate)) + " trở về!");
-            } else if ((productName == null || productName.isEmpty()) &&
-                    (supplierName == null || supplierName.isEmpty()) &&
-                    (endDate.isEmpty())) {
-                session.setAttribute("SUCCESS_MESSAGE", "Bạn đang tìm từ ngày " + new SimpleDateFormat("dd/MM/yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(startDate)) + " trở đi!");
-            }
-        }
-        model.addAttribute("inventoryTransactions", inventoryTransactions);
-        model.addAttribute("productName", productName);
-        model.addAttribute("supplierName", supplierName);
-        model.addAttribute("startDate", startDate);
-        model.addAttribute("endDate", endDate);
-        return "dashboard/transaction/out/list-transaction-out";
+        modelAndView.addObject("productName", productName);
+        modelAndView.addObject("supplierName", supplierName);
+        modelAndView.addObject("startDate", startDateStr);
+        modelAndView.addObject("endDate", endDateStr);
+        modelAndView.addObject("currentPage", page);
+        modelAndView.addObject("totalPage", searchResults.getTotalPages());
+        modelAndView.addObject("inventoryTransactions", searchResults); // Sửa ở đây
+        modelAndView.addObject("products", productList);
+        modelAndView.addObject("suppliers", supplierService.getSupplierList());
+
+        return modelAndView;
     }
+
+
+
 
 
     @GetMapping("/admin/transactions/Out/edit/{id}/{pid}")
@@ -430,14 +393,6 @@ public class OutTransactionController {
         }
         session.setAttribute("SUCCESS_MESSAGE", "Đã Xóa " + ids.size() + " lịch sử giao dịch!");
         return "redirect:/dashboard/admin/transactions/listOut";
-    }
-
-
-    @GetMapping("/admin/transactions/listIn")
-    public String listInTransactions(Model model) {
-        List<InventoryTransaction> inventoryTransactions = transactionOutService.getAllInTransactions();
-        model.addAttribute("inventoryTransactions", inventoryTransactions);
-        return "dashboard/transaction/in/list-transaction-in";
     }
 
 

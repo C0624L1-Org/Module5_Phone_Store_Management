@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhập kho hàng hóa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+    <style>
+        .form-section { background-color: #f8f9fa; border-radius: 10px; box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15); overflow: hidden; }
+        .form-header { background: linear-gradient(135deg, #0062cc 0%, #007bff 100%); color: white; padding: 1.5rem; }
+        .form-label { font-weight: 600; color: #495057; }
+        .form-control, .form-select { border-radius: 0.5rem; padding: 0.75rem; border: 1px solid #ced4da; }
+        .form-control:focus, .form-select:focus { border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
+        .form-control:read-only { background-color: #e9ecef; opacity: 0.7; cursor: not-allowed; }
+        .btn-save { background: linear-gradient(135deg, #0062cc 0%, #007bff 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.3s; }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3); }
+        .btn-cancel { background-color: #6c757d; color: white; border: none; padding: 0.75rem 2rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.3s; }
+        .btn-cancel:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3); }
+        .error-message { color: red; font-size: 0.875rem; display: none; }
+    </style>
+</head>
+<body>
+<div th:replace="~{common/toast}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="content-container">
+            <div class="container py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listIn}">Giao dịch Nhập kho</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thêm mới nhập kho</li>
+                    </ol>
+                </nav>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="form-section mb-4">
+                            <div class="form-header">
+                                <h3 class="mb-0"><i class="fas fa-warehouse me-2"></i>Nhập kho hàng hóa</h3>
+                                <p class="text-white-50 mt-2 mb-0">Nhập thông tin hàng hóa nhập kho</p>
+                            </div>
+
+                            <div class="p-4">
+                                <form th:action="@{/dashboard/admin/transaction/saveNew}" method="post"
+                                      th:object="${inventoryTransaction}" class="needs-validation" novalidate>
+                                    <div class="row g-3">
+                                        <!-- Nhà cung cấp -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="supplierID" class="form-label"><i class="fas fa-building me-2"></i>Nhà cung cấp</label>
+                                            <select class="form-select" id="supplierID" th:field="*{supplier.supplierID}" onchange="filterProducts()" required>
+                                                <option value="">Chọn nhà cung cấp</option>
+                                                <option th:each="supplier : ${suppliers}"
+                                                        th:value="${supplier.supplierID}"
+                                                        th:text="${supplier.name}"
+                                                        th:selected="${inventoryTransaction.product != null and inventoryTransaction.product.supplier.supplierID == supplier.supplierID}">
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback">Vui lòng chọn nhà cung cấp.</div>
+                                        </div>
+
+                                        <!-- Chọn hàng hóa -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="productID" class="form-label"><i class="fas fa-box me-2"></i>Chọn hàng hóa</label>
+                                            <select class="form-select" id="productID" th:field="*{product.productID}"
+                                                    onchange="updateProductInfo()" required>
+                                                <option value="">Chọn sản phẩm</option>
+                                            </select>
+                                            <div class="invalid-feedback">Vui lòng chọn sản phẩm.</div>
+                                        </div>
+
+                                        <!-- Giá hàng hóa cố định -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="purchasePriceFixed" class="form-label"><i class="fas fa-dollar-sign me-2"></i>Giá nhập cố định</label>
+                                            <input type="text" class="form-control" id="purchasePriceFixed" readonly>
+                                        </div>
+
+                                        <!-- Giá hàng hóa nhập -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="purchasePriceDisplay" class="form-label"><i class="fas fa-dollar-sign me-2"></i>Giá nhập giao dịch</label>
+                                            <input type="text" class="form-control" id="purchasePriceDisplay" placeholder="Nhập giá"
+                                                   oninput="formatPrice(this)" required>
+                                            <input type="hidden" id="purchasePrice" th:field="*{purchasePrice}">
+                                            <div class="invalid-feedback">Vui lòng nhập giá hợp lệ.</div>
+                                            <div id="priceError" class="error-message"></div>
+                                        </div>
+
+                                        <!-- Tổng giá tiền -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="totalAmountDisplay" class="form-label"><i class="fas fa-money-bill-wave me-2"></i>Tổng giá tiền</label>
+                                            <input type="text" class="form-control" id="totalAmountDisplay" readonly>
+                                            <input type="hidden" id="totalAmount" name="totalAmount">
+                                            <div id="totalError" class="error-message"></div>
+                                        </div>
+
+                                        <!-- Số lượng nhập -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="quantity" class="form-label"><i class="fas fa-cubes me-2"></i>Số lượng nhập</label>
+                                            <input type="number" class="form-control" id="quantity" th:field="*{quantity}"
+                                                   min="1" max="500" oninput="calculateTotal()" required>
+                                            <div class="invalid-feedback">Số lượng phải từ 1 đến 500.</div>
+                                            <div id="quantityError" class="error-message"></div>
+                                        </div>
+
+
+
+                                        <!-- Hidden fields -->
+                                        <input type="hidden" th:field="*{transactionType}" value="IN">
+                                        <input type="hidden" th:field="*{employee.employeeID}"
+                                               th:value="${session.employeeID != null ? session.employeeID : 1}">
+
+                                        <!-- Buttons -->
+                                        <div class="col-md-12 d-flex justify-content-end gap-2">
+                                            <button type="button" class="btn btn-cancel" data-bs-toggle="modal"
+                                                    data-bs-target="#confirmCancelModal">
+                                                <i class="fas fa-times me-2"></i>Thoát
+                                            </button>
+                                            <button type="submit" class="btn btn-save" id="saveButton" disabled>
+                                                <i class="fas fa-save me-2"></i>Lưu
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Xác Nhận Thoát -->
+                <div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmCancelLabel">Xác nhận thoát</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Bạn có chắc chắn muốn thoát? Dữ liệu chưa lưu sẽ bị mất.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+                                <a th:href="@{/dashboard/admin/transactions/listIn}" class="btn btn-danger">Xác nhận thoát</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal thông báo -->
+                <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header" th:classappend="${modalType == 'success' ? 'bg-success text-white' : 'bg-danger text-white'}">
+                                <h5 class="modal-title" id="notificationModalLabel" th:text="${modalType == 'success' ? 'Thành công' : 'Lỗi'}"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body"><p th:text="${modalMessage}"></p></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript">
+    const allProducts = /*[[${products}]]*/ [];
+    const selectedProductId = /*[[${selectedProductId}]]*/ null;
+    const MAX_PRICE = 90000000; // 90 triệu
+    const MAX_TOTAL = 9000000000; // 9 tỷ
+    const MAX_QUANTITY = 500;
+
+    // Hàm định dạng VND
+    function formatVND(value) {
+        if (!value || isNaN(value)) return '';
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VND';
+    }
+
+    // Hàm bỏ định dạng để lấy số nguyên
+    function unformatVND(value) {
+        return parseFloat(value.replace(/[^\d]/g, '')) || 0;
+    }
+
+    // Hàm định dạng giá khi nhập
+    function formatPrice(input) {
+        const productSelect = document.getElementById('productID');
+        const priceError = document.getElementById('priceError');
+        let rawValue = input.value.replace(/[^\d]/g, ''); // Lấy số thô từ input
+        let value = rawValue ? parseFloat(rawValue) : '';
+
+        if (!productSelect.value) {
+            priceError.textContent = 'Vui lòng chọn sản phẩm trước.';
+            priceError.style.display = 'block';
+            input.value = '';
+            document.getElementById('purchasePrice').value = '';
+            updateSaveButtonState();
+            return;
+        }
+
+        priceError.style.display = 'none';
+        input.value = value ? formatVND(value) : ''; // Nếu xóa hết thì để trống
+        document.getElementById('purchasePrice').value = value || ''; // Lưu giá trị số hoặc rỗng
+        calculateTotal();
+    }
+
+    // Hàm tính tổng giá tiền
+    function calculateTotal() {
+        const productSelect = document.getElementById('productID');
+        const quantity = parseInt(document.getElementById('quantity').value) || 0;
+        const purchasePrice = unformatVND(document.getElementById('purchasePriceDisplay').value);
+        const total = quantity * purchasePrice;
+        const quantityError = document.getElementById('quantityError');
+        const priceError = document.getElementById('priceError');
+        const totalError = document.getElementById('totalError');
+
+        if (!productSelect.value) {
+            quantityError.textContent = 'Vui lòng chọn sản phẩm trước.';
+            quantityError.style.display = 'block';
+            document.getElementById('quantity').value = '';
+            updateSaveButtonState();
+            return;
+        }
+
+        quantityError.style.display = 'none';
+        priceError.style.display = 'none';
+        totalError.style.display = 'none';
+
+        if (quantity <= 0) {
+            quantityError.textContent = 'Số lượng phải lớn hơn 0.';
+            quantityError.style.display = 'block';
+        } else if (quantity > MAX_QUANTITY) {
+            quantityError.textContent = 'Vui lòng nhập ít hơn hoặc bằng 500 sản phẩm.';
+            quantityError.style.display = 'block';
+        }
+
+        if (purchasePrice <= 0) {
+            priceError.textContent = 'Giá không được âm hoặc bằng 0.';
+            priceError.style.display = 'block';
+        } else if (purchasePrice > MAX_PRICE) {
+            priceError.textContent = 'Giao dịch quá lớn, giá phải nhỏ hơn 90 triệu.';
+            priceError.style.display = 'block';
+        }
+
+        if (total > MAX_TOTAL) {
+            totalError.textContent = 'Giao dịch quá lớn, tổng giá trị không vượt quá 9 tỷ.';
+            totalError.style.display = 'block';
+        }
+
+        document.getElementById('totalAmountDisplay').value = total ? formatVND(total) : '';
+        document.getElementById('totalAmount').value = total || '';
+        updateSaveButtonState();
+    }
+
+    // Lọc sản phẩm theo nhà cung cấp
+    function filterProducts() {
+        const supplierSelect = document.getElementById('supplierID');
+        const productSelect = document.getElementById('productID');
+        const selectedSupplierId = supplierSelect.value;
+
+        productSelect.innerHTML = '<option value="">Chọn sản phẩm</option>';
+
+        if (!selectedSupplierId) {
+            updateProductInfo();
+            return;
+        }
+
+        const filteredProducts = allProducts.filter(product =>
+            product.supplier && product.supplier.supplierID &&
+            product.supplier.supplierID.toString() === selectedSupplierId
+        );
+
+        if (filteredProducts.length === 0) {
+            productSelect.innerHTML = '<option value="">Không có sản phẩm cho nhà cung cấp này</option>';
+        } else {
+            filteredProducts.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.productID;
+                option.text = product.name;
+                option.setAttribute('data-price', product.purchasePrice || '');
+                if (selectedProductId && product.productID == selectedProductId) {
+                    option.selected = true;
+                }
+                productSelect.appendChild(option);
+            });
+        }
+        updateProductInfo();
+    }
+
+    // Cập nhật thông tin sản phẩm
+    function updateProductInfo() {
+        const select = document.getElementById('productID');
+        const selectedOption = select.options[select.selectedIndex];
+        const priceFixed = document.getElementById('purchasePriceFixed');
+        const priceDisplay = document.getElementById('purchasePriceDisplay');
+        const priceHidden = document.getElementById('purchasePrice');
+
+        if (selectedOption && selectedOption.value) {
+            const price = selectedOption.getAttribute('data-price') || '';
+            priceFixed.value = price ? formatVND(price) : ''; // Điền giá cố định nếu có
+            // Không điền giá giao dịch, giữ nguyên giá trị hiện tại của người dùng
+            calculateTotal();
+        } else {
+            priceFixed.value = ''; // Để trống khi không có sản phẩm
+            priceDisplay.value = '';
+            priceHidden.value = '';
+            document.getElementById('totalAmountDisplay').value = '';
+            document.getElementById('totalAmount').value = '';
+            document.getElementById('quantity').value = '';
+            document.getElementById('priceError').style.display = 'none';
+            document.getElementById('quantityError').style.display = 'none';
+            document.getElementById('totalError').style.display = 'none';
+            updateSaveButtonState();
+        }
+    }
+
+    // Cập nhật trạng thái nút Lưu
+    function updateSaveButtonState() {
+        const saveButton = document.getElementById('saveButton');
+        const productSelect = document.getElementById('productID');
+        const purchasePrice = unformatVND(document.getElementById('purchasePriceDisplay').value);
+        const quantity = parseInt(document.getElementById('quantity').value) || 0;
+        const total = unformatVND(document.getElementById('totalAmountDisplay').value);
+
+        const isValid =
+            productSelect.value && // Có sản phẩm được chọn
+            purchasePrice > 0 && purchasePrice <= MAX_PRICE && // Giá hợp lệ
+            quantity > 0 && quantity <= MAX_QUANTITY && // Số lượng hợp lệ
+            total <= MAX_TOTAL; // Tổng giá trị hợp lệ
+
+        saveButton.disabled = !isValid;
+    }
+
+    // Validation form
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+
+    // Hiển thị modal thông báo và khởi tạo khi trang tải
+    document.addEventListener('DOMContentLoaded', function () {
+        const showModal = /*[[${showModal}]]*/ false;
+        if (showModal) {
+            const modal = new bootstrap.Modal(document.getElementById('notificationModal'));
+            modal.show();
+        }
+
+        if (selectedProductId && selectedProductId != 0 && selectedProductId != -1) {
+            const supplierSelect = document.getElementById('supplierID');
+            const productSelect = document.getElementById('productID');
+
+            if (supplierSelect.value) {
+                filterProducts();
+                productSelect.value = selectedProductId;
+                updateProductInfo();
+            } else {
+                const selectedProduct = allProducts.find(p => p.productID == selectedProductId);
+                if (selectedProduct && selectedProduct.supplier) {
+                    supplierSelect.value = selectedProduct.supplier.supplierID;
+                    filterProducts();
+                    productSelect.value = selectedProductId;
+                    updateProductInfo();
+                }
+            }
+        }
+        updateSaveButtonState();
+    });
+</script>
+</body>
+</html>

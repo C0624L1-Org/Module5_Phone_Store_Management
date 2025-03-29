@@ -38,6 +38,9 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
     Page<Employee> findAllEmployeesByNameAndPhoneNumberAndRole(String name, String phoneNumber, String role, Pageable pageable);
 
 
+
+    Employee findByEmployeeID(Integer employeeID);
+
     //Update(Tân)
     @Modifying
     @Transactional

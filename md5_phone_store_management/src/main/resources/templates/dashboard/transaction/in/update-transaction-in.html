@@ -1,0 +1,687 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Quản lý Nhập Kho</title>-->
+
+<!--    &lt;!&ndash; Bootstrap CSS &ndash;&gt;-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">-->
+
+<!--    &lt;!&ndash; Custom CSS &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="/css/fragments/navbar.css">-->
+<!--    <link rel="stylesheet" href="/css/fragments/sidebar.css">-->
+<!--    <link rel="stylesheet" href="/css/fragments/footer.css">-->
+<!--    <link rel="stylesheet" href="/css/common/toast.css">-->
+<!--    <link rel="stylesheet" href="/css/common/pagination.css">-->
+<!--    <link rel="stylesheet" href="/css/common/layout.css">-->
+
+<!--    &lt;!&ndash; Inline CSS &ndash;&gt;-->
+<!--    <style>-->
+<!--        .form-section {-->
+<!--            background-color: #f8f9fa;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);-->
+<!--            overflow: hidden;-->
+<!--        }-->
+
+<!--        .form-header {-->
+<!--            background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);-->
+<!--            color: white;-->
+<!--            padding: 1.5rem;-->
+<!--            position: relative;-->
+<!--        }-->
+
+<!--        .form-label {-->
+<!--            font-weight: 600;-->
+<!--            color: #495057;-->
+<!--        }-->
+
+<!--        .form-control, .form-select {-->
+<!--            border-radius: 0.5rem;-->
+<!--            padding: 0.75rem;-->
+<!--            border: 1px solid #ced4da;-->
+<!--        }-->
+
+<!--        .form-control:focus, .form-select:focus {-->
+<!--            border-color: #ff9a00;-->
+<!--            box-shadow: 0 0 0 0.2rem rgba(255, 154, 0, 0.25);-->
+<!--        }-->
+
+<!--        .form-control:disabled, .form-control:read-only {-->
+<!--            background-color: #e9ecef;-->
+<!--            opacity: 0.7;-->
+<!--            cursor: not-allowed;-->
+<!--        }-->
+
+<!--        .btn-update {-->
+<!--            background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 0.75rem 2rem;-->
+<!--            border-radius: 0.5rem;-->
+<!--            font-weight: 600;-->
+<!--            letter-spacing: 0.5px;-->
+<!--            transition: all 0.3s;-->
+<!--        }-->
+
+<!--        .btn-update:hover {-->
+<!--            transform: translateY(-2px);-->
+<!--            box-shadow: 0 5px 15px rgba(255, 154, 0, 0.3);-->
+<!--        }-->
+
+<!--        .btn-cancel {-->
+<!--            background-color: #6c757d;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 0.75rem 2rem;-->
+<!--            border-radius: 0.5rem;-->
+<!--            font-weight: 600;-->
+<!--            letter-spacing: 0.5px;-->
+<!--            transition: all 0.3s;-->
+<!--        }-->
+
+<!--        .btn-cancel:hover {-->
+<!--            transform: translateY(-2px);-->
+<!--            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--&lt;!&ndash; Hiển thị thông báo &ndash;&gt;-->
+<!--<div th:replace="~{common/toast}"></div>-->
+
+<!--&lt;!&ndash; Nhúng navbar &ndash;&gt;-->
+<!--<nav th:replace="~{fragments/navbar :: navbar}"></nav>-->
+
+<!--<div class="content-wrapper">-->
+<!--    <div class="dashboard-container">-->
+<!--        &lt;!&ndash; Sidebar &ndash;&gt;-->
+<!--        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>-->
+
+<!--        &lt;!&ndash; Main content &ndash;&gt;-->
+<!--        <div class="content-container">-->
+<!--            <div class="container-fluid py-4">-->
+<!--                <nav aria-label="breadcrumb">-->
+<!--                    <ol class="breadcrumb">-->
+<!--                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a></li>-->
+<!--                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listIn}">Giao dịch Nhập kho</a></li>-->
+<!--                        <li class="breadcrumb-item active" aria-current="page">Cập nhật nhập kho</li>-->
+<!--                    </ol>-->
+<!--                </nav>-->
+
+<!--                <div class="row justify-content-center">-->
+<!--                    <div class="col-lg-8">-->
+<!--                        <div class="form-section mb-4">-->
+<!--                            <div class="form-header">-->
+<!--                                <h3 class="mb-0">-->
+<!--                                    <i class="fas fa-warehouse me-2"></i>-->
+<!--                                    Cập nhật nhập kho-->
+<!--                                </h3>-->
+<!--                                <p class="text-white-50 mt-2 mb-0">Cập nhật thông tin nhập kho</p>-->
+<!--                            </div>-->
+
+<!--                            <div class="p-4">-->
+<!--                                <form th:action="@{/dashboard/admin/transactions/updateIn}" method="post" class="needs-validation" novalidate>-->
+<!--                                    <input type="hidden" name="inventoryTransactionId" th:value="${inventoryTransaction.transactionID}"/>-->
+
+<!--                                    <div class="row">-->
+<!--                                        &lt;!&ndash; Product Name &ndash;&gt;-->
+<!--                                        <div class="col-12 mb-3">-->
+<!--                                            <label for="productName" class="form-label">-->
+<!--                                                <i class="fas fa-box me-2"></i>Tên sản phẩm-->
+<!--                                            </label>-->
+<!--                                            <input type="text" class="form-control" id="productName"-->
+<!--                                                   th:value="${inventoryTransaction.product.name}" readonly>-->
+<!--                                        </div>-->
+
+<!--                                        &lt;!&ndash; Current Stock &ndash;&gt;-->
+<!--                                        <div class="col-md-4 mb-3">-->
+<!--                                            <label for="stockQuantity" class="form-label">-->
+<!--                                                <i class="fas fa-warehouse me-2"></i>Số lượng tồn kho hiện tại-->
+<!--                                            </label>-->
+<!--                                            <input type="number" class="form-control" id="stockQuantity" name="stockQuantity"-->
+<!--                                                   th:value="${inventoryTransaction != null && inventoryTransaction.product != null ? inventoryTransaction.product.stockQuantity : 0}"-->
+<!--                                                   readonly>-->
+<!--                                            <div>-->
+<!--                                                <span th:text="${inventoryTransaction != null && inventoryTransaction.product != null ? inventoryTransaction.product.stockQuantity : 0}"-->
+<!--                                                      style="color: black;"></span>-->
+<!--                                                <span style="color: gray;">(</span>-->
+<!--                                                <span th:text="${inventoryTransaction != null && inventoryTransaction.product != null ? (inventoryTransaction.product.stockQuantity - inventoryTransaction.quantity) : 0}"-->
+<!--                                                      style="color: gray;"></span>-->
+<!--                                                <span style="color: gray;">+</span>-->
+<!--                                                <span th:text="${inventoryTransaction != null ? inventoryTransaction.quantity : 0}"-->
+<!--                                                      style="color: red;"></span>-->
+<!--                                                <span style="color: gray;">)</span>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+
+<!--                                        &lt;!&ndash; Old Quantity &ndash;&gt;-->
+<!--                                        <div class="col-md-4 mb-3">-->
+<!--                                            <label for="oldQuantity" class="form-label">-->
+<!--                                                <i class="fas fa-cubes me-2"></i>Số lượng nhập cũ-->
+<!--                                            </label>-->
+<!--                                            <input type="number" class="form-control" id="oldQuantity"-->
+<!--                                                   th:value="${inventoryTransaction.quantity}" readonly>-->
+<!--                                        </div>-->
+
+<!--                                        &lt;!&ndash; New Quantity &ndash;&gt;-->
+<!--                                        <div class="col-md-4 mb-3">-->
+<!--                                            <label for="newQuantity" class="form-label">-->
+<!--                                                <i class="fas fa-cubes me-2"></i>Số lượng nhập mới-->
+<!--                                            </label>-->
+<!--                                            <input type="number" class="form-control" id="newQuantity"-->
+<!--                                                   name="newQuantity" min="1" required>-->
+<!--                                            <div class="invalid-feedback">Vui lòng nhập số lượng hợp lệ.</div>-->
+<!--                                        </div>-->
+
+<!--                                        &lt;!&ndash; Fixed Purchase Price &ndash;&gt;-->
+<!--                                        <div class="col-md-4 mb-3">-->
+<!--                                            <label for="fixedPurchasePrice" class="form-label">-->
+<!--                                                <i class="fas fa-dollar-sign me-2"></i>Giá nhập cố định-->
+<!--                                            </label>-->
+<!--                                            <input type="text" class="form-control" id="fixedPurchasePrice"-->
+<!--                                                   th:value="${inventoryTransaction.product.purchasePrice}" readonly>-->
+<!--                                        </div>-->
+
+<!--                                        &lt;!&ndash; Old Purchase Price &ndash;&gt;-->
+<!--                                        <div class="col-md-4 mb-3">-->
+<!--                                            <label for="oldPurchasePrice" class="form-label">-->
+<!--                                                <i class="fas fa-dollar-sign me-2"></i>Giá nhập cũ-->
+<!--                                            </label>-->
+<!--                                            <input type="text" class="form-control" id="oldPurchasePrice"-->
+<!--                                                   th:value="${inventoryTransaction.purchasePrice}" readonly>-->
+<!--                                        </div>-->
+
+<!--                                        &lt;!&ndash; New Purchase Price &ndash;&gt;-->
+<!--                                        <div class="col-md-4 mb-3">-->
+<!--                                            <label for="newPurchasePrice" class="form-label">-->
+<!--                                                <i class="fas fa-dollar-sign me-2"></i>Giá nhập mới-->
+<!--                                            </label>-->
+<!--                                            <input type="text" class="form-control" id="newPurchasePrice" required>-->
+<!--                                            <input type="hidden" id="newPurchasePriceValue" name="newPurchasePrice">-->
+<!--                                            <div class="invalid-feedback">Vui lòng nhập giá nhập hợp lệ.</div>-->
+<!--                                        </div>-->
+
+<!--                                        &lt;!&ndash; New Total Amount &ndash;&gt;-->
+<!--                                        <div class="col-md-12 mb-3">-->
+<!--                                            <label for="newTotalAmount" class="form-label">-->
+<!--                                                <i class="fas fa-money-bill-wave me-2"></i>Tổng thanh toán mới-->
+<!--                                            </label>-->
+<!--                                            <input type="text" class="form-control" id="newTotalAmount" readonly>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+
+<!--                                    <div class="d-flex justify-content-end mt-4 gap-2">-->
+<!--                                        <button type="button" class="btn btn-cancel" data-bs-toggle="modal"-->
+<!--                                                data-bs-target="#confirmCancelModal">-->
+<!--                                            <i class="fas fa-times me-2"></i>Thoát-->
+<!--                                        </button>-->
+<!--                                        <button type="submit" class="btn btn-update">-->
+<!--                                            <i class="fas fa-save me-2"></i>Cập nhật-->
+<!--                                        </button>-->
+<!--                                    </div>-->
+<!--                                </form>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Footer &ndash;&gt;-->
+<!--    <footer th:replace="~{fragments/footer :: footer}"></footer>-->
+<!--</div>-->
+
+<!--&lt;!&ndash; Modal Xác Nhận Thoát &ndash;&gt;-->
+<!--<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">-->
+<!--    <div class="modal-dialog">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title" id="confirmCancelLabel">Xác nhận thoát</h5>-->
+<!--                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                <p>Bạn có chắc chắn muốn thoát? Dữ liệu chưa lưu sẽ bị mất.</p>-->
+<!--            </div>-->
+<!--            <div class="modal-footer">-->
+<!--                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>-->
+<!--                <a th:href="@{/dashboard/admin/transactions/listIn}" class="btn btn-danger">Xác nhận thoát</a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<script>-->
+<!--    (function () {-->
+<!--        'use strict';-->
+<!--        var forms = document.querySelectorAll('.needs-validation');-->
+<!--        Array.prototype.slice.call(forms).forEach(function (form) {-->
+<!--            form.addEventListener('submit', function (event) {-->
+<!--                if (!form.checkValidity()) {-->
+<!--                    event.preventDefault();-->
+<!--                    event.stopPropagation();-->
+<!--                }-->
+<!--                form.classList.add('was-validated');-->
+<!--            }, false);-->
+<!--        });-->
+
+<!--        // Format VND-->
+<!--        function formatVND(number) {-->
+<!--            return new Intl.NumberFormat('vi-VN', {-->
+<!--                style: 'currency',-->
+<!--                currency: 'VND'-->
+<!--            }).format(number);-->
+<!--        }-->
+
+<!--        // Parse VND to number-->
+<!--        function parseVND(string) {-->
+<!--            return parseFloat(string.replace(/[^\d]/g, '')) || 0;-->
+<!--        }-->
+
+<!--        // Format existing prices on load-->
+<!--        const fixedPrice = document.getElementById('fixedPurchasePrice');-->
+<!--        const oldPrice = document.getElementById('oldPurchasePrice');-->
+
+<!--        if (fixedPrice.value) fixedPrice.value = formatVND(parseFloat(fixedPrice.value));-->
+<!--        if (oldPrice.value) oldPrice.value = formatVND(parseFloat(oldPrice.value));-->
+
+<!--        // Handle new purchase price input-->
+<!--        const newPriceInput = document.getElementById('newPurchasePrice');-->
+<!--        const newPriceValue = document.getElementById('newPurchasePriceValue');-->
+<!--        const newQuantity = document.getElementById('newQuantity');-->
+<!--        const newTotal = document.getElementById('newTotalAmount');-->
+
+<!--        newPriceInput.addEventListener('input', function(e) {-->
+<!--            let value = e.target.value.replace(/[^\d]/g, '');-->
+<!--            if (value) {-->
+<!--                e.target.value = formatVND(value);-->
+<!--                newPriceValue.value = value; // Store raw number for submission-->
+<!--                calculateTotal();-->
+<!--            } else {-->
+<!--                newPriceValue.value = '';-->
+<!--                newTotal.value = '';-->
+<!--            }-->
+<!--        });-->
+
+<!--        newQuantity.addEventListener('input', calculateTotal);-->
+
+<!--        function calculateTotal() {-->
+<!--            const quantity = parseInt(newQuantity.value) || 0;-->
+<!--            const price = parseVND(newPriceInput.value);-->
+<!--            const total = quantity * price;-->
+<!--            newTotal.value = formatVND(total);-->
+<!--        }-->
+<!--    })();-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Nhập Kho</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <!-- Inline CSS -->
+    <style>
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #ff9a00;
+            box-shadow: 0 0 0 0.2rem rgba(255, 154, 0, 0.25);
+        }
+
+        .form-control:disabled, .form-control:read-only {
+            background-color: #e9ecef;
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-update:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 154, 0, 0.3);
+        }
+
+        .btn-update:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="container-fluid py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listIn}">Giao dịch Nhập kho</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Cập nhật nhập kho</li>
+                    </ol>
+                </nav>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="form-section mb-4">
+                            <div class="form-header">
+                                <h3 class="mb-0">
+                                    <i class="fas fa-warehouse me-2"></i>
+                                    Cập nhật nhập kho
+                                </h3>
+                                <p class="text-white-50 mt-2 mb-0">Cập nhật thông tin nhập kho</p>
+                            </div>
+
+                            <div class="p-4">
+                                <form th:action="@{/dashboard/admin/transactions/updateIn}" method="post" class="needs-validation" novalidate>
+                                    <input type="hidden" name="inventoryTransactionId" th:value="${inventoryTransaction.transactionID}"/>
+
+                                    <div class="row">
+                                        <!-- Product Name -->
+                                        <div class="col-12 mb-3">
+                                            <label for="productName" class="form-label">
+                                                <i class="fas fa-box me-2"></i>Tên sản phẩm
+                                            </label>
+                                            <input type="text" class="form-control" id="productName"
+                                                   th:value="${inventoryTransaction.product.name}" readonly>
+                                        </div>
+
+                                        <!-- Current Stock -->
+                                        <div class="col-md-4 mb-3">
+                                            <label for="stockQuantity" class="form-label">
+                                                <i class="fas fa-warehouse me-2"></i>Số lượng tồn kho hiện tại
+                                            </label>
+                                            <input type="number" class="form-control" id="stockQuantity" name="stockQuantity"
+                                                   th:value="${inventoryTransaction != null && inventoryTransaction.product != null ? inventoryTransaction.product.stockQuantity : 0}"
+                                                   readonly>
+                                            <div>
+                                                <span th:text="${inventoryTransaction != null && inventoryTransaction.product != null ? inventoryTransaction.product.stockQuantity : 0}"
+                                                      style="color: black;"></span>
+                                                <span style="color: gray;">(</span>
+                                                <span th:text="${inventoryTransaction != null && inventoryTransaction.product != null ? (inventoryTransaction.product.stockQuantity - inventoryTransaction.quantity) : 0}"
+                                                      style="color: gray;"></span>
+                                                <span style="color: gray;">+</span>
+                                                <span th:text="${inventoryTransaction != null ? inventoryTransaction.quantity : 0}"
+                                                      style="color: red;"></span>
+                                                <span style="color: gray;">)</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Old Quantity -->
+                                        <div class="col-md-4 mb-3">
+                                            <label for="oldQuantity" class="form-label">
+                                                <i class="fas fa-cubes me-2"></i>Số lượng nhập cũ
+                                            </label>
+                                            <input type="number" class="form-control" id="oldQuantity"
+                                                   th:value="${inventoryTransaction.quantity}" readonly>
+                                        </div>
+
+                                        <!-- New Quantity -->
+                                        <div class="col-md-4 mb-3">
+                                            <label for="newQuantity" class="form-label">
+                                                <i class="fas fa-cubes me-2"></i>Số lượng nhập mới
+                                            </label>
+                                            <input type="number" class="form-control" id="newQuantity"
+                                                   name="newQuantity" min="1" max="500" required>
+                                            <div class="invalid-feedback">Vui lòng nhập số lượng hợp lệ.</div>
+                                            <div id="quantityError" class="error-message">Số lượng phải từ 1 đến 500</div>
+                                        </div>
+
+                                        <!-- Fixed Purchase Price -->
+                                        <div class="col-md-4 mb-3">
+                                            <label for="fixedPurchasePrice" class="form-label">
+                                                <i class="fas fa-dollar-sign me-2"></i>Giá nhập cố định
+                                            </label>
+                                            <input type="text" class="form-control" id="fixedPurchasePrice"
+                                                   th:value="${inventoryTransaction.product.purchasePrice}" readonly>
+                                        </div>
+
+                                        <!-- Old Purchase Price -->
+                                        <div class="col-md-4 mb-3">
+                                            <label for="oldPurchasePrice" class="form-label">
+                                                <i class="fas fa-dollar-sign me-2"></i>Giá nhập cũ
+                                            </label>
+                                            <input type="text" class="form-control" id="oldPurchasePrice"
+                                                   th:value="${inventoryTransaction.purchasePrice}" readonly>
+                                        </div>
+
+                                        <!-- New Purchase Price -->
+                                        <div class="col-md-4 mb-3">
+                                            <label for="newPurchasePrice" class="form-label">
+                                                <i class="fas fa-dollar-sign me-2"></i>Giá nhập mới
+                                            </label>
+                                            <input type="text" class="form-control" id="newPurchasePrice" required>
+                                            <input type="hidden" id="newPurchasePriceValue" name="newPurchasePrice">
+                                            <div class="invalid-feedback">Vui lòng nhập giá nhập hợp lệ.</div>
+                                            <div id="priceError" class="error-message">Giá phải từ 1 đến 90,000,000 VND</div>
+                                        </div>
+
+                                        <!-- New Total Amount -->
+                                        <div class="col-md-12 mb-3">
+                                            <label for="newTotalAmount" class="form-label">
+                                                <i class="fas fa-money-bill-wave me-2"></i>Tổng thanh toán mới
+                                            </label>
+                                            <input type="text" class="form-control" id="newTotalAmount" readonly>
+                                            <div id="totalError" class="error-message">Tổng phải từ 1 đến 9,000,000,000 VND</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end mt-4 gap-2">
+                                        <button type="button" class="btn btn-cancel" data-bs-toggle="modal"
+                                                data-bs-target="#confirmCancelModal">
+                                            <i class="fas fa-times me-2"></i>Thoát
+                                        </button>
+                                        <button type="submit" class="btn btn-update" id="updateButton" disabled>
+                                            <i class="fas fa-save me-2"></i>Cập nhật
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- Modal Xác Nhận Thoát -->
+<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmCancelLabel">Xác nhận thoát</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn thoát? Dữ liệu chưa lưu sẽ bị mất.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+                <a th:href="@{/dashboard/admin/transactions/listIn}" class="btn btn-danger">Xác nhận thoát</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+
+        // Format VND
+        function formatVND(number) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(number);
+        }
+
+        // Parse VND to number
+        function parseVND(string) {
+            return parseFloat(string.replace(/[^\d]/g, '')) || 0;
+        }
+
+        // Format existing prices on load
+        const fixedPrice = document.getElementById('fixedPurchasePrice');
+        const oldPrice = document.getElementById('oldPurchasePrice');
+        if (fixedPrice.value) fixedPrice.value = formatVND(parseFloat(fixedPrice.value));
+        if (oldPrice.value) oldPrice.value = formatVND(parseFloat(oldPrice.value));
+
+        // Elements
+        const newPriceInput = document.getElementById('newPurchasePrice');
+        const newPriceValue = document.getElementById('newPurchasePriceValue');
+        const newQuantity = document.getElementById('newQuantity');
+        const newTotal = document.getElementById('newTotalAmount');
+        const updateButton = document.getElementById('updateButton');
+        const quantityError = document.getElementById('quantityError');
+        const priceError = document.getElementById('priceError');
+        const totalError = document.getElementById('totalError');
+
+        // Constants for validation
+        const MAX_QUANTITY = 500;
+        const MAX_PRICE = 90000000; // 90 million
+        const MAX_TOTAL = 9000000000; // 9 billion
+
+        // Handle new purchase price input (only numbers)
+        newPriceInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, ''); // Only allow digits
+            if (value) {
+                e.target.value = formatVND(value);
+                newPriceValue.value = value; // Store raw number for submission
+                validateForm();
+            } else {
+                newPriceValue.value = '';
+                newTotal.value = '';
+                validateForm();
+            }
+        });
+
+        // Handle new quantity input
+        newQuantity.addEventListener('input', validateForm);
+
+        // Validation function
+        function validateForm() {
+            const quantity = parseInt(newQuantity.value) || 0;
+            const price = parseVND(newPriceInput.value);
+            const total = quantity * price;
+
+            // Calculate total
+            newTotal.value = total > 0 ? formatVND(total) : '';
+
+            // Validate quantity
+            const isQuantityValid = quantity > 0 && quantity <= MAX_QUANTITY;
+            quantityError.style.display = isQuantityValid ? 'none' : 'block';
+
+            // Validate price
+            const isPriceValid = price > 0 && price <= MAX_PRICE;
+            priceError.style.display = isPriceValid ? 'none' : 'block';
+
+            // Validate total
+            const isTotalValid = total > 0 && total <= MAX_TOTAL;
+            totalError.style.display = isTotalValid ? 'none' : 'block';
+
+            // Enable/disable update button
+            updateButton.disabled = !(isQuantityValid && isPriceValid && isTotalValid);
+        }
+    })();
+</script>
+</body>
+</html>

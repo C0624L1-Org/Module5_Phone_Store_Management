@@ -2,6 +2,9 @@ package com.example.md5_phone_store_management.repository;
 
 
 import com.example.md5_phone_store_management.model.InventoryTransaction;
+import com.example.md5_phone_store_management.model.TransactionType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,13 +16,32 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<InventoryTransaction, Integer> {
+public interface TransactionOutRepository extends JpaRepository<InventoryTransaction, Integer> {
 
-//    List<InventoryTransaction> searchTransaction(String productName, String supplierName, String startDate, String endDate);
+    @Query("SELECT i FROM InventoryTransaction i WHERE i.transactionType = :type")
+    Page<InventoryTransaction> getByTransactionType(@Param("type") TransactionType type, Pageable pageable);
 
 
 
-        @Query("SELECT t FROM InventoryTransaction t " +
+
+    @Query("SELECT i FROM InventoryTransaction i " +
+            "WHERE i.transactionType = :transactionType " +
+            "AND (:productName IS NULL OR LOWER(i.product.name) LIKE LOWER(CONCAT('%', :productName, '%'))) " +
+            "AND (:supplierName IS NULL OR LOWER(i.supplier.name) LIKE LOWER(CONCAT('%', :supplierName, '%'))) " +
+            "AND (:startDate IS NULL OR i.transactionDate >= :startDate) " +
+            "AND (:endDate IS NULL OR i.transactionDate <= :endDate OR (:startDate IS NOT NULL AND :endDate IS NULL AND i.transactionDate <= CURRENT_TIMESTAMP))")
+    Page<InventoryTransaction> searchTransaction(
+            @Param("productName") String productName,
+            @Param("supplierName") String supplierName,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("transactionType") TransactionType transactionType,
+            Pageable pageable
+    );
+
+
+
+    @Query("SELECT t FROM InventoryTransaction t " +
                 "JOIN t.product p " +
                 "JOIN t.supplier s " +
                 "WHERE (:productName IS NULL OR p.name LIKE %:productName%) " +
@@ -27,7 +49,7 @@ public interface TransactionRepository extends JpaRepository<InventoryTransactio
                 "AND (:startDate IS NULL OR t.transactionDate >= :startDate) " +
                 "AND (:endDate IS NULL OR t.transactionDate <= :endDate) " +
                 "ORDER BY t.transactionDate ASC")
-        List<InventoryTransaction> searchTransaction(
+        List<InventoryTransaction> searchTransactionNoPage(
                 @Param("productName") String productName,
                 @Param("supplierName") String supplierName,
                 @Param("startDate") LocalDateTime startDate,

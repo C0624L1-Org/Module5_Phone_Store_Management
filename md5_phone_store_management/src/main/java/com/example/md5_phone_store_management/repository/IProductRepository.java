@@ -20,6 +20,10 @@ import java.util.List;
 public interface IProductRepository extends JpaRepository<Product, Integer> {
 
 
+    // Phương thức mới: Lấy sản phẩm theo supplierId
+    @Query("SELECT p FROM Product p WHERE p.supplier.supplierID = :supplierId")
+    List<Product> findBySupplierId(@Param("supplierId") Integer supplierId);
+
     @Query("SELECT p FROM Product p " +
             "WHERE (:productName IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%'))) " +
             "AND (:supplierName IS NULL OR LOWER(p.supplier.name) LIKE LOWER(CONCAT('%', :supplierName, '%'))) " +

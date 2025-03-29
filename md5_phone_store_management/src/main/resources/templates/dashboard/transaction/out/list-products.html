@@ -253,14 +253,15 @@
                                 <i class="fas fa-check me-2"></i> Chọn Thêm
                             </a>
 
-
-                            <a th:if="${action == 'edit'}"
-                               th:href="${product.stockQuantity == 0} ? null : @{/dashboard/admin/transactions/Out/edit/{oldId}/{id}(oldId=${oldId},id=${product.productID})}"
+                            <a th:href="${product.stockQuantity == 0
+            ? '/dashboard/admin/transactions/new/in/' + product.productID
+            : '/dashboard/admin/transactions/Out/edit/' + oldId + '/' + product.productID}"
                                class="btn btn-sm"
-                               th:classappend="${product.stockQuantity == 0} ? 'btn-danger disabled' : (${pid == product.productID} ? 'btn-primary' : 'btn-success')"
-                               th:attr="aria-disabled=${product.stockQuantity == 0}"
-                               th:text="${product.stockQuantity == 0} ? 'Hết hàng' : (${pid == product.productID} ? 'Hiện tại' : 'Chọn Sửa')">
-                                <i class="fas fa-check me-2"></i>
+                               th:classappend="${product.stockQuantity == 0
+                    ? 'btn-warning'
+                    : (pid == product.productID ? 'btn-primary' : 'btn-success')}"
+                               th:text="${product.stockQuantity == 0 ? 'Nhập Hàng' : (pid == product.productID ? 'Hiện tại' : 'Chọn Sửa')}">
+                                <i class="fas" th:classappend="${product.stockQuantity == 0 ? 'fa-plus' : 'fa-check'}"></i>
                             </a>
 
 
