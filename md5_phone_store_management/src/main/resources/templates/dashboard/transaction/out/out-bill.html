@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hóa Đơn Xuất Kho</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <style>
+
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .invoice-container {
+            width: 100%;
+            background-color: white;
+            padding: 15mm;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13px;
+            position: relative;
+            min-height: 297mm;
+        }
+
+        .watermark-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Đảm bảo watermark không cản trở tương tác */
+            background: repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 50px,
+                    rgba(128, 128, 128, 0.1) 50px,
+                    rgba(128, 128, 128, 0.1) 52px
+            ); /* Tạo các đường chéo lặp lại với khoảng cách lớn hơn */
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .watermark-text {
+            position: absolute;
+            color: rgba(128, 128, 128, 0.5); /* Màu chữ mờ */
+            font-size: 12px;
+            transform: rotate(45deg); /* Xoay văn bản 45 độ để khớp với đường chéo */
+            white-space: nowrap; /* Đảm bảo văn bản không xuống dòng */
+            opacity: 0.5; /* Độ mờ của văn bản */
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            border: 1px solid #000;
+        }
+
+        .product-table th, .product-table td {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .signature-table {
+            width: 100%;
+            margin-top: 5px;
+            border-collapse: collapse;
+        }
+
+        .signature-table td {
+            border: 1px solid #000;
+            text-align: center;
+            width: 33.33%;
+            padding: 6px;
+        }
+
+        .signature-space {
+            height: 60px;
+            margin-bottom: 8px;
+        }
+
+        hr {
+            border-top: 1px solid #000;
+            margin: 15px 0;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .invoice-container, .invoice-container * {
+                visibility: visible;
+            }
+            .invoice-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 210mm; /* Chiều rộng A4 */
+                height: 297mm; /* Chiều cao A4 */
+                padding: 15mm;
+                box-shadow: none;
+                overflow: hidden; /* Ngăn nội dung tràn ra ngoài */
+                page-break-before: always; /* Đảm bảo bắt đầu trên một trang mới */
+                page-break-after: always; /* Đảm bảo không có trang tiếp theo */
+                page-break-inside: avoid; /* Ngăn chia trang bên trong */
+            }
+            .action-buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content area -->
+        <div class="content-container">
+            <div class="container py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listOut}">Giao dịch Xuất kho</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Hóa Đơn Xuất Kho</li>
+                    </ol>
+                </nav>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="form-section mb-4">
+                            <div class="form-header">
+                                <h3 class="mb-0">
+                                    <i class="fas fa-file-invoice me-2"></i>
+                                    Hóa Đơn Xuất Kho
+                                </h3>
+                                <p class="text-white-50 mt-2 mb-0">Xem và quản lý chi tiết hóa đơn xuất kho</p>
+                            </div>
+
+                            <div class="p-4">
+                                <div class="action-buttons d-flex justify-content-end gap-2 mb-3">
+                                    <button class="btn-action" onclick="downloadAsWord()">
+                                        <i class="fas fa-download me-2"></i>Tải Xuống
+                                    </button>
+                                    <button class="btn-action" onclick="printInvoice()">
+                                        <i class="fas fa-print me-2"></i>In
+                                    </button>
+                                </div>
+
+                                <div class="invoice-container" id="invoice">
+                                    <h2 class="text-center">HÓA ĐƠN XUẤT KHO</h2>
+                                    <div class="header-info">
+                                        <p th:if="${bill != null}">
+                                            <strong>Mã Xuất Hàng:</strong> <span id="exportCode" th:text="'XH' + ${bill.transactionID}"></span>
+                                        </p>
+                                        <p th:if="${bill != null}">
+                                            <strong>Ngày Xuất:</strong> <span id="exportDate" th:text="${#temporals.format(bill.transactionDate, 'dd/MM/yyyy HH:mm:ss')}"></span>
+                                        </p>
+                                        <p th:unless="${bill != null}" class="text-danger text-center">Không tìm thấy giao dịch!</p>
+                                    </div>
+                                    <hr>
+                                    <div class="company-info d-flex justify-content-between">
+                                        <div>
+                                            <p><strong>Bên Gửi Hàng:</strong> Công Ty FPT</p>
+                                            <p><strong>Địa Chỉ:</strong> Số 1, Thủ Đức, TP HCM</p>
+                                            <p><strong>Số Điện Thoại:</strong> 0123 456 789</p>
+                                        </div>
+                                        <div>
+                                            <p><strong>Bên Nhận Hàng:</strong> .............................................................</p>
+                                            <p><strong>Địa Chỉ:</strong> ...............................................................................</p>
+                                            <p><strong>Số Điện Thoại:</strong> .................................................................</p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <table class="product-table" th:if="${bill != null}">
+                                        <tr>
+                                            <th>Tên Sản Phẩm</th>
+                                            <th>Nhà Cung Cấp</th>
+                                            <th>Đơn Vị Tính</th>
+                                            <th>Số Lượng</th>
+                                            <th>Đơn Giá</th>
+                                            <th>Thành Tiền</th>
+                                        </tr>
+                                        <tr>
+                                            <td th:text="${bill.product?.name ?: 'N/A'}"></td>
+                                            <td th:text="${bill.supplier?.name ?: 'N/A'}"></td>
+                                            <td>Cái</td>
+                                            <td th:text="${bill.quantity}"></td>
+                                            <td th:text="${#numbers.formatInteger(bill.purchasePrice, 0, 'COMMA')}"></td>
+                                            <td th:text="${#numbers.formatInteger(bill.totalPrice, 0, 'COMMA')}"></td>
+                                        </tr>
+                                    </table>
+                                    <div class="product-details" th:if="${bill != null}">
+                                        <h3>Chi Tiết Sản Phẩm</h3>
+                                        <ul class="list-unstyled">
+                                            <li><strong>Bộ Nhớ:</strong> <span th:text="${bill.product?.storage ?: 'N/A'}"></span></li>
+                                            <li><strong>CPU:</strong> <span th:text="${bill.product?.CPU ?: 'N/A'}"></span></li>
+                                            <li><strong>Camera:</strong> <span th:text="${bill.product?.camera ?: 'N/A'}"></span></li>
+                                            <li><strong>Chi Tiết:</strong> <span th:text="${bill.product?.detailedDescription ?: 'N/A'}"></span></li>
+                                            <li><strong>Màn Hình:</strong> <span th:text="${bill.product?.screenSize ?: 'N/A'}"></span></li>
+                                            <li><strong>Camera Trước:</strong> <span th:text="${bill.product?.selfie ?: 'N/A'}"></span></li>
+                                        </ul>
+                                    </div>
+                                    <p class="total text-end" th:if="${bill != null}">
+                                        <strong>Tổng Thanh Toán:</strong> <span th:text="${#numbers.formatInteger(bill.totalPrice, 0, 'COMMA')} + ' VND'"></span>
+                                    </p>
+                                    <hr>
+                                    <table class="signature-table">
+                                        <tr>
+                                            <td>
+                                                <div class="signature-space"></div>
+                                                <span style="text-align: center; font-size: 55px; font-family: 'UVN Ke Chuyen2', sans-serif;" th:if="${bill != null}" th:text="${bill.employee.fullName ?: 'N/A'}"></span>
+                                                <br><br>
+                                                Người Lập Hóa Đơn<br>(Ký tự động)
+                                            </td>
+                                            <td><div class="signature-space"></div><br><br><br><br><br>Bên Nhận Hàng<br>(Ký & ghi rõ họ tên)</td>
+                                            <td><div class="signature-space"></div><br><br><br><br><br>Bên Gửi Hàng<br>(Ký & ghi rõ họ tên)</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+    function getCurrentTime() {
+        const now = new Date();
+        return `ngày ${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+    }
+
+    function addWatermark(text) {
+        const watermarkOverlay = document.createElement('div');
+        watermarkOverlay.className = 'watermark-overlay';
+
+        // Tính toán số lượng văn bản cần lặp lại dựa trên kích thước hóa đơn
+        const invoice = document.getElementById('invoice');
+        const width = invoice.offsetWidth;
+        const height = invoice.offsetHeight;
+        const textWidth = 200; // Ước lượng chiều rộng của văn bản watermark
+        const textHeight = 20; // Ước lượng chiều cao của văn bản watermark
+        const spacing = 100; // Khoảng cách giữa các đoạn văn bản
+
+        // Tính số lượng văn bản theo chiều ngang và dọc
+        const cols = Math.ceil(width / (textWidth + spacing));
+        const rows = Math.ceil(height / (textHeight + spacing));
+
+        // Tạo các đoạn văn bản watermark và định vị chúng
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                const watermarkText = document.createElement('div');
+                watermarkText.className = 'watermark-text';
+                watermarkText.textContent = text;
+
+                // Định vị văn bản
+                const x = col * (textWidth + spacing) - (row % 2) * (textWidth / 2); // Dịch chuyển để tạo hiệu ứng chéo
+                const y = row * (textHeight + spacing);
+                watermarkText.style.left = `${x}px`;
+                watermarkText.style.top = `${y}px`;
+
+                watermarkOverlay.appendChild(watermarkText);
+            }
+        }
+
+        invoice.appendChild(watermarkOverlay);
+        return watermarkOverlay;
+    }
+
+    function removeWatermark(watermark) {
+        if (watermark && watermark.parentNode) {
+            watermark.parentNode.removeChild(watermark);
+        }
+    }
+
+    function printInvoice() {
+        const invoice = document.getElementById('invoice');
+        const watermark = addWatermark(`In lúc: ${getCurrentTime()}`);
+        html2canvas(invoice, {
+            scale: 2,
+            useCORS: true,
+            width: invoice.offsetWidth,
+            height: invoice.offsetHeight
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <body onload="window.print();window.close()">
+                    <img src="${imgData}" style="width: 210mm; height: 297mm;">
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            removeWatermark(watermark);
+        });
+    }
+
+    function downloadAsWord() {
+        const invoice = document.getElementById('invoice');
+        const exportCode = document.getElementById('exportCode')?.textContent || 'Unknown';
+        const exportDate = document.getElementById('exportDate')?.textContent.replace(/\//g, '') || 'Unknown';
+        const fileName = `Hoa_Don_Xuat_Kho_${exportCode}_${exportDate}.png`;
+        const downloadTime = getCurrentTime();
+        const watermark = addWatermark(`Tải về lúc: ${downloadTime}`);
+        setTimeout(() => {
+            html2canvas(invoice, {
+                scale: 2,
+                useCORS: true,
+                width: invoice.offsetWidth,
+                height: invoice.offsetHeight
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                removeWatermark(watermark);
+            });
+        }, 100);
+    }
+</script>
+</body>
+</html>

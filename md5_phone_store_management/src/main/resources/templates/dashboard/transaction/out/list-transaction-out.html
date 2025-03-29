@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Danh sách Giao dịch Xuất kho</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .chart-container {
+            width: 100%;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-wrapper {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+
+        /*<!--                    trượt bôstrrap-->*/
+        .table-responsive {
+            position: relative;
+        }
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #212529; /* Màu nền của thead */
+            z-index: 1;
+        }
+    </style>
+
+
+</head>
+
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="container-fluid py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Giao dịch Xuất kho</li>
+                    </ol>
+                </nav>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <h2 class="mb-0">
+                            <i class="bi bi-box-arrow-up me-2 text-primary"></i>
+                            Quản lý Giao dịch Xuất kho
+                        </h2>
+                        <a href="/dashboard/admin/transactions/listIn" class="btn btn-outline-primary">
+                            <i class="fas fa-exchange-alt me-2"></i> Giao dịch Nhập kho
+                        </a>
+                    </div>
+
+                    <a href="/dashboard/admin/transactions/new/out/0" class="btn btn-success">
+                        <i class="bi bi-arrow-up-right-circle"></i> Thêm mới xuất
+                    </a>
+                </div>
+                <div class="card shadow-sm">
+                    <!-- Filter section (always visible) -->
+                    <div class="card-body border-bottom py-3">
+
+                        <form class="row g-3 flex-nowrap" id="filterForm" th:action="@{/dashboard/admin/transactions/listOut/search}" method="get">
+                            <div class="col-md-3">
+                                <label for="productName" class="form-label">Tên sản phẩm</label>
+                                <input type="text" class="form-control" id="productName" name="productName"
+                                       th:value="${productName}" placeholder="Nhập tên sản phẩm">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="supplierName" class="form-label">Nhà cung cấp</label>
+                                <input type="text" class="form-control" id="supplierName" name="supplierName"
+                                       th:value="${supplierName}" placeholder="Nhập tên nhà cung cấp">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="startDate" class="form-label">Từ ngày</label>
+                                <input type="date" class="form-control" id="startDate" name="startDate"
+                                       th:value="${startDate}">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="endDate" class="form-label">Đến ngày</label>
+                                <input type="date" class="form-control" id="endDate" name="endDate"
+                                       th:value="${endDate}">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="btn-group w-100">
+                                    <button type="submit" class="btn btn-primary h-100">
+                                        <i class="fas fa-search me-1"></i>Tìm kiếm
+                                    </button>
+                                    <a th:href="@{/dashboard/admin/transactions/listOut}" class="btn btn-outline-secondary h-100">
+                                        <i class="fas fa-times-circle me-1"></i>Xóa bộ lọc
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+
+                    <div class="table-container table-fade-in" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-striped table-hover table-bordered">
+                            <thead class="table-dark sticky-top">
+                            <tr>
+                                <th style="width: 50px;">
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input" type="checkbox" id="selectAll">
+                                    </div>
+                                </th>
+                                <th class="text-center">ID</th>
+                                <th>Tên Sản phẩm</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-center">Giá</th>
+                                <th class="text-center">Tổng Giá Tiền</th>
+                                <th class="text-center">Ngày giao dịch</th>
+                                <th class="text-center">Nhân viên</th>
+                                <th class="text-center">Nhà cung cấp</th>
+                                <th class="text-center" style="width: 320px;">Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="transaction : ${inventoryTransactions}" data-bs-toggle="collapse"
+                                data-bs-target="#details-[[${transaction.transactionID}]]" aria-expanded="false"
+                                aria-controls="details-[[${transaction.transactionID}]]">
+                                <td>
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input transaction-checkbox" type="checkbox"
+                                               th:value="${transaction.transactionID}"
+                                               th:data-name="${transaction.product?.name ?: 'N/A'}">
+                                    </div>
+                                </td>
+                                <td class="text-center" th:text="${transaction.transactionID}"></td>
+                                <td th:text="${transaction.product?.name ?: 'N/A'}"></td>
+                                <td class="text-center" th:text="${transaction.quantity}"></td>
+                                <td class="text-center" th:text="${#numbers.formatDecimal(transaction.purchasePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td class="text-center" th:text="${#numbers.formatDecimal(transaction.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td class="text-center" th:text="${#temporals.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></td>
+                                <td class="text-center" th:text="${transaction.employee?.fullName ?: 'N/A'}"></td>
+                                <td class="text-center" th:text="${transaction.supplier?.name ?: 'N/A'}"></td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <a th:href="@{/dashboard/admin/transactions/new/out/{id}(id=${transaction.product.productID ?: -1})}"
+                                           class="btn btn-sm btn-secondary me-2 d-flex align-items-center"
+                                           data-bs-toggle="tooltip" title="Nhập lại">
+                                            <i class="fas fa-sync-alt me-1"></i> <span>Nhập lại</span>
+                                        </a>
+
+                                        <a th:href="@{/dashboard/admin/transactions/Out/edit/{id}/0(id=${transaction.transactionID})}"
+                                           class="btn btn-sm btn-warning me-2 d-flex align-items-center"
+                                           data-bs-toggle="tooltip" title="Sửa">
+                                            <i class="fas fa-edit me-1"></i> <span>Sửa</span>
+                                        </a>
+
+
+                                        <a th:href="@{/dashboard/admin/transactions/Out/bill/{id}(id=${transaction.transactionID ?: -1})}"
+                                           class="btn btn-sm btn-success d-flex align-items-center"
+                                           data-bs-toggle="tooltip" title="Hóa đơn">
+                                            <i class="fas fa-file-invoice me-1"></i> <span>Hóa đơn</span>
+                                        </a>
+                                    </div>
+                                </td>
+
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(inventoryTransactions)}">
+                                <td colspan="10" class="text-center py-4">Không tìm thấy giao dịch xuất kho nào</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+
+                        <div th:if="${!#lists.isEmpty(inventoryTransactions)}"
+                             class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                            <button id="deleteSelected" class="btn btn-danger" disabled>
+                                <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
+                            </button>
+
+                            <!-- Pagination -->
+                            <nav aria-label="Pagination">
+                                <ul class="pagination mb-0">
+                                    <!-- Trang đầu -->
+                                    <li class="page-item" th:classappend="${inventoryTransactions.number == 0} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listOut/search(page=0, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                                            Trang đầu
+                                        </a>
+                                    </li>
+
+                                    <!-- Trang trước -->
+                                    <li class="page-item" th:classappend="${inventoryTransactions.number == 0} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listOut/search(page=${inventoryTransactions.number - 1}, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Trang hiện tại -->
+                                    <li class="page-item active mx-2">
+        <span class="page-link">
+            <span th:text="${inventoryTransactions.number + 1}"></span> / <span th:text="${inventoryTransactions.totalPages}"></span>
+        </span>
+                                    </li>
+
+                                    <!-- Trang sau -->
+                                    <li class="page-item" th:classappend="${inventoryTransactions.number + 1 >= inventoryTransactions.totalPages} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listOut/search(page=${inventoryTransactions.number + 1}, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Trang cuối -->
+                                    <li class="page-item" th:classappend="${inventoryTransactions.number + 1 >= inventoryTransactions.totalPages} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listOut/search(page=${inventoryTransactions.totalPages - 1}, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                                            Trang cuối
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                </div>
+
+<!--                <div class="card shadow-sm mt-4">-->
+<!--                    <div class="card-header bg-light py-3">-->
+<!--                        <h5 class="mb-0 fw-bold">-->
+<!--                            <i class="fas fa-chart-line me-2"></i>Biểu đồ Thống kê Xuất Kho-->
+<!--                        </h5>-->
+<!--                    </div>-->
+<!--                    <div class="card-body">-->
+<!--                        <div class="chart-container">-->
+<!--                            <div class="chart-wrapper">-->
+<!--                                <canvas id="exportChart"></canvas>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+
+            </div>
+        </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+
+<!--    <footer th:replace="~{fragments/footer :: footer}"></footer>-->
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle select all checkbox
+        document.getElementById('selectAll').addEventListener('click', function () {
+            let checkboxes = document.querySelectorAll('.transaction-checkbox');
+            checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+            updateButtonState();
+        });
+
+        // Handle individual checkboxes
+        document.querySelectorAll('.transaction-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonState);
+        });
+
+        // Update button state
+        function updateButtonState() {
+            let selectedTransactions = document.querySelectorAll('.transaction-checkbox:checked');
+            document.getElementById('deleteSelected').disabled = selectedTransactions.length === 0;
+        }
+
+        // Handle delete button click
+        document.getElementById('deleteSelected').addEventListener('click', function () {
+            let selectedTransactions = [];
+            let selectedIds = [];
+
+            document.querySelectorAll('.transaction-checkbox:checked').forEach((checkbox) => {
+                let id = checkbox.getAttribute('value');
+                let name = checkbox.getAttribute('data-name');
+
+                selectedTransactions.push({id, name});
+                selectedIds.push(id);
+            });
+
+            if (selectedTransactions.length === 0) {
+                alert('Vui lòng chọn ít nhất một giao dịch để xóa.');
+                return;
+            }
+
+            // Format message for confirmation modal
+            let deleteMessage = 'Bạn có chắc chắn muốn xóa ' +
+                (selectedTransactions.length > 1 ? 'các giao dịch' : 'giao dịch') +
+                ' xuất kho sau đây?<br><br><ul class="list-group">';
+
+            selectedTransactions.forEach(trans => {
+                deleteMessage += `<li class="list-group-item">${trans.name} <small class="text-muted">(ID: ${trans.id})</small></li>`;
+            });
+
+            deleteMessage += '</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>';
+
+            // Create or update modal content (you'll need to add the modal HTML below)
+            document.getElementById('deleteMessage').innerHTML = deleteMessage;
+
+            // Show delete modal
+            let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+
+            // Handle confirm delete button
+            document.getElementById('confirmDelete').addEventListener('click', function () {
+                // Redirect to delete endpoint with selected IDs
+                window.location.href = `/dashboard/admin/transactions/delete?ids=${selectedIds.join(',')}`;
+            });
+        });
+    });
+</script>
+
+<!-- Add this modal HTML right before the closing </body> tag -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa giao dịch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="deleteMessage">
+                <!-- Delete message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Maps to store data
+        const monthlyData = new Map(); // For monthly totals
+        const dailyData = []; // For individual transaction points
+        const firstLastPointsByMonth = {}; // To track first and last points of each month
+
+        // Initialize monthly totals with zeros and first/last point trackers
+        for (let i = 1; i <= 12; i++) {
+            monthlyData.set(i, 0);
+            firstLastPointsByMonth[i] = { first: null, last: null };
+        }
+
+        // Process each transaction row to extract date and quantity
+        document.querySelectorAll('tbody tr:not(.collapse):not(:last-child)').forEach(row => {
+            if (row.cells.length < 7) return;
+
+            try {
+                const quantityCell = row.cells[3];
+                if (!quantityCell) return;
+                const quantity = parseInt(quantityCell.textContent.trim(), 10);
+                if (isNaN(quantity)) return;
+
+                const dateCell = row.cells[6];
+                if (!dateCell) return;
+                const dateText = dateCell.textContent.trim();
+
+                const parts = dateText.split('-');
+                if (parts.length < 3) return;
+
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10);
+                const yearTimeParts = parts[2].split(' ');
+                const year = parseInt(yearTimeParts[0], 10);
+                const time = yearTimeParts.length > 1 ? yearTimeParts[1] : "00:00";
+
+                if (isNaN(day) || isNaN(month) || isNaN(year)) return;
+                if (month < 1 || month > 12 || day < 1 || day > 31) return;
+
+                const currentAmount = monthlyData.get(month) || 0;
+                monthlyData.set(month, currentAmount + quantity);
+
+                const point = {
+                    date: new Date(year, month - 1, day),
+                    month: month,
+                    day: day,
+                    year: year,
+                    time: time,
+                    fullDate: `${day}-${month}-${year} ${time}`,
+                    quantity: quantity
+                };
+
+                dailyData.push(point);
+
+                if (!firstLastPointsByMonth[month].first || point.date < firstLastPointsByMonth[month].first.date) {
+                    firstLastPointsByMonth[month].first = point;
+                }
+                if (!firstLastPointsByMonth[month].last || point.date > firstLastPointsByMonth[month].last.date) {
+                    firstLastPointsByMonth[month].last = point;
+                }
+            } catch (e) {
+                console.error("Error processing row:", e);
+            }
+        });
+
+        dailyData.sort((a, b) => a.date - b.date);
+
+        const monthlyTotals = Array.from({ length: 12 }, (_, i) => monthlyData.get(i + 1) || 0);
+
+        // Tạo nhãn tháng với tổng số lượng, ví dụ: "Tháng 1 (50)"
+        const monthsWithTotals = monthlyTotals.map((total, index) => `Tháng ${index + 1} (${total})`);
+
+        const pointPositions = [];
+
+        const exportCtx = document.getElementById('exportChart').getContext('2d');
+        const exportChart = new Chart(exportCtx, {
+            type: 'line',
+            data: {
+                labels: monthsWithTotals,
+                datasets: [{
+                    label: 'Tổng tháng',
+                    data: monthlyTotals,
+                    backgroundColor: 'rgba(255, 99, 132, 0)',
+                    borderColor: 'rgba(255, 99, 132, 0)',
+                    borderWidth: 0,
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Số lượng', font: { size: 16, weight: 'bold' } },
+                        ticks: { font: { size: 14 } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Thời gian', font: { size: 16, weight: 'bold' } },
+                        ticks: { font: { size: 14 } }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Chi tiết số lượng hàng hóa xuất kho theo tháng',
+                        font: { size: 20, weight: 'bold' },
+                        padding: { top: 10, bottom: 20 }
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: { font: { size: 14, weight: 'bold' }, padding: 20 }
+                    },
+                    tooltip: { enabled: false }
+                },
+                onHover: function (event, elements) {
+                    const rect = exportChart.canvas.getBoundingClientRect();
+                    const x = event.clientX - rect.left;
+                    const y = event.clientY - rect.top;
+
+                    let hoveredPoint = null;
+                    for (const point of pointPositions) {
+                        const dx = point.x - x;
+                        const dy = point.y - y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 10) {
+                            hoveredPoint = point;
+                            break;
+                        }
+                    }
+
+                    document.body.style.cursor = hoveredPoint ? 'pointer' : 'default';
+
+                    const tooltipEl = document.getElementById('chartjs-tooltip');
+                    if (hoveredPoint) {
+                        tooltipEl.style.opacity = 1;
+                        tooltipEl.style.left = (hoveredPoint.x + 10) + 'px';
+                        tooltipEl.style.top = (hoveredPoint.y - 10) + 'px';
+                        tooltipEl.innerHTML = `
+                            <div class="tooltip-content">
+                                <div class="date">Ngày: ${hoveredPoint.data.day}-${hoveredPoint.data.month}-${hoveredPoint.data.year}</div>
+                                <div class="quantity">Tổng xuất: ${hoveredPoint.data.quantity}</div>
+                            </div>
+                        `;
+                    } else {
+                        tooltipEl.style.opacity = 0;
+                    }
+                },
+                onClick: function (event) {
+                    const rect = exportChart.canvas.getBoundingClientRect();
+                    const x = event.clientX - rect.left;
+                    const y = event.clientY - rect.top;
+
+                    let clickedPoint = null;
+                    for (const point of pointPositions) {
+                        const dx = point.x - x;
+                        const dy = point.y - y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 10) {
+                            clickedPoint = point;
+                            break;
+                        }
+                    }
+
+                    if (clickedPoint) {
+                        const dateStr = `${clickedPoint.data.day}-${clickedPoint.data.month}-${clickedPoint.data.year}`;
+                        window.location.href = `http://localhost:8080/dashboard/admin/transactions/out/search/${dateStr}`;
+                    }
+                }
+            },
+            plugins: [{
+                id: 'customDailyPoints',
+                afterDraw: function (chart) {
+                    const ctx = chart.ctx;
+                    pointPositions.length = 0;
+
+                    if (dailyData.length === 0) return;
+
+                    const xScale = chart.scales.x;
+                    const yScale = chart.scales.y;
+                    const monthPositions = [];
+                    for (let i = 0; i < 12; i++) {
+                        monthPositions.push(xScale.getPixelForTick(i));
+                    }
+
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgba(255, 99, 132, 1)';
+                    ctx.fillStyle = 'rgba(255, 99, 132, 1)';
+
+                    let currentMonth = null;
+                    let isFirstPointInMonth = true;
+
+                    dailyData.forEach((point, index) => {
+                        const monthIndex = point.month - 1;
+                        const daysInMonth = new Date(point.year, point.month, 0).getDate();
+                        let xPosition;
+
+                        if (monthIndex < 11) {
+                            const currentX = monthPositions[monthIndex];
+                            const nextX = monthPositions[monthIndex + 1];
+                            const dayRatio = point.day / daysInMonth;
+                            xPosition = currentX + (nextX - currentX) * dayRatio;
+                        } else {
+                            xPosition = monthPositions[monthIndex];
+                        }
+
+                        const yPosition = yScale.getPixelForValue(point.quantity);
+
+                        pointPositions.push({ x: xPosition, y: yPosition, data: point });
+
+                        if (currentMonth !== point.month) {
+                            if (currentMonth !== null) {
+                                ctx.stroke();
+                            }
+                            ctx.beginPath();
+                            isFirstPointInMonth = true;
+                            currentMonth = point.month;
+                        }
+
+                        if (isFirstPointInMonth) {
+                            ctx.moveTo(xPosition, yPosition);
+                            isFirstPointInMonth = false;
+                        } else {
+                            ctx.lineTo(xPosition, yPosition);
+                        }
+
+                        ctx.fillRect(xPosition - 3, yPosition - 3, 6, 6);
+                    });
+
+                    ctx.stroke();
+
+                    // Vẽ nét đứt từ điểm đầu tháng đến mốc tháng (màu xám)
+                    ctx.setLineDash([5, 5]);
+                    ctx.strokeStyle = 'rgba(100, 100, 100, 0.7)'; // Xám
+                    for (let month = 1; month <= 12; month++) {
+                        const firstPoint = firstLastPointsByMonth[month].first;
+                        if (firstPoint) {
+                            const monthIndex = month - 1;
+                            const daysInMonth = new Date(firstPoint.year, firstPoint.month, 0).getDate();
+                            let firstPointX;
+
+                            if (monthIndex < 11) {
+                                const currentX = monthPositions[monthIndex];
+                                const nextX = monthPositions[monthIndex + 1];
+                                const dayRatio = firstPoint.day / daysInMonth;
+                                firstPointX = currentX + (nextX - currentX) * dayRatio;
+                            } else {
+                                firstPointX = monthPositions[monthIndex];
+                            }
+
+                            const firstPointY = yScale.getPixelForValue(firstPoint.quantity);
+
+                            ctx.beginPath();
+                            ctx.moveTo(firstPointX, firstPointY);
+                            ctx.lineTo(monthPositions[monthIndex], yScale.getPixelForValue(0));
+                            ctx.stroke();
+                        }
+                    }
+
+                    // Vẽ nét đứt từ điểm cuối tháng đến mốc tháng tiếp theo (màu xám)
+                    ctx.strokeStyle = 'rgba(100, 100, 100, 0.7)'; // Xám
+                    for (let month = 1; month <= 11; month++) {
+                        const lastPoint = firstLastPointsByMonth[month].last;
+                        if (lastPoint) {
+                            const monthIndex = month - 1;
+                            const daysInMonth = new Date(lastPoint.year, lastPoint.month, 0).getDate();
+                            let lastPointX;
+
+                            if (monthIndex < 11) {
+                                const currentX = monthPositions[monthIndex];
+                                const nextX = monthPositions[monthIndex + 1];
+                                const dayRatio = lastPoint.day / daysInMonth;
+                                lastPointX = currentX + (nextX - currentX) * dayRatio;
+                            } else {
+                                lastPointX = monthPositions[monthIndex];
+                            }
+
+                            const lastPointY = yScale.getPixelForValue(lastPoint.quantity);
+
+                            ctx.beginPath();
+                            ctx.moveTo(lastPointX, lastPointY);
+                            ctx.lineTo(monthPositions[month], yScale.getPixelForValue(0));
+                            ctx.stroke();
+                        }
+                    }
+
+                    ctx.setLineDash([]);
+                }
+            }]
+        });
+
+        if (!document.getElementById('chartjs-tooltip')) {
+            const tooltipEl = document.createElement('div');
+            tooltipEl.id = 'chartjs-tooltip';
+            tooltipEl.style.opacity = 0;
+            tooltipEl.style.position = 'absolute';
+            tooltipEl.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            tooltipEl.style.color = 'white';
+            tooltipEl.style.padding = '10px';
+            tooltipEl.style.borderRadius = '5px';
+            tooltipEl.style.pointerEvents = 'none';
+            tooltipEl.style.zIndex = 100;
+            tooltipEl.style.transition = 'opacity 0.3s';
+            document.body.appendChild(tooltipEl);
+        }
+    });
+</script>
+
+</body>
+</html>

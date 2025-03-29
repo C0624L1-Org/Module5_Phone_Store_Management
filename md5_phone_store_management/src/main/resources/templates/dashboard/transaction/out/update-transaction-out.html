@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa xuất kho</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+    <!-- Inline CSS -->
+    <style>
+
+        .btn-update.disabled {
+            background: #d3d3d3;
+            color: #6c757d;
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
+        .btn-update.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #ff9a00;
+            box-shadow: 0 0 0 0.2rem rgba(255, 154, 0, 0.25);
+        }
+
+        .form-control:read-only {
+            background-color: #e9ecef;
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 154, 0, 0.3);
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-select-product {
+            transition: all 0.3s;
+        }
+
+        .btn-select-product.no-data {
+            background-color: #ffc107;
+            color: white;
+            cursor: pointer;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .btn-select-product.has-data {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .btn-select-product:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-select-product.no-data:hover {
+            transform: translateY(-2px);
+        }
+
+        .table-rounded th, .table-rounded td {
+            border: none;
+        }
+
+    </style>
+</head>
+<body>
+<div th:replace="~{common/toast}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="content-container">
+            <div class="container py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a>
+                        </li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listOut}">Giao dịch Xuất
+                            kho</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa xuất kho</li>
+                    </ol>
+                </nav>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="form-section mb-4">
+                            <div class="form-header">
+                                <h3 class="mb-0">
+                                    <i class="fas fa-warehouse me-2"></i>
+                                    Chỉnh sửa xuất kho
+                                </h3>
+                                <p class="text-white-50 mt-2 mb-0">Cập nhật thông tin xuất kho</p>
+                            </div>
+
+                            <div class="p-4">
+                                <form th:action="@{/dashboard/admin/transactions/updateOut}" method="post"
+                                      th:object="${inventoryTransaction}" class="needs-validation" novalidate>
+                                    <input type="hidden" th:field="*{transactionID}"/>
+
+                                    <div class="row">
+                                        <!-- Thông tin sản phẩm -->
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label">
+                                                <i class="fas fa-box me-2"></i>Sản phẩm đã chọn
+                                            </label>
+
+
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <button class="btn btn-select-product has-data" disabled>
+                                                        <i class="fas fa-check me-2"></i> Đã chọn: <span
+                                                            th:text="${product.name}"></span>
+                                                    </button>
+
+                                                    <a th:href="@{/dashboard/admin/transactions/choose/out/product/edit/{id}(id=${inventoryTransaction.transactionID})}"
+                                                       class="btn btn-warning ms-2">
+                                                        <i class="fas fa-redo me-2"></i> Chọn lại sản phẩm
+                                                    </a>
+                                                </div>
+
+                                                <div>
+                                                    <table class="table table-rounded">
+                                                        <thead>
+                                                        <tr>
+                                                            <th scope="col" class="text-center">
+                                                                <i class="fas fa-history"></i> Hoá đơn cũ
+                                                            </th>
+                                                            <th scope="col" class="text-center">
+                                                                <i class="fas fa-history me-2"></i> SL trước xuất
+                                                            </th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <input type="text" class="form-control"
+                                                                       id="oldProductName" name="oldProductName"
+                                                                       th:value="${oldProduct.name}" readonly>
+                                                                <input type="text" class="form-control"
+                                                                       id="oldProductQuantity" name="oldProductQuantity"
+                                                                       th:value="${inventoryTransaction.getQuantity()}"
+                                                                       readonly>
+                                                                <input type="hidden"
+                                                                       id="oldProductId"
+                                                                       name="oldProductId"
+                                                                       th:value="${oldProduct.productID}">
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control"
+                                                                       id="oldProductQuantityBF"
+                                                                       name="oldProductQuantityBF"
+                                                                       th:value="${inventoryTransaction.getQuantity() + oldProduct.getStockQuantity()}"
+                                                                       readonly>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+
+                                            <input type="hidden" id="productId" name="product.productID"
+                                                   th:value="${product.productID}">
+
+                                        </div>
+
+
+                                        <!-- Tên sản phẩm -->
+                                        <div class="col-12 mb-3">
+                                            <label for="productName" class="form-label">
+                                                <i class="fas fa-tag me-2"></i>Tên sản phẩm
+                                            </label>
+                                            <input type="text" class="form-control" id="productName" name="productName"
+                                                   th:value="${product.name}" readonly>
+                                        </div>
+
+                                        <!-- Tên nhà cung cấp -->
+                                        <div class="col-12 mb-3">
+                                            <label for="supplierName" class="form-label">
+                                                <i class="fas fa-building me-2"></i>Tên nhà cung cấp
+                                            </label>
+                                            <input type="text" class="form-control" id="supplierName"
+                                                   name="supplierName"
+                                                   th:value="${product.supplier.name}" readonly>
+                                        </div>
+
+                                        <!-- Số lượng còn lại -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="stockQuantity" class="form-label">
+                                                <i class="fas fa-cubes me-2"></i>Số lượng còn lại
+                                            </label>
+                                            <input type="number" class="form-control" id="stockQuantity"
+                                                   name="stockQuantity"
+                                                   th:value="${product.stockQuantity}" readonly>
+                                        </div>
+
+                                        <!-- Số lượng xuất -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="quantity" class="form-label">
+                                                <i class="fas fa-truck-loading me-2"></i>Số lượng xuất
+                                            </label>
+                                            <input type="number" class="form-control" id="quantity" name="quantity"
+                                                   th:value="${inventoryTransaction.quantity}" min="1" required
+                                                   th:disabled="${product.stockQuantity == 0}">
+                                            <div class="invalid-feedback" id="quantityFeedback"></div>
+                                            <div class="text-danger" id="quantityError"></div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="productPrice" class="form-label">
+                                                <i class="fas fa-dollar-sign me-2"></i>Giá sản phẩm
+                                            </label>
+                                            <input type="text" class="form-control" id="productPrice"
+                                                   name="productPrice"
+                                                   th:attr="value=${product.sellingPrice != null ? #numbers.formatDecimal(product.sellingPrice, 0, 'COMMA', 0, 'POINT') + ' đ' : 'N/A'}"
+                                                   readonly>
+                                        </div>
+
+
+                                        <!-- Tổng thanh toán -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="totalAmount" class="form-label">
+                                                <i class="fas fa-money-bill-wave me-2"></i>Tổng thanh toán
+                                            </label>
+                                            <input type="text" class="form-control" id="totalAmount" name="totalAmount"
+                                                   readonly>
+                                        </div>
+
+                                        <!-- Hidden field for transaction type -->
+                                        <input type="hidden" name="type" value="OUT">
+                                    </div>
+
+                                    <div class="d-flex justify-content-end mt-4 gap-2">
+                                        <button type="button" class="btn btn-cancel" data-bs-toggle="modal"
+                                                data-bs-target="#confirmCancelModal">
+                                            <i class="fas fa-times me-2"></i>Thoát
+                                        </button>
+                                        <button type="button" class="btn btn-update" id="updateButton">
+                                            <i class="fas fa-save me-2"></i>Cập nhật
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- Modal Xác Nhận Cập Nhật -->
+<div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmUpdateLabel">Xác nhận cập nhật</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn cập nhật thông tin xuất kho này?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-success" id="confirmUpdate">Xác nhận cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xác Nhận Thoát -->
+<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmCancelLabel">Xác nhận thoát</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn thoát? Dữ liệu chưa lưu sẽ bị mất.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+                <a th:href="@{/dashboard/admin/transactions/listOut}" class="btn btn-danger">Xác nhận thoát</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function formatVND(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VND";
+    }
+
+    // Hàm kiểm tra và cập nhật trạng thái nút Cập nhật
+    function updateButtonState() {
+        const updateButton = document.getElementById("updateButton");
+        const quantityInput = document.getElementById("quantity");
+        const stockQuantity = parseInt(document.getElementById("stockQuantity")?.value) || 0;
+        const oldProductQuantityBF = parseInt(document.getElementById("oldProductQuantityBF")?.value) || 0;
+        const exportQuantity = parseInt(quantityInput.value) || 0;
+        const oldProductId = document.getElementById("oldProductId")?.value;
+        const productId = document.getElementById("productId")?.value;
+        const isSameProduct = oldProductId === productId;
+
+        if (isSameProduct) {
+            if (exportQuantity > 0 && exportQuantity <= oldProductQuantityBF) {
+                updateButton.classList.remove("disabled");
+                updateButton.disabled = false;
+            } else {
+                updateButton.classList.add("disabled");
+                updateButton.disabled = true;
+            }
+        } else {
+            if (exportQuantity > 0 && exportQuantity <= stockQuantity) {
+                updateButton.classList.remove("disabled");
+                updateButton.disabled = false;
+            } else {
+                updateButton.classList.add("disabled");
+                updateButton.disabled = true;
+            }
+        }
+    }
+
+    // Hàm tính tổng thanh toán và validate
+    function calculateTotalAmount() {
+        const stockQuantity = parseInt(document.getElementById("stockQuantity")?.value) || 0;
+        const oldProductQuantityBF = parseInt(document.getElementById("oldProductQuantityBF")?.value) || 0;
+        const exportQuantity = parseInt(document.getElementById("quantity")?.value) || 0;
+        const productPriceString = document.getElementById("productPrice")?.value || "0";
+        const oldProductId = document.getElementById("oldProductId")?.value;
+        const productId = document.getElementById("productId")?.value;
+        const isSameProduct = oldProductId === productId;
+
+        function convertVNDToNumber(vndString) {
+            const numberString = vndString.replace(/\./g, '').replace(/,/g, '').replace(/đ/g, '').trim();
+            return parseFloat(numberString) || 0;
+        }
+
+        const productPrice = convertVNDToNumber(productPriceString);
+        const totalAmountField = document.getElementById("totalAmount");
+        const quantityError = document.getElementById("quantityError");
+        const quantityFeedback = document.getElementById("quantityFeedback");
+        const quantityInput = document.getElementById("quantity");
+
+        if (exportQuantity !== "") {
+            if (stockQuantity === 0) {
+                quantityInput.setCustomValidity("Sản phẩm đã hết hàng, không thể xuất kho");
+                quantityError.textContent = "Sản phẩm đã hết hàng, không thể xuất kho";
+                quantityFeedback.textContent = "Sản phẩm đã hết hàng, không thể xuất kho";
+            } else if (exportQuantity <= 0) {
+                quantityInput.setCustomValidity("Số lượng xuất phải lớn hơn 0");
+                quantityError.textContent = "Số lượng xuất phải lớn hơn 0";
+                quantityFeedback.textContent = "Số lượng xuất phải lớn hơn 0";
+            } else if (isSameProduct && exportQuantity > oldProductQuantityBF) {
+                quantityInput.setCustomValidity("Vui lòng nhập ít hơn hoặc bằng số lượng hàng trước khi xuất");
+                quantityError.textContent = "Vui lòng nhập ít hơn hoặc bằng số lượng hàng trước khi xuất";
+                quantityFeedback.textContent = "Vui lòng nhập ít hơn hoặc bằng số lượng hàng trước khi xuất";
+            } else if (!isSameProduct && exportQuantity > stockQuantity) {
+                quantityInput.setCustomValidity("Vui lòng nhập ít hơn hoặc bằng số lượng tồn kho");
+                quantityError.textContent = "Vui lòng nhập ít hơn hoặc bằng số lượng tồn kho";
+                quantityFeedback.textContent = "Vui lòng nhập ít hơn hoặc bằng số lượng tồn kho";
+            } else {
+                quantityInput.setCustomValidity("");
+                quantityError.textContent = "";
+                quantityFeedback.textContent = "";
+            }
+        } else {
+            quantityInput.setCustomValidity("");
+            quantityError.textContent = "";
+            quantityFeedback.textContent = "";
+        }
+
+        const totalAmount = productPrice * exportQuantity;
+        totalAmountField.value = exportQuantity > 0 &&
+        ((isSameProduct && exportQuantity <= oldProductQuantityBF) ||
+            (!isSameProduct && exportQuantity <= stockQuantity)) ? formatVND(totalAmount) : "";
+
+        updateButtonState();
+    }
+
+    document.getElementById("updateButton").addEventListener("click", function () {
+        if (!this.disabled) {
+            const form = document.querySelector("form");
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+            const modal = new bootstrap.Modal(document.getElementById('confirmUpdateModal'));
+            modal.show();
+        }
+    });
+
+    document.getElementById("confirmUpdate").addEventListener("click", function () {
+        const form = document.querySelector("form");
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            var modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpdateModal'));
+            modal.hide();
+            return;
+        }
+        form.submit();
+    });
+
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+
+    // Xử lý khi thay đổi số lượng
+    document.getElementById("quantity").addEventListener("input", function () {
+        calculateTotalAmount();
+    });
+
+    // Thêm thông báo xanh lá khi sản phẩm không thay đổi
+    window.addEventListener("load", function () {
+        const oldProductId = document.getElementById("oldProductId")?.value;
+        const productId = document.getElementById("productId")?.value;
+        const table = document.querySelector(".table-rounded");
+
+        if (oldProductId === productId) {
+            const alertDiv = document.createElement("div");
+            alertDiv.className = "alert alert-success mb-2";
+            alertDiv.textContent = "Bạn đang sửa giao dịch với sản phẩm cũ!";
+            table.insertAdjacentElement("beforebegin", alertDiv);
+        }
+
+        calculateTotalAmount();
+    });
+</script>
+</body>
+</html>

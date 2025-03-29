@@ -105,23 +105,21 @@ public class SupplierController {
     @GetMapping("/suppliers/delete/{ids}")
     public String deleteSuppliers(@PathVariable("ids") String ids, RedirectAttributes redirectAttributes) {
         try {
-            // Chuyển chuỗi ids thành List<Integer>
             List<Integer> idList = Arrays.stream(ids.split(","))
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
 
-            // Gọi service để xóa
             supplierService.deleteSupplier(idList);
 
-            // Thêm thông báo thành công
             redirectAttributes.addFlashAttribute("message", "Xóa nhà cung cấp thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         } catch (Exception e) {
-            // Thêm thông báo lỗi nếu xóa thất bại
             redirectAttributes.addFlashAttribute("message", "Lỗi khi xóa nhà cung cấp: " + e.getMessage());
             redirectAttributes.addFlashAttribute("messageType", "error");
         }
 
         return "redirect:/dashboard/suppliers";
     }
+
+
 }
