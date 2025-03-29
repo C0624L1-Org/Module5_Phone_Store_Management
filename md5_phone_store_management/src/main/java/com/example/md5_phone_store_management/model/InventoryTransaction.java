@@ -34,9 +34,10 @@ public class InventoryTransaction {
     @JoinColumn(name = "supplierID", foreignKey = @ForeignKey(name = "FK_Supplier"))
     private Supplier supplier;
 
-    @ManyToOne
-    @JoinColumn(name = "employeeID", foreignKey = @ForeignKey(name = "FK_Employee"))
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "employeeID", nullable = false, foreignKey = @ForeignKey(name = "FK_Employee"))
     private Employee employee;
+
 
     @Column(precision = 12, scale = 2)
     private BigDecimal totalPrice;

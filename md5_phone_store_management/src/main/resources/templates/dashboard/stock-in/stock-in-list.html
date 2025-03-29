@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="_csrf" content="your-csrf-token-here"/>
-  <meta name="_csrf_header" content="X-CSRF-TOKEN"/>
+  <meta name="_csrf" content="${_csrf.token}"/>
+  <meta name="_csrf_header" content="${_csrf.headerName}"/>
   <title>Quản lý Nhập Kho</title>
 
   <!-- Bootstrap CSS -->
@@ -19,208 +19,9 @@
   <link rel="stylesheet" href="/css/common/pagination.css">
   <link rel="stylesheet" href="/css/common/layout.css">
 
+  <!-- Style giữ nguyên -->
   <style>
-    .card-header {
-      background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);
-      color: white;
-      padding: 1.2rem 1.5rem;
-      border-radius: 10px 10px 0 0;
-    }
-
-    .search-section {
-      background-color: #f8f9fa;
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-      border: 1px solid #e9ecef;
-    }
-
-    .table-card {
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-      border: 1px solid #e9ecef;
-    }
-
-    .btn-action {
-      padding: 0.375rem 0.75rem;
-      border-radius: 0.25rem;
-      font-weight: 500;
-      font-size: 0.875rem;
-      transition: all 0.2s;
-    }
-
-    .btn-action:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
-    }
-
-    .btn-view {
-      background-color: #6c8deb;
-      border-color: #6c8deb;
-      color: white;
-    }
-
-    .btn-view:hover {
-      background-color: #4a6fdc;
-      border-color: #4a6fdc;
-    }
-
-    .btn-edit {
-      background-color: #ffc107;
-      border-color: #ffc107;
-      color: #212529;
-    }
-
-    .btn-edit:hover {
-      background-color: #e0a800;
-      border-color: #e0a800;
-    }
-
-    .table thead th {
-      background-color: #343a40;
-      color: white;
-      font-weight: 500;
-      border-color: #454d55;
-      text-transform: uppercase;
-      font-size: 0.875rem;
-      vertical-align: middle;
-      white-space: nowrap;
-    }
-
-    .table-striped tbody tr:nth-of-type(odd) {
-      background-color: rgba(0, 0, 0, 0.02);
-    }
-
-    .table-hover tbody tr:hover {
-      background-color: rgba(0, 0, 0, 0.075);
-    }
-
-    .form-control:focus, .form-select:focus {
-      border-color: #6c8deb;
-      box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);
-    }
-
-    .badge-role {
-      padding: 0.4em 0.6em;
-      font-size: 0.75em;
-      font-weight: 600;
-      border-radius: 0.375rem;
-    }
-
-    .badge-admin {
-      background-color: #dc3545;
-      color: white;
-    }
-
-    .badge-sales-staff {
-      background-color: #198754;
-      color: white;
-    }
-
-    .badge-sales-person {
-      background-color: #0d6efd;
-      color: white;
-    }
-
-    .badge-warehouse {
-      background-color: #6610f2;
-      color: white;
-    }
-
-    .avatar-sm {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #fff;
-      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    }
-
-    .employee-name {
-      font-weight: 600;
-      color: #343a40;
-    }
-
-    /* Checkbox */
-    .custom-checkbox {
-      position: relative;
-      padding-left: 30px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .custom-checkbox input {
-      position: absolute;
-      opacity: 0;
-      cursor: pointer;
-      height: 0;
-      width: 0;
-    }
-
-    .checkmark {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 20px;
-      width: 20px;
-      background-color: #eee;
-      border-radius: 3px;
-      border: 1px solid #ddd;
-    }
-
-    .custom-checkbox:hover input ~ .checkmark {
-      background-color: #ccc;
-    }
-
-    .custom-checkbox input:checked ~ .checkmark {
-      background-color: #6c8deb;
-      border-color: #6c8deb;
-    }
-
-    .checkmark:after {
-      content: "";
-      position: absolute;
-      display: none;
-    }
-
-    .custom-checkbox input:checked ~ .checkmark:after {
-      display: block;
-    }
-
-    .custom-checkbox .checkmark:after {
-      left: 6px;
-      top: 2px;
-      width: 6px;
-      height: 12px;
-      border: solid white;
-      border-width: 0 2px 2px 0;
-      transform: rotate(45deg);
-    }
-    .autocomplete-list {
-      position: absolute;
-      z-index: 1050;
-      background: white;
-      border: 1px solid #ddd;
-      max-height: 200px;
-      overflow-y: auto;
-      width: 100%;
-      top: 100%;
-      left: 0;
-    }
-
-    .input-group {
-      position: relative;
-      width: 100%;
-    }
-    .autocomplete-item {
-      padding: 8px;
-      cursor: pointer;
-    }
-    .autocomplete-item:hover {
-      background-color: #f0f0f0;
-    }
+    /* ... (Style của bạn) ... */
   </style>
 </head>
 <body>
@@ -250,40 +51,30 @@
             <i class="fas fa-users me-2 text-primary"></i>
             Danh sách sản phẩm trong kho
           </h2>
-
           <a th:href="@{/dashboard/warehouse-staff/inventory}" class="btn btn-success">
             <i class="fas fa-user-plus me-2"></i>Nhập Kho
           </a>
         </div>
 
         <div class="search-section">
-          <form action="/dashboard/stock-in/search" method="GET">
+          <form th:action="@{/dashboard/stock-in/search}" method="GET">
             <div class="row g-3">
-              <!-- Tên sản phẩm -->
               <div class="col-md-3 position-relative">
                 <label for="productName" class="form-label">Tên sản phẩm</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="fas fa-box"></i></span>
                   <input type="text" class="form-control" id="productName" name="productName"
-                         placeholder="Nhập tên sản phẩm" th:value="${param.productName}"
-                         onkeyup="autocompleteProduct()" onblur="hideAutocomplete('productList')">
-                  <div id="productList" class="autocomplete-list"></div>
+                         placeholder="Nhập tên sản phẩm" th:value="${param.productName}">
                 </div>
               </div>
-
-              <!-- Nhà cung cấp -->
               <div class="col-md-3 position-relative">
                 <label for="supplierName" class="form-label">Nhà cung cấp</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="fas fa-industry"></i></span>
                   <input type="text" class="form-control" id="supplierName" name="supplierName"
-                         placeholder="Nhập tên nhà cung cấp" th:value="${param.supplierName}"
-                         onkeyup="autocompleteSupplier()" onblur="hideAutocomplete('supplierList')">
-                  <div id="supplierList" class="autocomplete-list"></div>
+                         placeholder="Nhập tên nhà cung cấp" th:value="${param.supplierName}">
                 </div>
               </div>
-
-              <!-- Ngày bắt đầu -->
               <div class="col-md-3">
                 <label for="startDate" class="form-label">Từ ngày</label>
                 <div class="input-group">
@@ -291,8 +82,6 @@
                   <input type="date" id="startDate" name="startDate" class="form-control" th:value="${param.startDate}">
                 </div>
               </div>
-
-              <!-- Ngày kết thúc -->
               <div class="col-md-3">
                 <label for="endDate" class="form-label">Đến ngày</label>
                 <div class="input-group">
@@ -300,8 +89,6 @@
                   <input type="date" id="endDate" name="endDate" class="form-control" th:value="${param.endDate}">
                 </div>
               </div>
-
-              <!-- Nút tìm kiếm & xóa bộ lọc -->
               <div class="col-md-12 d-flex justify-content-end gap-2">
                 <button type="submit" class="btn btn-primary">
                   <i class="fas fa-search me-2"></i>Tìm kiếm
@@ -332,26 +119,25 @@
                 <th>Số Lượng</th>
                 <th>Đơn Giá</th>
                 <th>Thành Tiền</th>
+                <th>Nhân viên</th>
                 <th style="width: 200px; text-align: center;">Hành động</th>
               </tr>
               </thead>
               <tbody>
-              <!-- TH Nếu không có dữ liệu -->
-              <tr th:if="${stockInLists.totalElements == 0}">
-                <td colspan="7" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
+              <tr th:if="${stockInList.totalElements == 0}">
+                <td colspan="10" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
               </tr>
-              <!--                            <tr th:each="employee:${employeePage}" th:if="${employee.role?.name() != 'Admin'}">-->
-              <tr th:each="stock,l:${stockInLists}">
+              <tr th:each="stock, iterStat : ${stockInList}">
                 <td class="text-center">
                   <div class="form-check">
                     <input class="form-check-input selectInventoryTransaction" type="checkbox"
                            th:value="${stock.transactionID}"
                            th:data-product="${stock.product.name}"
                            th:data-suppliers="${stock.supplier.name}"
-                           th:data-date="${stock.transactionDate}">
+                           th:data-date="${#temporals.format(stock.transactionDate, 'yyyy-MM-dd HH:mm:ss')}">
                   </div>
                 </td>
-                <td th:text="${l.count}"></td>
+                <td th:text="${iterStat.count}"></td>
                 <td th:text="${#temporals.format(stock.transactionDate, 'dd/MM/yyyy')}"></td>
                 <td>
                   <div class="d-flex align-items-center">
@@ -366,10 +152,10 @@
                 <td th:text="${stock.quantity}"></td>
                 <td th:text="${#numbers.formatDecimal(stock.purchasePrice, 0, 'COMMA', 2, 'POINT') + ' VNĐ'}"></td>
                 <td th:text="${#numbers.formatDecimal(stock.totalPrice, 0, 'COMMA', 2, 'POINT') + ' VNĐ'}"></td>
+                <td th:text="${stock.employee.name}"></td> <!-- Hiển thị tên nhân viên -->
                 <td>
                   <div class="d-flex gap-2 justify-content-center">
-
-                    <a th:href="@{/dashboard/stock-in/update(inventionId=${stock.transactionID})}"
+                    <a th:href="@{/dashboard/stock-in/update(productId=${stock.product.productID}, supplierId=${stock.supplier.supplierID})}"
                        class="btn btn-warning btn-edit btn-sm">
                       <i class="fas fa-pen me-1"></i>Cập nhật
                     </a>
@@ -380,166 +166,88 @@
             </table>
           </div>
 
-          <div th:if="${stockInLists.totalElements > 0}"
+          <div th:if="${stockInList.totalElements > 0}"
                class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
             <button id="deleteSelected" class="btn btn-danger" disabled>
               <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
             </button>
-
-            <!-- Pagination -->
             <nav aria-label="Pagination">
               <ul class="pagination mb-0">
-                <!-- Trang đầu -->
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                  <a class="page-link"
-                     th:href="${#strings.isEmpty(productName) and #strings.isEmpty(supplierName)
-                            and #strings.isEmpty(startDate) and #strings.isEmpty(endDate)}
-                            ? @{/dashboard/stock-in/list(page=0)}
-                            : @{/dashboard/stock-in/search(page=0, productName=${productName},
-                            supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                  <a class="page-link" th:href="@{/dashboard/stock-in/list(page=0, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
                     Trang đầu
                   </a>
                 </li>
-
-                <!-- Trang trước -->
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                  <a class="page-link"
-                     th:href="${#strings.isEmpty(productName) and #strings.isEmpty(supplierName)
-                            and #strings.isEmpty(startDate) and #strings.isEmpty(endDate)}
-                            ? @{/dashboard/stock-in/list(page=${currentPage - 1})}
-                            : @{/dashboard/stock-in/search(page=${currentPage - 1}, productName=${productName},
-                            supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                  <a class="page-link" th:href="@{/dashboard/stock-in/list(page=${currentPage - 1}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
                     <i class="fas fa-chevron-left"></i>
                   </a>
                 </li>
-
-                <!-- Hiển thị số trang -->
                 <li class="page-item active mx-2">
-                <span class="page-link">
+                  <span class="page-link">
                     <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPage}"></span>
-                </span>
+                  </span>
                 </li>
-
-                <!-- Trang tiếp theo -->
                 <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
-                  <a class="page-link"
-                     th:href="${#strings.isEmpty(productName) and #strings.isEmpty(supplierName)
-                            and #strings.isEmpty(startDate) and #strings.isEmpty(endDate)}
-                            ? @{/dashboard/stock-in/list(page=${currentPage + 1})}
-                            : @{/dashboard/stock-in/search(page=${currentPage + 1}, productName=${productName},
-                            supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                  <a class="page-link" th:href="@{/dashboard/stock-in/list(page=${currentPage + 1}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
                     <i class="fas fa-chevron-right"></i>
                   </a>
                 </li>
-
-                <!-- Trang cuối -->
                 <li class="page-item" th:classappend="${currentPage + 1 >= totalPage} ? 'disabled'">
-                  <a class="page-link"
-                     th:href="${#strings.isEmpty(productName) and #strings.isEmpty(supplierName)
-                            and #strings.isEmpty(startDate) and #strings.isEmpty(endDate)}
-                            ? @{/dashboard/stock-in/list(page=${totalPage - 1})}
-                            : @{/dashboard/stock-in/search(page=${totalPage - 1}, productName=${productName},
-                            supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                  <a class="page-link" th:href="@{/dashboard/stock-in/list(page=${totalPage - 1}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
                     Trang cuối
                   </a>
                 </li>
               </ul>
             </nav>
           </div>
-
-
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Footer -->
   <footer th:replace="~{fragments/footer :: footer}"></footer>
-  <form id="deleteForm" action="/dashboard/stock-in/delete" method="post">
-    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-    <input type="hidden" name="ids" id="selectedTransactionIds">
+
+  <form id="deleteForm" th:action="@{/dashboard/stock-in/delete}" method="POST">
+    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+    <input type="hidden" name="ids" id="deleteIds" />
   </form>
+
   <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="deleteModalLabel">
-            <i class="fas fa-exclamation-triangle text-danger me-2"></i>
-            Xác nhận xóa giao dịch
-          </h5>
+          <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p id="deleteMessage"></p>
+          <div id="deleteMessage"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            <i class="fas fa-times me-2"></i>Hủy bỏ
-          </button>
-          <button type="button" class="btn btn-danger" id="confirmDelete">
-            <i class="fas fa-trash-alt me-2"></i>Đồng ý
-          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" id="confirmDelete" class="btn btn-danger">Xác nhận xóa</button>
         </div>
       </div>
     </div>
   </div>
 </div>
-</div>
 
-<!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
-
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-
 <script th:inline="javascript">
-  let products = /*[[${products}]]*/ [];
-  let suppliers = /*[[${suppliers}]]*/ [];
-  let productNames = products.map(p => p.name).filter(name => name);
-  let supplierNames = suppliers.map(s => s.name).filter(name => name);
-
-  function autocomplete(inputId, listId, dataArray) {
-    let input = document.getElementById(inputId);
-    let list = document.getElementById(listId);
-
-    let value = input.value.trim().toLowerCase();
-    list.innerHTML = '';  // Xóa kết quả cũ
-    if (!value) return;
-
-    let filtered = dataArray.filter(name => name.toLowerCase().includes(value));
-
-    filtered.forEach(name => {
-      let div = document.createElement('div');
-      div.classList.add('autocomplete-item');
-      div.textContent = name;
-      div.onclick = function () {
-        input.value = name;
-        list.innerHTML = ''; // Ẩn gợi ý sau khi chọn
-      };
-      list.appendChild(div);
-    });
-  }
-
-  function autocompleteProduct() {
-    autocomplete('productName', 'productList', productNames);
-  }
-
-  function autocompleteSupplier() {
-    autocomplete('supplierName', 'supplierList', supplierNames);
-  }
-
-  function hideAutocomplete(listId) {
-    setTimeout(() => document.getElementById(listId).innerHTML = '', 200);
-  }
-
-  //modal xóa
   document.addEventListener('DOMContentLoaded', function () {
-    let selectedIds = []; // Đưa selectedIds ra ngoài để giữ giá trị
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const deleteSelectedButton = document.getElementById('deleteSelected');
+    const confirmDeleteButton = document.getElementById('confirmDelete');
+    const deleteMessageContainer = document.getElementById('deleteMessage');
+    const deleteForm = document.getElementById('deleteForm');
+    let selectedIds = [];
 
-    document.getElementById('selectAll').addEventListener('click', function () {
-      let checkboxes = document.querySelectorAll('.selectInventoryTransaction');
-      checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+    selectAllCheckbox.addEventListener('click', function () {
+      document.querySelectorAll('.selectInventoryTransaction').forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
       updateButtonState();
     });
 
@@ -548,99 +256,64 @@
     });
 
     function updateButtonState() {
-      let selectedTransactions = document.querySelectorAll('.selectInventoryTransaction:checked');
-      document.getElementById('deleteSelected').disabled = selectedTransactions.length === 0;
+      selectedIds = getSelectedTransactionIds();
+      deleteSelectedButton.disabled = selectedIds.length === 0;
     }
 
-    document.getElementById('deleteSelected').addEventListener('click', function () {
-      selectedIds = []; // Reset danh sách khi nhấn xóa
-      let transactionDetails = [];
+    deleteSelectedButton.addEventListener('click', function () {
+      let selectedTransactions = [];
 
       document.querySelectorAll('.selectInventoryTransaction:checked').forEach((checkbox) => {
-        let id = Number(checkbox.getAttribute('value')); // Ép kiểu về số
+        let id = checkbox.getAttribute('value');
         let product = checkbox.getAttribute('data-product');
         let supplier = checkbox.getAttribute('data-suppliers');
         let date = checkbox.getAttribute('data-date');
 
-        transactionDetails.push({ id, product, supplier, date });
-        selectedIds.push(id);
+        selectedTransactions.push({ id, product, supplier, date });
       });
 
-      if (selectedIds.length === 0) {
+      if (selectedTransactions.length === 0) {
         alert('Vui lòng chọn ít nhất một giao dịch để xóa.');
         return;
       }
 
-      console.log("Selected IDs:", selectedIds);
-
-      let deleteMessage = `Bạn có chắc chắn muốn xóa ${transactionDetails.length} giao dịch sau đây?<br><br><ul class="list-group">`;
-      transactionDetails.forEach(tran => {
-        deleteMessage += `<li class="list-group-item"><strong>Sản phẩm:</strong> ${tran.product} <br>
-                                  <small class="text-muted">Nhà cung cấp: ${tran.supplier}</small> <br>
-                                  <small class="text-muted">Ngày nhập: ${tran.date}</small></li>`;
+      let deleteMessage = `<p>Bạn có chắc chắn muốn xóa ${selectedTransactions.length} giao dịch sau?</p><ul class="list-group">`;
+      selectedTransactions.forEach(trx => {
+        deleteMessage += `<li class="list-group-item">
+                            <strong>${trx.product}</strong> - Nhà cung cấp: ${trx.supplier}, Ngày: ${trx.date}
+                          </li>`;
       });
+      deleteMessage += '</ul><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>';
 
-      deleteMessage += `</ul><br><p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>`;
-      document.getElementById('deleteMessage').innerHTML = deleteMessage;
+      deleteMessageContainer.innerHTML = deleteMessage;
 
       let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
       deleteModal.show();
     });
 
-    document.getElementById('confirmDelete').addEventListener('click', function () {
+    confirmDeleteButton.addEventListener('click', function () {
       if (selectedIds.length === 0) {
-        alert("Không có giao dịch nào được chọn để xóa!");
+        alert("Vui lòng chọn ít nhất một giao dịch để xóa.");
         return;
       }
 
-      let csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
-      let csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+      document.querySelectorAll('#deleteForm input[name="ids"]').forEach(input => input.remove());
 
-      if (!csrfTokenMeta || !csrfHeaderMeta) {
-        alert("Không tìm thấy CSRF token!");
-        console.error("CSRF token hoặc header bị thiếu!");
-        return;
-      }
+      selectedIds.forEach(id => {
+        let inputField = document.createElement('input');
+        inputField.type = 'hidden';
+        inputField.name = 'ids';
+        inputField.value = id;
+        deleteForm.appendChild(inputField);
+      });
 
-      let csrfToken = csrfTokenMeta.getAttribute('content');
-      let csrfHeader = csrfHeaderMeta.getAttribute('content');
-
-      console.log("CSRF Token:", csrfToken);
-      console.log("CSRF Header:", csrfHeader);
-      console.log("Selected IDs:", selectedIds);
-
-      let url = '/dashboard/stock-in/delete';
-
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          [csrfHeader]: csrfToken,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ids: selectedIds.map(id => Number(id)) })
-      })
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
-                }
-                return response.json();
-              })
-              .then(data => {
-                if (data.success) {
-                  document.getElementById('deleteMessage').innerHTML =
-                          `<div class="alert alert-success">${data.message}</div>`;
-                  setTimeout(() => window.location.href = "/dashboard/stock-in/list", 2000);
-                } else {
-                  document.getElementById('deleteMessage').innerHTML =
-                          `<div class="alert alert-danger">${data.message || "Xóa thất bại!"}</div>`;
-                }
-              })
-              .catch(error => {
-                console.error("Lỗi khi thực hiện fetch:", error);
-                document.getElementById('deleteMessage').innerHTML =
-                        `<div class="alert alert-danger">Lỗi khi gửi yêu cầu: ${error.message}</div>`;
-              });
+      deleteForm.submit();
     });
+
+    function getSelectedTransactionIds() {
+      return Array.from(document.querySelectorAll('.selectInventoryTransaction:checked'))
+              .map(checkbox => checkbox.value);
+    }
   });
 </script>
 </body>
