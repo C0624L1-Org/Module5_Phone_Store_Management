@@ -210,42 +210,84 @@
                         <nav aria-label="Pagination">
                             <ul class="pagination mb-0">
                                 <!-- Nút Trang đầu - luôn hiển thị -->
-                                <li class="page-item" th:classappend="${stockInLists.number == 0} ? 'disabled'">
+                                <th:block th:if="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
                                     <a class="page-link"
-                                       th:href="@{/dashboard/admin/transactions/listIn/search(page=0, size=${stockInLists.size}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
+                                       th:href="@{/dashboard/admin/transactions/listIn(page=0, size=${stockInLists.size})}">
                                         Trang đầu
                                     </a>
+                                </th:block>
+                                <th:block th:unless="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                    <a class="page-link" th:href="@{/dashboard/admin/transactions/listIn/search(page=0, size=${stockInLists.size},
+                     productName=${param.productName}, supplierName=${param.supplierName},
+                     startDate=${param.startDate}, endDate=${param.endDate})}">
+                                        Trang đầu
+                                    </a>
+                                </th:block>
                                 </li>
 
                                 <!-- Nút Trước - luôn hiển thị -->
                                 <li class="page-item" th:classappend="${stockInLists.number == 0} ? 'disabled'">
-                                    <a class="page-link"
-                                       th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.number - 1}, size=${stockInLists.size}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </a>
+                                    <th:block th:if="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listIn(page=${stockInLists.number - 1}, size=${stockInLists.size})}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </th:block>
+                                    <th:block th:unless="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link" th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.number - 1}, size=${stockInLists.size},
+                     productName=${param.productName}, supplierName=${param.supplierName},
+                     startDate=${param.startDate}, endDate=${param.endDate})}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </th:block>
                                 </li>
-
-                                <!-- Hiển thị số trang hiện tại / tổng số trang -->
+                                <!-- Hiển thị số trang -->
                                 <li class="page-item active mx-2">
-                                    <span class="page-link">
-                                        <span th:text="${stockInLists.number + 1}"></span> / <span th:text="${stockInLists.totalPages}"></span>
-                                    </span>
+                                     <span class="page-link">
+                 <span th:text="${stockInLists.number + 1}"></span> / <span th:text="${stockInLists.totalPages}"></span>
+             </span>
                                 </li>
 
                                 <!-- Nút Tiếp - luôn hiển thị -->
                                 <li class="page-item" th:classappend="${stockInLists.number + 1 >= stockInLists.totalPages} ? 'disabled'">
-                                    <a class="page-link"
-                                       th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.number + 1}, size=${stockInLists.size}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
+                                    <th:block th:if="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listIn(page=${stockInLists.number + 1}, size=${stockInLists.size})}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </th:block>
+                                    <th:block th:unless="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link" th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.number + 1}, size=${stockInLists.size},
+                     productName=${param.productName}, supplierName=${param.supplierName},
+                     startDate=${param.startDate}, endDate=${param.endDate})}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </th:block>
                                 </li>
 
                                 <!-- Nút Trang cuối - luôn hiển thị -->
                                 <li class="page-item" th:classappend="${stockInLists.number + 1 >= stockInLists.totalPages} ? 'disabled'">
-                                    <a class="page-link"
-                                       th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.totalPages - 1}, size=${stockInLists.size}, productName=${param.productName}, supplierName=${param.supplierName}, startDate=${param.startDate}, endDate=${param.endDate})}">
-                                        Trang cuối
-                                    </a>
+                                    <th:block th:if="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/admin/transactions/listIn(page=${stockInLists.totalPages - 1}, size=${stockInLists.size})}">
+                                            Trang cuối
+                                        </a>
+                                    </th:block>
+                                    <th:block th:unless="${#strings.isEmpty(param.productName) and #strings.isEmpty(param.supplierName)
+                 and #strings.isEmpty(param.startDate) and #strings.isEmpty(param.endDate)}">
+                                        <a class="page-link" th:href="@{/dashboard/admin/transactions/listIn/search(page=${stockInLists.totalPages - 1}, size=${stockInLists.size},
+                     productName=${param.productName}, supplierName=${param.supplierName},
+                     startDate=${param.startDate}, endDate=${param.endDate})}">
+                                            Trang cuối
+                                        </a>
+                                    </th:block>
                                 </li>
                             </ul>
                         </nav>
