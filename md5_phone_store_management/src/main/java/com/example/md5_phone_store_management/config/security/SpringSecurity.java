@@ -51,7 +51,8 @@ public class SpringSecurity {
                                 "/register",
                                 "/clear-session",
                                 "/api/payment/**").permitAll()
-                        .requestMatchers("/dashboard/admin/**").hasRole("Admin")
+                        //                        phần kho
+                        .requestMatchers("/dashboard/admin/**").hasAnyRole("Admin","WarehouseStaff")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")
                         .anyRequest().authenticated()
                 )

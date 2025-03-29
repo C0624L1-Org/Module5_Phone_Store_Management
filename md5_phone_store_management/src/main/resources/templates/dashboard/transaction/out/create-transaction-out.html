@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm mới xuất kho</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+    <!-- Inline CSS -->
+    <style>
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .form-control:read-only {
+            background-color: #e9ecef;
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-save.disabled {
+            background: #d3d3d3;
+            color: #6c757d;
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
+        .btn-save.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-save.disabled::before {
+            content: "Vui lòng chọn sản phẩm để xuất";
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            white-space: nowrap;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .btn-save.disabled:hover::before {
+            opacity: 1;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-select-product {
+            transition: all 0.3s;
+        }
+
+        .btn-select-product.no-data {
+            background-color: #ffc107;
+            color: white;
+            cursor: pointer;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .btn-select-product.has-data {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .btn-select-product:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-select-product.no-data:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{common/toast}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="content-container">
+            <div class="container py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listOut}">Giao dịch Xuất kho</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thêm mới xuất kho</li>
+                    </ol>
+                </nav>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="form-section mb-4">
+                            <div class="form-header">
+                                <h3 class="mb-0">
+                                    <i class="fas fa-warehouse me-2"></i>
+                                    Thêm mới xuất kho
+                                </h3>
+                                <p class="text-white-50 mt-2 mb-0">Nhập thông tin xuất kho</p>
+                            </div>
+
+                            <div class="p-4">
+
+                                <form th:action="@{/dashboard/admin/transactions/saveNew}" method="post"
+                                      th:object="${inventoryTransaction}" class="needs-validation" novalidate>
+                                    <div class="row">
+                                        <!-- Chọn sản phẩm -->
+                                        <div class="col-12 mb-3" th:classappend="${product != null} ? 'd-none' : ''">
+                                            <label for="productId" class="form-label">
+                                                <i class="fas fa-box me-2"></i>Chọn sản phẩm
+                                            </label>
+                                            <div>
+                                                <a id="selectProductButton"
+                                                   th:href="@{/dashboard/admin/transactions/choose/out/product/add/0}"
+                                                   class="btn btn-lg fw-bold px-4 py-2 btn-select-product no-data">
+                                                    <i class="fas fa-search me-2"></i> Nhấn để chọn sản phẩm cần xuất!
+                                                </a>
+                                            </div>
+                                            <input type="hidden" id="productId" name="productId" th:value="${product != null ? product.productID : ''}">
+                                            <div class="text-danger" id="productIdError"></div>
+                                        </div>
+
+                                        <!-- Thông tin sản phẩm nếu id != 0 -->
+                                        <div class="col-12 mb-3" th:if="${product != null}">
+                                            <label class="form-label">
+                                                <i class="fas fa-box me-2"></i>Sản phẩm đã chọn
+                                            </label>
+                                            <div>
+                                                <button class="btn btn-select-product has-data" disabled>
+                                                    <i class="fas fa-check me-2"></i> Đã chọn: <span th:text="${product.name}"></span>
+                                                </button>
+                                                <a th:href="@{/dashboard/admin/transactions/new/out/0}"
+                                                   class="btn btn-warning ms-2">
+                                                    <i class="fas fa-redo me-2"></i> Chọn lại sản phẩm
+                                                </a>
+                                            </div>
+                                            <!-- Không cần input này nữa -->
+                                        </div>
+
+                                        <!-- Tên sản phẩm -->
+                                        <div class="col-12 mb-3">
+                                            <label for="productName" class="form-label">
+                                                <i class="fas fa-tag me-2"></i>Tên sản phẩm
+                                            </label>
+                                            <input type="text" class="form-control" id="productName" name="productName"
+                                                   th:value="${product != null ? product.name : ''}" readonly
+                                                   placeholder="Chưa chọn sản phẩm">
+                                        </div>
+
+                                        <!-- Tên nhà cung cấp -->
+                                        <div class="col-12 mb-3">
+                                            <label for="supplierName" class="form-label">
+                                                <i class="fas fa-building me-2"></i>Tên nhà cung cấp
+                                            </label>
+                                            <input type="text" class="form-control" id="supplierName" name="supplierName"
+                                                   th:value="${product != null ? product.supplier.name : ''}" readonly
+                                                   placeholder="Chưa chọn sản phẩm">
+                                        </div>
+
+                                        <!-- Số lượng còn lại -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="stockQuantity" class="form-label">
+                                                <i class="fas fa-cubes me-2"></i>Số lượng còn lại
+                                            </label>
+                                            <input type="number" class="form-control" id="stockQuantity" name="stockQuantity"
+                                                   th:value="${product != null ? product.stockQuantity : ''}" readonly
+                                                   placeholder="Chưa chọn sản phẩm">
+                                        </div>
+
+                                        <!-- Số lượng xuất -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="quantity" class="form-label">
+                                                <i class="fas fa-truck-loading me-2"></i>Số lượng xuất
+                                            </label>
+                                            <input type="number" class="form-control" id="quantity" name="quantity"
+                                                   th:value="${inventoryTransaction.quantity}" min="1" required
+                                                   th:disabled="${product != null and product.stockQuantity == 0}">
+                                            <div class="invalid-feedback" id="quantityFeedback"></div>
+                                            <div class="text-danger" id="quantityError"></div>
+                                        </div>
+
+
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="productPrice" class="form-label">
+                                                <i class="fas fa-dollar-sign me-2"></i>Giá sản phẩm
+                                            </label>
+                                            <input type="text" class="form-control" id="productPrice" name="productPrice"
+                                                   th:value="${product != null && product.sellingPrice != null ? #numbers.formatDecimal(product.sellingPrice, 0, 'COMMA', 0, 'POINT') + ' đ' : 'N/A'}"
+                                                   readonly>
+                                        </div>
+
+
+                                        <!-- Tổng thanh toán -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="totalAmount" class="form-label">
+                                                <i class="fas fa-money-bill-wave me-2"></i>Tổng thanh toán
+                                            </label>
+                                            <input type="text" class="form-control" id="totalAmount" name="totalAmount" readonly>
+                                        </div>
+
+
+                                        <input type="hidden" name="type" value="OUT">
+                                    </div>
+
+                                    <div class="d-flex justify-content-end mt-4 gap-2">
+                                        <button type="button" class="btn btn-cancel" data-bs-toggle="modal"
+                                                data-bs-target="#confirmCancelModal">
+                                            <i class="fas fa-times me-2"></i>Thoát
+                                        </button>
+                                        <button type="button" class="btn btn-save" id="saveButton"
+                                                th:classappend="${product == null} ? 'disabled'" th:disabled="${product == null}">
+                                            <i class="fas fa-save me-2"></i>Lưu
+                                        </button>
+                                    </div>
+                                </form>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- Modal Xác Nhận Lưu -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmSaveLabel">Xác nhận lưu thông tin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn lưu thông tin xuất kho này?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-success" id="confirmSave">Xác nhận lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xác Nhận Thoát -->
+<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmCancelLabel">Xác nhận thoát</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn thoát? Dữ liệu chưa lưu sẽ bị mất.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+                <a th:href="@{/dashboard/admin/transactions/listOut}" class="btn btn-danger">Xác nhận thoát</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function formatVND(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VND";
+    }
+
+    // Hàm kiểm tra và cập nhật trạng thái nút Lưu
+    function updateSaveButtonState() {
+        const saveButton = document.getElementById("saveButton");
+        const quantityInput = document.getElementById("quantity");
+        const stockQuantity = parseInt(document.getElementById("stockQuantity")?.value) || 0;
+        const exportQuantity = parseInt(quantityInput.value) || 0;
+        const hasProduct = document.getElementById("productId")?.value !== "";
+
+        if (!hasProduct) {
+            saveButton.classList.add("disabled");
+            saveButton.disabled = true;
+        } else {
+            if (exportQuantity > 0 && exportQuantity <= stockQuantity) {
+                saveButton.classList.remove("disabled");
+                saveButton.disabled = false;
+            } else {
+                saveButton.classList.add("disabled");
+                saveButton.disabled = true;
+            }
+        }
+    }
+
+    document.getElementById("saveButton").addEventListener("click", function () {
+        if (!this.disabled) {
+            const form = document.querySelector("form");
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+            const modal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+            modal.show();
+        }
+    });
+
+    document.getElementById("confirmSave").addEventListener("click", function () {
+        const form = document.querySelector("form");
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            var modal = bootstrap.Modal.getInstance(document.getElementById('confirmSaveModal'));
+            modal.hide();
+            return;
+        }
+        form.submit();
+    });
+
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+
+    document.getElementById("quantity").addEventListener("input", function () {
+        const stockQuantity = parseInt(document.getElementById("stockQuantity")?.value) || 0;
+        const exportQuantity = parseInt(this.value) || 0;
+        const productPriceString = document.getElementById("productPrice")?.value || "0";
+        const hasProduct = document.getElementById("productId")?.value !== "";
+
+        function convertVNDToNumber(vndString) {
+            const numberString = vndString.replace(/\./g, '').replace(/,/g, '').replace(/đ/g, '').trim();
+            return parseFloat(numberString) || 0;
+        }
+
+        const productPrice = convertVNDToNumber(productPriceString);
+        const totalAmountField = document.getElementById("totalAmount");
+        const quantityError = document.getElementById("quantityError");
+        const quantityFeedback = document.getElementById("quantityFeedback");
+
+        if (this.value !== "") {
+            if (!hasProduct) {
+                this.setCustomValidity("Vui lòng chọn sản phẩm trước");
+                quantityError.textContent = "Vui lòng chọn sản phẩm trước";
+                quantityFeedback.textContent = "Vui lòng chọn sản phẩm trước";
+            } else if (stockQuantity === 0) {
+                this.setCustomValidity("Sản phẩm đã hết hàng, không thể xuất kho");
+                quantityError.textContent = "Sản phẩm đã hết hàng, không thể xuất kho";
+                quantityFeedback.textContent = "Sản phẩm đã hết hàng, không thể xuất kho";
+            } else if (exportQuantity <= 0) {
+                this.setCustomValidity("Số lượng xuất phải lớn hơn 0");
+                quantityError.textContent = "Số lượng xuất phải lớn hơn 0";
+                quantityFeedback.textContent = "Số lượng xuất phải lớn hơn 0";
+            } else if (exportQuantity > stockQuantity) {
+                this.setCustomValidity("Vui lòng nhập số lượng ít hơn hoặc bằng số lượng tồn kho");
+                quantityError.textContent = "Vui lòng nhập số lượng ít hơn hoặc bằng số lượng tồn kho";
+                quantityFeedback.textContent = "Vui lòng nhập số lượng ít hơn hoặc bằng số lượng tồn kho";
+            } else {
+                this.setCustomValidity("");
+                quantityError.textContent = "";
+                quantityFeedback.textContent = "";
+            }
+        } else {
+            this.setCustomValidity("");
+            quantityError.textContent = "";
+            quantityFeedback.textContent = "";
+        }
+
+        const totalAmount = productPrice * exportQuantity;
+        totalAmountField.value = hasProduct && exportQuantity > 0 && exportQuantity <= stockQuantity ? formatVND(totalAmount) : "";
+
+        updateSaveButtonState();
+    });
+
+    // Gọi hàm khi trang được tải để thiết lập trạng thái ban đầu
+    document.addEventListener("DOMContentLoaded", function() {
+        updateSaveButtonState();
+    });
+</script>
+</body>
+</html>

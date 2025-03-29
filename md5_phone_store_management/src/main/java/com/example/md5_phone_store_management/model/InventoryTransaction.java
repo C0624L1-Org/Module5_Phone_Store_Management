@@ -28,30 +28,19 @@ public class InventoryTransaction {
     private BigDecimal purchasePrice = BigDecimal.ZERO;
 
     @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime transactionDate ;
+    private LocalDateTime transactionDate = LocalDateTime.now();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "supplierID", foreignKey = @ForeignKey(name = "FK_Supplier"))
     private Supplier supplier;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "employeeID", foreignKey = @ForeignKey(name = "FK_Employee"))
     private Employee employee;
 
+    // Cột totalPrice lưu vào database
     @Column(precision = 12, scale = 2)
     private BigDecimal totalPrice;
-
-    @PrePersist
-    @PreUpdate
-    private void updateValuesFromProduct() {
-        // Chỉ áp dụng cho xuất kho, không ghi đè khi nhập kho
-        if (transactionType == TransactionType.OUT && product != null) {
-            this.quantity = product.getStockQuantity();
-            this.purchasePrice = product.getPurchasePrice();
-            this.totalPrice = purchasePrice.multiply(BigDecimal.valueOf(quantity));
-        }
-    }
-
 
     // Getters and Setters
     public Integer getTransactionID() {
@@ -68,7 +57,6 @@ public class InventoryTransaction {
 
     public void setProduct(Product product) {
         this.product = product;
-        updateValuesFromProduct();
     }
 
     public TransactionType getTransactionType() {
@@ -83,12 +71,25 @@ public class InventoryTransaction {
         return quantity;
     }
 
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+
+    }
+
     public BigDecimal getPurchasePrice() {
         return purchasePrice;
     }
 
+    public void setPurchasePrice(BigDecimal purchasePrice) {
+        this.purchasePrice = purchasePrice;
+    }
+
     public BigDecimal getTotalPrice() {
         return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice; // Lưu trực tiếp từ FE
     }
 
     public LocalDateTime getTransactionDate() {
@@ -113,17 +114,5 @@ public class InventoryTransaction {
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public void setPurchasePrice(BigDecimal price) {
-        this.purchasePrice = price;
     }
 }
