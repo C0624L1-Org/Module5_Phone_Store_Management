@@ -218,59 +218,62 @@
                     </div>
 
 
+                    <div th:if="${!#lists.isEmpty(inventoryTransactions)}"
+                         class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                        <button id="deleteSelected" class="btn btn-danger" disabled>
+                            <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
+                        </button>
 
+                        <!-- Pagination -->
+                        <nav aria-label="Pagination">
+                            <ul class="pagination mb-0">
+                                <!-- Trang đầu -->
+                                <li class="page-item"
+                                    th:classappend="${inventoryTransactions.number == 0} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/transactions/listOut/search(page=0, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                                        Trang đầu
+                                    </a>
+                                </li>
 
-                        <div th:if="${!#lists.isEmpty(inventoryTransactions)}"
-                             class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
-                            <button id="deleteSelected" class="btn btn-danger" disabled>
-                                <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
-                            </button>
+                                <!-- Trang trước -->
+                                <li class="page-item"
+                                    th:classappend="${inventoryTransactions.number == 0} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/transactions/listOut/search(page=${inventoryTransactions.number - 1}, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
 
-                            <!-- Pagination -->
-                            <nav aria-label="Pagination">
-                                <ul class="pagination mb-0">
-                                    <!-- Trang đầu -->
-                                    <li class="page-item" th:classappend="${inventoryTransactions.number == 0} ? 'disabled'">
-                                        <a class="page-link"
-                                           th:href="@{/dashboard/admin/transactions/listOut/search(page=0, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
-                                            Trang đầu
-                                        </a>
-                                    </li>
-
-                                    <!-- Trang trước -->
-                                    <li class="page-item" th:classappend="${inventoryTransactions.number == 0} ? 'disabled'">
-                                        <a class="page-link"
-                                           th:href="@{/dashboard/admin/transactions/listOut/search(page=${inventoryTransactions.number - 1}, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
-                                            <i class="fas fa-chevron-left"></i>
-                                        </a>
-                                    </li>
-
-                                    <!-- Trang hiện tại -->
-                                    <li class="page-item active mx-2">
+                                <!-- Trang hiện tại -->
+                                <li class="page-item active mx-2">
         <span class="page-link">
-            <span th:text="${inventoryTransactions.number + 1}"></span> / <span th:text="${inventoryTransactions.totalPages}"></span>
+            <span th:text="${inventoryTransactions.number + 1}"></span> / <span
+                th:text="${inventoryTransactions.totalPages}"></span>
         </span>
-                                    </li>
+                                </li>
 
-                                    <!-- Trang sau -->
-                                    <li class="page-item" th:classappend="${inventoryTransactions.number + 1 >= inventoryTransactions.totalPages} ? 'disabled'">
-                                        <a class="page-link"
-                                           th:href="@{/dashboard/admin/transactions/listOut/search(page=${inventoryTransactions.number + 1}, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
-                                            <i class="fas fa-chevron-right"></i>
-                                        </a>
-                                    </li>
+                                <!-- Trang sau -->
+                                <li class="page-item"
+                                    th:classappend="${inventoryTransactions.number + 1 >= inventoryTransactions.totalPages} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/transactions/listOut/search(page=${inventoryTransactions.number + 1}, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
 
-                                    <!-- Trang cuối -->
-                                    <li class="page-item" th:classappend="${inventoryTransactions.number + 1 >= inventoryTransactions.totalPages} ? 'disabled'">
-                                        <a class="page-link"
-                                           th:href="@{/dashboard/admin/transactions/listOut/search(page=${inventoryTransactions.totalPages - 1}, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
-                                            Trang cuối
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </div>
+                                <!-- Trang cuối -->
+                                <li class="page-item"
+                                    th:classappend="${inventoryTransactions.number + 1 >= inventoryTransactions.totalPages} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/admin/transactions/listOut/search(page=${inventoryTransactions.totalPages - 1}, size=5, productName=${productName}, supplierName=${supplierName}, startDate=${startDate}, endDate=${endDate})}">
+                                        Trang cuối
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
+                </div>
 
                 </div>
 

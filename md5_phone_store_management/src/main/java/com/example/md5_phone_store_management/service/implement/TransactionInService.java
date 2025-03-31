@@ -222,6 +222,9 @@ public class TransactionInService implements ITransactionInService {
     public InventoryTransaction findById(Integer id) {
         return inventoryTransactionInRepo.findById(id).get();
     }
+    public InventoryTransaction findByInventoryTransactionId(Integer id){
+        return inventoryTransactionInRepo.getByTransactionID(id,TransactionType.IN);
+    }
 
 
 

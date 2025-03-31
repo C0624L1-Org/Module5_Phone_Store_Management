@@ -10,9 +10,13 @@ import com.example.md5_phone_store_management.service.implement.CustomUserDetail
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +32,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -99,16 +105,6 @@ public class InTransactionController {
         return modelAndView;
     }
 
-    @GetMapping("/admin/transaction/delete")
-    public String deleteCustomers(@RequestParam List<Integer> ids, HttpSession session) {
-        for (Integer transactionID : ids) {
-            transactionInService.deleteOutTransaction(transactionID);
-        }
-        session.setAttribute("SUCCESS_MESSAGE", "Đã Xóa " + ids.size() + " lịch sử giao dịch!");
-        return "redirect:/dashboard/admin/transactions/listIn";
-    }
-
-
     @GetMapping("/admin/transactions/new/in/{id}")
     public String showAddInTransaction(@PathVariable("id") Long id, Model model, HttpSession session) {
         List<Product> products = productService.findAllWithOutPageable();
@@ -138,8 +134,14 @@ public class InTransactionController {
 
         return "dashboard/transaction/in/create-transaction-in";
     }
-
-
+    @GetMapping("/admin/transactions/view/{id}")
+public ModelAndView showEditInTransaction(@PathVariable("id") Integer id) {
+        ModelAndView modelAndView = new ModelAndView("dashboard/transaction/in/view-in");
+        modelAndView.addObject("InventoryTransaction", transactionInService.findByInventoryTransactionId(id));
+        modelAndView.addObject("products", productService.findAllProducts());
+        modelAndView.addObject("suppliers", supplierService.getSupplierList());
+        return modelAndView;
+    }
     @PostMapping("/admin/transaction/saveNew")
     public String processImport(
             @Valid @ModelAttribute("inventoryTransaction") InventoryTransaction transaction,
@@ -266,6 +268,36 @@ public class InTransactionController {
         } catch (Exception e) {
             session.setAttribute("ERROR_MESSAGE", "Có lỗi xảy ra khi cập nhật giao dịch: " + e.getMessage());
             return "redirect:/dashboard/admin/transactions/new/in/0";
+        }
+    }
+    @PostMapping("/admin/transactions/listIn/delete")
+    @PreAuthorize("hasAnyRole('Admin', 'WarehouseStaff')")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> deleteImportTransactions(
+            @RequestBody Map<String, List<Integer>> requestBody) {
+        Map<String, String> response = new HashMap<>();
+
+        List<Integer> ids = requestBody.get("ids");
+
+        if (ids == null || ids.isEmpty()) {
+            response.put("success", "false");
+            response.put("message", "Vui lòng chọn ít nhất một giao dịch để xóa.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+           transactionInService.deleteImportTransactions(ids);
+            response.put("success", "true");
+            response.put("message", "Xóa giao dịch thành công!");
+            return ResponseEntity.ok(response);
+        } catch (DataAccessException e) {
+            response.put("success", "false");
+            response.put("message", "Không thể xóa do lỗi dữ liệu.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        } catch (Exception e) {
+            response.put("success", "false");
+            response.put("message", "Lỗi hệ thống khi xóa giao dịch.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

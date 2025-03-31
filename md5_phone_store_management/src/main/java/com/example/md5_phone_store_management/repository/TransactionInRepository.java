@@ -60,4 +60,6 @@ public interface TransactionInRepository extends JpaRepository<InventoryTransact
 
     @Query("SELECT i FROM InventoryTransaction i WHERE i.product.qrCode = :qrCode")
     InventoryTransaction findByQRCode(@Param("qrCode") String qrCode);
+    @Query("SELECT i FROM InventoryTransaction i WHERE i.transactionID = :id AND i.transactionType = :transactionType")
+    InventoryTransaction getByTransactionID(@Param("id") Integer id, @Param("transactionType") TransactionType transactionType);
 }

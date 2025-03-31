@@ -39,6 +39,9 @@ public class Invoice {
     public Invoice() {
     }
 
+    
+
+    
     public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, String bankCode, String payDate, String transactionNo, String cardType, Customer customer, List<InvoiceDetail> invoiceDetailList) {
         this.id = id;
         this.vnp_TxnRef = vnp_TxnRef;
