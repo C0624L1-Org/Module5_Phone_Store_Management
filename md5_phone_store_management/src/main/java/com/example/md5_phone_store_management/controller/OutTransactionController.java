@@ -89,6 +89,8 @@ public class OutTransactionController {
             Model model,
             HttpSession session) {
 
+        System.out.println(" tên lồn là : " + productName);
+
         // Validate and set default values if parameters are null
         stockSort = stockSort == null ? "" : (stockSort.equals("u") ? "ASC" : (stockSort.equals("d") ? "DESC" : ""));
         priceSort = priceSort == null ? "" : (priceSort.equals("u") ? "ASC" : (priceSort.equals("d") ? "DESC" : ""));
@@ -224,7 +226,6 @@ public class OutTransactionController {
                 return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
             }
             oldProduct.setStockQuantity(oldProduct.getStockQuantity() + oldInventoryTransaction.getQuantity());
-            productService.saveProduct(oldProduct);
 
             // Kiểm tra sản phẩm mới
             if (newTransaction.getProduct() == null || newTransaction.getProduct().getProductID() == null) {
@@ -243,7 +244,6 @@ public class OutTransactionController {
                 return "redirect:/dashboard/admin/transactions/Out/edit/" + oldTransactionID + "/0";
             }
             newProduct.setStockQuantity(newProduct.getStockQuantity() - newTransaction.getQuantity());
-            productService.saveProduct(newProduct);
 
             // Tạo giao dịch mới
             InventoryTransaction updatedTransaction = new InventoryTransaction();
@@ -456,7 +456,6 @@ public class OutTransactionController {
         if (optionalProduct.isPresent()) {
 //            set lại sl
             product.setStockQuantity(product.getStockQuantity() - transaction.getQuantity());
-            productService.saveProduct(product);
 
 //            lấy giá và số lượng xuất để lưu tổng
             transaction.setProduct(product);
