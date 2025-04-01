@@ -25,7 +25,7 @@ public class VNPayService {
     @Autowired
     private VNPayConfig vnPayConfig;
 
-    public String createPaymentUrl(Long orderId, double amount, String orderInfo) throws UnsupportedEncodingException {
+    public String createPaymentUrl(Long invoiceId, double amount, String orderInfo) throws UnsupportedEncodingException {
         String vnpUrl = vnPayConfig.getVnpUrl();
         String vnpMerchantId = vnPayConfig.getVnpMerchantId();
         String vnpSecretKey = vnPayConfig.getVnpSecretKey();
@@ -35,7 +35,7 @@ public class VNPayService {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnpCreateDate = formatter.format(cld.getTime());
 
-        String vnpTxnRef = String.valueOf(orderId);
+        String vnpTxnRef = String.valueOf(invoiceId);
 
         Map<String, String> vnpParams = new HashMap<>();
         vnpParams.put("vnp_Version", "2.1.0");

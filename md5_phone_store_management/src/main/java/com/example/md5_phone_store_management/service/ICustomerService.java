@@ -10,19 +10,20 @@ public interface ICustomerService {
 
     Integer countTotalCustomers();
 
+    Integer countCustomersWithPurchases();
+
     Page<Customer> searchCustomers(String name, String phone, String gender, Pageable pageable);
-    
-    /**
-     * Tìm kiếm khách hàng theo tên HOẶC số điện thoại HOẶC email (OR logic)
-     */
-    Page<Customer> searchCustomersByNameOrPhoneOrEmail(String name, String phone, String email, Pageable pageable);
 
     Customer findCustomerById(Integer id);
 
-    Customer saveCustomer(Customer customer);
-
     // Phương thức cập nhật trực tiếp số lần mua hàng
     void updatePurchaseCount(Integer customerId, int newCount);
+
+    // customer có purchaseCount > 0
+    Page<Customer> findCustomersWithPurchases(Pageable pageable);
+
+    Page<Customer> searchCustomerWithPurchases(String name, String phone, String email, Pageable pageable);
+
 }
 
 

@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.md5_phone_store_management.model.Invoice;
+import com.example.md5_phone_store_management.model.InvoiceStatus;
 import com.example.md5_phone_store_management.model.dto.PaymentResDTO;
+import com.example.md5_phone_store_management.service.IInvoiceService;
 import com.example.md5_phone_store_management.service.VNPayService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,15 +28,30 @@ public class VNPayController {
     @Autowired
     private VNPayService vnPayService;
 
+    @Autowired
+    private IInvoiceService iInvoiceService;
+
     // API endpoint for direct integration from JavaScript
     @PostMapping("/create-payment")
     @ResponseBody
     public ResponseEntity<PaymentResDTO> createPayment(@RequestBody Map<String, Object> request) throws UnsupportedEncodingException {
-        Long orderId = Long.parseLong(request.get("orderId").toString());
+        Long invoiceId = Long.parseLong(request.get("invoiceId").toString());
         double amount = Double.parseDouble(request.get("amount").toString());
         String orderInfo = request.get("orderInfo").toString();
 
-        String paymentUrl = vnPayService.createPaymentUrl(orderId, amount, orderInfo);
+        // Đặt trạng thái của hóa đơn là PROCESSING khi bắt đầu quá trình thanh toán
+        try {
+            Invoice invoice = iInvoiceService.findById(invoiceId);
+            if (invoice != null) {
+                invoice.setStatus(InvoiceStatus.PROCESSING);
+                iInvoiceService.saveInvoice(invoice);
+                System.out.println("Invoice " + invoiceId + " set to PROCESSING state");
+            }
+        } catch (Exception e) {
+            System.err.println("Error setting invoice to PROCESSING state: " + e.getMessage());
+        }
+
+        String paymentUrl = vnPayService.createPaymentUrl(invoiceId, amount, orderInfo);
 
         PaymentResDTO response = new PaymentResDTO();
         response.setStatus("Ok");
@@ -46,16 +64,43 @@ public class VNPayController {
     // Endpoint for direct access from session data
     @GetMapping("/create-direct-payment")
     public String createDirectPayment(HttpSession session) throws UnsupportedEncodingException {
-        Long orderId = (Long) session.getAttribute("orderId");
+        // Log thông tin session để debug
+        System.out.println("Session attributes: " + session.getAttributeNames().asIterator());
+        
+        Long invoiceId = (Long) session.getAttribute("invoiceId");
         BigDecimal amount = (BigDecimal) session.getAttribute("totalAmount");
-        String orderInfo = "Thanh toan don hang #" + orderId;
-
-        if (orderId == null || amount == null) {
+        
+        System.out.println("Invoice ID from session: " + invoiceId);
+        System.out.println("Amount from session: " + amount);
+        
+        if (invoiceId == null || amount == null) {
+            System.err.println("Missing payment data: invoiceId=" + invoiceId + ", amount=" + amount);
             return "redirect:/dashboard/sales/form?error=missing_payment_data";
         }
-
-        String paymentUrl = vnPayService.createPaymentUrl(orderId, amount.doubleValue(), orderInfo);
-        return "redirect:" + paymentUrl;
+        
+        String orderInfo = "Thanh toan hoa don #" + invoiceId;
+        
+        // Đặt trạng thái của hóa đơn là PROCESSING khi bắt đầu quá trình thanh toán
+        try {
+            Invoice invoice = iInvoiceService.findById(invoiceId);
+            if (invoice != null) {
+                invoice.setStatus(InvoiceStatus.PROCESSING);
+                iInvoiceService.saveInvoice(invoice);
+                System.out.println("Invoice " + invoiceId + " set to PROCESSING state");
+            }
+        } catch (Exception e) {
+            System.err.println("Error setting invoice to PROCESSING state: " + e.getMessage());
+        }
+        
+        try {
+            String paymentUrl = vnPayService.createPaymentUrl(invoiceId, amount.doubleValue(), orderInfo);
+            System.out.println("Generated payment URL: " + paymentUrl);
+            return "redirect:" + paymentUrl;
+        } catch (Exception e) {
+            System.err.println("Error creating payment URL: " + e.getMessage());
+            e.printStackTrace();
+            return "redirect:/dashboard/sales/form?error=payment_url_error";
+        }
     }
 
     // Payment callback endpoint - redirects đến SalesController để xử lý

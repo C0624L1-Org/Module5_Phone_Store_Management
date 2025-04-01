@@ -116,6 +116,14 @@ public class CustomerController {
         return "dashboard/admin/customers/customer-invoices";
     }
 
+    // Của Tân
+    @GetMapping("/sales/create-customer")
+    public String createCustomer(Model model) {
+        model.addAttribute("customer", new Customer());
+        return "dashboard/sales/form";
+    }
+
+
 
     @GetMapping("/admin/customers/search")
     public ModelAndView searchCustomers(

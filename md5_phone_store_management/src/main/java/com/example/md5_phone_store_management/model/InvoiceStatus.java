@@ -1,17 +1,18 @@
 package com.example.md5_phone_store_management.model;
 
-public enum Gender {
-    Male("Nam"),
-    Female("Nữ"),
-    Other("Khác"),;
+public enum InvoiceStatus {
+    
+    SUCCESS("Thành công"),
+    FAILED("Thất bại"),
+    PROCESSING("Đang xử lý");
 
     private final String label;
 
-    Gender(String label) {
+    InvoiceStatus(String label) {
         this.label = label;
     }
 
     public String getLabel() {
         return label;
     }
-}
+} 

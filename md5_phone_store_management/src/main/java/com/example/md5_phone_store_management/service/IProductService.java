@@ -53,5 +53,6 @@ public interface IProductService {
 
     Product findById(Integer id);
 
+    Page<Product> searchProductsByKeyword(String keyword, Pageable pageable);
 
 }

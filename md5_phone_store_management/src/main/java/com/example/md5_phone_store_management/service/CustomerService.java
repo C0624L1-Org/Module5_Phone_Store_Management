@@ -1,19 +1,19 @@
 package com.example.md5_phone_store_management.service;
 
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.repository.CustomerRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.example.md5_phone_store_management.model.Customer;
+import com.example.md5_phone_store_management.repository.CustomerRepository;
 
 @Service
 public class CustomerService {
 
     @Autowired
     private CustomerRepository customerRepository;
-
 
     public List<Customer> findAllCustomers() {
         return customerRepository.findAll();
@@ -55,6 +55,10 @@ public class CustomerService {
     public List<Customer> searchCustomers(String name, String phone, String gender) {
         return customerRepository.searchCustomers( name,  phone,  gender);
     }
-
+    
+    // Lấy danh sách khách hàng có lịch sử mua hàng (purchaseCount > 0)
+    public List<Customer> getCustomersWithPurchases() {
+        return customerRepository.findCustomersWithPurchases();
+    }
 
 }
