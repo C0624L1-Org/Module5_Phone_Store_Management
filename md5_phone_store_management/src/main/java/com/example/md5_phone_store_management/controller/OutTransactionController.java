@@ -89,7 +89,6 @@ public class OutTransactionController {
             Model model,
             HttpSession session) {
 
-        System.out.println(" tên lồn là : " + productName);
 
         // Validate and set default values if parameters are null
         stockSort = stockSort == null ? "" : (stockSort.equals("u") ? "ASC" : (stockSort.equals("d") ? "DESC" : ""));
