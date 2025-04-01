@@ -1,12 +1,9 @@
 package com.example.md5_phone_store_management.controller;
 
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Employee;
-import com.example.md5_phone_store_management.model.Gender;
-import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.model.Role;
+import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
 import com.example.md5_phone_store_management.service.CustomerService;
+import com.example.md5_phone_store_management.service.IInvoiceDetailService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
 import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
 import jakarta.servlet.http.HttpSession;
@@ -37,6 +34,9 @@ public class CustomerController {
 
     @Autowired
     private IInvoiceService invoiceService;
+
+    @Autowired
+    private IInvoiceDetailService invoiceDetailService;
 
 
     @GetMapping("/admin/customers/list")
@@ -181,6 +181,42 @@ public class CustomerController {
             }
         }
         return mv;
+    }
+
+    @GetMapping("admin/customers/invoice/list")
+    public String invoiceDetailList(Model model, @RequestParam(name = "page",defaultValue="0") int page){
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<InvoiceDetail> invoiceDetailList = invoiceDetailService.findAll(pageable);
+
+        model.addAttribute("invoiceDetailList", invoiceDetailList);
+        return "dashboard/invoice/invoice_detail_list";
+    }
+
+    @GetMapping("admin/customers/invoice/sortName")
+    public String invoiceSortName(Model model, @RequestParam(name = "page",defaultValue="0") int page){
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<InvoiceDetail> invoiceDetailList = invoiceDetailService.sortByCustomerFullName(pageable);
+
+        model.addAttribute("invoiceDetailList", invoiceDetailList);
+        return "dashboard/invoice/invoice_detail_list";
+    }
+
+    @GetMapping("admin/customers/invoice/sortProduct")
+    public String invoiceSortProduct(Model model, @RequestParam(name = "page",defaultValue="0") int page){
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<InvoiceDetail> invoiceDetailList = invoiceDetailService.sortByProductName(pageable);
+
+        model.addAttribute("invoiceDetailList", invoiceDetailList);
+        return "dashboard/invoice/invoice_detail_list";
+    }
+
+    @GetMapping("admin/customers/invoice/sortPrice")
+    public String invoiceSortPrice(Model model, @RequestParam(name = "page",defaultValue="0") int page){
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<InvoiceDetail> invoiceDetailList = invoiceDetailService.sortByPrice(pageable);
+
+        model.addAttribute("invoiceDetailList", invoiceDetailList);
+        return "dashboard/invoice/invoice_detail_list";
     }
 
 

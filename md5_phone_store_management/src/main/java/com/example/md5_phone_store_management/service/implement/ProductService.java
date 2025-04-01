@@ -20,11 +20,37 @@ import com.example.md5_phone_store_management.service.IProductService;
 @Service
 @Transactional
 public class ProductService implements IProductService {
+
+
     @Autowired
     IProductRepository productRepository;
 
     @Autowired
     CloudinaryService cloudinaryService;
+
+    public List<Product> searchProductToChoose(
+            String productName,
+            String supplierName,
+            String stockSort,
+            String priceSort,
+            String inStockStatus
+    ) {
+        return productRepository.searchProductToChoose(
+                productName,
+                supplierName,
+                stockSort,
+                priceSort,
+                inStockStatus
+        );
+    }
+
+
+    @Override
+    public List<Product> findAllWithOutPageable() {
+        return productRepository.findAllWithOutPageable();
+    }
+
+
     // Đình Anh
     @Override
     public void saveProduct(Product product) {

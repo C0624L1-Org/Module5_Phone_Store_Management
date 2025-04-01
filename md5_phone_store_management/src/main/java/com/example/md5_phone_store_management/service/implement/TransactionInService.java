@@ -2,10 +2,10 @@ package com.example.md5_phone_store_management.service.implement;
 
 import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.repository.IEmployeeRepository;
-import com.example.md5_phone_store_management.repository.IInventoryTransactionInRepo;
-import com.example.md5_phone_store_management.repository.ISupplierRepository;
 import com.example.md5_phone_store_management.repository.IProductRepository;
-import com.example.md5_phone_store_management.service.IInventoryTransactionService;
+import com.example.md5_phone_store_management.repository.ISupplierRepository;
+import com.example.md5_phone_store_management.repository.TransactionInRepository;
+import com.example.md5_phone_store_management.service.ITransactionInService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,13 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-public class InventoryTransactionService implements IInventoryTransactionService {
-
+public class TransactionInService implements ITransactionInService {
     @Autowired
-    private IInventoryTransactionInRepo inventoryTransactionInRepo;
+    private TransactionInRepository inventoryTransactionInRepo;
 
     @Autowired
     private ISupplierRepository supplierRepository;
@@ -31,6 +31,86 @@ public class InventoryTransactionService implements IInventoryTransactionService
 
     @Autowired
     private IEmployeeRepository employeeRepository;
+
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+
+
+    @Override
+    public InventoryTransaction save(InventoryTransaction transaction) {
+        return inventoryTransactionInRepo.save(transaction);
+    }
+
+
+
+
+    @Override
+    public void editTransactionById(int transactionId, InventoryTransaction updatedTransaction) {
+        InventoryTransaction existingTransaction = findById(transactionId);
+
+        // Update only the fields provided by the updatedTransaction
+        if (updatedTransaction.getProduct() != null) {
+            existingTransaction.setProduct(updatedTransaction.getProduct());
+        }
+        if (updatedTransaction.getTransactionType() != null) {
+            existingTransaction.setTransactionType(updatedTransaction.getTransactionType());
+        }
+        if (updatedTransaction.getQuantity() != null) {
+            existingTransaction.setQuantity(updatedTransaction.getQuantity());
+        }
+        if (updatedTransaction.getPurchasePrice() != null) {
+            existingTransaction.setPurchasePrice(updatedTransaction.getPurchasePrice());
+        }
+        if (updatedTransaction.getTotalPrice() != null) {
+            existingTransaction.setTotalPrice(updatedTransaction.getTotalPrice());
+        }
+        if (updatedTransaction.getTransactionDate() != null) {
+            existingTransaction.setTransactionDate(updatedTransaction.getTransactionDate());
+        }
+        if (updatedTransaction.getSupplier() != null) {
+            existingTransaction.setSupplier(updatedTransaction.getSupplier());
+        }
+        if (updatedTransaction.getEmployee() != null) {
+            existingTransaction.setEmployee(updatedTransaction.getEmployee());
+        }
+
+         inventoryTransactionInRepo.save(existingTransaction);
+    }
+
+
+    @Override
+    public void addInTransaction(InventoryTransaction transaction) {
+        try {
+            System.out.println("Transaction Type: " + transaction.getTransactionType());
+            if (transaction.getTransactionType() == TransactionType.IN) {
+                inventoryTransactionInRepo.saveOutTransaction(
+                        transaction.getProduct().getProductID(),
+                        transaction.getQuantity(),
+                        transaction.getPurchasePrice().doubleValue(),
+                        transaction.getTransactionDate().format(formatter),
+                        transaction.getSupplier() != null ? transaction.getSupplier().getSupplierID() : null,
+                        transaction.getEmployee() != null ? transaction.getEmployee().getEmployeeID() : null,
+                        transaction.getTotalPrice().doubleValue()
+                );
+
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi lưu giao dịch: " + e.getMessage());
+        }
+    }
+
+
+    @Override
+    public void deleteOutTransaction(int id) {
+        InventoryTransaction transaction = inventoryTransactionInRepo.findInTransactionById((long) id);
+        if (transaction != null && transaction.getTransactionType() == TransactionType.IN) {
+            inventoryTransactionInRepo.deleteInTransaction(id);
+        }
+    }
 
     @Override
     public Page<InventoryTransaction> getImportTransactions(Pageable pageable) {
@@ -142,4 +222,11 @@ public class InventoryTransactionService implements IInventoryTransactionService
     public InventoryTransaction findById(Integer id) {
         return inventoryTransactionInRepo.findById(id).get();
     }
+    public InventoryTransaction findByInventoryTransactionId(Integer id){
+        return inventoryTransactionInRepo.getByTransactionID(id,TransactionType.IN);
+    }
+
+
+
+
 }

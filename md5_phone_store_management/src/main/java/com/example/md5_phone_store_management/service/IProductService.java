@@ -10,6 +10,18 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface IProductService {
+
+
+
+    List<Product> findAllWithOutPageable ();
+    List<Product> searchProductToChoose(
+            String productName,
+            String supplierName,
+            String stockSort,
+            String priceSort,
+            String inStockStatus
+    );
+
     //Tuấn Anh
     Page<Product> findAll(Pageable pageable);
     List<Product> findAllProducts();

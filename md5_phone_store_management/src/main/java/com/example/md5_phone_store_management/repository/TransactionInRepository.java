@@ -11,12 +11,26 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface IInventoryTransactionInRepo extends JpaRepository<InventoryTransaction, Integer> {
+public interface TransactionInRepository extends JpaRepository<InventoryTransaction, Integer> {
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO inventoryTransaction (productID, transactionType, quantity, purchasePrice, transactionDate, supplierID, employeeID, totalPrice) " +
+            "VALUES (?1, 'IN', ?2, ?3, ?4, ?5, ?6, ?7)", nativeQuery = true)
+    void saveOutTransaction(int productID, int quantity, double purchasePrice, String transactionDate, Integer supplierID, Integer employeeID, double totalPrice);
+
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM inventoryTransaction WHERE transactionID = ?1 AND transactionType = 'IN'", nativeQuery = true)
+    void deleteInTransaction(int id);
+
+    @Query(value = "SELECT * FROM inventoryTransaction WHERE transactionID = ?1 AND transactionType = 'IN'", nativeQuery = true)
+    InventoryTransaction findInTransactionById(Long id);
 
     @Query("SELECT i FROM InventoryTransaction i WHERE i.transactionType = :type")
     Page<InventoryTransaction> getByTransactionType(@Param("type") TransactionType type, Pageable pageable);
@@ -46,4 +60,6 @@ public interface IInventoryTransactionInRepo extends JpaRepository<InventoryTran
 
     @Query("SELECT i FROM InventoryTransaction i WHERE i.product.qrCode = :qrCode")
     InventoryTransaction findByQRCode(@Param("qrCode") String qrCode);
+    @Query("SELECT i FROM InventoryTransaction i WHERE i.transactionID = :id AND i.transactionType = :transactionType")
+    InventoryTransaction getByTransactionID(@Param("id") Integer id, @Param("transactionType") TransactionType transactionType);
 }

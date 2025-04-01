@@ -41,7 +41,8 @@ public class SpringSecurity {
                         .ignoringRequestMatchers("/clear-session",
                                 "/dashboard/stock-in/delete",
                                 "/api/sales/**",
-                                "/dashboard/sales/add")
+                                "/dashboard/sales/add",
+                                "/dashboard/admin/transactions/listIn/delete")
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login",
@@ -58,7 +59,7 @@ public class SpringSecurity {
                                 "/dashboard/sales/payment-callback",
                                 "/dashboard/sales/invoice-pdf/**",
                                 "/dashboard/sales/download-invoice-pdf/**").permitAll()
-                        .requestMatchers("/dashboard/admin/**").hasRole("Admin")
+                        .requestMatchers("/dashboard/admin/**").hasAnyRole("Admin", "WarehouseStaff")
                         .requestMatchers("/dashboard/sales/create-customer").hasAnyRole("Admin", "SalesPerson")
                         .requestMatchers("/api/create-customer").hasAnyRole("Admin", "SalesPerson", "SalesStaff")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")

@@ -70,7 +70,7 @@
 
       <!-- Quản lý xuất nhập kho - Thủ kho, Admin -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
-        <a th:href="@{/dashboard/stock-in/list}" class="nav-link text-white">
+        <a th:href="@{/dashboard/warehouse/inventory}" class="nav-link text-white">
           <i class="fas fa-warehouse me-2"></i>Quản lý xuất nhập kho
         </a>
       </li>
@@ -93,6 +93,12 @@
       <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">
         <a th:href="@{/dashboard/reports}" class="nav-link text-white">
           <i class="fas fa-file-alt me-2"></i>Quản lý báo cáo
+        </a>
+      </li>
+
+      <li class="nav-item" sec:authorize="hasAnyRole('Admin')">
+        <a th:href="@{/dashboard/admin/customers/invoice/list}" class="nav-link text-white">
+          <i class="fas fa-boxes me-2"></i>Xem lịch sử mua hàng
         </a>
       </li>
     </ul>
