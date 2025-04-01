@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,6 +18,10 @@ import com.example.md5_phone_store_management.model.PaymentMethod;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
+    // Tìm tất cả các hóa đơn thành công
+    @Query(value = "SELECT * FROM invoices WHERE invoices.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoice(Pageable pageable, Sort sort);
+
     // Tìm tất cả hóa đơn của một khách hàng
     List<Invoice> findByCustomer(Customer customer);
 

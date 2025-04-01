@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang quản lý kinh doanh</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+    <style>
+        .btn-custom {
+            width: 100%;
+            padding: 55px 20px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            font-size: 38px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-retail {
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        }
+
+        .btn-transactions {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+
+        .btn-customers {
+            background: linear-gradient(135deg, #f83600, #fe8c00);
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .btn-icon {
+            margin-right: 15px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="col-12">
+                        <a th:href="@{#}" class="btn btn-custom btn-retail">
+                            <span class="btn-icon">💰</span> Quản lý giá bán lẻ
+                        </a>
+                    </div>
+
+                    <div class="col-12">
+                        <a th:href="@{/dashboard/business/transaction}" class="btn btn-custom btn-transactions">
+                            <span class="btn-icon">📊</span> Quản lý lịch sử mua bán
+                        </a>
+                    </div>
+
+                    <div class="col-12">
+                        <a class="btn btn-custom btn-customers">
+                            <span class="btn-icon">👥</span> Quản lý khách hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
