@@ -1,10 +1,5 @@
-
 package com.example.md5_phone_store_management.config.security;
 
-import com.example.md5_phone_store_management.common.CustomAccessDeniedHandler;
-import com.example.md5_phone_store_management.common.CustomAuthenticationEntryPoint;
-import com.example.md5_phone_store_management.common.CustomAuthenticationFailureHandler;
-import com.example.md5_phone_store_management.common.CustomAuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +10,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.example.md5_phone_store_management.common.CustomAccessDeniedHandler;
+import com.example.md5_phone_store_management.common.CustomAuthenticationEntryPoint;
+import com.example.md5_phone_store_management.common.CustomAuthenticationFailureHandler;
+import com.example.md5_phone_store_management.common.CustomAuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -38,7 +38,10 @@ public class SpringSecurity {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/clear-session", "/dashboard/stock-in/delete")
+                        .ignoringRequestMatchers("/clear-session",
+                                "/dashboard/stock-in/delete",
+                                "/api/sales/**",
+                                "/dashboard/sales/add")
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login",
@@ -50,8 +53,14 @@ public class SpringSecurity {
                                 "/",
                                 "/register",
                                 "/clear-session",
-                                "/api/payment/**").permitAll()
+                                "/api/vnpay/**",
+                                "/api/payment/**",
+                                "/dashboard/sales/payment-callback",
+                                "/dashboard/sales/invoice-pdf/**",
+                                "/dashboard/sales/download-invoice-pdf/**").permitAll()
                         .requestMatchers("/dashboard/admin/**").hasRole("Admin")
+                        .requestMatchers("/dashboard/sales/create-customer").hasAnyRole("Admin", "SalesPerson")
+                        .requestMatchers("/api/create-customer").hasAnyRole("Admin", "SalesPerson", "SalesStaff")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")
                         .anyRequest().authenticated()
                 )
@@ -90,5 +99,22 @@ public class SpringSecurity {
 
         return http.build();
     }
+
+    // tắt tạm thời sercurity
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                // Vô hiệu hóa CSRF
+//                .csrf(csrf -> csrf.disable())
+//                // Cho phép mọi request không cần xác thực
+//                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+//                // Vô hiệu hóa form login
+//                .formLogin(form -> form.disable())
+//                // Vô hiệu hóa logout
+//                .logout(logout -> logout.disable());
+//
+//        return http.build();
+//    }
+
 
 }

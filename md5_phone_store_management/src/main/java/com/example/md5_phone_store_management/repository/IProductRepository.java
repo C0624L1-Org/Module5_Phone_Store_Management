@@ -99,4 +99,13 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
             @Param("supplier") String supplier,
             @Param("price") double price,
             Pageable pageable);
+
+    Page<Product> findByNameContainingOrSupplier_NameContaining(
+        String name, String supplierName, Pageable pageable);
+
+    @Query(value = "SELECT * FROM product WHERE " +
+            "name LIKE CONCAT('%', :keyword, '%') OR " +
+            "COALESCE(detailedDescription, '') LIKE CONCAT('%', :keyword, '%')",
+            nativeQuery = true)
+    Page<Product> searchProductsByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

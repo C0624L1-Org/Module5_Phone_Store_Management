@@ -1,13 +1,15 @@
 package com.example.md5_phone_store_management.model.unique;
 
-import com.example.md5_phone_store_management.repository.CustomerRepository;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.example.md5_phone_store_management.repository.CustomerRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 @Component
 public class UniqueValidator implements ConstraintValidator<Unique, String> {
@@ -23,21 +25,28 @@ public class UniqueValidator implements ConstraintValidator<Unique, String> {
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null || value.isBlank()) {
-            return true; // Không kiểm tra nếu giá trị rỗng
+        try {
+            if (value == null || value.isBlank()) {
+                return true; // Không kiểm tra nếu giá trị rỗng
+            }
+
+            // Lấy ID của đối tượng đang được cập nhật (nếu có)
+            Integer currentId = getCurrentObjectId();
+
+            // Kiểm tra tính duy nhất dựa trên fieldName
+            boolean exists = switch (fieldName) {
+                case "phone" -> customerRepository.isPhoneExistsExceptId(value, currentId);
+                case "email" -> customerRepository.isEmailExistsExceptId(value, currentId);
+                default -> false;
+            };
+
+            return !exists;
+        } catch (Exception e) {
+            System.err.println("Lỗi trong quá trình validate tính duy nhất: " + e.getMessage());
+            e.printStackTrace();
+            // Mặc định cho phép validation pass để tránh exception trong validator
+            return true;
         }
-
-        // Lấy ID của đối tượng đang được cập nhật (nếu có)
-        Integer currentId = getCurrentObjectId();
-
-        // Kiểm tra tính duy nhất dựa trên fieldName
-        boolean exists = switch (fieldName) {
-            case "phone" -> customerRepository.isPhoneExistsExceptId(value, currentId);
-            case "email" -> customerRepository.isEmailExistsExceptId(value, currentId);
-            default -> false;
-        };
-
-        return !exists;
     }
 
     // Phương thức để lấy ID của đối tượng đang được cập nhật

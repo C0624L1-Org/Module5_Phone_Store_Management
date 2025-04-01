@@ -11,9 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.md5_phone_store_management.model.Customer;
 
+import java.util.List;
+
 @Repository
 public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
-    @Query(value = "SELECT * FROM customer", nativeQuery = true)
+    @Query("SELECT c FROM Customer c ORDER BY c.customerID")
     Page<Customer> getAllCustomerPageable(Pageable pageable);
 
     @Query(value = "SELECT COUNT(*) FROM customer", nativeQuery = true)
@@ -26,14 +28,14 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
     void updatePurchaseCountById(@Param("customerId") Integer customerId, @Param("purchaseCount") int purchaseCount);
 
     // Phương thức kiểm tra sự tồn tại của phone và email (phục vụ cho annotation Unique)
-    @Query(value = "SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM customer c WHERE c.phone = :phone AND (c.customerID != :id OR :id IS NULL)", nativeQuery = true)
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM customer WHERE phone = :phone AND (customerID != :id OR :id IS NULL))", nativeQuery = true)
     boolean isPhoneExistsExceptId(@Param("phone") String phone, @Param("id") Integer id);
 
-    @Query(value = "SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM customer c WHERE c.email = :email AND (c.customerID != :id OR :id IS NULL)", nativeQuery = true)
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM customer WHERE email = :email AND (customerID != :id OR :id IS NULL))", nativeQuery = true)
     boolean isEmailExistsExceptId(@Param("email") String email, @Param("id") Integer id);
 
-    // Tìm kiếm với tham số
-    @Query(value = "SELECT * FROM customer WHERE full_Name LIKE CONCAT('%',:name,'%')", nativeQuery = true)
+    // Tìm kiếm với tham số cho tất cả customer
+    @Query(value = "SELECT * FROM customer WHERE LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%'))", nativeQuery = true)
     Page<Customer> findByName(@Param("name") String name, Pageable pageable);
 
     @Query(value = "SELECT * FROM customer WHERE phone LIKE CONCAT('%',:phone,'%')", nativeQuery = true)
@@ -42,23 +44,56 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
     @Query(value = "SELECT * FROM customer WHERE gender = :gender", nativeQuery = true)
     Page<Customer> findByGender(@Param("gender") String gender, Pageable pageable);
 
-    @Query(value = "SELECT * FROM customer WHERE full_Name LIKE CONCAT('%',:name,'%') AND phone LIKE CONCAT('%',:phone,'%')", nativeQuery = true)
+    @Query(value = "SELECT * FROM customer WHERE LOWER(email) LIKE LOWER(CONCAT('%',:email,'%'))", nativeQuery = true)
+    Page<Customer> findByEmail(@Param("email") String email, Pageable pageable);
+
+    @Query(value = "SELECT * FROM customer WHERE LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%')) AND phone LIKE CONCAT('%',:phone,'%')", nativeQuery = true)
     Page<Customer> findByNameAndPhone(@Param("name") String name, @Param("phone") String phone, Pageable pageable);
 
-    @Query(value = "SELECT * FROM customer WHERE full_Name LIKE CONCAT('%',:name,'%') AND gender = :gender", nativeQuery = true)
+    @Query(value = "SELECT * FROM customer WHERE LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%')) AND gender = :gender", nativeQuery = true)
     Page<Customer> findByNameAndGender(@Param("name") String name, @Param("gender") String gender, Pageable pageable);
 
     @Query(value = "SELECT * FROM customer WHERE phone LIKE CONCAT('%',:phone,'%') AND gender = :gender", nativeQuery = true)
     Page<Customer> findByPhoneAndGender(@Param("phone") String phone, @Param("gender") String gender, Pageable pageable);
 
-    @Query(value = "SELECT * FROM customer WHERE full_Name LIKE CONCAT('%',:name,'%') AND phone LIKE CONCAT('%',:phone,'%') AND gender = :gender", nativeQuery = true)
+    @Query(value = "SELECT * FROM customer WHERE LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%')) AND phone LIKE CONCAT('%',:phone,'%') AND gender = :gender", nativeQuery = true)
     Page<Customer> findByNameAndPhoneAndGender(@Param("name") String name, @Param("phone") String phone, @Param("gender") String gender, Pageable pageable);
 
-    /**
-     * Tìm kiếm khách hàng theo tên HOẶC điện thoại HOẶC email
-     */
-    @Query(value = "SELECT * FROM customer WHERE (:name IS NULL OR full_Name LIKE CONCAT('%', :name, '%')) " +
-            "OR (:phone IS NULL OR phone LIKE CONCAT('%', :phone, '%')) " +
-            "OR (:email IS NULL OR email LIKE CONCAT('%', :email, '%'))", nativeQuery = true)
-    Page<Customer> findByNameOrPhoneOrEmail(@Param("name") String name, @Param("phone") String phone, @Param("email") String email, Pageable pageable);
+    // Tìm kiếm với tham số cho customer với purchaseCount > 0
+    @Query(value = "SELECT * FROM customer WHERE purchaseCount > 0 ORDER BY customerID", nativeQuery = true)
+    Page<Customer> findCustomersWithPurchases(Pageable pageable);
+
+    @Query(value = "SELECT * FROM customer WHERE purchaseCount > 0 AND LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%'))", nativeQuery = true)
+    Page<Customer> findCustomersWithPurchasesByName(@Param("name") String name, Pageable pageable);
+
+    @Query(value = "SELECT * FROM customer WHERE purchaseCount > 0 AND phone LIKE CONCAT('%',:phone,'%')", nativeQuery = true)
+    Page<Customer> findCustomersWithPurchasesByPhone(@Param("phone") String phone, Pageable pageable);
+
+    @Query(value = "SELECT * FROM customer WHERE purchaseCount > 0 AND LOWER(email) LIKE LOWER(CONCAT('%',:email,'%'))", nativeQuery = true)
+    Page<Customer> findCustomersWithPurchasesByEmail(@Param("email") String email, Pageable pageable);
+
+    @Query(value = "SELECT * FROM customer WHERE purchaseCount > 0 AND LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%')) AND phone LIKE CONCAT('%',:phone,'%')", nativeQuery = true)
+    Page<Customer> findCustomersWithPurchasesByNameAndPhone(@Param("name") String name, @Param("phone") String phone, Pageable pageable);
+
+    @Query(value = "SELECT * FROM customer WHERE purchaseCount > 0 AND LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%')) AND LOWER(email) LIKE LOWER(CONCAT('%',:email,'%'))", nativeQuery = true)
+    Page<Customer> findCustomersWithPurchasesByNameAndEmail(@Param("name") String name, @Param("email") String email, Pageable pageable);
+
+    @Query(value = "SELECT * FROM customer WHERE purchaseCount > 0 AND phone LIKE CONCAT('%',:phone,'%') AND LOWER(email) LIKE LOWER(CONCAT('%',:email,'%'))", nativeQuery = true)
+    Page<Customer> findCustomersWithPurchasesByPhoneAndEmail(@Param("phone") String phone, @Param("email") String email, Pageable pageable);
+
+    @Query(value = "SELECT * FROM customer WHERE purchaseCount > 0 AND LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%')) AND phone LIKE CONCAT('%',:phone,'%') AND LOWER(email) LIKE LOWER(CONCAT('%',:email,'%'))", nativeQuery = true)
+    Page<Customer> findCustomersWithPurchasesByNameAndPhoneAndEmail(@Param("name") String name, @Param("phone") String phone, @Param("email") String email, Pageable pageable);
+
+    // Đếm số người đã mua hàng
+    @Query(value = "SELECT COUNT(*) FROM customer WHERE purchaseCount > 0", nativeQuery = true)
+    Integer countCustomersWithPurchases();
+
+    // Đếm số người đã mua hàng với tên khách hàng
+    @Query(value = "SELECT COUNT(*) FROM customer WHERE purchaseCount > 0 AND LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%'))", nativeQuery = true)
+    Integer countCustomersWithPurchasesByName(@Param("name") String name);
+
+    // Cung cấp thêm phương thức để lấy khách hàng mẫu khi không tìm thấy khách hàng đã mua
+    @Query(value = "SELECT * FROM customer LIMIT 5", nativeQuery = true)
+    List<Customer> findSampleCustomers();
+
 }
