@@ -271,7 +271,6 @@ public ModelAndView showEditInTransaction(@PathVariable("id") Integer id) {
         }
     }
     @PostMapping("/admin/transactions/listIn/delete")
-    @PreAuthorize("hasAnyRole('Admin', 'WarehouseStaff')")
     @ResponseBody
     public ResponseEntity<Map<String, String>> deleteImportTransactions(
             @RequestBody Map<String, List<Integer>> requestBody) {
