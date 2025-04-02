@@ -45,8 +45,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td></td>
+                        <tr th:each="i,l : ${invoices}">
+                            <td th:text="${l.count}"></td>
+                            <td th:text="${i.createdAt != null ? #temporals.format(i.createdAt, 'dd-MM-yyyy') : 'Lỗi'}"></td>
+                            <td th:text="${i.createdAt != null ? #temporals.format(i.createdAt, 'HH:mm') : 'Lỗi'}"></td>
+                            <td th:text="${i.customer.fullName}"></td>
+                            <td><span th:each="detail, loop : ${i.invoiceDetailList}"
+                                      th:text="${detail.quantity + ' ' + detail.product.name + (loop.count == i.invoiceDetailList.size() ? '' : ', ')}"></span></td>
+                            <td th:text="${#numbers.formatInteger(i.amount,1,'POINT') + 'VND'}"></td>
                         </tr>
                         </tbody>
                     </table>

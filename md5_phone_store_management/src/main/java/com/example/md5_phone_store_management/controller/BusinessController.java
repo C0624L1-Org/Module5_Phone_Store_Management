@@ -3,12 +3,14 @@ package com.example.md5_phone_store_management.controller;
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.service.IInvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import java.util.List;
 
 @Controller
@@ -29,6 +31,10 @@ public class BusinessController {
         for(Invoice i : invoices) {
             System.out.println(i.toString());
         }
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<Invoice> invoicesPage = invoiceService.findAllSuccessInvoices(pageable);
+        model.addAttribute("invoices", invoicesPage);
+
         return "dashboard/business-management/transaction";
     }
 }

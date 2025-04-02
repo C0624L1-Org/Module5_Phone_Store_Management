@@ -18,9 +18,18 @@ import com.example.md5_phone_store_management.model.PaymentMethod;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
-    // Tìm tất cả các hóa đơn thành công
-    @Query(value = "SELECT * FROM invoices WHERE invoices.status = 'SUCCESS'", nativeQuery = true)
-    Page<Invoice> findAllSuccessInvoices(Pageable pageable);
+    // Sắp xếp
+    //Theo thoi gian
+    @Query(value = "SELECT * FROM invoices WHERE invoices.status = 'SUCCESS' ORDER BY TIME(created_at) ASC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithTimeAsc(Pageable pageable);
+    @Query(value = "SELECT * FROM invoices WHERE invoices.status = 'SUCCESS' ORDER BY TIME(created_at) DESC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithTimeDesc(Pageable pageable);
+    //Theo ten khach hang
+    @Query(value = "SELECT invoices.* FROM invoices LEFT JOIN customer ON invoices.customer_id = customer.customerID WHERE invoices.status = 'SUCCESS' ORDER BY customer.full_name ASC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithCustomerNameAsc(Pageable pageable);
+    @Query(value = "SELECT invoices.* FROM invoices LEFT JOIN customer ON invoices.customer_id = customer.customerID WHERE invoices.status = 'SUCCESS' ORDER BY customer.full_name DESC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithCustomerNameDesc(Pageable pageable);
+    //Theo
 
     // Tìm tất cả hóa đơn của một khách hàng
     List<Invoice> findByCustomer(Customer customer);
