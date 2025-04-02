@@ -17,6 +17,8 @@ import com.example.md5_phone_store_management.model.PaymentMethod;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
+
+
     // Tìm tất cả hóa đơn của một khách hàng
     List<Invoice> findByCustomer(Customer customer);
 

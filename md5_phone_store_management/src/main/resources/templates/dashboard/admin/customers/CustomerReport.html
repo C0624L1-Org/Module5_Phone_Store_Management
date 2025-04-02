@@ -26,19 +26,15 @@
 
         .chart-container canvas {
             width: 100%;
-            height: auto; /* Tự động điều chỉnh chiều cao */
+            height: auto;
         }
 
         #genderChart {
-            height: 300px; /* Chiều cao cố định cho biểu đồ tròn */
+            height: 300px;
         }
 
         #purchaseChart {
-            height: 300px; /* Chiều cao cố định cho biểu đồ cột */
-        }
-
-        #purchaseChart .chartjs-axis-y-label {
-            white-space: nowrap; /* Ngăn nhãn trục tung bị xuống dòng */
+            height: 300px;
         }
 
     </style>
@@ -95,17 +91,17 @@
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-around;">
-                    <div style="width: 45%; height: 300px;">
+                    <div style="width: 45%; height: 300px; display: flex; flex-direction: column; align-items: center;">
                         <canvas id="genderChart" style="width: 100%; height: 100%;"></canvas>
-                        <div style="text-align: center;">Biểu đồ giới tính khách hàng</div>
+                        <div style="width: 100%; text-align: center;">Biểu đồ giới tính khách hàng</div>
                     </div>
-                    <div style="width: 45%; height: 300px;">
+                    <div style="width: 45%; height: 300px; display: flex; flex-direction: column; align-items: center;">
                         <canvas id="purchaseChart" style="width: 100%; height: 100%;"></canvas>
-                        <div style="text-align: center;">Biểu đồ số lần mua hàng của khách hàng</div>
+                        <div style="width: 100%; text-align: center;">Biểu đồ số lần mua hàng của khách hàng</div>
                     </div>
-                    <div style="width: 50%; height: 300px;">
-                        <canvas id="newOldCustomerChart"></canvas>
-                        <div style="text-align: center;">Biểu đồ khách hàng mới và cũ</div>
+                    <div style="width: 50%; height: 300px; display: flex; flex-direction: column; align-items: center;">
+                        <canvas id="newOldCustomerChart" style="width: 100%; height: 100%;"></canvas>
+                        <div style="width: 100%; text-align: center;">Biểu đồ khách hàng mới và cũ</div>
                     </div>
                 </div>
             </div>
@@ -225,7 +221,8 @@
             options: {
                 title: {
                     display: true,
-                    text: 'Biểu đồ giới tính khách hàng'
+                    text: 'Biểu đồ giới tính khách hàng',
+                    align: 'center'
                 }
             }
         });
@@ -244,7 +241,8 @@
             options: {
                 title: {
                     display: true,
-                    text: 'Biểu đồ số lần mua hàng của khách hàng'
+                    text: 'Biểu đồ số lần mua hàng của khách hàng',
+                    align: 'center'
                 },
                 scales: {
                     yAxes: [{
@@ -273,7 +271,8 @@
             options: {
                 title: {
                     display: true,
-                    text: 'Biểu đồ khách hàng mới và cũ'
+                    text: 'Biểu đồ khách hàng mới và cũ',
+                    align: 'center'
                 }
             }
         });
