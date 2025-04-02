@@ -263,8 +263,6 @@
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     // Submit form when confirm create button is clicked
@@ -318,7 +316,6 @@
             });
     });
 
-    // Form validation logic
     (function () {
         'use strict'
 
@@ -335,6 +332,17 @@
 
                     form.classList.add('was-validated')
                 }, false)
+
+                // Thêm sự kiện input cho các trường để xóa thông báo lỗi
+                const inputs = form.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function () {
+                        const errorDiv = document.querySelector(`#${input.id}Error`);
+                        if (errorDiv) {
+                            errorDiv.textContent = ''; // Xóa thông báo lỗi
+                        }
+                    });
+                });
             })
     })()
 </script>
