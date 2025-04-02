@@ -19,8 +19,8 @@ import com.example.md5_phone_store_management.model.PaymentMethod;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     // Tìm tất cả các hóa đơn thành công
-    @Query(value = "SELECT * FROM invoices WHERE invoices.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS", nativeQuery = true)
-    Page<Invoice> findAllSuccessInvoice(Pageable pageable, Sort sort);
+    @Query(value = "SELECT * FROM invoices WHERE invoices.status = 'SUCCESS'", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoices(Pageable pageable);
 
     // Tìm tất cả hóa đơn của một khách hàng
     List<Invoice> findByCustomer(Customer customer);

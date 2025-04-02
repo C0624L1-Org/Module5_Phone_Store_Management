@@ -11,6 +11,7 @@ import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.InvoiceStatus;
 import com.example.md5_phone_store_management.model.PaymentMethod;
+import org.springframework.data.domain.Sort;
 
 public interface IInvoiceService {
     Invoice saveInvoice(Invoice invoice);
@@ -18,6 +19,8 @@ public interface IInvoiceService {
     List<Invoice> findAll();
     Page<Invoice> findAll(Pageable pageable);
     void deleteInvoice(Long id);
+    // tìm tất ca3 hóa đoơn thành công
+    Page<Invoice> findAllSuccessInvoices(Pageable pageable);
 
     // Lấy tất cả hóa đơn của khách hàng
     List<Invoice> findByCustomer(Customer customer);
