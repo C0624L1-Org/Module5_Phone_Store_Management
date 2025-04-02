@@ -18,22 +18,59 @@
     <link rel="stylesheet" href="/css/common/layout.css">
 
     <style>
-        .btn:hover {
-            transform: scale(1.05);
-            transition: 0.3s;
+        .detail-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            overflow: hidden;
         }
-        .breadcrumb-item a {
-            text-decoration: none;
-            color: #007bff;
+        .detail-header {
+            background: linear-gradient(135deg, #006400 0%, #008000 100%);
+            color: white;
+            padding: 1.5rem;
         }
-        .breadcrumb-item a:hover {
-            text-decoration: underline;
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .detail-value {
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            background-color: #fff;
+            color: #212529;
+            font-size: 1rem;
+        }
+        .btn-back {
+            background: linear-gradient(135deg, #006400 0%, #008000 100%);
+            color: #ffffff; /* Explicitly set to white */
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 128, 0, 0.3);
+            color: #ffffff; /* Ensure it stays white on hover */
         }
         .product-image {
-            width: 150px;
-            height: 150px;
+            width: 180px; /* Increased size */
+            height: 180px; /* Increased size */
             object-fit: cover;
-            border-radius: 10px;}
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .text-dark-green {
+            color: #008000;
+        }
+        .text-danger {
+            color: #dc3545;
+        }
+        .text-success {
+            color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -49,79 +86,91 @@
 
         <!-- Main content -->
         <div class="content-container p-4">
-            <div class="container-fluid">
-                <!-- Breadcrumbs -->
+            <div class="container py-4">
+                <!-- Breadcrumbs (giữ nguyên màu mặc định) -->
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập & xuất</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a></li>
                         <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listIn}">Giao dịch Nhập kho</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Chi tiết giao dịch</li>
+                        <li class="breadcrumb-item active" aria-current="page">Chi tiết nhập kho</li>
                     </ol>
                 </nav>
 
-                <!-- Tiêu đề -->
-                <h1 style="text-align: center; font-size: 32px; color: #333; margin-top: 20px;">
-                    Chi tiết giao dịch
-                </h1>
-
                 <!-- Nội dung chính -->
-                <div class="card shadow p-4">
-                    <div class="row">
-                        <!-- Hình ảnh sản phẩm -->
-                        <div th:each="image : ${InventoryTransaction.product.images}">
-                            <img th:src="@{${image.imageUrl}}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" alt="Product Image">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="detail-section mb-4">
+                            <div class="detail-header">
+                                <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>Chi tiết giao dịch</h3>
+                                <p class="text-white-50 mt-2 mb-0">Thông tin chi tiết về giao dịch nhập kho</p>
+                            </div>
+
+                            <div class="p-4">
+                                <div class="row g-3">
+
+                                    <div class="col-md-3 text-center">
+                                        <div th:each="image : ${InventoryTransaction.product.images}">
+                                            <img th:src="@{${image.imageUrl}}" class="product-image mb-3" alt="Product Image">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="row g-3">
+                                            <div class="col-12 mb-3">
+                                                <label class="detail-label"><i class="fas fa-box me-2"></i>Tên sản phẩm</label>
+                                                <div class="detail-value text-success" th:text="${InventoryTransaction.product.name}"></div>
+                                            </div>
+                                            <div class="col-12 mb-3">
+                                                <label class="detail-label"><i class="fas fa-building me-2"></i>Nhà cung cấp</label>
+                                                <div class="detail-value" th:text="${InventoryTransaction.supplier.name}"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hàng 2: Giá mua, Số lượng, Tổng giá -->
+                                    <div class="col-12">
+                                        <div class="row g-3">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="detail-label"><i class="fas fa-dollar-sign me-2"></i>Giá mua</label>
+                                                <div class="detail-value fw-bold"
+                                                     th:text="${#numbers.formatDecimal(InventoryTransaction.purchasePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></div>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="detail-label"><i class="fas fa-cubes me-2"></i>Số lượng</label>
+                                                <div class="detail-value" th:text="${InventoryTransaction.quantity}"></div>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="detail-label"><i class="fas fa-money-bill-wave me-2"></i>Tổng giá</label>
+                                                <div class="detail-value fw-bold"
+                                                     th:text="${#numbers.formatDecimal(InventoryTransaction.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hàng 3: Nhân viên và Ngày giao dịch -->
+                                    <div class="col-12">
+                                        <div class="row g-3">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label"><i class="fas fa-user me-2"></i>Nhân viên thực hiện</label>
+                                                <div class="detail-value" th:text="${InventoryTransaction.employee.fullName}"></div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label"><i class="fas fa-calendar-alt me-2"></i>Ngày giao dịch</label>
+                                                <div class="detail-value"
+                                                     th:text="${#temporals.format(InventoryTransaction.transactionDate, 'dd-MM-yyyy')}"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Nút quay lại -->
+                                    <div class="col-12 d-flex justify-content-end mt-3">
+                                        <a href="/dashboard/admin/transactions/listIn" class="btn btn-back text-white">
+                                            <i class="fa fa-arrow-left me-2"></i>Quay lại
+                                        </a>
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <!-- Thông tin giao dịch -->
-                        <div class="col-md-8">
-                            <h3 class="text-success" th:text="${InventoryTransaction.product.name}"></h3>
-                            <table class="table table-bordered mt-3">
-                                <tr>
-                                    <th class="bg-light">Loại giao dịch</th>
-                                    <td class="text-center" th:text="${InventoryTransaction.transactionType}"></td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light">Số lượng</th>
-                                    <td class="text-center" th:text="${InventoryTransaction.quantity}"></td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light">Giá mua</th>
-                                    <td class="text-primary fw-bold text-center"
-                                        th:text="${#numbers.formatDecimal(InventoryTransaction.purchasePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light">Tổng giá</th>
-                                    <td class="text-danger fw-bold text-center"
-                                        th:text="${#numbers.formatDecimal(InventoryTransaction.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light">Ngày giao dịch</th>
-                                    <td class="text-center"
-                                        th:text="${#temporals.format(InventoryTransaction.transactionDate, 'dd-MM-yyyy')}">
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Nhà cung cấp -->
-                    <div class="mt-4">
-                        <h4 class="text-secondary">Nhà cung cấp</h4>
-                        <p><strong>Tên:</strong> <span th:text="${InventoryTransaction.supplier.name}"></span></p>
-                    </div>
-
-                    <!-- Nhân viên thực hiện -->
-                    <div class="mt-3">
-                        <h4 class="text-secondary">Nhân viên thực hiện</h4>
-                        <p><strong>Tên:</strong> <span th:text="${InventoryTransaction.employee.fullName}"></span></p>
-                    </div>
-
-                    <!-- Nút quay lại -->
-                    <div class="text-end">
-                        <a href="/dashboard/admin/transactions/listIn" class="btn btn-outline-primary mt-3">
-                            <i class="fa fa-arrow-left"></i> Quay lại
-                        </a>
                     </div>
                 </div>
             </div>
@@ -131,5 +180,6 @@
     <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

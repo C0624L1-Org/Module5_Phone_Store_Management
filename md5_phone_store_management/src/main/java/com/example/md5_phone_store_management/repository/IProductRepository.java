@@ -18,6 +18,25 @@ import com.example.md5_phone_store_management.model.Product;
 public interface IProductRepository extends JpaRepository<Product, Integer> {
 
 
+//    @Query("SELECT p FROM Product p " +
+//            "WHERE (:productName IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%'))) " +
+//            "AND (:supplierName IS NULL OR LOWER(p.supplier.name) LIKE LOWER(CONCAT('%', :supplierName, '%'))) " +
+//            "AND (:inStockStatus IS NULL " +
+//            "     OR (:inStockStatus = 'inStock' AND p.stockQuantity > 0) " +
+//            "     OR (:inStockStatus = 'outStock' AND p.stockQuantity = 0)) " +
+//            "ORDER BY " +
+//            "CASE WHEN :stockSort = 'ASC' THEN p.stockQuantity END ASC, " +
+//            "CASE WHEN :stockSort = 'DESC' THEN p.stockQuantity END DESC, " +
+//            "CASE WHEN :priceSort = 'ASC' THEN p.sellingPrice END ASC, " +
+//            "CASE WHEN :priceSort = 'DESC' THEN p.sellingPrice END DESC")
+//    List<Product> searchProductToChoose(
+//            @Param("productName") String productName,
+//            @Param("supplierName") String supplierName,
+//            @Param("stockSort") String stockSort,
+//            @Param("priceSort") String priceSort,
+//            @Param("inStockStatus") String inStockStatus
+//    );
+
     @Query("SELECT p FROM Product p " +
             "WHERE (:productName IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%'))) " +
             "AND (:supplierName IS NULL OR LOWER(p.supplier.name) LIKE LOWER(CONCAT('%', :supplierName, '%'))) " +
@@ -123,4 +142,13 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
             @Param("supplier") String supplier,
             @Param("price") double price,
             Pageable pageable);
+
+    Page<Product> findByNameContainingOrSupplier_NameContaining(
+        String name, String supplierName, Pageable pageable);
+
+    @Query(value = "SELECT * FROM product WHERE " +
+            "name LIKE CONCAT('%', :keyword, '%') OR " +
+            "COALESCE(detailedDescription, '') LIKE CONCAT('%', :keyword, '%')",
+            nativeQuery = true)
+    Page<Product> searchProductsByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

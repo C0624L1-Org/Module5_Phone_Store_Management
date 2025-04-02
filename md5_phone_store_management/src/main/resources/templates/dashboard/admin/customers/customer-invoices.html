@@ -153,12 +153,13 @@
                                 <th>Tổng tiền</th>
                                 <th>Thông tin đơn hàng</th>
                                 <th style="text-align: center">Phương thức</th>
+                                <th style="text-align: center">Trạng thái</th>
                                 <th style="width: 150px; text-align: center;">Hành động</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr th:if="${invoicePage.content.empty}">
-                                <td colspan="6" class="text-center py-4">
+                                <td colspan="7" class="text-center py-4">
                                     <i class="fas fa-receipt fa-3x mb-3 text-muted"></i>
                                     <p class="text-muted">Khách hàng chưa có hóa đơn nào</p>
                                 </td>
@@ -166,20 +167,39 @@
                             <tr th:each="invoice : ${invoicePage.content}">
                                 <td th:text="${invoice.id}"></td>
                                 <td>
-                                    <!-- Hiển thị ngày với format mặc định, JavaScript sẽ định dạng lại sau -->
-                                    <span th:attr="data-date=${invoice.payDate}" class="date-format">
-                                            <span th:text="${invoice.payDate != null && !invoice.payDate.isEmpty() ? invoice.payDate : 'Không có'}"></span>
+                                    <!-- Hiển thị ngày thanh toán -->
+                                    <span th:if="${invoice.paymentMethod == T(com.example.md5_phone_store_management.model.PaymentMethod).VNPAY && invoice.payDate != null && !invoice.payDate.isEmpty()}">
+                                        <span th:with="formattedDate=${#strings.substring(invoice.payDate, 6, 8) + '/' + #strings.substring(invoice.payDate, 4, 6) + '/' + #strings.substring(invoice.payDate, 0, 4) + ' ' + #strings.substring(invoice.payDate, 8, 10) + ':' + #strings.substring(invoice.payDate, 10, 12) + ':' + #strings.substring(invoice.payDate, 12, 14)}"
+                                              th:text="${formattedDate}">
                                         </span>
+                                    </span>
+                                    <span th:if="${invoice.paymentMethod == T(com.example.md5_phone_store_management.model.PaymentMethod).CASH}">
+                                        <span th:text="${#temporals.format(invoice.createdAt, 'dd/MM/yyyy HH:mm:ss')}"></span>
+                                    </span>
+                                    <span th:if="${invoice.paymentMethod == T(com.example.md5_phone_store_management.model.PaymentMethod).VNPAY && (invoice.payDate == null || invoice.payDate.isEmpty())}">
+                                        <span th:text="${#temporals.format(invoice.createdAt, 'dd/MM/yyyy HH:mm:ss')}"></span>
+                                    </span>
                                 </td>
                                 <td th:text="${#numbers.formatDecimal(invoice.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
                                 <td th:text="${invoice.orderInfo}"></td>
                                 <td class="text-center">
-                                        <span th:if="${invoice.bankCode == null || invoice.bankCode == '' || invoice.bankCode == 'CASH' || #strings.equalsIgnoreCase(invoice.bankCode, 'CASH')}" class="badge bg-success">
-                                            <i class="fas fa-money-bill-wave me-1"></i>Tiền mặt
-                                        </span>
-                                    <span th:unless="${invoice.bankCode == null || invoice.bankCode == '' || invoice.bankCode == 'CASH' || #strings.equalsIgnoreCase(invoice.bankCode, 'CASH')}" class="badge bg-primary">
-                                            <i class="fas fa-credit-card me-1"></i>VNPay - <span th:text="${invoice.bankCode}"></span>
-                                        </span>
+                                    <span th:if="${invoice.paymentMethod == T(com.example.md5_phone_store_management.model.PaymentMethod).CASH}" class="badge bg-success">
+                                        <i class="fas fa-money-bill-wave me-1"></i><span th:text="${invoice.paymentMethod.label}"></span>
+                                    </span>
+                                    <span th:if="${invoice.paymentMethod == T(com.example.md5_phone_store_management.model.PaymentMethod).VNPAY}" class="badge bg-primary">
+                                        <i class="fas fa-credit-card me-1"></i><span th:text="${invoice.paymentMethod.label}"></span>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:if="${invoice.status == T(com.example.md5_phone_store_management.model.InvoiceStatus).SUCCESS}" class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i><span th:text="${invoice.status.label}"></span>
+                                    </span>
+                                    <span th:if="${invoice.status == T(com.example.md5_phone_store_management.model.InvoiceStatus).FAILED}" class="badge bg-danger">
+                                        <i class="fas fa-times-circle me-1"></i><span th:text="${invoice.status.label}"></span>
+                                    </span>
+                                    <span th:if="${invoice.status == T(com.example.md5_phone_store_management.model.InvoiceStatus).PROCESSING}" class="badge bg-warning">
+                                        <i class="fas fa-spinner me-1"></i><span th:text="${invoice.status.label}"></span>
+                                    </span>
                                 </td>
                                 <td class="text-center">
                                     <a th:href="@{/dashboard/sales/invoice-pdf/{id}(id=${invoice.id})}" class="btn btn-primary btn-sm">

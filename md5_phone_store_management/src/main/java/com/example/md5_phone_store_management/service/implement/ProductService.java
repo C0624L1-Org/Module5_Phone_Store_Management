@@ -156,6 +156,14 @@ public class ProductService implements IProductService {
         return productRepository.count();
     }
 
+    @Override
+    public Page<Product> searchProductsByKeyword(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return productRepository.findAll(pageable);
+        }
+        return productRepository.searchProductsByKeyword(keyword, pageable);
+    }
+
     // Đếm tổng số sản phẩm đã bán
 //    @Override
 //    public Long countSoldProducts() {

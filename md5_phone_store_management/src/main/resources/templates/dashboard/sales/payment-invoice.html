@@ -180,19 +180,53 @@
                     </div>
 
                     <div class="invoice-details">
-                        <p><strong><i class="fas fa-file-invoice me-2"></i>Mã giao dịch:</strong> <span th:text="${transactionId}"></span></p>
-                        <p><strong><i class="fas fa-money-bill-wave me-2"></i>Số tiền:</strong> <span th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')}"></span> VND</p>
-                        <p><strong><i class="fas fa-info-circle me-2"></i>Thông tin đơn hàng:</strong> <span th:text="${orderInfo}"></span></p>
-                        <p><strong><i class="fas fa-calendar-alt me-2"></i>Ngày thanh toán:</strong> <span th:text="${#dates.format(payDate, 'dd/MM/yyyy HH:mm')}"></span></p>
-                        <p>
-                            <strong><i class="fas fa-credit-card me-2"></i>Phương thức thanh toán:</strong>
-                            <span th:if="${bankCode == 'CASH'}" class="badge bg-success">Tiền mặt</span>
-                            <span th:unless="${bankCode == 'CASH'}" class="badge bg-primary">VNPay - <span th:text="${bankCode}"></span></span>
-                        </p>
-                        <p th:if="${cardType != null && cardType != 'CASH'}">
-                            <strong><i class="fas fa-credit-card me-2"></i>Loại thẻ:</strong>
-                            <span class="badge bg-info" th:text="${cardType}"></span>
-                        </p>
+                        <h5 class="card-title">Thông tin thanh toán</h5>
+                        <hr>
+                        <div class="mb-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Mã giao dịch:</strong> <span th:text="${transactionId}"></span></p>
+                                    <p><strong>Thời gian thanh toán:</strong> <span th:text="${#dates.format(payDate, 'dd/MM/yyyy HH:mm:ss')}"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Tổng tiền:</strong> <span th:text="${#numbers.formatInteger(amount,1,'POINT') + ' VND'}"></span></p>
+                                    <p><strong>Nội dung:</strong> <span th:text="${orderInfo}"></span></p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Phương thức thanh toán:</strong> <span th:text="${paymentMethod.label}"></span></p>
+                                    <p><strong>Trạng thái đơn hàng:</strong> 
+                                        <span th:if="${invoice.status != null}" 
+                                              th:class="${invoice.status.name() == 'SUCCESS'} ? 'text-success' : (${invoice.status.name() == 'FAILED'} ? 'text-danger' : 'text-warning')"
+                                              th:text="${invoice.status.getLabel()}">
+                                        </span>
+                                        <span th:unless="${invoice.status != null}">Chưa xác định</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin nhân viên xử lý -->
+                            <div class="mt-3 p-3 bg-light rounded border" th:if="${invoice.employee != null}">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h6><i class="fas fa-user-tie me-2"></i>Nhân viên xử lý</h6>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><strong>Họ tên:</strong> <span th:text="${invoice.employee.fullName}">Tên nhân viên</span></p>
+                                                <p class="mb-1"><strong>Email:</strong> <span th:text="${invoice.employee.email}">Email</span></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><strong>SĐT:</strong> <span th:text="${invoice.employee.phone}">Số điện thoại</span></p>
+                                                <p class="mb-1"><strong>Chức vụ:</strong> <span th:text="${invoice.employee.role}">Chức vụ</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div th:if="${invoice != null && invoice.invoiceDetailList != null && !invoice.invoiceDetailList.empty}">
@@ -231,8 +265,20 @@
                     </div>
 
                     <div class="actions">
-                        <a href="javascript:window.print()" class="print"><i class="fas fa-print me-2"></i>In hóa đơn</a>
-                        <a th:href="@{/dashboard/sales/download-invoice-pdf/{id}(id=${invoice.id})}" class="download"><i class="fas fa-file-pdf me-2"></i>Tải PDF</a>
+                        <!-- Chỉ hiển thị nút in và tải PDF nếu đơn hàng có trạng thái SUCCESS -->
+                        <span th:if="${invoice.status != null && invoice.status.name() == 'SUCCESS'}">
+                            <a href="javascript:window.print()" class="print"><i class="fas fa-print me-2"></i>In hóa đơn</a>
+                            <a th:href="@{/dashboard/sales/download-invoice-pdf/{id}(id=${invoice.id})}" class="download"><i class="fas fa-file-pdf me-2"></i>Tải PDF</a>
+                        </span>
+                        
+                        <!-- Hiển thị thông báo nếu đơn hàng đang xử lý hoặc thất bại -->
+                        <span th:if="${invoice.status != null && invoice.status.name() == 'PROCESSING'}" class="text-warning me-3">
+                            <i class="fas fa-spinner me-2"></i>Đơn hàng đang được xử lý
+                        </span>
+                        <span th:if="${invoice.status != null && invoice.status.name() == 'FAILED'}" class="text-danger me-3">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Thanh toán không thành công
+                        </span>
+                        
                         <a th:href="@{/dashboard/sales/form}" class="back"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
                     </div>
                 </div>

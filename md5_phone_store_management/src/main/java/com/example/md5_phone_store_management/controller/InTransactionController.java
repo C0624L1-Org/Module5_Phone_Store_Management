@@ -156,15 +156,14 @@ public ModelAndView showEditInTransaction(@PathVariable("id") Integer id) {
             return "redirect:/dashboard/admin/transactions/new/in/0";
         }
 
-        // Get productId from the transaction object
         Long productId = Long.valueOf(transaction.getProduct().getProductID());
         Product product = productService.getProductById(Math.toIntExact(productId));
         Optional<Product> optionalProduct = Optional.ofNullable(product);
 
         if (optionalProduct.isPresent()) {
-            // For import: Increase stock quantity
+
             product.setStockQuantity(product.getStockQuantity() + transaction.getQuantity());
-            productService.saveProduct(product);
+
 
             // Set transaction details
             transaction.setProduct(product);

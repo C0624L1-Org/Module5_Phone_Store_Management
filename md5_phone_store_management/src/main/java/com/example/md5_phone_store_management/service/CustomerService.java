@@ -1,12 +1,16 @@
 package com.example.md5_phone_store_management.service;
 
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.repository.CustomerRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.example.md5_phone_store_management.repository.IInvoiceDetailRepository;
+import com.example.md5_phone_store_management.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.example.md5_phone_store_management.model.Customer;
+import com.example.md5_phone_store_management.repository.CustomerRepository;
 
 @Service
 public class CustomerService {
@@ -14,10 +18,18 @@ public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private InvoiceRepository invoiceRepository;
 
     public List<Customer> findAllCustomers() {
         return customerRepository.findAll();
     }
+
+
+    public void deleteCustomer(List<Integer> customerID) {
+        customerRepository.deleteCustomer(customerID);
+    }
+
 
 
     public boolean updateCustomer(Customer customer) {
@@ -40,9 +52,6 @@ public class CustomerService {
     }
 
 
-    public void deleteCustomer(List<Integer> customerID) {
-        customerRepository.deleteCustomer(customerID);
-    }
 
     public void addNewCustomer(Customer customer) {
         customerRepository.save(customer);
@@ -55,6 +64,10 @@ public class CustomerService {
     public List<Customer> searchCustomers(String name, String phone, String gender) {
         return customerRepository.searchCustomers( name,  phone,  gender);
     }
-
+    
+    // Lấy danh sách khách hàng có lịch sử mua hàng (purchaseCount > 0)
+    public List<Customer> getCustomersWithPurchases() {
+        return customerRepository.findCustomersWithPurchases();
+    }
 
 }
