@@ -15,26 +15,26 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "invoices")
-public class Invoice {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Table(name = "invoices")
+    public class Invoice {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    private String vnp_TxnRef;
-    private Long amount;
-    private String orderInfo;
-    private String bankCode;
-    private String payDate;
-    private String transactionNo;
-    private String cardType;
+        private String vnp_TxnRef;
+        private Long amount;
+        private String orderInfo;
+        private String bankCode;
+        private String payDate;
+        private String transactionNo;
+        private String cardType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "customer_id", nullable = false)
+        private Customer customer;
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InvoiceDetail> invoiceDetailList;
+        @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<InvoiceDetail> invoiceDetailList;
 
     public Invoice() {
     }

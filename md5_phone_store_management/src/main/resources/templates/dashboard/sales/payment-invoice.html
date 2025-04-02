@@ -185,12 +185,12 @@
                         <p><strong><i class="fas fa-info-circle me-2"></i>Thông tin đơn hàng:</strong> <span th:text="${orderInfo}"></span></p>
                         <p><strong><i class="fas fa-calendar-alt me-2"></i>Ngày thanh toán:</strong> <span th:text="${#dates.format(payDate, 'dd/MM/yyyy HH:mm')}"></span></p>
                         <p>
-                            <strong><i class="fas fa-credit-card me-2"></i>Phương thức thanh toán:</strong> 
+                            <strong><i class="fas fa-credit-card me-2"></i>Phương thức thanh toán:</strong>
                             <span th:if="${bankCode == 'CASH'}" class="badge bg-success">Tiền mặt</span>
                             <span th:unless="${bankCode == 'CASH'}" class="badge bg-primary">VNPay - <span th:text="${bankCode}"></span></span>
                         </p>
                         <p th:if="${cardType != null && cardType != 'CASH'}">
-                            <strong><i class="fas fa-credit-card me-2"></i>Loại thẻ:</strong> 
+                            <strong><i class="fas fa-credit-card me-2"></i>Loại thẻ:</strong>
                             <span class="badge bg-info" th:text="${cardType}"></span>
                         </p>
                     </div>

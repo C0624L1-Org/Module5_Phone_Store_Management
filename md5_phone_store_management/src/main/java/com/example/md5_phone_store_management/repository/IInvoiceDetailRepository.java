@@ -24,4 +24,5 @@ public interface IInvoiceDetailRepository extends JpaRepository<InvoiceDetail, I
     @Query("select  ind from InvoiceDetail ind " +
             "order by  ind.totalPrice asc")
     Page<InvoiceDetail> sortByPrice(Pageable pageable);
+
 }

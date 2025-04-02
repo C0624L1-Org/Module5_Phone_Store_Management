@@ -1,0 +1,96 @@
+package com.example.md5_phone_store_management.controller;
+
+import com.example.md5_phone_store_management.service.SalesReportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Map;
+
+@Controller
+public class SalesReportController {
+
+    private static final Logger logger = LoggerFactory.getLogger(SalesReportController.class);
+
+    @Autowired
+    private SalesReportService salesReportService;
+
+    private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    @GetMapping("/sales-report")
+    public String showSalesReportForm(Model model) {
+        model.addAttribute("startDate", "1970-01-01");
+        model.addAttribute("endDate", LocalDate.now().format(DATE_INPUT_FORMATTER));
+        return "dashboard/sales/sales-report";
+    }
+
+    @PostMapping("/sales-report")
+    public String generateSalesReport(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam(required = false) String filterType,
+            @RequestParam(required = false) String productCode,
+            Model model) {
+
+        model.addAttribute("startDate", startDate != null ? startDate.format(DATE_INPUT_FORMATTER) : "");
+        model.addAttribute("endDate", endDate != null ? endDate.format(DATE_INPUT_FORMATTER) : "");
+        model.addAttribute("filterType", filterType);
+        model.addAttribute("productCode", productCode);
+
+        if (startDate == null || endDate == null) {
+            model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.");
+            return "dashboard/sales/sales-report";
+        }
+
+        try {
+            if (endDate.isBefore(startDate)) {
+                model.addAttribute("errorMessage", "Thời gian không hợp lệ: Ngày kết thúc phải sau ngày bắt đầu.");
+                return "dashboard/sales/sales-report";
+            }
+
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+            if ("product".equals(filterType)) {
+                if (productCode == null || productCode.trim().isEmpty()) {
+                    model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại hoặc chưa nhập.");
+                    return "dashboard/sales/sales-report";
+                }
+                if (!salesReportService.isProductCodeValid(productCode)) {
+                    model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại.");
+                    return "dashboard/sales/sales-report";
+                }
+            }
+
+            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, "product".equals(filterType) ? productCode : null);
+            if (report == null) {
+                model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này. Vui lòng nhập lại ngày.");
+                return "dashboard/sales/sales-report";
+            }
+
+            model.addAttribute("totalOrders", report.get("totalOrders"));
+            model.addAttribute("totalRevenue", report.get("totalRevenue"));
+            model.addAttribute("totalProfit", report.get("totalProfit"));
+            model.addAttribute("revenueByCustomer", report.get("revenueByCustomer"));
+            model.addAttribute("profitByCustomer", report.get("profitByCustomer"));
+            model.addAttribute("showReport", true);
+
+        } catch (DateTimeParseException e) {
+            logger.error("Error parsing date: " + e.getMessage());
+            model.addAttribute("errorMessage", "Ngày không đúng định dạng (yyyy-MM-dd).");
+            return "dashboard/sales/sales-report";
+        }
+
+        return "dashboard/sales/sales-report";
+    }
+}

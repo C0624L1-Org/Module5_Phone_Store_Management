@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sales Report</title>
+    <meta charset="UTF-8">
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+<h1>Sales Report</h1>
+
+<!-- Form nhập liệu -->
+<form th:action="@{/sales-report}" method="post">
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" name="startDate" th:value="${startDate}" required>
+
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" name="endDate" th:value="${endDate}" required>
+
+    <label for="filterType">Filter Type:</label>
+    <select id="filterType" name="filterType">
+        <option value="all" th:selected="${filterType == 'all'}">All</option>
+        <option value="product" th:selected="${filterType == 'product'}">By Product</option>
+    </select>
+
+    <label for="productCode">Product Code:</label>
+    <input type="text" id="productCode" name="productCode" th:value="${productCode}">
+
+    <button type="submit">Generate Report</button>
+</form>
+
+<!-- Hiển thị thông báo lỗi -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<!-- Hiển thị báo cáo -->
+<div th:if="${showReport}">
+    <h2>Report Summary</h2>
+    <p>Total Orders: <span th:text="${totalOrders}"></span></p>
+    <p>Total Revenue: <span th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')}"></span> VND</p>
+    <p>Total Profit: <span th:text="${#numbers.formatDecimal(totalProfit, 0, 'COMMA', 0, 'POINT')}"></span> VND</p>
+
+    <h3>Revenue by Customer</h3>
+    <ul>
+        <li th:each="entry : ${revenueByCustomer}">
+            Customer ID: <span th:text="${entry.key}"></span> - Revenue: <span th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')}"></span> VND
+        </li>
+    </ul>
+
+    <h3>Profit by Customer</h3>
+    <ul>
+        <li th:each="entry : ${profitByCustomer}">
+            Customer ID: <span th:text="${entry.key}"></span> - Profit: <span th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')}"></span> VND
+        </li>
+    </ul>
+</div>
+</body>
+</html>

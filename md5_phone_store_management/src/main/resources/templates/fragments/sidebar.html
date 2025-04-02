@@ -91,7 +91,7 @@
 
       <!-- Quản lý báo cáo - Admin & Nhân viên kinh doanh -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">
-        <a th:href="@{/dashboard/reports}" class="nav-link text-white">
+        <a th:href="@{/sales-report}" class="nav-link text-white">
           <i class="fas fa-file-alt me-2"></i>Quản lý báo cáo
         </a>
       </li>
