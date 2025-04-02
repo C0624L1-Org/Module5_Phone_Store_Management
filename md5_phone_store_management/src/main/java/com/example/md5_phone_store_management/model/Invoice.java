@@ -1,10 +1,14 @@
 package com.example.md5_phone_store_management.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,47 +28,69 @@ public class Invoice {
     private String vnp_TxnRef;
     private Long amount;
     private String orderInfo;
-    private String bankCode;
     private String payDate;
     private String transactionNo;
-    private String cardType;
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false)
+    private PaymentMethod paymentMethod;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private InvoiceStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
 
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceDetail> invoiceDetailList;
 
     public Invoice() {
+        this.status = InvoiceStatus.PROCESSING;
+        this.createdAt = LocalDateTime.now();
     }
 
-    
-
-    
-    public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, String bankCode, String payDate, String transactionNo, String cardType, Customer customer, List<InvoiceDetail> invoiceDetailList) {
+    public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, 
+                   String payDate, String transactionNo, 
+                   PaymentMethod paymentMethod, InvoiceStatus status,
+                   Customer customer, Employee employee, List<InvoiceDetail> invoiceDetailList) {
         this.id = id;
         this.vnp_TxnRef = vnp_TxnRef;
         this.amount = amount;
         this.orderInfo = orderInfo;
-        this.bankCode = bankCode;
         this.payDate = payDate;
         this.transactionNo = transactionNo;
-        this.cardType = cardType;
+        this.paymentMethod = paymentMethod;
+        this.status = status;
         this.customer = customer;
+        this.employee = employee;
         this.invoiceDetailList = invoiceDetailList;
+        this.createdAt = LocalDateTime.now();
     }
 
-    public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, String bankCode, String payDate, String transactionNo, String cardType, Customer customer) {
+    public Invoice(Long id, String vnp_TxnRef, Long amount, String orderInfo, 
+                   String payDate, String transactionNo,
+                   PaymentMethod paymentMethod, InvoiceStatus status,
+                   Customer customer, Employee employee) {
         this.id = id;
         this.vnp_TxnRef = vnp_TxnRef;
         this.amount = amount;
         this.orderInfo = orderInfo;
-        this.bankCode = bankCode;
         this.payDate = payDate;
         this.transactionNo = transactionNo;
-        this.cardType = cardType;
+        this.paymentMethod = paymentMethod;
+        this.status = status;
         this.customer = customer;
+        this.employee = employee;
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -99,14 +125,6 @@ public class Invoice {
         this.orderInfo = orderInfo;
     }
 
-    public String getBankCode() {
-        return bankCode;
-    }
-
-    public void setBankCode(String bankCode) {
-        this.bankCode = bankCode;
-    }
-
     public String getPayDate() {
         return payDate;
     }
@@ -122,13 +140,29 @@ public class Invoice {
     public void setTransactionNo(String transactionNo) {
         this.transactionNo = transactionNo;
     }
-
-    public String getCardType() {
-        return cardType;
+    
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCardType(String cardType) {
-        this.cardType = cardType;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+    
+    public InvoiceStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(InvoiceStatus status) {
+        this.status = status;
     }
 
     public Customer getCustomer() {
@@ -137,6 +171,14 @@ public class Invoice {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+    
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
     public List<InvoiceDetail> getInvoiceDetailList() {
@@ -183,11 +225,13 @@ public class Invoice {
                 ", vnp_TxnRef='" + vnp_TxnRef + '\'' +
                 ", amount=" + amount +
                 ", orderInfo='" + orderInfo + '\'' +
-                ", bankCode='" + bankCode + '\'' +
                 ", payDate='" + payDate + '\'' +
                 ", transactionNo='" + transactionNo + '\'' +
-                ", cardType='" + cardType + '\'' +
+                ", paymentMethod=" + paymentMethod +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
                 ", customer=" + (customer != null ? customer.getCustomerID() : null) +
+                ", employee=" + (employee != null ? employee.getEmployeeID() : null) +
                 ", invoiceDetailCount=" + (invoiceDetailList != null ? invoiceDetailList.size() : 0) +
                 '}';
     }

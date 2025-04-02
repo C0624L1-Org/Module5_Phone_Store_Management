@@ -14,9 +14,9 @@
 <body>
 
 <!-- Toast Container -->
-<div class="toast-container">
-  <!-- Success Toast -->
-  <div class="toast success" th:if="${messageType} == 'success'">
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <!-- Success Toast từ Model -->
+  <div class="toast success show" th:if="${messageType} == 'success'">
     <i class="fa-solid fa-circle-check toast-icon"></i>
     <div class="toast-content">
       <div class="toast-title"><strong>Thành Công</strong></div>
@@ -25,8 +25,8 @@
     <button class="close-btn">&times;</button>
   </div>
 
-  <!-- Error Toast -->
-  <div class="toast error" th:if="${messageType} == 'error'">
+  <!-- Error Toast từ Model -->
+  <div class="toast error show" th:if="${messageType} == 'error'">
     <i class="fa-solid fa-circle-xmark toast-icon"></i>
     <div class="toast-content">
       <div class="toast-title"><strong>Lỗi</strong></div>
@@ -36,18 +36,17 @@
   </div>
 
   <!-- Session Success Toast -->
-  <div class="toast success" th:if="${session.SUCCESS_MESSAGE}">
+  <div class="toast success show" th:if="${session.SUCCESS_MESSAGE}">
     <i class="fa-solid fa-circle-check toast-icon"></i>
     <div class="toast-content">
       <div class="toast-title"><strong>Thành Công</strong></div>
-      <div class="toast-message"
-           th:text="${session.SUCCESS_MESSAGE}"></div>
+      <div class="toast-message" th:text="${session.SUCCESS_MESSAGE}"></div>
     </div>
     <button class="close-btn">&times;</button>
   </div>
 
   <!-- Session Error Toast -->
-  <div class="toast error" th:if="${session.ERROR_MESSAGE}">
+  <div class="toast error show" th:if="${session.ERROR_MESSAGE}">
     <i class="fa-solid fa-circle-xmark toast-icon"></i>
     <div class="toast-content">
       <div class="toast-title"><strong>Lỗi</strong></div>
@@ -55,19 +54,37 @@
     </div>
     <button class="close-btn">&times;</button>
   </div>
+  
+  <!-- Template toast dùng cho JavaScript -->
+  <div id="toast-template" class="toast d-none">
+    <i class="toast-icon"></i>
+    <div class="toast-content">
+      <div class="toast-title"></div>
+      <div class="toast-message"></div>
+    </div>
+    <button class="close-btn">&times;</button>
+  </div>
 </div>
 
-<!-- Custom JS -->
-<script src="/js/common/toast.js"></script>
 <script th:inline="javascript">
-  window.onload = function() {
+  document.addEventListener('DOMContentLoaded', function() {
+    // Đặt timeout cho toast hiện tại
     setTimeout(() => {
-      document.querySelectorAll('.toast').forEach(el => el.remove());
-
+      document.querySelectorAll('.toast.show').forEach(el => el.remove());
+      
+      // Clear session messages
       fetch('/clear-session?key=SUCCESS_MESSAGE', { method: 'POST' });
       fetch('/clear-session?key=ERROR_MESSAGE', { method: 'POST' });
     }, 3000);
-  };
+    
+    // Thêm event listener cho nút đóng toast
+    document.querySelectorAll('.close-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.closest('.toast').remove();
+      });
+    });
+  });
 </script>
+
 </body>
 </html>

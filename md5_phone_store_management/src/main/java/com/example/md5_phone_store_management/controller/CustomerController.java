@@ -116,6 +116,14 @@ public class CustomerController {
         return "dashboard/admin/customers/customer-invoices";
     }
 
+    // Của Tân
+    @GetMapping("/sales/create-customer")
+    public String createCustomer(Model model) {
+        model.addAttribute("customer", new Customer());
+        return "dashboard/sales/form";
+    }
+
+
 
     @GetMapping("/admin/customers/search")
     public ModelAndView searchCustomers(
@@ -210,6 +218,14 @@ public class CustomerController {
         model.addAttribute("invoiceDetailList", invoiceDetailList);
         return "dashboard/invoice/invoice_detail_list";
     }
-
+    // Report
+    @GetMapping("/admin/customer/report")
+    public ModelAndView adminCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page) {
+        ModelAndView mv = new ModelAndView("/dashboard/admin/customers/CustomerReport");
+        List<Customer> allCustomers =customerService.findAllCustomers();
+        mv.addObject("customers", allCustomers);
+        mv.addObject("page", page);
+        return mv;
+    }
 
 }
