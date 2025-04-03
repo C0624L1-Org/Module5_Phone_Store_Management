@@ -85,13 +85,66 @@ public class ProductController {
     }
 
 
+//    @PostMapping("/update-prices")
+//    public String updatePrices(@RequestParam("productIds") List<Long> productIds,
+//                               @RequestParam("newPrices") List<Integer> newPrices,
+//                               @RequestParam("oldPrices") List<Integer> oldPrices,
+//                               HttpSession session,
+//                               RedirectAttributes redirectAttributes) {
+//        try {
+//            if (productIds.size() != newPrices.size() || productIds.size() != oldPrices.size()) {
+//                redirectAttributes.addFlashAttribute("error", "Dữ liệu không hợp lệ!");
+//                return "redirect:/dashboard/products/list";
+//            }
+//
+//            StringBuilder successMessage = new StringBuilder("Cập nhật giá cho ");
+//            List<String> updatedNames = new ArrayList<>();
+//
+//            for (int i = 0; i < productIds.size(); i++) {
+//                Long productId = productIds.get(i);
+//                Integer newPrice = newPrices.get(i) != null && newPrices.get(i) > 0 ? newPrices.get(i) : oldPrices.get(i);
+//
+//                Product product = productService.findById(Math.toIntExact(productId));
+//                if (product != null) {
+//                    product.setRetailPrice(BigDecimal.valueOf(newPrice));
+//                    productService.save(product);
+//                    updatedNames.add(product.getName());
+//                }
+//            }
+//
+//            successMessage.append(String.join(", ", updatedNames)).append(" thành công!");
+//            session.setAttribute("selectedProductIds", new ArrayList<>());
+//            session.setAttribute("SUCCESS_MESSAGE", successMessage.toString());
+//            return "redirect:/dashboard/products/list";
+//
+//        } catch (Exception e) {
+//            redirectAttributes.addFlashAttribute("error", "Lỗi khi cập nhật giá bán lẻ!");
+//            return "redirect:/dashboard/products/list";
+//        }
+//    }
+
     @PostMapping("/update-prices")
     public String updatePrices(@RequestParam("productIds") List<Long> productIds,
-                               @RequestParam("newPrices") List<Integer> newPrices,
-                               @RequestParam("oldPrices") List<Integer> oldPrices,
+                               @RequestParam(value = "newPrices", required = false) List<String> newPrices,
+                               @RequestParam(value = "oldPrices", required = false) List<String> oldPrices,
                                HttpSession session,
                                RedirectAttributes redirectAttributes) {
         try {
+            // Kiểm tra kích thước danh sách cơ bản
+            if (productIds == null || productIds.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Không có sản phẩm nào được chọn!");
+                return "redirect:/dashboard/products/list";
+            }
+
+            // Đảm bảo newPrices và oldPrices không null, nếu null thì tạo danh sách rỗng
+            if (newPrices == null) newPrices = new ArrayList<>();
+            if (oldPrices == null) oldPrices = new ArrayList<>();
+
+            // Điều chỉnh kích thước danh sách nếu cần
+            while (newPrices.size() < productIds.size()) newPrices.add("");
+            while (oldPrices.size() < productIds.size()) oldPrices.add("");
+
+            // Kiểm tra kích thước sau khi điều chỉnh
             if (productIds.size() != newPrices.size() || productIds.size() != oldPrices.size()) {
                 redirectAttributes.addFlashAttribute("error", "Dữ liệu không hợp lệ!");
                 return "redirect:/dashboard/products/list";
@@ -102,23 +155,57 @@ public class ProductController {
 
             for (int i = 0; i < productIds.size(); i++) {
                 Long productId = productIds.get(i);
-                Integer newPrice = newPrices.get(i) != null && newPrices.get(i) > 0 ? newPrices.get(i) : oldPrices.get(i);
+                String newPriceStr = newPrices.get(i);
+                String oldPriceStr = oldPrices.get(i);
+
+                // Xử lý giá cũ
+                Integer oldPrice = null;
+                if (oldPriceStr != null && !oldPriceStr.trim().isEmpty() && !"null".equals(oldPriceStr)) {
+                    try {
+                        oldPrice = Integer.parseInt(oldPriceStr);
+                    } catch (NumberFormatException e) {
+                        oldPrice = null; // Nếu không parse được, coi như không có giá cũ
+                    }
+                }
+
+                // Xử lý giá mới
+                Integer newPrice = null;
+                if (newPriceStr != null && !newPriceStr.trim().isEmpty()) {
+                    try {
+                        newPrice = Integer.parseInt(newPriceStr);
+                        if (newPrice <= 0) newPrice = oldPrice; // Giá mới không hợp lệ thì dùng giá cũ
+                    } catch (NumberFormatException e) {
+                        newPrice = oldPrice; // Nếu không parse được, dùng giá cũ
+                    }
+                } else {
+                    newPrice = oldPrice; // Nếu không điền giá mới, dùng giá cũ
+                }
 
                 Product product = productService.findById(Math.toIntExact(productId));
                 if (product != null) {
-                    product.setRetailPrice(BigDecimal.valueOf(newPrice));
-                    productService.save(product);
-                    updatedNames.add(product.getName());
+                    // Chỉ cập nhật nếu giá mới khác giá hiện tại hoặc giá hiện tại là null mà giá mới được điền
+                    BigDecimal currentPrice = product.getRetailPrice();
+                    if ((currentPrice == null && newPrice != null) ||
+                            (currentPrice != null && newPrice != null && !currentPrice.equals(BigDecimal.valueOf(newPrice)))) {
+                        product.setRetailPrice(newPrice != null ? BigDecimal.valueOf(newPrice) : null);
+                        productService.save(product);
+                        updatedNames.add(product.getName());
+                    }
                 }
             }
 
-            successMessage.append(String.join(", ", updatedNames)).append(" thành công!");
+            if (updatedNames.isEmpty()) {
+                session.setAttribute("SUCCESS_MESSAGE", "Không có thay đổi nào được áp dụng!");
+            } else {
+                successMessage.append(String.join(", ", updatedNames)).append(" thành công!");
+                session.setAttribute("SUCCESS_MESSAGE", successMessage.toString());
+            }
+
             session.setAttribute("selectedProductIds", new ArrayList<>());
-            session.setAttribute("SUCCESS_MESSAGE", successMessage.toString());
             return "redirect:/dashboard/products/list";
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi khi cập nhật giá bán lẻ!");
+            redirectAttributes.addFlashAttribute("error", "Lỗi khi cập nhật giá bán lẻ: " + e.getMessage());
             return "redirect:/dashboard/products/list";
         }
     }

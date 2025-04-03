@@ -657,11 +657,13 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="price-display selling-price">
-                                        <i class="fas fa-tags me-1"></i>
-                                        <span th:text="${#numbers.formatInteger(product.retailPrice,1,'POINT') + ' VND'}"></span>
-                                    </span>
+    <span class="price-display selling-price">
+        <i class="fas fa-tags me-1"></i>
+        <span th:if="${product.retailPrice != null}" th:text="${#numbers.formatInteger(product.retailPrice,1,'POINT') + ' VND'}"></span>
+        <span th:unless="${product.retailPrice != null}" style="color: red;">Chưa có</span>
+    </span>
                                 </td>
+
                                 <td>
                                     <span th:text="${product.CPU}"></span>
                                 </td>
@@ -800,255 +802,7 @@
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!--<script>-->
-<!--    // Range slider functionality-->
-<!--    var slider = document.getElementById("myRange");-->
-<!--    var output = document.getElementById("rangeValue");-->
-<!--    if (slider && output) {-->
-<!--        output.innerText = slider.value.toLocaleString() + " VND";-->
-<!--        slider.oninput = function() {-->
-<!--            output.innerText = this.value.toLocaleString() + " VND";-->
-<!--        };-->
-<!--    }-->
 
-<!--    // Reset search form-->
-<!--    function resetSearch() {-->
-<!--        document.querySelector("form").reset();-->
-<!--        window.location.href = "/dashboard/products/list";-->
-<!--    }-->
-
-<!--    // Update selected count-->
-<!--    function updateSelectedCount(count) {-->
-<!--        const selectedCountElement = document.getElementById('selectedCount');-->
-<!--        if (selectedCountElement) {-->
-<!--            selectedCountElement.textContent = count;-->
-<!--        } else {-->
-<!--            console.error("Không tìm thấy element 'selectedCount'");-->
-<!--        }-->
-<!--    }-->
-
-<!--    // Validate price function-->
-<!--    function validatePrice(value, oldPrice) {-->
-<!--        const maxPrice = 900000000; // 900 triệu-->
-<!--        if (value === "" || value === null) {-->
-<!--            return { isValid: true, message: "Giá cũ sẽ được dùng nếu không cập nhật", type: "info" };-->
-<!--        }-->
-<!--        const price = parseFloat(value);-->
-<!--        if (isNaN(price)) {-->
-<!--            return { isValid: false, message: "Giá phải là số hợp lệ", type: "error" };-->
-<!--        }-->
-<!--        if (price <= 0) {-->
-<!--            return { isValid: false, message: "Giá phải lớn hơn 0", type: "error" };-->
-<!--        }-->
-<!--        if (price > maxPrice) {-->
-<!--            return { isValid: false, message: "Giá không được vượt quá 900 triệu", type: "error" };-->
-<!--        }-->
-<!--        return { isValid: true, message: "", type: "" };-->
-<!--    }-->
-
-<!--    // Update save button state-->
-<!--    function updateSaveButtonState() {-->
-<!--        const priceInputs = document.querySelectorAll(".new-price-input");-->
-<!--        const saveButton = document.getElementById("saveButton");-->
-<!--        let allValid = true;-->
-
-<!--        priceInputs.forEach(input => {-->
-<!--            const oldPrice = parseFloat(input.parentElement.querySelector('input[name="oldPrices"]').value);-->
-<!--            const validation = validatePrice(input.value, oldPrice);-->
-<!--            if (!validation.isValid) {-->
-<!--                allValid = false;-->
-<!--            }-->
-<!--        });-->
-
-<!--        saveButton.disabled = !allValid;-->
-<!--    }-->
-
-<!--    // Handle checkbox changes and initial state-->
-<!--    document.addEventListener("DOMContentLoaded", function() {-->
-<!--        const checkboxes = document.querySelectorAll(".product-checkbox");-->
-<!--        if (checkboxes.length === 0) {-->
-<!--            console.error("Không tìm thấy checkbox nào với class 'product-checkbox'");-->
-<!--            return;-->
-<!--        }-->
-
-<!--        // Đặt trạng thái checked ban đầu dựa trên selectedProductIds-->
-<!--        checkboxes.forEach(checkbox => {-->
-<!--            const productId = parseInt(checkbox.value);-->
-<!--            checkbox.checked = selectedProductIds.includes(productId);-->
-<!--            console.log(`Checkbox ID: ${checkbox.id}, Value: ${checkbox.value}, Checked: ${checkbox.checked}`);-->
-
-<!--            // Xử lý sự kiện thay đổi-->
-<!--            checkbox.addEventListener("change", function() {-->
-<!--                console.log("Sending request to select product ID:", this.value, "Checked:", this.checked);-->
-<!--                fetch('/dashboard/products/select-product', {-->
-<!--                    method: 'POST',-->
-<!--                    headers: {-->
-<!--                        'Content-Type': 'application/json',-->
-<!--                    },-->
-<!--                    body: JSON.stringify({-->
-<!--                        productId: parseInt(this.value),-->
-<!--                        isChecked: this.checked-->
-<!--                    })-->
-<!--                })-->
-<!--                    .then(response => {-->
-<!--                        console.log("Response status:", response.status);-->
-<!--                        if (!response.ok) {-->
-<!--                            return response.text().then(text => {-->
-<!--                                console.error("Response text:", text.substring(0, 100));-->
-<!--                                throw new Error(`HTTP error! Status: ${response.status}`);-->
-<!--                            });-->
-<!--                        }-->
-<!--                        return response.json();-->
-<!--                    })-->
-<!--                    .then(data => {-->
-<!--                        console.log("Response data:", data);-->
-<!--                        if (data.selectedCount > 5) {-->
-<!--                            this.checked = false;-->
-<!--                            Swal.fire("Cảnh báo", "Vui lòng chọn ít hơn hoặc bằng 5 sản phẩm!", "warning");-->
-<!--                        }-->
-<!--                        updateSelectedCount(data.selectedCount);-->
-<!--                    })-->
-<!--                    .catch(error => {-->
-<!--                        console.error('Error selecting product:', error);-->
-<!--                        Swal.fire("Lỗi", "Không thể chọn sản phẩm: " + error.message, "error");-->
-<!--                    });-->
-<!--            });-->
-<!--        });-->
-
-<!--        // Đồng bộ số lượng ban đầu từ session-->
-<!--        updateSelectedCount(selectedProductIds.length);-->
-<!--    });-->
-
-<!--    // Clear selected products-->
-<!--    document.getElementById("clearSelectedProducts").addEventListener("click", function() {-->
-<!--        fetch('/dashboard/products/deselect-products', {-->
-<!--            method: 'POST',-->
-<!--            headers: {-->
-<!--                'Content-Type': 'application/json',-->
-<!--            },-->
-<!--        })-->
-<!--            .then(response => {-->
-<!--                if (!response.ok) {-->
-<!--                    throw new Error('Network response was not ok');-->
-<!--                }-->
-<!--                return response.json();-->
-<!--            })-->
-<!--            .then(data => {-->
-<!--                document.querySelectorAll(".product-checkbox").forEach(cb => cb.checked = false);-->
-<!--                updateSelectedCount(data.selectedCount);-->
-<!--                hideEditForm();-->
-<!--            })-->
-<!--            .catch(error => {-->
-<!--                console.error('Error deselecting products:', error);-->
-<!--                Swal.fire("Lỗi", "Không thể bỏ chọn sản phẩm!", "error");-->
-<!--            });-->
-<!--    });-->
-
-<!--    // Show edit form-->
-<!--    document.getElementById("showEditForm").addEventListener("click", function() {-->
-<!--        fetch('/dashboard/products/selected-products')-->
-<!--            .then(response => {-->
-<!--                if (!response.ok) {-->
-<!--                    return response.text().then(text => { throw new Error(text) });-->
-<!--                }-->
-<!--                return response.json();-->
-<!--            })-->
-<!--            .then(products => {-->
-<!--                const container = document.getElementById('selectedProductsContainer');-->
-<!--                container.innerHTML = '';-->
-
-<!--                products.forEach(product => {-->
-<!--                    container.innerHTML += `-->
-<!--                <div class="product-card" id="card-${product.productID}">-->
-<!--                    <div class="product-info">-->
-<!--                        <div class="product-image">Hình ảnh</div>-->
-<!--                        <h5 class="product-name">${product.name}</h5>-->
-<!--                        <div class="old-price">${product.retailPrice.toLocaleString()} VND</div>-->
-<!--                        <input type="number" class="new-price-input" name="newPrices" placeholder="Nhập giá mới">-->
-<!--                        <div class="validate-message"></div>-->
-<!--                        <input type="hidden" name="productIds" value="${product.productID}">-->
-<!--                        <input type="hidden" name="oldPrices" value="${product.retailPrice}">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            `;-->
-<!--                });-->
-
-<!--                const modal = document.getElementById("editFormModal");-->
-<!--                const cardWidth = 220;-->
-<!--                const minWidth = 300;-->
-<!--                const maxWidth = 1100;-->
-<!--                const newWidth = Math.min(maxWidth, Math.max(minWidth, products.length * cardWidth));-->
-<!--                modal.style.width = `${newWidth}px`;-->
-
-<!--                modal.style.display = "block";-->
-<!--                document.getElementById("modalBackdrop").style.display = "block";-->
-<!--                document.getElementById("actionButtons").style.display = "flex";-->
-
-<!--                // Add validation for each price input-->
-<!--                const priceInputs = document.querySelectorAll(".new-price-input");-->
-<!--                priceInputs.forEach(input => {-->
-<!--                    input.addEventListener("input", function() {-->
-<!--                        const oldPrice = parseFloat(this.parentElement.querySelector('input[name="oldPrices"]').value);-->
-<!--                        const validation = validatePrice(this.value, oldPrice);-->
-<!--                        const messageDiv = this.parentElement.querySelector(".validate-message");-->
-
-<!--                        if (validation.type === "error") {-->
-<!--                            messageDiv.className = "validate-message validate-error";-->
-<!--                            messageDiv.textContent = validation.message;-->
-<!--                        } else if (validation.type === "info") {-->
-<!--                            messageDiv.className = "validate-message validate-info";-->
-<!--                            messageDiv.textContent = validation.message;-->
-<!--                        } else {-->
-<!--                            messageDiv.className = "validate-message";-->
-<!--                            messageDiv.textContent = "";-->
-<!--                        }-->
-
-<!--                        updateSaveButtonState();-->
-<!--                    });-->
-
-<!--                    // Trigger initial validation-->
-<!--                    const event = new Event('input');-->
-<!--                    input.dispatchEvent(event);-->
-<!--                });-->
-<!--            })-->
-<!--            .catch(error => {-->
-<!--                Swal.fire("Thông báo", error.message, "warning");-->
-<!--            });-->
-<!--    });-->
-
-<!--    // Hide edit form-->
-<!--    function hideEditForm() {-->
-<!--        const modal = document.getElementById("editFormModal");-->
-<!--        const backdrop = document.getElementById("modalBackdrop");-->
-<!--        const actionButtons = document.getElementById("actionButtons");-->
-<!--        if (modal) modal.style.display = "none";-->
-<!--        if (backdrop) backdrop.style.display = "none";-->
-<!--        if (actionButtons) actionButtons.style.display = "none";-->
-<!--    }-->
-
-<!--    // Handle page load-->
-<!--    window.onload = function() {-->
-<!--        hideEditForm();-->
-<!--        const message = "[[${message}]]";-->
-<!--        const error = "[[${error}]]";-->
-
-<!--        if (message && message.trim() !== "") {-->
-<!--            Swal.fire({-->
-<!--                title: "Thành công!",-->
-<!--                text: message,-->
-<!--                icon: "success",-->
-<!--                timer: 2000,-->
-<!--                showConfirmButton: false-->
-<!--            }).then(() => {-->
-<!--                window.location.reload();-->
-<!--            });-->
-<!--        }-->
-
-<!--        if (error && error.trim() !== "") {-->
-<!--            Swal.fire("Lỗi", error, "error");-->
-<!--        }-->
-<!--    };-->
-<!--</script>-->
 <script>
     // Range slider functionality
     var slider = document.getElementById("myRange");
@@ -1235,7 +989,9 @@
                         <div class="product-info">
                             <div class="product-image">Hình ảnh</div>
                             <h5 class="product-name">${product.name}</h5>
-                            <div class="old-price">${formatPrice(product.retailPrice)} VND</div>
+                            <div class="old-price" th:if="${product.retailPrice != null}" th:text="${formatPrice(product.retailPrice) + ' VND'}"></div>
+<div class="old-price" th:unless="${product.retailPrice != null}" style="color: red;">Chưa có</div>
+
                             <input type="number" class="new-price-input" name="newPrices" placeholder="Nhập giá mới">
                             <div class="validate-message"></div>
                             <input type="hidden" name="productIds" value="${product.productID}">
