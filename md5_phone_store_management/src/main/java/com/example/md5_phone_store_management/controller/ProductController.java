@@ -47,81 +47,85 @@ public class ProductController {
         return "dashboard/product/home-product";
     }*/
 
-    @GetMapping("/list")
-    public String search1(Model model,
-                          @RequestParam(name = "searchProduct", required = false) String searchProduct,
-                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
-                          @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
-                          @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-                          HttpSession session) {
-        Pageable pageable = PageRequest.of(page, 5);
-        Page<Product> listProducts;
+//    @GetMapping("/list")
+//    public String search1(Model model,
+//                          @RequestParam(name = "searchProduct", required = false) String searchProduct,
+//                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
+//                          @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
+//                          @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+//                          HttpSession session) {
+//        Pageable pageable = PageRequest.of(page, 5);
+//        Page<Product> listProducts;
+//
+//        if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0)) {
+//            listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(
+//                    searchProduct, searchSupplier, rangePrice, pageable);
+//        } else {
+//            listProducts = productService.findAll(pageable);
+//        }
+//
+//        List<Long> selectedProductIds = (List<Long>) session.getAttribute("selectedProductIds");
+//        if (selectedProductIds == null) {
+//            selectedProductIds = new ArrayList<>();
+//        }
+//
+//        model.addAttribute("listProducts", listProducts);
+//        model.addAttribute("selectedProductIds", selectedProductIds); // Truyền danh sách ID đã chọn
+//        model.addAttribute("searchProduct", searchProduct);
+//        model.addAttribute("searchSupplier", searchSupplier);
+//        model.addAttribute("rangePrice", rangePrice);
+//
+//        String successMessage = (String) session.getAttribute("SUCCESS_MESSAGE");
+//        if (successMessage != null) {
+//            model.addAttribute("message", successMessage);
+//            session.removeAttribute("SUCCESS_MESSAGE");
+//        }
+//
+//        return "dashboard/product/home-product";
+//    }
+@GetMapping("/list")
+public String search1(Model model,
+                      @RequestParam(name = "searchProduct", required = false) String searchProduct,
+                      @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
+                      @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
+                      @RequestParam(name = "haveRetailPrice", required = false, defaultValue = "yes") String haveRetailPrice, // Thêm tham số mới
+                      @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+                      HttpSession session) {
+    Pageable pageable = PageRequest.of(page, 5);
+    Page<Product> listProducts;
 
-        if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0)) {
-            listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(
-                    searchProduct, searchSupplier, rangePrice, pageable);
-        } else {
-            listProducts = productService.findAll(pageable);
-        }
-
-        List<Long> selectedProductIds = (List<Long>) session.getAttribute("selectedProductIds");
-        if (selectedProductIds == null) {
-            selectedProductIds = new ArrayList<>();
-        }
-
-        model.addAttribute("listProducts", listProducts);
-        model.addAttribute("selectedProductIds", selectedProductIds); // Truyền danh sách ID đã chọn
-        model.addAttribute("searchProduct", searchProduct);
-        model.addAttribute("searchSupplier", searchSupplier);
-        model.addAttribute("rangePrice", rangePrice);
-
-        String successMessage = (String) session.getAttribute("SUCCESS_MESSAGE");
-        if (successMessage != null) {
-            model.addAttribute("message", successMessage);
-            session.removeAttribute("SUCCESS_MESSAGE");
-        }
-
-        return "dashboard/product/home-product";
+    // Điều kiện lọc dựa trên haveRetailPrice
+    if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0) || "no".equals(haveRetailPrice)) {
+        listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(
+                searchProduct, searchSupplier, rangePrice, "no".equals(haveRetailPrice), pageable);
+    } else {
+        listProducts = productService.findAll(pageable); // Mặc định là "Tất cả sản phẩm"
     }
 
+    List<Long> selectedProductIds = (List<Long>) session.getAttribute("selectedProductIds");
+    if (selectedProductIds == null) {
+        selectedProductIds = new ArrayList<>();
+    }
 
-//    @PostMapping("/update-prices")
-//    public String updatePrices(@RequestParam("productIds") List<Long> productIds,
-//                               @RequestParam("newPrices") List<Integer> newPrices,
-//                               @RequestParam("oldPrices") List<Integer> oldPrices,
-//                               HttpSession session,
-//                               RedirectAttributes redirectAttributes) {
-//        try {
-//            if (productIds.size() != newPrices.size() || productIds.size() != oldPrices.size()) {
-//                redirectAttributes.addFlashAttribute("error", "Dữ liệu không hợp lệ!");
-//                return "redirect:/dashboard/products/list";
-//            }
-//
-//            StringBuilder successMessage = new StringBuilder("Cập nhật giá cho ");
-//            List<String> updatedNames = new ArrayList<>();
-//
-//            for (int i = 0; i < productIds.size(); i++) {
-//                Long productId = productIds.get(i);
-//                Integer newPrice = newPrices.get(i) != null && newPrices.get(i) > 0 ? newPrices.get(i) : oldPrices.get(i);
-//
-//                Product product = productService.findById(Math.toIntExact(productId));
-//                if (product != null) {
-//                    product.setRetailPrice(BigDecimal.valueOf(newPrice));
-//                    productService.save(product);
-//                    updatedNames.add(product.getName());
-//                }
-//            }
-//
-//            successMessage.append(String.join(", ", updatedNames)).append(" thành công!");
-//            session.setAttribute("selectedProductIds", new ArrayList<>());
-//            session.setAttribute("SUCCESS_MESSAGE", successMessage.toString());
-//            return "redirect:/dashboard/products/list";
-//
-//        } catch (Exception e) {
-//            redirectAttributes.addFlashAttribute("error", "Lỗi khi cập nhật giá bán lẻ!");
-//            return "redirect:/dashboard/products/list";
-//        }
-//    }
+    // Thêm các thuộc tính vào model
+    model.addAttribute("listProducts", listProducts);
+    model.addAttribute("selectedProductIds", selectedProductIds);
+    model.addAttribute("searchProduct", searchProduct);
+    model.addAttribute("searchSupplier", searchSupplier);
+    model.addAttribute("rangePrice", rangePrice);
+    model.addAttribute("haveRetailPrice", haveRetailPrice); // Trả lại giá trị haveRetailPrice
+
+    String successMessage = (String) session.getAttribute("SUCCESS_MESSAGE");
+    if (successMessage != null) {
+        model.addAttribute("message", successMessage);
+        session.removeAttribute("SUCCESS_MESSAGE");
+    }
+
+    return "dashboard/product/home-product";
+}
+
+
+
 
     @PostMapping("/update-prices")
     public String updatePrices(@RequestParam("productIds") List<Long> productIds,

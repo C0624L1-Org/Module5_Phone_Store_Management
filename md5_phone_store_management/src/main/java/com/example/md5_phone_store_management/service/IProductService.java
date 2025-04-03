@@ -13,6 +13,9 @@ public interface IProductService {
 
     public List<Product> findAllByIds(List<Long> ids);
 
+    Page<Product> searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(
+            String name, String supplierName, Integer purchasePrice, boolean noRetailPrice, Pageable pageable);
+
 
     List<Product> findAllWithOutPageable ();
     List<Product> searchProductToChoose(

@@ -31,6 +31,34 @@ public class ProductService implements IProductService {
     CloudinaryService cloudinaryService;
 
 
+
+    @Override
+    public Page<Product> searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(
+            String name, String supplierName, Integer purchasePrice, boolean noRetailPrice, Pageable pageable) {
+        if (noRetailPrice) {
+            // Lọc các sản phẩm có retailPrice là null
+            return productRepository.findByNameContainingAndSupplierNameContainingAndPurchasePriceLessThanEqualAndRetailPriceIsNull(
+                    name != null ? name : "",
+                    supplierName != null ? supplierName : "",
+                    purchasePrice != null ? purchasePrice : Integer.MAX_VALUE,
+                    pageable);
+        } else {
+            // Lọc tất cả sản phẩm (bao gồm cả có và không có retailPrice)
+            return productRepository.findByNameContainingAndSupplierNameContainingAndPurchasePriceLessThanEqual(
+                    name != null ? name : "",
+                    supplierName != null ? supplierName : "",
+                    purchasePrice != null ? purchasePrice : Integer.MAX_VALUE,
+                    pageable);
+        }
+    }
+
+
+
+
+
+
+
+
     public List<Product> findAllByIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return new ArrayList<>();

@@ -16,6 +16,15 @@ import com.example.md5_phone_store_management.model.Product;
 
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Integer> {
+
+
+    Page<Product> findByNameContainingAndSupplierNameContainingAndPurchasePriceLessThanEqual(
+            String name, String supplierName, Integer purchasePrice, Pageable pageable);
+
+    Page<Product> findByNameContainingAndSupplierNameContainingAndPurchasePriceLessThanEqualAndRetailPriceIsNull(
+            String name, String supplierName, Integer purchasePrice, Pageable pageable);
+
+
     List<Product> findAllById(Iterable<Integer> ids);
 
 

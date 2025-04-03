@@ -17,248 +17,19 @@
     <link rel="stylesheet" href="/css/common/pagination.css">
     <link rel="stylesheet" href="/css/common/layout.css">
 
-    <!--    <style>-->
-    <!--        .validate-error {-->
-    <!--            color: #dc3545; /* Màu đỏ cho lỗi */-->
-    <!--            font-size: 0.85rem;-->
-    <!--            margin-top: 0.25rem;-->
-    <!--        }-->
-
-    <!--        .validate-info {-->
-    <!--            color: #198754; /* Màu xanh lá cho thông báo không nhập */-->
-    <!--            font-size: 0.85rem;-->
-    <!--            margin-top: 0.25rem;-->
-    <!--        }-->
-    <!--        .card-header {-->
-    <!--            background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);-->
-    <!--            color: white;-->
-    <!--            padding: 1.2rem 1.5rem;-->
-    <!--            border-radius: 10px 10px 0 0;-->
-    <!--        }-->
-
-    <!--        .search-section {-->
-    <!--            background-color: #f8f9fa;-->
-    <!--            border-radius: 10px;-->
-    <!--            padding: 1.5rem;-->
-    <!--            margin-bottom: 1.5rem;-->
-    <!--            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);-->
-    <!--            border: 1px solid #e9ecef;-->
-    <!--        }-->
-
-    <!--        .table-card {-->
-    <!--            border-radius: 10px;-->
-    <!--            overflow: hidden;-->
-    <!--            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);-->
-    <!--            border: 1px solid #e9ecef;-->
-    <!--        }-->
-
-    <!--        .btn-action {-->
-    <!--            padding: 0.375rem 0.75rem;-->
-    <!--            border-radius: 0.25rem;-->
-    <!--            font-weight: 500;-->
-    <!--            font-size: 0.875rem;-->
-    <!--            transition: all 0.2s;-->
-    <!--        }-->
-
-    <!--        .btn-action:hover {-->
-    <!--            transform: translateY(-2px);-->
-    <!--            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);-->
-    <!--        }-->
-
-    <!--        .btn-edit {-->
-    <!--            background-color: #ffc107;-->
-    <!--            border-color: #ffc107;-->
-    <!--            color: #212529;-->
-    <!--        }-->
-
-    <!--        .btn-edit:hover {-->
-    <!--            background-color: #e0a800;-->
-    <!--            border-color: #e0a800;-->
-    <!--        }-->
-
-    <!--        .table thead th {-->
-    <!--            background-color: #343a40;-->
-    <!--            color: white;-->
-    <!--            font-weight: 500;-->
-    <!--            border-color: #454d55;-->
-    <!--            text-transform: uppercase;-->
-    <!--            font-size: 0.875rem;-->
-    <!--            vertical-align: middle;-->
-    <!--        }-->
-
-    <!--        .table-striped tbody tr:nth-of-type(odd) {-->
-    <!--            background-color: rgba(0, 0, 0, 0.02);-->
-    <!--        }-->
-
-    <!--        .table-hover tbody tr:hover {-->
-    <!--            background-color: rgba(0, 0, 0, 0.075);-->
-    <!--        }-->
-
-    <!--        .form-control:focus, .form-select:focus {-->
-    <!--            border-color: #6c8deb;-->
-    <!--            box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);-->
-    <!--        }-->
-
-    <!--        .product-name {-->
-    <!--            font-weight: 600;-->
-    <!--            color: #343a40;-->
-    <!--        }-->
-
-    <!--        .price-display {-->
-    <!--            font-weight: 500;-->
-    <!--            background-color: #f8f9fa;-->
-    <!--            padding: 4px 8px;-->
-    <!--            border-radius: 4px;-->
-    <!--            border: 1px solid #e9ecef;-->
-    <!--        }-->
-
-    <!--        .purchase-price {-->
-    <!--            color: #dc3545;-->
-    <!--        }-->
-
-    <!--        .selling-price {-->
-    <!--            color: #198754;-->
-    <!--        }-->
-
-    <!--        .price-slider {-->
-    <!--            width: 100%;-->
-    <!--            height: 10px;-->
-    <!--            border-radius: 5px;-->
-    <!--        }-->
-
-    <!--        .price-slider::-webkit-slider-thumb {-->
-    <!--            -webkit-appearance: none;-->
-    <!--            appearance: none;-->
-    <!--            width: 20px;-->
-    <!--            height: 20px;-->
-    <!--            border-radius: 50%;-->
-    <!--            background: #4a6fdc;-->
-    <!--            cursor: pointer;-->
-    <!--        }-->
-
-    <!--        .price-slider::-moz-range-thumb {-->
-    <!--            width: 20px;-->
-    <!--            height: 20px;-->
-    <!--            border-radius: 50%;-->
-    <!--            background: #4a6fdc;-->
-    <!--            cursor: pointer;-->
-    <!--        }-->
-
-    <!--        .range-value-display {-->
-    <!--            font-weight: bold;-->
-    <!--            color: #4a6fdc;-->
-    <!--            padding: 0 8px;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal {-->
-    <!--            display: none;-->
-    <!--            position: fixed;-->
-    <!--            top: 50%;-->
-    <!--            left: 50%;-->
-    <!--            transform: translate(-50%, -50%);-->
-    <!--            background: white;-->
-    <!--            border-radius: 10px;-->
-    <!--            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);-->
-    <!--            z-index: 1050;-->
-    <!--            padding: 2rem;-->
-    <!--            max-height: 80vh;-->
-    <!--            overflow-y: auto;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .modal-header {-->
-    <!--            display: flex;-->
-    <!--            justify-content: center;-->
-    <!--            margin-bottom: 1.5rem;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .modal-header h4 {-->
-    <!--            font-size: 1.5rem;-->
-    <!--            font-weight: bold;-->
-    <!--            color: #343a40;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .product-container {-->
-    <!--            display: flex;-->
-    <!--            flex-wrap: nowrap;-->
-    <!--            gap: 1rem;-->
-    <!--            justify-content: flex-start;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .product-card {-->
-    <!--            background: white;-->
-    <!--            border-radius: 10px;-->
-    <!--            padding: 1rem;-->
-    <!--            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);-->
-    <!--            border: 1px solid #e9ecef;-->
-    <!--            width: 200px;-->
-    <!--            text-align: center;-->
-    <!--            flex-shrink: 0;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .product-image {-->
-    <!--            width: 100px;-->
-    <!--            height: 100px;-->
-    <!--            background-color: #f8f9fa;-->
-    <!--            border: 1px solid #e9ecef;-->
-    <!--            border-radius: 5px;-->
-    <!--            margin-bottom: 0.5rem;-->
-    <!--            display: flex;-->
-    <!--            align-items: center;-->
-    <!--            justify-content: center;-->
-    <!--            font-size: 0.9rem;-->
-    <!--            color: #6c757d;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .product-info {-->
-    <!--            display: flex;-->
-    <!--            flex-direction: column;-->
-    <!--            align-items: center;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .product-name {-->
-    <!--            font-size: 1rem;-->
-    <!--            min-height: 40px;-->
-    <!--            margin-bottom: 0.5rem;-->
-    <!--            overflow: hidden;-->
-    <!--            text-overflow: ellipsis;-->
-    <!--            white-space: nowrap;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .old-price {-->
-    <!--            color: #6c757d;-->
-    <!--            text-decoration: line-through;-->
-    <!--            margin-bottom: 0.5rem;-->
-    <!--            font-size: 0.9rem;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .new-price-input {-->
-    <!--            width: 100%;-->
-    <!--            margin: 0.5rem 0;-->
-    <!--            padding: 0.5rem;-->
-    <!--            border-radius: 5px;-->
-    <!--            border: 1px solid #ced4da;-->
-    <!--            font-size: 0.9rem;-->
-    <!--        }-->
-
-    <!--        .edit-form-modal .action-buttons {-->
-    <!--            display: flex;-->
-    <!--            gap: 0.5rem;-->
-    <!--            justify-content: flex-end;-->
-    <!--            margin-top: 1.5rem;-->
-    <!--        }-->
-
-    <!--        .modal-backdrop {-->
-    <!--            display: none;-->
-    <!--            position: fixed;-->
-    <!--            top: 0;-->
-    <!--            left: 0;-->
-    <!--            width: 100%;-->
-    <!--            height: 100%;-->
-    <!--            background: rgba(128, 128, 128, 0.5) !important;-->
-    <!--            z-index: 1040;-->
-    <!--        }-->
-    <!--    </style>-->
     <style>
+        .search-section .row {
+            align-items: center; /* Đảm bảo tất cả các cột trong row căn giữa theo chiều dọc */
+        }
+
+        .search-section .form-check {
+            margin-top: 1.5rem; /* Điều chỉnh khoảng cách trên của radio button nếu cần */
+        }
+
+        .search-section .btn-group {
+            height: 100%; /* Đảm bảo btn-group chiếm toàn bộ chiều cao của cột */
+        }
+
         .validate-error {
             color: #dc3545; /* Màu đỏ cho lỗi */
             font-size: 0.85rem;
@@ -285,6 +56,10 @@
             margin-bottom: 1.5rem;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             border: 1px solid #e9ecef;
+        }
+
+        .search-section .row {
+            flex-wrap: nowrap; /* Đảm bảo không xuống dòng */
         }
 
         .table-card {
@@ -464,8 +239,8 @@
         }
 
         .edit-form-modal .product-image {
-            width: 100px;
-            height: 100px;
+            width: 170px;
+            height: 170px;
             background-color: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 5px;
@@ -555,45 +330,63 @@
                 </div>
 
                 <div class="search-section">
-                    <form th:action="@{/dashboard/products/list(page=${page})}" method="get">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
-                                <label for="searchProduct" class="form-label">Tên sản phẩm</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
-                                    <input type="text" class="form-control" id="searchProduct" name="searchProduct"
-                                           placeholder="Nhập tên sản phẩm" th:value="${searchProduct}">
+                    <form th:action="@{/dashboard/products/list(page=${page})}" method="get" class="row g-3 flex-nowrap">
+                        <!-- Tên sản phẩm -->
+                        <div class="col-md-3 position-relative">
+                            <label for="searchProduct" class="form-label">Tên sản phẩm</label>
+                            <input type="text" class="form-control" id="searchProduct" name="searchProduct"
+                                   placeholder="Nhập tên sản phẩm" th:value="${searchProduct}"
+                                   onkeyup="autocompleteProduct()" onblur="hideAutocomplete('productList')">
+                            <div id="productList" class="autocomplete-list"></div>
+                        </div>
+
+                        <!-- Nhà cung cấp -->
+                        <div class="col-md-3 position-relative">
+                            <label for="searchSupplier" class="form-label">Nhà cung cấp</label>
+                            <input type="text" class="form-control" id="searchSupplier" name="searchSupplier"
+                                   placeholder="Nhập tên nhà cung cấp" th:value="${searchSupplier}"
+                                   onkeyup="autocompleteSupplier()" onblur="hideAutocomplete('supplierList')">
+                            <div id="supplierList" class="autocomplete-list"></div>
+                        </div>
+
+                        <!-- Giá mua vào tối đa -->
+                        <div class="col-md-2">
+                            <label for="myRange" class="form-label">Giá mua vào tối đa (VND)</label>
+                            <input type="range" min="1000000" max="100000000" step="500000"
+                                   class="form-range price-slider" id="myRange" name="rangePrice"
+                                   th:value="${rangePrice}">
+                            <span id="rangeValue" class="range-value-display">1000000 VND</span>
+                        </div>
+
+                        <!-- Radio buttons -->
+                        <div class="col-md-2 d-flex align-items-center">
+                            <div class="d-flex flex-column">
+                                <div class="form-check mb-2">
+                                    <input type="radio" id="all-products" name="haveRetailPrice" value="yes" class="form-check-input"
+                                           th:checked="${haveRetailPrice == null || haveRetailPrice == 'yes'}">
+                                    <label for="all-products" class="form-check-label">Tất cả sản phẩm</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" id="no-price-products" name="haveRetailPrice" value="no" class="form-check-input"
+                                           th:checked="${haveRetailPrice == 'no'}">
+                                    <label for="no-price-products" class="form-check-label">Các mặt hàng chưa có giá</label>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="col-md-3">
-                                <label for="searchSupplier" class="form-label">Nhà cung cấp</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-building"></i></span>
-                                    <input type="text" class="form-control" id="searchSupplier" name="searchSupplier"
-                                           placeholder="Nhập tên nhà cung cấp" th:value="${searchSupplier}">
-                                </div>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label for="myRange" class="form-label">Giá mua vào tối đa (VND)</label>
-                                <div class="d-flex align-items-center">
-                                    <input type="range" min="1000000" max="100000000" step="500000"
-                                           class="form-range price-slider" id="myRange" name="rangePrice"
-                                           th:value="${rangePrice}">
-                                    <span id="rangeValue" class="range-value-display">1000000 VND</span>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3 d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-secondary" onclick="resetSearch()">
-                                    <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                        <!-- Buttons -->
+                        <div class="col-md-2 d-flex align-items-center">
+                            <div class="btn-group w-100">
+                                <button type="submit" class="btn btn-primary h-100">
+                                    <i class="fas fa-search me-1"></i>Tìm kiếm
                                 </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search me-2"></i>Tìm kiếm
+                                <button type="button" class="btn btn-outline-secondary h-100" onclick="resetSearch()">
+                                    <i class="fas fa-times-circle me-1"></i>Xóa bộ lọc
                                 </button>
                             </div>
                         </div>
+                        <!-- Ẩn trường page để mặc định là 0 khi gửi form -->
+                        <input type="hidden" name="page" value="0">
                     </form>
                 </div>
 
@@ -620,18 +413,14 @@
                                 <td colspan="11" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
                             </tr>
                             <tr th:each="product,index : ${listProducts}">
-
                                 <td style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 50px;">
                                     <input type="checkbox" class="product-checkbox"
                                            th:id="'product-' + ${product.productID}"
                                            th:value="${product.productID}"
                                            style="transform: scale(2.2); margin: 0;"/>
                                 </td>
-
-
-
-
-                                <td class="text-center" th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
+                                <td class="text-center"
+                                    th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-mobile-alt me-2 text-primary"></i>
@@ -657,13 +446,13 @@
                                     </span>
                                 </td>
                                 <td>
-    <span class="price-display selling-price">
-        <i class="fas fa-tags me-1"></i>
-        <span th:if="${product.retailPrice != null}" th:text="${#numbers.formatInteger(product.retailPrice,1,'POINT') + ' VND'}"></span>
-        <span th:unless="${product.retailPrice != null}" style="color: red;">Chưa có</span>
-    </span>
+                                    <span class="price-display selling-price">
+                                        <i class="fas fa-tags me-1"></i>
+                                        <span th:if="${product.retailPrice != null}"
+                                              th:text="${#numbers.formatInteger(product.retailPrice,1,'POINT') + ' VND'}"></span>
+                                        <span th:unless="${product.retailPrice != null}" style="color: red;">Chưa có</span>
+                                    </span>
                                 </td>
-
                                 <td>
                                     <span th:text="${product.CPU}"></span>
                                 </td>
@@ -689,7 +478,8 @@
                         </table>
                     </div>
 
-                    <div th:if="${listProducts.totalPages > 0}" class="p-3 bg-light border-top d-flex justify-content-between">
+                    <div th:if="${listProducts.totalPages > 0}"
+                         class="p-3 bg-light border-top d-flex justify-content-between">
                         <div class="d-flex justify-content-start mt-3">
                             <button class="btn btn-info" id="showEditForm">
                                 <i class="fas fa-bell me-2"></i>
@@ -725,14 +515,16 @@
                                 </li>
                                 <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
                                     th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
 
                                 <li class="page-item active mx-2">
                                     <span class="page-link">
-                                        <span th:text="${listProducts.number + 1}"></span> / <span th:text="${listProducts.totalPages}"></span>
+                                        <span th:text="${listProducts.number + 1}"></span> / <span
+                                            th:text="${listProducts.totalPages}"></span>
                                     </span>
                                 </li>
 
@@ -745,21 +537,25 @@
                                 </li>
                                 <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'"
                                     th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
 
-                                <li class="page-item" th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
+                                <li class="page-item"
+                                    th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
                                     th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
                                     <a class="page-link"
                                        th:href="@{/dashboard/products/list(page=${listProducts.totalPages - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         Trang cuối
                                     </a>
                                 </li>
-                                <li class="page-item" th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
+                                <li class="page-item"
+                                    th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
                                     th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.totalPages - 1})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.totalPages - 1})}">
                                         Trang cuối
                                     </a>
                                 </li>
@@ -810,7 +606,7 @@
     if (slider && output) {
         // Định dạng giá trị ban đầu
         output.innerText = formatPrice(slider.value) + " VND";
-        slider.oninput = function() {
+        slider.oninput = function () {
             output.innerText = formatPrice(this.value) + " VND";
         };
     }
@@ -825,8 +621,10 @@
 
     // Reset search form
     function resetSearch() {
+        document.getElementById("all-products").checked = true;
         document.querySelector("form").reset();
         window.location.href = "/dashboard/products/list";
+
     }
 
     // Update selected count and button state
@@ -857,19 +655,19 @@
     function validatePrice(value, oldPrice) {
         const maxPrice = 900000000; // 900 triệu
         if (value === "" || value === null) {
-            return { isValid: true, message: "Giá cũ sẽ được dùng nếu không cập nhật", type: "info" };
+            return {isValid: true, message: "Giá cũ sẽ được dùng nếu không cập nhật", type: "info"};
         }
         const price = parseFloat(value);
         if (isNaN(price)) {
-            return { isValid: false, message: "Giá phải là số hợp lệ", type: "error" };
+            return {isValid: false, message: "Giá phải là số hợp lệ", type: "error"};
         }
         if (price <= 0) {
-            return { isValid: false, message: "Giá phải lớn hơn 0", type: "error" };
+            return {isValid: false, message: "Giá phải lớn hơn 0", type: "error"};
         }
         if (price > maxPrice) {
-            return { isValid: false, message: "Giá không được vượt quá 900 triệu", type: "error" };
+            return {isValid: false, message: "Giá không được vượt quá 900 triệu", type: "error"};
         }
-        return { isValid: true, message: "", type: "" };
+        return {isValid: true, message: "", type: ""};
     }
 
     // Update save button state
@@ -890,7 +688,7 @@
     }
 
     // Handle checkbox changes and initial state
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const checkboxes = document.querySelectorAll(".product-checkbox");
         if (checkboxes.length === 0) {
             console.error("Không tìm thấy checkbox nào với class 'product-checkbox'");
@@ -904,7 +702,7 @@
             console.log(`Checkbox ID: ${checkbox.id}, Value: ${checkbox.value}, Checked: ${checkbox.checked}`);
 
             // Xử lý sự kiện thay đổi
-            checkbox.addEventListener("change", function() {
+            checkbox.addEventListener("change", function () {
                 console.log("Sending request to select product ID:", this.value, "Checked:", this.checked);
                 fetch('/dashboard/products/select-product', {
                     method: 'POST',
@@ -946,7 +744,7 @@
     });
 
     // Clear selected products
-    document.getElementById("clearSelectedProducts").addEventListener("click", function() {
+    document.getElementById("clearSelectedProducts").addEventListener("click", function () {
         fetch('/dashboard/products/deselect-products', {
             method: 'POST',
             headers: {
@@ -971,11 +769,13 @@
     });
 
     // Show edit form
-    document.getElementById("showEditForm").addEventListener("click", function() {
+    document.getElementById("showEditForm").addEventListener("click", function () {
         fetch('/dashboard/products/selected-products')
             .then(response => {
                 if (!response.ok) {
-                    return response.text().then(text => { throw new Error(text) });
+                    return response.text().then(text => {
+                        throw new Error(text)
+                    });
                 }
                 return response.json();
             })
@@ -984,21 +784,30 @@
                 container.innerHTML = '';
 
                 products.forEach(product => {
-                    container.innerHTML += `
-                    <div class="product-card" id="card-${product.productID}">
-                        <div class="product-info">
-                            <div class="product-image">Hình ảnh</div>
-                            <h5 class="product-name">${product.name}</h5>
-                            <div class="old-price" th:if="${product.retailPrice != null}" th:text="${formatPrice(product.retailPrice) + ' VND'}"></div>
-<div class="old-price" th:unless="${product.retailPrice != null}" style="color: red;">Chưa có</div>
+                    const retailPriceDisplay = product.retailPrice != null
+                        ? `${Number(product.retailPrice).toLocaleString('vi-VN')} VND`
+                        : '<span style="color: red;">Chưa có</span>';
 
-                            <input type="number" class="new-price-input" name="newPrices" placeholder="Nhập giá mới">
-                            <div class="validate-message"></div>
-                            <input type="hidden" name="productIds" value="${product.productID}">
-                            <input type="hidden" name="oldPrices" value="${product.retailPrice}">
-                        </div>
-                    </div>
-                `;
+                    // Kiểm tra và lấy URL ảnh đầu tiên nếu tồn tại
+                    const imageUrl = product.images && product.images.length > 0
+                        ? product.images[0].imageUrl
+                        : '/default-image.jpg'; // Ảnh mặc định nếu không có ảnh
+
+                    container.innerHTML += `
+        <div class="product-card" id="card-${product.productID}">
+            <div class="product-info">
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${product.name}" class="img-thumbnail">
+                </div>
+                <h5 class="product-name">${product.name}</h5>
+                <div class="old-price">${retailPriceDisplay}</div>
+                <input type="number" class="new-price-input" name="newPrices" placeholder="Nhập giá mới">
+                <div class="validate-message"></div>
+                <input type="hidden" name="productIds" value="${product.productID}">
+                <input type="hidden" name="oldPrices" value="${product.retailPrice || ''}">
+            </div>
+        </div>
+    `;
                 });
 
                 const modal = document.getElementById("editFormModal");
@@ -1016,7 +825,7 @@
                 // Add validation for each price input
                 const priceInputs = document.querySelectorAll(".new-price-input");
                 priceInputs.forEach(input => {
-                    input.addEventListener("input", function() {
+                    input.addEventListener("input", function () {
                         const oldPrice = parseFloat(this.parentElement.querySelector('input[name="oldPrices"]').value);
                         const validation = validatePrice(this.value, oldPrice);
                         const messageDiv = this.parentElement.querySelector(".validate-message");
@@ -1056,7 +865,7 @@
     }
 
     // Handle page load
-    window.onload = function() {
+    window.onload = function () {
         hideEditForm();
         const message = "[[${message}]]";
         const error = "[[${error}]]";
