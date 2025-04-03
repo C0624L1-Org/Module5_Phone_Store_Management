@@ -230,11 +230,10 @@ public class BusinessController {
         return "redirect:/dashboard/products/listToChoose";
     }
 
-    @GetMapping("/transaction")
+    @GetMapping("/dashboard/business/transaction")
     public String transactionPage(@RequestParam(name = "page", defaultValue = "0", required = false) int page,
                                   @RequestParam(name = "sortValue", required = false) String sortValue,
                                   @RequestParam(name = "sortType", defaultValue = "true", required = false) boolean sortType,
-                                  @RequestParam(name = "remain", defaultValue = "false", required = false) boolean remain,
                                   Model model) {
 
         Pageable pageable = PageRequest.of(page, 2);
@@ -249,7 +248,7 @@ public class BusinessController {
         model.addAttribute("sortValue", sortValue);
         model.addAttribute("currentPage", page);
 
-        return "dashboard/business-management/transaction";
+        return "business/transaction";
     }
 
     public Page<Invoice> returnSortedInvoicePage(Pageable pageable, boolean sortType, String sortValue) {
