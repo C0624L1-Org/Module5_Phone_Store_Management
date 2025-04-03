@@ -121,7 +121,7 @@
                     <tbody>
                     <tr th:each="invoiceDetail,index : ${invoiceDetailList}">
                         <td th:text="${index.index + 1 + invoiceDetailList.size * invoiceDetailList.number}"></td>
-                        <td th:text="${#temporals.format(invoiceDetail.invoice.payDate,'dd-MM-yyyy')}"></td>
+                        <td th:text="${#temporals.format(invoiceDetail.invoice.createdAt,'dd-MM-yyyy')}"></td>
                         <td th:text="${invoiceDetail.invoice.customer.fullName}"></td>
                         <td th:text="${invoiceDetail.product.name}"></td>
                         <td th:text="${#numbers.formatDecimal(invoiceDetail.totalPrice,0,'POINT',0,'POINT')}"></td>
