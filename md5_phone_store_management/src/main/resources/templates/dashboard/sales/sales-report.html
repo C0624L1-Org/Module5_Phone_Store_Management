@@ -1,62 +1,193 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Sales Report</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
     <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid black; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .content-container { flex-grow: 1; padding: 20px; }
+        .card { border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .card-header { background: linear-gradient(90deg, #007bff, #00b4db); color: white; }
+        .form-group { margin-bottom: 15px; }
+        .summary-box { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; }
+        .summary-box h5 { margin: 0; color: #333; }
+        .summary-box p { font-size: 1.5rem; font-weight: bold; color: #007bff; margin: 5px 0 0; }
+        .chart-container { max-width: 600px; margin: 20px auto; }
     </style>
 </head>
 <body>
-<h1>Sales Report</h1>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
 
-<!-- Form nhập liệu -->
-<form th:action="@{/sales-report}" method="post">
-    <label for="startDate">Start Date:</label>
-    <input type="date" id="startDate" name="startDate" th:value="${startDate}" required>
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-    <label for="endDate">End Date:</label>
-    <input type="date" id="endDate" name="endDate" th:value="${endDate}" required>
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-    <label for="filterType">Filter Type:</label>
-    <select id="filterType" name="filterType">
-        <option value="all" th:selected="${filterType == 'all'}">All</option>
-        <option value="product" th:selected="${filterType == 'product'}">By Product</option>
-    </select>
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h1 class="mb-0"><i class="fas fa-chart-line me-2"></i>Sales Report</h1>
+                </div>
+                <div class="card-body">
+                    <!-- Form nhập liệu -->
+                    <form th:action="@{/sales-report}" method="post" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" id="startDate" name="startDate" th:value="${startDate}" class="form-control" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" id="endDate" name="endDate" th:value="${endDate}" class="form-control" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filterType" class="form-label">Filter Type</label>
+                            <select id="filterType" name="filterType" class="form-select">
+                                <option value="all" th:selected="${filterType == 'all'}">All</option>
+                                <option value="product" th:selected="${filterType == 'product'}">By Product</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="productCode" class="form-label">Product Code</label>
+                            <input type="text" id="productCode" name="productCode" th:value="${productCode}" class="form-control">
+                        </div>
+                        <div class="col-md-12 text-center">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-search me-2"></i>Generate Report</button>
+                        </div>
+                    </form>
 
-    <label for="productCode">Product Code:</label>
-    <input type="text" id="productCode" name="productCode" th:value="${productCode}">
+                    <!-- Hiển thị thông báo lỗi -->
+                    <div th:if="${errorMessage}" class="alert alert-danger mt-3" role="alert">
+                        <p th:text="${errorMessage}"></p>
+                    </div>
 
-    <button type="submit">Generate Report</button>
-</form>
+                    <!-- Hiển thị báo cáo -->
+                    <div th:if="${showReport}" class="mt-4">
+                        <h2 class="mb-4">Report Summary</h2>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="summary-box">
+                                    <h5>Total Orders</h5>
+                                    <p th:text="${totalOrders}"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="summary-box">
+                                    <h5>Total Revenue</h5>
+                                    <p th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' VND'"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="summary-box">
+                                    <h5>Total Profit</h5>
+                                    <p th:text="${#numbers.formatDecimal(totalProfit, 0, 'COMMA', 0, 'POINT')} + ' VND'"></p>
+                                </div>
+                            </div>
+                        </div>
 
-<!-- Hiển thị thông báo lỗi -->
-<div th:if="${errorMessage}" style="color: red;">
-    <p th:text="${errorMessage}"></p>
+                        <!-- Đồ thị doanh thu theo khách hàng -->
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <h3>Revenue by Customer</h3>
+                                <ul class="list-group">
+                                    <li class="list-group-item" th:each="entry : ${revenueByCustomer}">
+                                        Customer ID: <span th:text="${entry.key}"></span> - Revenue: <span th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h3>Profit by Customer</h3>
+                                <ul class="list-group">
+                                    <li class="list-group-item" th:each="entry : ${profitByCustomer}">
+                                        Customer ID: <span th:text="${entry.key}"></span> - Profit: <span th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
 
-<!-- Hiển thị báo cáo -->
-<div th:if="${showReport}">
-    <h2>Report Summary</h2>
-    <p>Total Orders: <span th:text="${totalOrders}"></span></p>
-    <p>Total Revenue: <span th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')}"></span> VND</p>
-    <p>Total Profit: <span th:text="${#numbers.formatDecimal(totalProfit, 0, 'COMMA', 0, 'POINT')}"></span> VND</p>
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-    <h3>Revenue by Customer</h3>
-    <ul>
-        <li th:each="entry : ${revenueByCustomer}">
-            Customer ID: <span th:text="${entry.key}"></span> - Revenue: <span th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')}"></span> VND
-        </li>
-    </ul>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <h3>Profit by Customer</h3>
-    <ul>
-        <li th:each="entry : ${profitByCustomer}">
-            Customer ID: <span th:text="${entry.key}"></span> - Profit: <span th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')}"></span> VND
-        </li>
-    </ul>
-</div>
+<!-- Script cho đồ thị -->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        /*[# th:if="${showReport}"]*/
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const customerIds = /*[[${revenueByCustomer.keySet()}]]*/ [];
+        const revenues = /*[[${revenueByCustomer.values()}]]*/ [];
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: customerIds,
+                datasets: [{
+                    label: 'Revenue by Customer (VND)',
+                    data: revenues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('vi-VN') + ' VND';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw.toLocaleString('vi-VN') + ' VND';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        /*[/]*/
+    });
+</script>
 </body>
 </html>

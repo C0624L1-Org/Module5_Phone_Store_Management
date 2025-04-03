@@ -42,6 +42,7 @@ public class SpringSecurity {
                                 "/dashboard/stock-in/delete",
                                 "/api/sales/**",
                                 "/dashboard/sales/add",
+                                "/dashboard/products/**",
                                 "/dashboard/admin/transactions/listIn/delete")
                 )
                 .authorizeHttpRequests(auth -> auth
@@ -56,10 +57,16 @@ public class SpringSecurity {
                                 "/clear-session",
                                 "/api/vnpay/**",
                                 "/api/payment/**",
+
+//                                chọn sp
+                                "/dashboard/products/select-product",
+                                "/dashboard/products/deselect-products",
+                                "/dashboard/products/selected-products",
+
                                 "/dashboard/sales/payment-callback",
                                 "/dashboard/sales/invoice-pdf/**",
                                 "/dashboard/sales/download-invoice-pdf/**").permitAll()
-                        .requestMatchers("/dashboard/admin/**").hasAnyRole("Admin", "WarehouseStaff")
+                        .requestMatchers("/dashboard/admin/**").hasAnyRole("Admin", "WarehouseStaff", "SalesPerson")
                         .requestMatchers("/dashboard/sales/create-customer", "/dashboard/business/**").hasAnyRole("Admin", "SalesPerson")
                         .requestMatchers("/api/create-customer").hasAnyRole("Admin", "SalesPerson", "SalesStaff")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")

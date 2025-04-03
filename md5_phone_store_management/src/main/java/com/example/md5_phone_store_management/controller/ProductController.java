@@ -8,6 +8,7 @@ import com.example.md5_phone_store_management.model.dto.ProductDTO;
 import com.example.md5_phone_store_management.service.CloudinaryService;
 import com.example.md5_phone_store_management.service.implement.ProductService;
 import com.example.md5_phone_store_management.service.implement.SupplierService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,34 +37,49 @@ public class ProductController {
     @Autowired
     CloudinaryService cloudinaryService;
 
-    // Tuấn Anh
-    /*@GetMapping("/list")
-    public String index(Model model,
-                        @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
-        Pageable pageable = PageRequest.of(page, 2);
-        Page<Product> listProducts = productService.findAll(pageable);
-        model.addAttribute("listProducts", listProducts);
-        return "dashboard/product/home-product";
-    }*/
-
     @GetMapping("/list")
-    public String search(Model model, @RequestParam(name = "searchProduct", required = false) String searchProduct,
-                         @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
-                         @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
-                         @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
+    public String search1(Model model,
+                          @RequestParam(name = "searchProduct", required = false) String searchProduct,
+                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
+                          @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
+                          @RequestParam(name = "haveRetailPrice", required = false, defaultValue = "yes") String haveRetailPrice, // Thêm tham số mới
+                          @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+                          HttpSession session) {
         Pageable pageable = PageRequest.of(page, 5);
-        Page<Product> listProducts = productService.findAll(pageable);
-        if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0)) {
-            listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(searchProduct, searchSupplier, rangePrice, pageable);
+        Page<Product> listProducts;
+
+        // Điều kiện lọc dựa trên haveRetailPrice
+        if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0) || "no".equals(haveRetailPrice)) {
+            listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(
+                    searchProduct, searchSupplier, rangePrice, "no".equals(haveRetailPrice), pageable);
         } else {
-            listProducts = productService.findAll(pageable);
+            listProducts = productService.findAll(pageable); // Mặc định là "Tất cả sản phẩm"
         }
+
+        List<Long> selectedProductIds = (List<Long>) session.getAttribute("selectedProductIds");
+        if (selectedProductIds == null) {
+            selectedProductIds = new ArrayList<>();
+        }
+
+        // Thêm các thuộc tính vào model
         model.addAttribute("listProducts", listProducts);
+        model.addAttribute("selectedProductIds", selectedProductIds);
         model.addAttribute("searchProduct", searchProduct);
         model.addAttribute("searchSupplier", searchSupplier);
         model.addAttribute("rangePrice", rangePrice);
+        model.addAttribute("haveRetailPrice", haveRetailPrice); // Trả lại giá trị haveRetailPrice
+
+        String successMessage = (String) session.getAttribute("SUCCESS_MESSAGE");
+        if (successMessage != null) {
+            model.addAttribute("message", successMessage);
+            session.removeAttribute("SUCCESS_MESSAGE");
+        }
+
         return "dashboard/product/home-product";
     }
+
+
+
 
     // Đình Anh
     @GetMapping("/create-form")
@@ -191,7 +207,7 @@ public class ProductController {
 
 
         redirectAttr.addFlashAttribute("messageType", "success");
-        redirectAttr.addFlashAttribute("message", "Đã Thêm mới thành công!");
+        redirectAttr.addFlashAttribute("message", "Đã cập nhật thành công!");
         return "redirect:/dashboard/products/list";
     }
 

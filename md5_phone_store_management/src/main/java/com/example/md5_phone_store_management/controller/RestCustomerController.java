@@ -16,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +26,7 @@ import com.example.md5_phone_store_management.repository.ICustomerRepository;
 import com.example.md5_phone_store_management.service.CustomerService;
 import com.example.md5_phone_store_management.service.ICustomerService;
 import com.example.md5_phone_store_management.service.IProductService;
+import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -105,86 +107,84 @@ public class RestCustomerController {
         return ResponseEntity.ok(response);
     }
 
-    /** API endpoint để tạo khách hàng mới (Quản lý bán bàng) */
-    @PostMapping("/api/create-customer")
-    public ResponseEntity<Map<String, Object>> apiCreateCustomer(
-            @Valid @ModelAttribute Customer customer,
-            BindingResult result,
-            HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        
-        // Log để debug
-        System.out.println("API tạo khách hàng mới được gọi với thông tin: " + customer.getFullName() + ", " + customer.getPhone());
-        
-        if (result.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            result.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-
-            System.out.println("Lỗi validation khi tạo khách hàng: " + errors);
-            response.put("success", false);
-            response.put("errors", errors);
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        try {
-            // Kiểm tra phone hoặc email đã tồn tại trước khi thêm khách hàng
-            if (customer.getPhone() != null && !customer.getPhone().isEmpty()) {
-                // Sử dụng JdbcTemplate để kiểm tra trực tiếp
-                String sql = "SELECT COUNT(*) FROM customer WHERE phone = ?";
-                Integer count = jdbcTemplate.queryForObject(sql, Integer.class, customer.getPhone());
-                if (count != null && count > 0) {
-                    response.put("success", false);
-                    response.put("message", "Số điện thoại đã tồn tại trong hệ thống.");
-                    return ResponseEntity.badRequest().body(response);
-                }
-            }
-            
-            if (customer.getEmail() != null && !customer.getEmail().isEmpty()) {
-                // Sử dụng JdbcTemplate để kiểm tra trực tiếp
-                String sql = "SELECT COUNT(*) FROM customer WHERE email = ?";
-                Integer count = jdbcTemplate.queryForObject(sql, Integer.class, customer.getEmail());
-                if (count != null && count > 0) {
-                    response.put("success", false);
-                    response.put("message", "Email đã tồn tại trong hệ thống.");
-                    return ResponseEntity.badRequest().body(response);
-                }
-            }
-            
-            // Đảm bảo ngày sinh không null
-            if (customer.getDob() == null) {
-                try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    customer.setDob(dateFormat.parse("2000-01-01"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            
-            // Lưu khách hàng
-            Customer savedCustomer = customerService.addNewCustomerAjax(customer);
-            
-            // Log thông tin khách hàng đã lưu
-            System.out.println("Đã thêm khách hàng mới: ID=" + savedCustomer.getCustomerID() + 
-                              ", Tên=" + savedCustomer.getFullName() + 
-                              ", SĐT=" + savedCustomer.getPhone());
-            
-            // Chuẩn bị dữ liệu phản hồi
-            response.put("success", true);
-            response.put("customerId", savedCustomer.getCustomerID());
-            response.put("fullName", savedCustomer.getFullName());
-            response.put("message", "Thêm khách hàng thành công!");
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            // Xử lý ngoại lệ và ghi log chi tiết
-            System.err.println("Lỗi khi thêm khách hàng mới: " + e.getMessage());
-            e.printStackTrace();
-            
-            response.put("success", false);
-            response.put("message", "Lỗi khi thêm khách hàng: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
+//    /** API endpoint để tạo khách hàng mới (Quản lý bán bàng) */
+//    @PostMapping("/api/create-customer")
+//    public ResponseEntity<Map<String, Object>> apiCreateCustomer(
+//            @Valid @ModelAttribute Customer customer,
+//            BindingResult result,
+//            HttpSession session) {
+//        Map<String, Object> response = new HashMap<>();
+//
+//        // Log để debug
+//        System.out.println("API tạo khách hàng mới được gọi với thông tin: " + customer.getFullName() + ", " + customer.getPhone());
+//
+//        // Check for validation errors
+//        if (result.hasErrors()) {
+//            Map<String, String> errors = new HashMap<>();
+//            result.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+//
+//            System.out.println("Lỗi validation khi tạo khách hàng: " + errors);
+//            response.put("success", false);
+//            response.put("errors", errors);
+//            return ResponseEntity.badRequest().body(response);
+//        }
+//
+//        try {
+//            if (customer.getPhone() != null && !customer.getPhone().isEmpty()) {
+//                if (iCustomerService.isPhoneExists(customer.getPhone())) {
+//                    response.put("success", false);
+//                    response.put("message", "Số điện thoại đã tồn tại!");
+//                    return ResponseEntity.badRequest().body(response);
+//                }
+//            }
+//
+//            if (customer.getEmail() != null && !customer.getEmail().isEmpty()) {
+//                // Sử dụng service để kiểm tra
+//                if (iCustomerService.isEmailExists(customer.getEmail())) {
+//                    response.put("success", false);
+//                    response.put("message", "Email đã tồn tại!");
+//                    return ResponseEntity.badRequest().body(response);
+//                }
+//            }
+//
+//            // Đảm bảo ngày sinh không null
+//            if (customer.getDob() == null) {
+//                try {
+//                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//                    customer.setDob(dateFormat.parse("2000-01-01"));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            // Đảm bảo purchaseCount bắt đầu từ 0
+//            customer.setPurchaseCount(0);
+//
+//            // Lưu khách hàng
+//            Customer savedCustomer = customerService.addNewCustomerAjax(customer);
+//
+//            // Log thông tin khách hàng đã lưu
+//            System.out.println("Đã thêm khách hàng mới: ID=" + savedCustomer.getCustomerID() +
+//                              ", Tên=" + savedCustomer.getFullName() +
+//                              ", SĐT=" + savedCustomer.getPhone());
+//
+//            // Chuẩn bị dữ liệu phản hồi
+//            response.put("success", true);
+//            response.put("customerId", savedCustomer.getCustomerID());
+//            response.put("fullName", savedCustomer.getFullName());
+//            response.put("message", "Thêm khách hàng thành công!");
+//
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            // Xử lý ngoại lệ và ghi log chi tiết
+//            System.err.println("Lỗi khi thêm khách hàng mới: " + e.getMessage());
+//            e.printStackTrace();
+//
+//            response.put("success", false);
+//            response.put("message", "Lỗi khi thêm khách hàng: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//        }
+//    }
 
     /** API endpoint tìm kiếm và phân trang cho khách hàng cũ (Quản lý bán hàng) */
     @GetMapping("/api/sales/search-customers")
@@ -340,6 +340,131 @@ public class RestCustomerController {
         }
     }
 
+    /**
+     * API endpoint để đồng bộ hóa purchaseCount cho tất cả khách hàng
+     */
+    @GetMapping("/api/sales/sync-purchase-counts")
+    public ResponseEntity<Map<String, Object>> synchronizePurchaseCounts() {
+        System.out.println("API được gọi: /api/sales/sync-purchase-counts - Đồng bộ hóa số lượng mua hàng cho khách hàng");
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Sử dụng CustomerServiceImpl để truy cập hàm đồng bộ hóa
+            CustomerServiceImpl customerServiceImpl = (CustomerServiceImpl) iCustomerService;
+            
+            // Thực hiện đồng bộ hóa và lấy số bản ghi đã cập nhật
+            int updatedCount = customerServiceImpl.synchronizeAllPurchaseCounts();
+            
+            // Trả về thông tin thành công
+            response.put("success", true);
+            response.put("message", "Đã đồng bộ hóa số lượng mua hàng cho " + updatedCount + " khách hàng");
+            response.put("updatedCount", updatedCount);
+            
+            // Log thành công
+            System.out.println("Đồng bộ hóa thành công, đã cập nhật " + updatedCount + " khách hàng");
+            
+            return ResponseEntity.ok(response);
+        } catch (ClassCastException e) {
+            // Xử lý trường hợp không thể cast
+            System.err.println("Lỗi cast dịch vụ: " + e.getMessage());
+            e.printStackTrace();
+            
+            response.put("success", false);
+            response.put("message", "Lỗi cấu hình dịch vụ, không thể đồng bộ hóa");
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        } catch (Exception e) {
+            // Xử lý các lỗi khác
+            System.err.println("Lỗi không xác định khi đồng bộ hóa: " + e.getMessage());
+            e.printStackTrace();
+            
+            response.put("success", false);
+            response.put("message", "Lỗi khi đồng bộ hóa: " + e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
+    /** API endpoint thêm khách hàng mới từ trang bán hàng */
+    @PostMapping("/api/sales/add-customer")
+    public ResponseEntity<Map<String, Object>> addCustomerFromSales(@Valid @RequestBody Customer customer,
+                                                                    BindingResult bindingResult) {
+        Map<String, Object> response = new HashMap<>();
+
+        // Check for validation errors
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+
+            System.out.println("Lỗi validation khi tạo khách hàng: " + errors);
+            response.put("success", false);
+            response.put("errors", errors);
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        // Log thông tin khách hàng mới
+        System.out.println("Thêm khách hàng mới từ trang bán hàng: " + customer.getFullName() + ", " + customer.getPhone());
+        
+        try {
+            // Kiểm tra số điện thoại
+            if (customer.getPhone() != null && !customer.getPhone().isEmpty()) {
+                if (iCustomerService.isPhoneExists(customer.getPhone())) {
+                    response.put("success", false);
+                    response.put("message", "Số điện thoại đã tồn tại!");
+                    return ResponseEntity.ok(response);
+                }
+            }
+            
+            // Kiểm tra email
+            if (customer.getEmail() != null && !customer.getEmail().isEmpty()) {
+                if (iCustomerService.isEmailExists(customer.getEmail())) {
+                    response.put("success", false);
+                    response.put("message", "Email đã tồn tại!");
+                    return ResponseEntity.ok(response);
+                }
+            }
+            
+            // Đảm bảo ngày sinh không null
+            if (customer.getDob() == null) {
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    customer.setDob(dateFormat.parse("2000-01-01"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            // Đảm bảo purchaseCount bắt đầu từ 0
+            customer.setPurchaseCount(0);
+            
+            // Lưu khách hàng
+            Customer savedCustomer = customerService.addNewCustomerAjax(customer);
+            
+            // Log thông tin khách hàng đã lưu
+            System.out.println("Đã thêm khách hàng mới từ trang bán hàng: ID=" + savedCustomer.getCustomerID() + 
+                              ", Tên=" + savedCustomer.getFullName() + 
+                              ", SĐT=" + savedCustomer.getPhone());
+            
+            // Chuẩn bị dữ liệu phản hồi
+            response.put("success", true);
+            response.put("customerId", savedCustomer.getCustomerID());
+            response.put("fullName", savedCustomer.getFullName());
+            response.put("message", "Thêm khách hàng thành công!");
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Xử lý ngoại lệ
+            System.err.println("Lỗi khi thêm khách hàng mới từ trang bán hàng: " + e.getMessage());
+            e.printStackTrace();
+            
+            response.put("success", false);
+            response.put("message", "Lỗi khi thêm khách hàng: " + e.getMessage());
+            
+            return ResponseEntity.ok(response);
+        }
+    }
+    
     /** API endpoint tìm kiếm và phân trang cho sản phẩm (Quản lý bán hàng) */
     @GetMapping("/api/sales/search-products")
     public ResponseEntity<Map<String, Object>> searchProducts(

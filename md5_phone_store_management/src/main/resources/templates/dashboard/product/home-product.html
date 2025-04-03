@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -18,11 +19,26 @@
     <link rel="stylesheet" href="/css/common/layout.css">
 
     <style>
-        .card-header {
-            background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);
-            color: white;
-            padding: 1.2rem 1.5rem;
-            border-radius: 10px 10px 0 0;
+        .search-section .row {
+            flex-wrap: nowrap; /* Đảm bảo không xuống dòng */
+            justify-content: space-between; /* Dãn đều các cột */
+            align-items: end; /* Căn các phần tử theo đáy */
+        }
+
+        .search-section .col {
+            flex: 1; /* Cho phép các cột dãn đều */
+            min-width: 0; /* Ngăn cột bị tràn nội dung */
+            padding: 0 10px; /* Thêm khoảng cách giữa các cột */
+        }
+
+        .search-section .btn-group {
+            width: 100%; /* Đảm bảo btn-group chiếm toàn bộ chiều rộng cột */
+            display: flex; /* Sử dụng flex để các nút dãn đều */
+        }
+
+        .search-section .btn-group .btn {
+            flex: 1; /* Các nút trong btn-group dãn đều */
+            white-space: nowrap; /* Ngăn text trong nút xuống dòng */
         }
 
         .search-section {
@@ -93,7 +109,6 @@
             color: #343a40;
         }
 
-        /* Price display styling */
         .price-display {
             font-weight: 500;
             background-color: #f8f9fa;
@@ -110,7 +125,6 @@
             color: #198754;
         }
 
-        /* Range slider custom styling */
         .price-slider {
             width: 100%;
             height: 10px;
@@ -143,23 +157,17 @@
     </style>
 </head>
 <body>
-<!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
-
-<!-- Nhúng navbar -->
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
 <div class="content-wrapper">
     <div class="dashboard-container">
-        <!-- Sidebar -->
         <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-        <!-- Main content -->
         <div class="content-container">
             <div class="container-fluid py-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Quản lý sản phẩm</li>
                     </ol>
                 </nav>
@@ -169,56 +177,58 @@
                         <i class="fas fa-mobile-alt me-2 text-primary"></i>
                         Danh sách sản phẩm
                     </h2>
-
                     <a th:href="@{/dashboard/products/create-form}" class="btn btn-success">
                         <i class="fas fa-plus-circle me-2"></i>Thêm mới sản phẩm
                     </a>
                 </div>
 
-                <!-- Search -->
                 <div class="search-section">
-                    <form th:action="@{/dashboard/products/list(page=${page})}" method="get">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label for="searchProduct" class="form-label">Tên sản phẩm</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
-                                    <input type="text" class="form-control" id="searchProduct" name="searchProduct"
-                                           placeholder="Nhập tên sản phẩm" th:value="${searchProduct}">
-                                </div>
-                            </div>
+                    <form th:action="@{/dashboard/products/list(page=${page})}" method="get" class="row g-3 flex-nowrap align-items-end">
+                        <!-- Tên sản phẩm -->
+                        <div class="col position-relative">
+                            <label for="searchProduct" class="form-label">Tên sản phẩm</label>
+                            <input type="text" class="form-control" id="searchProduct" name="searchProduct"
+                                   placeholder="Nhập tên sản phẩm" th:value="${searchProduct}"
+                                   onkeyup="autocompleteProduct()" onblur="hideAutocomplete('productList')">
+                            <div id="productList" class="autocomplete-list"></div>
+                        </div>
 
-                            <div class="col-md-4">
-                                <label for="searchSupplier" class="form-label">Nhà cung cấp</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-building"></i></span>
-                                    <input type="text" class="form-control" id="searchSupplier" name="searchSupplier"
-                                           placeholder="Nhập tên nhà cung cấp" th:value="${searchSupplier}">
-                                </div>
-                            </div>
+                        <!-- Nhà cung cấp -->
+                        <div class="col position-relative">
+                            <label for="searchSupplier" class="form-label">Nhà cung cấp</label>
+                            <input type="text" class="form-control" id="searchSupplier" name="searchSupplier"
+                                   placeholder="Nhập tên nhà cung cấp" th:value="${searchSupplier}"
+                                   onkeyup="autocompleteSupplier()" onblur="hideAutocomplete('supplierList')">
+                            <div id="supplierList" class="autocomplete-list"></div>
+                        </div>
 
-                            <div class="col-md-4">
-                                <label for="myRange" class="form-label">Giá mua vào tối đa (VND)</label>
-                                <div class="d-flex align-items-center">
-                                    <input type="range" min="1000000" max="100000000" step="500000" class="form-range price-slider" id="myRange" name="rangePrice"
-                                           th:value="${rangePrice}">
-                                    <span id="rangeValue" class="range-value-display" >1000000 VND</span>
-                                </div>
-                            </div>
+                        <!-- Giá mua vào tối đa -->
+                        <div class="col">
+                            <label for="myRange" class="form-label">Giá mua vào tối đa (VND)</label>
+                            <input type="range" min="1000000" max="100000000" step="500000"
+                                   class="form-range price-slider" id="myRange" name="rangePrice"
+                                   th:value="${rangePrice}">
+                            <span id="rangeValue" class="range-value-display">1000000 VND</span>
+                        </div>
 
-                            <div class="col-md-12 d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-secondary" onclick="resetSearch()">
-                                    <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                        <input type="hidden" name="haveRetailPrice" value="yes">
+
+                        <!-- Buttons -->
+                        <div class="col d-flex align-items-end">
+                            <div class="btn-group w-100">
+                                <button type="submit" class="btn btn-primary flex-fill">
+                                    <i class="fas fa-search me-1"></i>Tìm kiếm
                                 </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search me-2"></i>Tìm kiếm
+                                <button type="button" class="btn btn-outline-secondary flex-fill" onclick="resetSearch()">
+                                    <i class="fas fa-times-circle me-1"></i>Xóa bộ lọc
                                 </button>
                             </div>
                         </div>
+                        <!-- Ẩn trường page để mặc định là 0 khi gửi form -->
+                        <input type="hidden" name="page" value="0">
                     </form>
                 </div>
 
-                <!-- Table -->
                 <div class="table-card">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover table-bordered mb-0">
@@ -229,6 +239,7 @@
                                 <th>Nhà cung cấp</th>
                                 <th>Giá mua vào</th>
                                 <th>Giá bán</th>
+                                <th>Giá bán lẻ</th>
                                 <th>CPU</th>
                                 <th>Bộ nhớ</th>
                                 <th>Số lượng</th>
@@ -236,13 +247,12 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <!-- TH Nếu không có dữ liệu -->
                             <tr th:if="${listProducts.totalElements == 0}">
-                                <td colspan="9" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
+                                <td colspan="10" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
                             </tr>
-                            <!-- Dữ liệu sản phẩm -->
                             <tr th:each="product,index : ${listProducts}">
-                                <td class="text-center" th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
+                                <td class="text-center"
+                                    th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-mobile-alt me-2 text-primary"></i>
@@ -250,22 +260,30 @@
                                     </div>
                                 </td>
                                 <td>
-                                        <span class="badge bg-info text-dark">
-                                            <i class="fas fa-building me-1"></i>
-                                            <span th:text="${product.supplier.name}"></span>
-                                        </span>
+                                    <span class="badge bg-info text-dark">
+                                        <i class="fas fa-building me-1"></i>
+                                        <span th:text="${product.supplier.name}"></span>
+                                    </span>
                                 </td>
                                 <td>
-                                        <span class="price-display purchase-price">
-                                            <i class="fas fa-tag me-1"></i>
-                                            <span th:text="${#numbers.formatInteger(product.purchasePrice,1,'POINT') + ' VND'}"></span>
-                                        </span>
+                                    <span class="price-display purchase-price">
+                                        <i class="fas fa-tag me-1"></i>
+                                        <span th:text="${#numbers.formatInteger(product.purchasePrice,1,'POINT') + ' VND'}"></span>
+                                    </span>
                                 </td>
                                 <td>
-                                        <span class="price-display selling-price">
-                                            <i class="fas fa-tags me-1"></i>
-                                            <span th:text="${#numbers.formatInteger(product.sellingPrice,1,'POINT') + ' VND'}"></span>
-                                        </span>
+                                    <span class="price-display selling-price">
+                                        <i class="fas fa-tags me-1"></i>
+                                        <span th:text="${#numbers.formatInteger(product.sellingPrice,1,'POINT') + ' VND'}"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="price-display selling-price">
+                                        <i class="fas fa-tags me-1"></i>
+                                        <span th:if="${product.retailPrice != null}"
+                                              th:text="${#numbers.formatInteger(product.retailPrice,1,'POINT') + ' VND'}"></span>
+                                        <span th:unless="${product.retailPrice != null}" style="color: red;">Chưa có</span>
+                                    </span>
                                 </td>
                                 <td>
                                     <span th:text="${product.CPU}"></span>
@@ -274,10 +292,10 @@
                                     <span th:text="${product.storage}"></span>
                                 </td>
                                 <td class="text-center">
-                                        <span class="badge bg-secondary">
-                                            <i class="fas fa-cubes me-1"></i>
-                                            <span th:text="${product.stockQuantity}"></span>
-                                        </span>
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-cubes me-1"></i>
+                                        <span th:text="${product.stockQuantity}"></span>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-center">
@@ -292,14 +310,14 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div th:if="${listProducts.totalPages > 0}" class="p-3 bg-light border-top d-flex justify-content-end">
+                    <div th:if="${listProducts.totalPages > 0}"
+                         class="p-3 bg-light border-top d-flex justify-content-end">
                         <nav aria-label="Pagination">
                             <ul class="pagination mb-0">
-                                <!-- Nút Trang đầu -->
                                 <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
                                     th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/search(page=0, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=0, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         Trang đầu
                                     </a>
                                 </li>
@@ -310,51 +328,56 @@
                                     </a>
                                 </li>
 
-                                <!-- Nút Previous -->
                                 <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
                                     th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.number - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.number - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
                                 <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
                                     th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.number - 1})}">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
 
-                                <!-- Hiển thị trang hiện tại / tổng số trang -->
                                 <li class="page-item active mx-2">
                                     <span class="page-link">
-                                        <span th:text="${listProducts.number + 1}"></span> / <span th:text="${listProducts.totalPages}"></span>
+                                        <span th:text="${listProducts.number + 1}"></span> / <span
+                                            th:text="${listProducts.totalPages}"></span>
                                     </span>
                                 </li>
 
-                                <!-- Nút Next -->
                                 <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'"
                                     th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.number + 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.number + 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
                                 <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'"
                                     th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.number + 1})}">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
 
-                                <!-- Nút Trang cuối -->
-                                <li class="page-item" th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
+                                <li class="page-item"
+                                    th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
                                     th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.totalPages - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.totalPages - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         Trang cuối
                                     </a>
                                 </li>
-                                <li class="page-item" th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
+                                <li class="page-item"
+                                    th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
                                     th:unless="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/list(page=${listProducts.totalPages - 1})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.totalPages - 1})}">
                                         Trang cuối
                                     </a>
                                 </li>
@@ -366,14 +389,10 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
 
-<!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
-
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -381,27 +400,47 @@
     // Range slider functionality
     var slider = document.getElementById("myRange");
     var output = document.getElementById("rangeValue");
-    output.innerText = slider.value;
-    slider.oninput = function() {
-        output.innerText = this.value;
-    };
+    if (slider && output) {
+        // Định dạng giá trị ban đầu
+        output.innerText = formatPrice(slider.value) + " VND";
+        slider.oninput = function () {
+            output.innerText = formatPrice(this.value) + " VND";
+        };
+    }
+
+    // Hàm định dạng giá trị tiền tệ
+    function formatPrice(value) {
+        const price = parseInt(value);
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
     // Reset search form
     function resetSearch() {
-        document.querySelector("form").reset();  // Reset form fields
-        window.location.href = "/dashboard/products/list";  // Redirect to product list
+        document.querySelector("form").reset();
+        window.location.href = "/dashboard/products/list";
     }
 
-    // Success message handling
-    if ("[[${message}]]".trim() !== "") {
-        Swal.fire({
-            title: "Thành công!",
-            text: "[[${message}]]",
-            icon: "success",
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
+    // Handle page load
+    window.onload = function () {
+        const message = "[[${message}]]";
+        const error = "[[${error}]]";
+
+        if (message && message.trim() !== "") {
+            Swal.fire({
+                title: "Thành công!",
+                text: message,
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+
+        if (error && error.trim() !== "") {
+            Swal.fire("Lỗi", error, "error");
+        }
+    };
 </script>
 </body>
 </html>

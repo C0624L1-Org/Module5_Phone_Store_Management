@@ -2,9 +2,6 @@ package com.example.md5_phone_store_management.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -123,15 +120,19 @@ public class PDFExportService {
                 }
             }
             
+            // Hàm tạo font với giảm độ đậm
+            final int SEMI_BOLD_ALPHA = 200;
+            
             // Tạo font từ BaseFont với hỗ trợ Unicode
-            Font titleFont = new Font(baseFont, 18, Font.BOLD, BaseColor.BLACK);
+            Font titleFont = new Font(baseFont, 18, Font.BOLD, new BaseColor(0, 0, 0, SEMI_BOLD_ALPHA));
             Font subtitleFont = new Font(baseFont, 12, Font.NORMAL, BaseColor.DARK_GRAY);
-            Font headerFont = new Font(baseFont, 12, Font.BOLD, BaseColor.WHITE);
+            Font headerFont = new Font(baseFont, 12, Font.BOLD, new BaseColor(255, 255, 255, SEMI_BOLD_ALPHA));
             Font normalFont = new Font(baseFont, 10, Font.NORMAL, BaseColor.BLACK);
-            Font normalBold = new Font(baseFont, 10, Font.BOLD, BaseColor.BLACK);
+            Font normalBold = new Font(baseFont, 10, Font.BOLD, new BaseColor(0, 0, 0, SEMI_BOLD_ALPHA));
             Font smallFont = new Font(baseFont, 9, Font.NORMAL, BaseColor.DARK_GRAY);
-            Font redBoldFont = new Font(baseFont, 12, Font.BOLD, redColor);
-            Font signatureFont = new Font(baseFont, 12, Font.BOLD, BaseColor.BLACK);
+            Font redBoldFont = new Font(baseFont, 12, Font.BOLD, new BaseColor(
+                redColor.getRed(), redColor.getGreen(), redColor.getBlue(), SEMI_BOLD_ALPHA));
+            Font signatureFont = new Font(baseFont, 12, Font.BOLD, new BaseColor(0, 0, 0, SEMI_BOLD_ALPHA));
             
             // Font cho watermark
             Font watermarkFont = new Font(baseFont, 30, Font.NORMAL, BaseColor.LIGHT_GRAY);
@@ -143,7 +144,7 @@ public class PDFExportService {
             // Tạo watermark nhẹ
             PdfContentByte canvas = writer.getDirectContentUnder();
             PdfGState gState = new PdfGState();
-            gState.setFillOpacity(0.05f); // Giảm độ đậm của watermark
+            gState.setFillOpacity(0.09f); // Giảm độ đậm của watermark
             canvas.saveState();
             canvas.setGState(gState);
             
@@ -164,7 +165,7 @@ public class PDFExportService {
             document.add(title);
 
             // Thông tin cửa hàng
-            Paragraph storeInfo = new Paragraph("CỬA HÀNG ĐIỆN THOẠI", subtitleFont);
+            Paragraph storeInfo = new Paragraph("PHONE STORE", subtitleFont);
             storeInfo.setAlignment(Element.ALIGN_CENTER);
             document.add(storeInfo);
 
@@ -325,7 +326,7 @@ public class PDFExportService {
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
-            Font headerTableFont = new Font(baseFont, 9, Font.BOLD, BaseColor.WHITE);
+            Font headerTableFont = new Font(baseFont, 9, Font.NORMAL, BaseColor.WHITE);
 
             cell.setPhrase(new Phrase("STT", headerTableFont));
             table.addCell(cell);

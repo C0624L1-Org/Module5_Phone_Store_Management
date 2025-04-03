@@ -142,7 +142,7 @@ public class SalesController {
             System.out.println("DEBUG: Quantities: " + quantities);
             System.out.println("DEBUG: Payment Method: " + paymentMethodStr);
             System.out.println("DEBUG: Print Invoice: " + printInvoice);
-            
+
             PaymentMethod paymentMethod;
             try {
                 paymentMethod = PaymentMethod.valueOf(paymentMethodStr);
@@ -219,7 +219,7 @@ public class SalesController {
             // Đặt danh sách chi tiết và số tiền
             invoice.setInvoiceDetailList(invoiceDetails);
             invoice.setAmount(totalAmount);
-            
+
             // Thiết lập orderInfo cho hóa đơn (khá quan trọng)
             String orderInfo = "Thanh toán hóa đơn";
 
@@ -233,12 +233,12 @@ public class SalesController {
                 session.setAttribute("ERROR_MESSAGE", "Lỗi khi lưu hóa đơn!");
                 return "redirect:/dashboard/sales/form?error=save_failed";
             }
-            
+
             // Cập nhật orderInfo để bao gồm mã hóa đơn
             orderInfo = "Thanh toán đơn hàng #" + invoice.getId();
 
             invoice.setOrderInfo(orderInfo);
-            
+
             // Cập nhật lại hóa đơn với orderInfo đã cập nhật
             invoice = iInvoiceService.saveInvoice(invoice);
 
@@ -307,7 +307,7 @@ public class SalesController {
     private String processSuccessfulPayment(Long invoiceId, boolean printInvoice, HttpSession session) {
         try {
             System.out.println("Processing successful payment for invoice ID: " + invoiceId);
-            
+
             // Lấy thông tin hóa đơn
             Invoice invoice = iInvoiceService.findById(invoiceId);
             if (invoice == null) {
@@ -315,7 +315,7 @@ public class SalesController {
                 session.setAttribute("ERROR_MESSAGE", "Không tìm thấy hóa đơn!");
                 return "redirect:/dashboard/sales/form?error=invoice_not_found";
             }
-            
+
             System.out.println("Found invoice: " + invoice);
 
             // Kiểm tra trạng thái đơn hàng thành thành công
@@ -327,7 +327,7 @@ public class SalesController {
                 String payDate = new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                 invoice.setPayDate(payDate);
                 System.out.println("Set pay date for CASH payment: " + payDate);
-                
+
                 // Đảm bảo orderInfo được thiết lập
                 Customer customer = invoice.getCustomer();
                 if (invoice.getOrderInfo() == null || !invoice.getOrderInfo().contains("#")) {
@@ -347,7 +347,7 @@ public class SalesController {
                         !"anonymousUser".equals(authentication.getPrincipal())) {
                     String username = authentication.getName();
                     System.out.println("Current authenticated user: " + username);
-                    
+
                     // Tìm nhân viên theo username
                     Optional<Employee> employeeOpt = iEmployeeService.findByUsername(username);
                     if (employeeOpt.isPresent()) {
@@ -535,7 +535,7 @@ public class SalesController {
                 String name = attributeNames.nextElement();
                 System.out.println("  " + name + ": " + session.getAttribute(name));
             }
-            
+
             // Lấy các tham số từ VNPay trả về
             Map<String, String> vnpParams = new HashMap<>();
             request.getParameterMap().forEach((key, value) -> {
@@ -592,7 +592,7 @@ public class SalesController {
                 session.setAttribute("ERROR_MESSAGE", "Không tìm thấy hóa đơn!");
                 return "redirect:/dashboard/sales/form?error=invoice_not_found";
             }
-            
+
             System.out.println("Found invoice: " + invoice);
 
             // Kiểm tra kết quả thanh toán
@@ -699,7 +699,7 @@ public class SalesController {
         if (invoice == null) {
             return "redirect:/dashboard/sales/form?error=invoice_not_found";
         }
-        
+
         // Thêm thông tin để thực hiện tải xuống tự động
         model.addAttribute("invoice", invoice);
         model.addAttribute("transactionId", invoice.getId());

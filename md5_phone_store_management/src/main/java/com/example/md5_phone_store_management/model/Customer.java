@@ -3,6 +3,7 @@ package com.example.md5_phone_store_management.model;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -41,16 +42,19 @@ public class Customer {
     @Column(name = "full_name", length = 50, nullable = false)
     private String fullName;
 
+    @NotBlank(message = "Số điện thoại không được để trống!")
     @Pattern(regexp = "\\d{10,15}", message = "Số điện thoại phải chứa từ 10 đến 15 chữ số!")
 //    @Unique(fieldName = "phone", message = "Số điện thoại đã tồn tại!")
     @Unique(fieldName = "phone", message = "Số điện thoại đã tồn tại!", id = @Value("#{customerID}"))
     @Column(name = "phone", length = 15)
     private String phone;
 
+    @NotBlank(message = "Địa chỉ không được để trống!")
     @Size(max = 500, message = "Địa chỉ không được vượt quá 500 ký tự!")
     @Column(name = "address", length = 500)
     private String address;
 
+    @NotBlank(message = "Email không được để trống!")
     @Email(message = "Định dạng email không hợp lệ!")
     @Size(max = 50, message = "Email không được vượt quá 50 ký tự!")
 //    @Unique(fieldName = "email", message = "Email đã tồn tại!")
@@ -73,6 +77,7 @@ public class Customer {
     @Column(name = "purchaseCount", nullable = false)
     private int purchaseCount = 0;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Invoice> invoices;
 
