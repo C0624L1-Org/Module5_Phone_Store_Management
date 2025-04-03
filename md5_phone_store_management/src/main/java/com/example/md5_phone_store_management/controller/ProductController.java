@@ -8,6 +8,7 @@ import com.example.md5_phone_store_management.model.dto.ProductDTO;
 import com.example.md5_phone_store_management.service.CloudinaryService;
 import com.example.md5_phone_store_management.service.implement.ProductService;
 import com.example.md5_phone_store_management.service.implement.SupplierService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,22 +48,79 @@ public class ProductController {
     }*/
 
     @GetMapping("/list")
-    public String search(Model model, @RequestParam(name = "searchProduct", required = false) String searchProduct,
-                         @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
-                         @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
-                         @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
+    public String search1(Model model,
+                          @RequestParam(name = "searchProduct", required = false) String searchProduct,
+                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
+                          @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
+                          @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+                          HttpSession session) {
         Pageable pageable = PageRequest.of(page, 5);
-        Page<Product> listProducts = productService.findAll(pageable);
+        Page<Product> listProducts;
+
         if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0)) {
-            listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(searchProduct, searchSupplier, rangePrice, pageable);
+            listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(
+                    searchProduct, searchSupplier, rangePrice, pageable);
         } else {
             listProducts = productService.findAll(pageable);
         }
+
+        List<Long> selectedProductIds = (List<Long>) session.getAttribute("selectedProductIds");
+        if (selectedProductIds == null) {
+            selectedProductIds = new ArrayList<>();
+        }
+
         model.addAttribute("listProducts", listProducts);
+        model.addAttribute("selectedProductIds", selectedProductIds); // Truyền danh sách ID đã chọn
         model.addAttribute("searchProduct", searchProduct);
         model.addAttribute("searchSupplier", searchSupplier);
         model.addAttribute("rangePrice", rangePrice);
+
+        String successMessage = (String) session.getAttribute("SUCCESS_MESSAGE");
+        if (successMessage != null) {
+            model.addAttribute("message", successMessage);
+            session.removeAttribute("SUCCESS_MESSAGE");
+        }
+
         return "dashboard/product/home-product";
+    }
+
+
+    @PostMapping("/update-prices")
+    public String updatePrices(@RequestParam("productIds") List<Long> productIds,
+                               @RequestParam("newPrices") List<Integer> newPrices,
+                               @RequestParam("oldPrices") List<Integer> oldPrices,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            if (productIds.size() != newPrices.size() || productIds.size() != oldPrices.size()) {
+                redirectAttributes.addFlashAttribute("error", "Dữ liệu không hợp lệ!");
+                return "redirect:/dashboard/products/list";
+            }
+
+            StringBuilder successMessage = new StringBuilder("Cập nhật giá cho ");
+            List<String> updatedNames = new ArrayList<>();
+
+            for (int i = 0; i < productIds.size(); i++) {
+                Long productId = productIds.get(i);
+                Integer newPrice = newPrices.get(i) != null && newPrices.get(i) > 0 ? newPrices.get(i) : oldPrices.get(i);
+
+                Product product = productService.findById(Math.toIntExact(productId));
+                if (product != null) {
+                    product.setRetailPrice(BigDecimal.valueOf(newPrice));
+                    productService.save(product);
+                    updatedNames.add(product.getName());
+                }
+            }
+
+            successMessage.append(String.join(", ", updatedNames)).append(" thành công!");
+            session.setAttribute("selectedProductIds", new ArrayList<>());
+            session.setAttribute("SUCCESS_MESSAGE", successMessage.toString());
+            return "redirect:/dashboard/products/list";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Lỗi khi cập nhật giá bán lẻ!");
+            return "redirect:/dashboard/products/list";
+        }
     }
 
     // Đình Anh

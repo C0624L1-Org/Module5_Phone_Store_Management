@@ -17,7 +17,260 @@
     <link rel="stylesheet" href="/css/common/pagination.css">
     <link rel="stylesheet" href="/css/common/layout.css">
 
+    <!--    <style>-->
+    <!--        .validate-error {-->
+    <!--            color: #dc3545; /* Màu đỏ cho lỗi */-->
+    <!--            font-size: 0.85rem;-->
+    <!--            margin-top: 0.25rem;-->
+    <!--        }-->
+
+    <!--        .validate-info {-->
+    <!--            color: #198754; /* Màu xanh lá cho thông báo không nhập */-->
+    <!--            font-size: 0.85rem;-->
+    <!--            margin-top: 0.25rem;-->
+    <!--        }-->
+    <!--        .card-header {-->
+    <!--            background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);-->
+    <!--            color: white;-->
+    <!--            padding: 1.2rem 1.5rem;-->
+    <!--            border-radius: 10px 10px 0 0;-->
+    <!--        }-->
+
+    <!--        .search-section {-->
+    <!--            background-color: #f8f9fa;-->
+    <!--            border-radius: 10px;-->
+    <!--            padding: 1.5rem;-->
+    <!--            margin-bottom: 1.5rem;-->
+    <!--            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);-->
+    <!--            border: 1px solid #e9ecef;-->
+    <!--        }-->
+
+    <!--        .table-card {-->
+    <!--            border-radius: 10px;-->
+    <!--            overflow: hidden;-->
+    <!--            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);-->
+    <!--            border: 1px solid #e9ecef;-->
+    <!--        }-->
+
+    <!--        .btn-action {-->
+    <!--            padding: 0.375rem 0.75rem;-->
+    <!--            border-radius: 0.25rem;-->
+    <!--            font-weight: 500;-->
+    <!--            font-size: 0.875rem;-->
+    <!--            transition: all 0.2s;-->
+    <!--        }-->
+
+    <!--        .btn-action:hover {-->
+    <!--            transform: translateY(-2px);-->
+    <!--            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);-->
+    <!--        }-->
+
+    <!--        .btn-edit {-->
+    <!--            background-color: #ffc107;-->
+    <!--            border-color: #ffc107;-->
+    <!--            color: #212529;-->
+    <!--        }-->
+
+    <!--        .btn-edit:hover {-->
+    <!--            background-color: #e0a800;-->
+    <!--            border-color: #e0a800;-->
+    <!--        }-->
+
+    <!--        .table thead th {-->
+    <!--            background-color: #343a40;-->
+    <!--            color: white;-->
+    <!--            font-weight: 500;-->
+    <!--            border-color: #454d55;-->
+    <!--            text-transform: uppercase;-->
+    <!--            font-size: 0.875rem;-->
+    <!--            vertical-align: middle;-->
+    <!--        }-->
+
+    <!--        .table-striped tbody tr:nth-of-type(odd) {-->
+    <!--            background-color: rgba(0, 0, 0, 0.02);-->
+    <!--        }-->
+
+    <!--        .table-hover tbody tr:hover {-->
+    <!--            background-color: rgba(0, 0, 0, 0.075);-->
+    <!--        }-->
+
+    <!--        .form-control:focus, .form-select:focus {-->
+    <!--            border-color: #6c8deb;-->
+    <!--            box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);-->
+    <!--        }-->
+
+    <!--        .product-name {-->
+    <!--            font-weight: 600;-->
+    <!--            color: #343a40;-->
+    <!--        }-->
+
+    <!--        .price-display {-->
+    <!--            font-weight: 500;-->
+    <!--            background-color: #f8f9fa;-->
+    <!--            padding: 4px 8px;-->
+    <!--            border-radius: 4px;-->
+    <!--            border: 1px solid #e9ecef;-->
+    <!--        }-->
+
+    <!--        .purchase-price {-->
+    <!--            color: #dc3545;-->
+    <!--        }-->
+
+    <!--        .selling-price {-->
+    <!--            color: #198754;-->
+    <!--        }-->
+
+    <!--        .price-slider {-->
+    <!--            width: 100%;-->
+    <!--            height: 10px;-->
+    <!--            border-radius: 5px;-->
+    <!--        }-->
+
+    <!--        .price-slider::-webkit-slider-thumb {-->
+    <!--            -webkit-appearance: none;-->
+    <!--            appearance: none;-->
+    <!--            width: 20px;-->
+    <!--            height: 20px;-->
+    <!--            border-radius: 50%;-->
+    <!--            background: #4a6fdc;-->
+    <!--            cursor: pointer;-->
+    <!--        }-->
+
+    <!--        .price-slider::-moz-range-thumb {-->
+    <!--            width: 20px;-->
+    <!--            height: 20px;-->
+    <!--            border-radius: 50%;-->
+    <!--            background: #4a6fdc;-->
+    <!--            cursor: pointer;-->
+    <!--        }-->
+
+    <!--        .range-value-display {-->
+    <!--            font-weight: bold;-->
+    <!--            color: #4a6fdc;-->
+    <!--            padding: 0 8px;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal {-->
+    <!--            display: none;-->
+    <!--            position: fixed;-->
+    <!--            top: 50%;-->
+    <!--            left: 50%;-->
+    <!--            transform: translate(-50%, -50%);-->
+    <!--            background: white;-->
+    <!--            border-radius: 10px;-->
+    <!--            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);-->
+    <!--            z-index: 1050;-->
+    <!--            padding: 2rem;-->
+    <!--            max-height: 80vh;-->
+    <!--            overflow-y: auto;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .modal-header {-->
+    <!--            display: flex;-->
+    <!--            justify-content: center;-->
+    <!--            margin-bottom: 1.5rem;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .modal-header h4 {-->
+    <!--            font-size: 1.5rem;-->
+    <!--            font-weight: bold;-->
+    <!--            color: #343a40;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .product-container {-->
+    <!--            display: flex;-->
+    <!--            flex-wrap: nowrap;-->
+    <!--            gap: 1rem;-->
+    <!--            justify-content: flex-start;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .product-card {-->
+    <!--            background: white;-->
+    <!--            border-radius: 10px;-->
+    <!--            padding: 1rem;-->
+    <!--            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);-->
+    <!--            border: 1px solid #e9ecef;-->
+    <!--            width: 200px;-->
+    <!--            text-align: center;-->
+    <!--            flex-shrink: 0;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .product-image {-->
+    <!--            width: 100px;-->
+    <!--            height: 100px;-->
+    <!--            background-color: #f8f9fa;-->
+    <!--            border: 1px solid #e9ecef;-->
+    <!--            border-radius: 5px;-->
+    <!--            margin-bottom: 0.5rem;-->
+    <!--            display: flex;-->
+    <!--            align-items: center;-->
+    <!--            justify-content: center;-->
+    <!--            font-size: 0.9rem;-->
+    <!--            color: #6c757d;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .product-info {-->
+    <!--            display: flex;-->
+    <!--            flex-direction: column;-->
+    <!--            align-items: center;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .product-name {-->
+    <!--            font-size: 1rem;-->
+    <!--            min-height: 40px;-->
+    <!--            margin-bottom: 0.5rem;-->
+    <!--            overflow: hidden;-->
+    <!--            text-overflow: ellipsis;-->
+    <!--            white-space: nowrap;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .old-price {-->
+    <!--            color: #6c757d;-->
+    <!--            text-decoration: line-through;-->
+    <!--            margin-bottom: 0.5rem;-->
+    <!--            font-size: 0.9rem;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .new-price-input {-->
+    <!--            width: 100%;-->
+    <!--            margin: 0.5rem 0;-->
+    <!--            padding: 0.5rem;-->
+    <!--            border-radius: 5px;-->
+    <!--            border: 1px solid #ced4da;-->
+    <!--            font-size: 0.9rem;-->
+    <!--        }-->
+
+    <!--        .edit-form-modal .action-buttons {-->
+    <!--            display: flex;-->
+    <!--            gap: 0.5rem;-->
+    <!--            justify-content: flex-end;-->
+    <!--            margin-top: 1.5rem;-->
+    <!--        }-->
+
+    <!--        .modal-backdrop {-->
+    <!--            display: none;-->
+    <!--            position: fixed;-->
+    <!--            top: 0;-->
+    <!--            left: 0;-->
+    <!--            width: 100%;-->
+    <!--            height: 100%;-->
+    <!--            background: rgba(128, 128, 128, 0.5) !important;-->
+    <!--            z-index: 1040;-->
+    <!--        }-->
+    <!--    </style>-->
     <style>
+        .validate-error {
+            color: #dc3545; /* Màu đỏ cho lỗi */
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .validate-info {
+            color: #198754; /* Màu xanh lá cho thông báo không nhập */
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
         .card-header {
             background: linear-gradient(135deg, #4a6fdc 0%, #6c8deb 100%);
             color: white;
@@ -93,7 +346,6 @@
             color: #343a40;
         }
 
-        /* Price display styling */
         .price-display {
             font-weight: 500;
             background-color: #f8f9fa;
@@ -110,7 +362,6 @@
             color: #198754;
         }
 
-        /* Range slider custom styling */
         .price-slider {
             width: 100%;
             height: 10px;
@@ -140,21 +391,150 @@
             color: #4a6fdc;
             padding: 0 8px;
         }
+
+        .edit-form-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+            z-index: 1050;
+            padding: 2rem;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Chỉ hiển thị thanh trượt khi nội dung vượt quá chiều cao tối đa */
+        .edit-form-modal::-webkit-scrollbar {
+            width: 0; /* Ẩn thanh trượt trên Webkit browsers khi không cần */
+        }
+
+        .edit-form-modal {
+            scrollbar-width: none; /* Ẩn thanh trượt trên Firefox khi không cần */
+        }
+
+        .edit-form-modal:hover {
+            scrollbar-width: auto; /* Hiện thanh trượt khi hover trên Firefox */
+        }
+
+        .edit-form-modal:hover::-webkit-scrollbar {
+            width: 8px; /* Hiện thanh trượt khi hover trên Webkit browsers */
+        }
+
+        .edit-form-modal::-webkit-scrollbar-thumb {
+            background: #6c757d;
+            border-radius: 4px;
+        }
+
+        .edit-form-modal::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .edit-form-modal .modal-header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .edit-form-modal .modal-header h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .edit-form-modal .product-container {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 1rem;
+            justify-content: center; /* Căn giữa các sản phẩm */
+        }
+
+        .edit-form-modal .product-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            width: 200px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .edit-form-modal .product-image {
+            width: 100px;
+            height: 100px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .edit-form-modal .product-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .edit-form-modal .product-name {
+            font-size: 1rem;
+            min-height: 40px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .edit-form-modal .old-price {
+            color: #6c757d;
+            text-decoration: line-through;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .edit-form-modal .new-price-input {
+            width: 100%;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            font-size: 0.9rem;
+        }
+
+        .edit-form-modal .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 128, 0.5) !important;
+            z-index: 1040;
+        }
     </style>
 </head>
 <body>
-<!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
-
-<!-- Nhúng navbar -->
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
 <div class="content-wrapper">
     <div class="dashboard-container">
-        <!-- Sidebar -->
         <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-        <!-- Main content -->
         <div class="content-container">
             <div class="container-fluid py-4">
                 <nav aria-label="breadcrumb">
@@ -169,17 +549,15 @@
                         <i class="fas fa-mobile-alt me-2 text-primary"></i>
                         Danh sách sản phẩm
                     </h2>
-
                     <a th:href="@{/dashboard/products/create-form}" class="btn btn-success">
                         <i class="fas fa-plus-circle me-2"></i>Thêm mới sản phẩm
                     </a>
                 </div>
 
-                <!-- Search -->
                 <div class="search-section">
                     <form th:action="@{/dashboard/products/list(page=${page})}" method="get">
-                        <div class="row g-3">
-                            <div class="col-md-4">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
                                 <label for="searchProduct" class="form-label">Tên sản phẩm</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
@@ -188,7 +566,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="searchSupplier" class="form-label">Nhà cung cấp</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-building"></i></span>
@@ -197,16 +575,17 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="myRange" class="form-label">Giá mua vào tối đa (VND)</label>
                                 <div class="d-flex align-items-center">
-                                    <input type="range" min="1000000" max="100000000" step="500000" class="form-range price-slider" id="myRange" name="rangePrice"
+                                    <input type="range" min="1000000" max="100000000" step="500000"
+                                           class="form-range price-slider" id="myRange" name="rangePrice"
                                            th:value="${rangePrice}">
-                                    <span id="rangeValue" class="range-value-display" >1000000 VND</span>
+                                    <span id="rangeValue" class="range-value-display">1000000 VND</span>
                                 </div>
                             </div>
 
-                            <div class="col-md-12 d-flex justify-content-end gap-2">
+                            <div class="col-md-3 d-flex justify-content-end gap-2">
                                 <button type="button" class="btn btn-secondary" onclick="resetSearch()">
                                     <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
                                 </button>
@@ -218,17 +597,18 @@
                     </form>
                 </div>
 
-                <!-- Table -->
                 <div class="table-card">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover table-bordered mb-0">
                             <thead>
                             <tr>
+                                <th>Chọn</th>
                                 <th style="width: 60px">STT</th>
                                 <th>Tên sản phẩm</th>
                                 <th>Nhà cung cấp</th>
                                 <th>Giá mua vào</th>
                                 <th>Giá bán</th>
+                                <th>Giá bán lẻ</th>
                                 <th>CPU</th>
                                 <th>Bộ nhớ</th>
                                 <th>Số lượng</th>
@@ -236,12 +616,21 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <!-- TH Nếu không có dữ liệu -->
                             <tr th:if="${listProducts.totalElements == 0}">
-                                <td colspan="9" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
+                                <td colspan="11" class="text-center">Không tìm thấy kết quả tìm kiếm phù hợp.</td>
                             </tr>
-                            <!-- Dữ liệu sản phẩm -->
                             <tr th:each="product,index : ${listProducts}">
+
+                                <td style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 50px;">
+                                    <input type="checkbox" class="product-checkbox"
+                                           th:id="'product-' + ${product.productID}"
+                                           th:value="${product.productID}"
+                                           style="transform: scale(2.2); margin: 0;"/>
+                                </td>
+
+
+
+
                                 <td class="text-center" th:text="${index.index + listProducts.size*listProducts.number +1}"></td>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -250,22 +639,28 @@
                                     </div>
                                 </td>
                                 <td>
-                                        <span class="badge bg-info text-dark">
-                                            <i class="fas fa-building me-1"></i>
-                                            <span th:text="${product.supplier.name}"></span>
-                                        </span>
+                                    <span class="badge bg-info text-dark">
+                                        <i class="fas fa-building me-1"></i>
+                                        <span th:text="${product.supplier.name}"></span>
+                                    </span>
                                 </td>
                                 <td>
-                                        <span class="price-display purchase-price">
-                                            <i class="fas fa-tag me-1"></i>
-                                            <span th:text="${#numbers.formatInteger(product.purchasePrice,1,'POINT') + ' VND'}"></span>
-                                        </span>
+                                    <span class="price-display purchase-price">
+                                        <i class="fas fa-tag me-1"></i>
+                                        <span th:text="${#numbers.formatInteger(product.purchasePrice,1,'POINT') + ' VND'}"></span>
+                                    </span>
                                 </td>
                                 <td>
-                                        <span class="price-display selling-price">
-                                            <i class="fas fa-tags me-1"></i>
-                                            <span th:text="${#numbers.formatInteger(product.sellingPrice,1,'POINT') + ' VND'}"></span>
-                                        </span>
+                                    <span class="price-display selling-price">
+                                        <i class="fas fa-tags me-1"></i>
+                                        <span th:text="${#numbers.formatInteger(product.sellingPrice,1,'POINT') + ' VND'}"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="price-display selling-price">
+                                        <i class="fas fa-tags me-1"></i>
+                                        <span th:text="${#numbers.formatInteger(product.retailPrice,1,'POINT') + ' VND'}"></span>
+                                    </span>
                                 </td>
                                 <td>
                                     <span th:text="${product.CPU}"></span>
@@ -274,10 +669,10 @@
                                     <span th:text="${product.storage}"></span>
                                 </td>
                                 <td class="text-center">
-                                        <span class="badge bg-secondary">
-                                            <i class="fas fa-cubes me-1"></i>
-                                            <span th:text="${product.stockQuantity}"></span>
-                                        </span>
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-cubes me-1"></i>
+                                        <span th:text="${product.stockQuantity}"></span>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-center">
@@ -292,14 +687,23 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div th:if="${listProducts.totalPages > 0}" class="p-3 bg-light border-top d-flex justify-content-end">
+                    <div th:if="${listProducts.totalPages > 0}" class="p-3 bg-light border-top d-flex justify-content-between">
+                        <div class="d-flex justify-content-start mt-3">
+                            <button class="btn btn-info" id="showEditForm">
+                                <i class="fas fa-bell me-2"></i>
+                                Giá bán lẻ - Chọn <span id="selectedCount" th:text="${#lists.size(selectedProductIds)}">0</span>/5
+                            </button>
+                            <button class="btn btn-danger ms-2" id="clearSelectedProducts">
+                                <i class="fas fa-trash me-2"></i>Bỏ chọn
+                            </button>
+                        </div>
+
                         <nav aria-label="Pagination">
                             <ul class="pagination mb-0">
-                                <!-- Nút Trang đầu -->
                                 <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
                                     th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/search(page=0, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=0, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         Trang đầu
                                     </a>
                                 </li>
@@ -310,10 +714,10 @@
                                     </a>
                                 </li>
 
-                                <!-- Nút Previous -->
                                 <li class="page-item" th:classappend="${listProducts.number == 0} ? 'disabled'"
                                     th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.number - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.number - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
@@ -324,17 +728,16 @@
                                     </a>
                                 </li>
 
-                                <!-- Hiển thị trang hiện tại / tổng số trang -->
                                 <li class="page-item active mx-2">
                                     <span class="page-link">
                                         <span th:text="${listProducts.number + 1}"></span> / <span th:text="${listProducts.totalPages}"></span>
                                     </span>
                                 </li>
 
-                                <!-- Nút Next -->
                                 <li class="page-item" th:classappend="${!listProducts.hasNext()} ? 'disabled'"
                                     th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.number + 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.number + 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
@@ -345,10 +748,10 @@
                                     </a>
                                 </li>
 
-                                <!-- Nút Trang cuối -->
                                 <li class="page-item" th:classappend="${listProducts.number + 1 >= listProducts.totalPages} ? 'disabled'"
                                     th:if="${param.searchProduct != null || param.searchSupplier != null || param.rangePrice != null}">
-                                    <a class="page-link" th:href="@{/dashboard/products/search(page=${listProducts.totalPages - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
+                                    <a class="page-link"
+                                       th:href="@{/dashboard/products/list(page=${listProducts.totalPages - 1}, searchProduct=${param.searchProduct}, searchSupplier=${param.searchSupplier}, rangePrice=${param.rangePrice})}">
                                         Trang cuối
                                     </a>
                                 </li>
@@ -366,42 +769,558 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
 
-<!-- Nhúng script navbar -->
-<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+<div class="modal-backdrop" id="modalBackdrop"></div>
+<div class="edit-form-modal" id="editFormModal">
+    <form th:action="@{/dashboard/products/update-prices}" method="post" id="updatePriceForm">
+        <div class="modal-header">
+            <h4>Chỉnh sửa giá bán lẻ</h4>
+        </div>
+        <div class="product-container" id="selectedProductsContainer">
+            <!-- Sản phẩm sẽ được load động qua JavaScript -->
+        </div>
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <button type="button" class="btn btn-secondary" onclick="hideEditForm()">
+                <i class="fas fa-times me-2"></i>Hủy
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveButton">
+                <i class="fas fa-save me-2"></i>Lưu
+            </button>
+        </div>
+    </form>
+</div>
 
-<!-- Bootstrap JS -->
+<!-- Truyền selectedProductIds từ Thymeleaf vào JavaScript -->
+<script th:inline="javascript">
+    const selectedProductIds = /*[[${selectedProductIds}]]*/ [];
+</script>
+
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--<script>-->
+<!--    // Range slider functionality-->
+<!--    var slider = document.getElementById("myRange");-->
+<!--    var output = document.getElementById("rangeValue");-->
+<!--    if (slider && output) {-->
+<!--        output.innerText = slider.value.toLocaleString() + " VND";-->
+<!--        slider.oninput = function() {-->
+<!--            output.innerText = this.value.toLocaleString() + " VND";-->
+<!--        };-->
+<!--    }-->
 
+<!--    // Reset search form-->
+<!--    function resetSearch() {-->
+<!--        document.querySelector("form").reset();-->
+<!--        window.location.href = "/dashboard/products/list";-->
+<!--    }-->
+
+<!--    // Update selected count-->
+<!--    function updateSelectedCount(count) {-->
+<!--        const selectedCountElement = document.getElementById('selectedCount');-->
+<!--        if (selectedCountElement) {-->
+<!--            selectedCountElement.textContent = count;-->
+<!--        } else {-->
+<!--            console.error("Không tìm thấy element 'selectedCount'");-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Validate price function-->
+<!--    function validatePrice(value, oldPrice) {-->
+<!--        const maxPrice = 900000000; // 900 triệu-->
+<!--        if (value === "" || value === null) {-->
+<!--            return { isValid: true, message: "Giá cũ sẽ được dùng nếu không cập nhật", type: "info" };-->
+<!--        }-->
+<!--        const price = parseFloat(value);-->
+<!--        if (isNaN(price)) {-->
+<!--            return { isValid: false, message: "Giá phải là số hợp lệ", type: "error" };-->
+<!--        }-->
+<!--        if (price <= 0) {-->
+<!--            return { isValid: false, message: "Giá phải lớn hơn 0", type: "error" };-->
+<!--        }-->
+<!--        if (price > maxPrice) {-->
+<!--            return { isValid: false, message: "Giá không được vượt quá 900 triệu", type: "error" };-->
+<!--        }-->
+<!--        return { isValid: true, message: "", type: "" };-->
+<!--    }-->
+
+<!--    // Update save button state-->
+<!--    function updateSaveButtonState() {-->
+<!--        const priceInputs = document.querySelectorAll(".new-price-input");-->
+<!--        const saveButton = document.getElementById("saveButton");-->
+<!--        let allValid = true;-->
+
+<!--        priceInputs.forEach(input => {-->
+<!--            const oldPrice = parseFloat(input.parentElement.querySelector('input[name="oldPrices"]').value);-->
+<!--            const validation = validatePrice(input.value, oldPrice);-->
+<!--            if (!validation.isValid) {-->
+<!--                allValid = false;-->
+<!--            }-->
+<!--        });-->
+
+<!--        saveButton.disabled = !allValid;-->
+<!--    }-->
+
+<!--    // Handle checkbox changes and initial state-->
+<!--    document.addEventListener("DOMContentLoaded", function() {-->
+<!--        const checkboxes = document.querySelectorAll(".product-checkbox");-->
+<!--        if (checkboxes.length === 0) {-->
+<!--            console.error("Không tìm thấy checkbox nào với class 'product-checkbox'");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        // Đặt trạng thái checked ban đầu dựa trên selectedProductIds-->
+<!--        checkboxes.forEach(checkbox => {-->
+<!--            const productId = parseInt(checkbox.value);-->
+<!--            checkbox.checked = selectedProductIds.includes(productId);-->
+<!--            console.log(`Checkbox ID: ${checkbox.id}, Value: ${checkbox.value}, Checked: ${checkbox.checked}`);-->
+
+<!--            // Xử lý sự kiện thay đổi-->
+<!--            checkbox.addEventListener("change", function() {-->
+<!--                console.log("Sending request to select product ID:", this.value, "Checked:", this.checked);-->
+<!--                fetch('/dashboard/products/select-product', {-->
+<!--                    method: 'POST',-->
+<!--                    headers: {-->
+<!--                        'Content-Type': 'application/json',-->
+<!--                    },-->
+<!--                    body: JSON.stringify({-->
+<!--                        productId: parseInt(this.value),-->
+<!--                        isChecked: this.checked-->
+<!--                    })-->
+<!--                })-->
+<!--                    .then(response => {-->
+<!--                        console.log("Response status:", response.status);-->
+<!--                        if (!response.ok) {-->
+<!--                            return response.text().then(text => {-->
+<!--                                console.error("Response text:", text.substring(0, 100));-->
+<!--                                throw new Error(`HTTP error! Status: ${response.status}`);-->
+<!--                            });-->
+<!--                        }-->
+<!--                        return response.json();-->
+<!--                    })-->
+<!--                    .then(data => {-->
+<!--                        console.log("Response data:", data);-->
+<!--                        if (data.selectedCount > 5) {-->
+<!--                            this.checked = false;-->
+<!--                            Swal.fire("Cảnh báo", "Vui lòng chọn ít hơn hoặc bằng 5 sản phẩm!", "warning");-->
+<!--                        }-->
+<!--                        updateSelectedCount(data.selectedCount);-->
+<!--                    })-->
+<!--                    .catch(error => {-->
+<!--                        console.error('Error selecting product:', error);-->
+<!--                        Swal.fire("Lỗi", "Không thể chọn sản phẩm: " + error.message, "error");-->
+<!--                    });-->
+<!--            });-->
+<!--        });-->
+
+<!--        // Đồng bộ số lượng ban đầu từ session-->
+<!--        updateSelectedCount(selectedProductIds.length);-->
+<!--    });-->
+
+<!--    // Clear selected products-->
+<!--    document.getElementById("clearSelectedProducts").addEventListener("click", function() {-->
+<!--        fetch('/dashboard/products/deselect-products', {-->
+<!--            method: 'POST',-->
+<!--            headers: {-->
+<!--                'Content-Type': 'application/json',-->
+<!--            },-->
+<!--        })-->
+<!--            .then(response => {-->
+<!--                if (!response.ok) {-->
+<!--                    throw new Error('Network response was not ok');-->
+<!--                }-->
+<!--                return response.json();-->
+<!--            })-->
+<!--            .then(data => {-->
+<!--                document.querySelectorAll(".product-checkbox").forEach(cb => cb.checked = false);-->
+<!--                updateSelectedCount(data.selectedCount);-->
+<!--                hideEditForm();-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error('Error deselecting products:', error);-->
+<!--                Swal.fire("Lỗi", "Không thể bỏ chọn sản phẩm!", "error");-->
+<!--            });-->
+<!--    });-->
+
+<!--    // Show edit form-->
+<!--    document.getElementById("showEditForm").addEventListener("click", function() {-->
+<!--        fetch('/dashboard/products/selected-products')-->
+<!--            .then(response => {-->
+<!--                if (!response.ok) {-->
+<!--                    return response.text().then(text => { throw new Error(text) });-->
+<!--                }-->
+<!--                return response.json();-->
+<!--            })-->
+<!--            .then(products => {-->
+<!--                const container = document.getElementById('selectedProductsContainer');-->
+<!--                container.innerHTML = '';-->
+
+<!--                products.forEach(product => {-->
+<!--                    container.innerHTML += `-->
+<!--                <div class="product-card" id="card-${product.productID}">-->
+<!--                    <div class="product-info">-->
+<!--                        <div class="product-image">Hình ảnh</div>-->
+<!--                        <h5 class="product-name">${product.name}</h5>-->
+<!--                        <div class="old-price">${product.retailPrice.toLocaleString()} VND</div>-->
+<!--                        <input type="number" class="new-price-input" name="newPrices" placeholder="Nhập giá mới">-->
+<!--                        <div class="validate-message"></div>-->
+<!--                        <input type="hidden" name="productIds" value="${product.productID}">-->
+<!--                        <input type="hidden" name="oldPrices" value="${product.retailPrice}">-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            `;-->
+<!--                });-->
+
+<!--                const modal = document.getElementById("editFormModal");-->
+<!--                const cardWidth = 220;-->
+<!--                const minWidth = 300;-->
+<!--                const maxWidth = 1100;-->
+<!--                const newWidth = Math.min(maxWidth, Math.max(minWidth, products.length * cardWidth));-->
+<!--                modal.style.width = `${newWidth}px`;-->
+
+<!--                modal.style.display = "block";-->
+<!--                document.getElementById("modalBackdrop").style.display = "block";-->
+<!--                document.getElementById("actionButtons").style.display = "flex";-->
+
+<!--                // Add validation for each price input-->
+<!--                const priceInputs = document.querySelectorAll(".new-price-input");-->
+<!--                priceInputs.forEach(input => {-->
+<!--                    input.addEventListener("input", function() {-->
+<!--                        const oldPrice = parseFloat(this.parentElement.querySelector('input[name="oldPrices"]').value);-->
+<!--                        const validation = validatePrice(this.value, oldPrice);-->
+<!--                        const messageDiv = this.parentElement.querySelector(".validate-message");-->
+
+<!--                        if (validation.type === "error") {-->
+<!--                            messageDiv.className = "validate-message validate-error";-->
+<!--                            messageDiv.textContent = validation.message;-->
+<!--                        } else if (validation.type === "info") {-->
+<!--                            messageDiv.className = "validate-message validate-info";-->
+<!--                            messageDiv.textContent = validation.message;-->
+<!--                        } else {-->
+<!--                            messageDiv.className = "validate-message";-->
+<!--                            messageDiv.textContent = "";-->
+<!--                        }-->
+
+<!--                        updateSaveButtonState();-->
+<!--                    });-->
+
+<!--                    // Trigger initial validation-->
+<!--                    const event = new Event('input');-->
+<!--                    input.dispatchEvent(event);-->
+<!--                });-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                Swal.fire("Thông báo", error.message, "warning");-->
+<!--            });-->
+<!--    });-->
+
+<!--    // Hide edit form-->
+<!--    function hideEditForm() {-->
+<!--        const modal = document.getElementById("editFormModal");-->
+<!--        const backdrop = document.getElementById("modalBackdrop");-->
+<!--        const actionButtons = document.getElementById("actionButtons");-->
+<!--        if (modal) modal.style.display = "none";-->
+<!--        if (backdrop) backdrop.style.display = "none";-->
+<!--        if (actionButtons) actionButtons.style.display = "none";-->
+<!--    }-->
+
+<!--    // Handle page load-->
+<!--    window.onload = function() {-->
+<!--        hideEditForm();-->
+<!--        const message = "[[${message}]]";-->
+<!--        const error = "[[${error}]]";-->
+
+<!--        if (message && message.trim() !== "") {-->
+<!--            Swal.fire({-->
+<!--                title: "Thành công!",-->
+<!--                text: message,-->
+<!--                icon: "success",-->
+<!--                timer: 2000,-->
+<!--                showConfirmButton: false-->
+<!--            }).then(() => {-->
+<!--                window.location.reload();-->
+<!--            });-->
+<!--        }-->
+
+<!--        if (error && error.trim() !== "") {-->
+<!--            Swal.fire("Lỗi", error, "error");-->
+<!--        }-->
+<!--    };-->
+<!--</script>-->
 <script>
     // Range slider functionality
     var slider = document.getElementById("myRange");
     var output = document.getElementById("rangeValue");
-    output.innerText = slider.value;
-    slider.oninput = function() {
-        output.innerText = this.value;
-    };
+    if (slider && output) {
+        // Định dạng giá trị ban đầu
+        output.innerText = formatPrice(slider.value) + " VND";
+        slider.oninput = function() {
+            output.innerText = formatPrice(this.value) + " VND";
+        };
+    }
+
+    // Hàm định dạng giá trị tiền tệ
+    function formatPrice(value) {
+        // Chuyển đổi giá trị thành số
+        const price = parseInt(value);
+        // Định dạng với dấu chấm phân cách hàng nghìn
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
     // Reset search form
     function resetSearch() {
-        document.querySelector("form").reset();  // Reset form fields
-        window.location.href = "/dashboard/products/list";  // Redirect to product list
+        document.querySelector("form").reset();
+        window.location.href = "/dashboard/products/list";
     }
 
-    // Success message handling
-    if ("[[${message}]]".trim() !== "") {
-        Swal.fire({
-            title: "Thành công!",
-            text: "[[${message}]]",
-            icon: "success",
-            timer: 2000,
-            showConfirmButton: false
-        });
+    // Update selected count and button state
+    function updateSelectedCount(count) {
+        const selectedCountElement = document.getElementById('selectedCount');
+        const clearButton = document.getElementById('clearSelectedProducts');
+        if (selectedCountElement) {
+            selectedCountElement.textContent = count;
+        } else {
+            console.error("Không tìm thấy element 'selectedCount'");
+        }
+
+        // Cập nhật trạng thái nút "Bỏ chọn"
+        if (clearButton) {
+            if (count == 0) {
+                clearButton.disabled = true;
+                clearButton.style.opacity = '0.5'; // Làm mờ nút
+            } else {
+                clearButton.disabled = false;
+                clearButton.style.opacity = '1'; // Khôi phục độ mờ
+            }
+        } else {
+            console.error("Không tìm thấy nút 'clearSelectedProducts'");
+        }
     }
+
+    // Validate price function
+    function validatePrice(value, oldPrice) {
+        const maxPrice = 900000000; // 900 triệu
+        if (value === "" || value === null) {
+            return { isValid: true, message: "Giá cũ sẽ được dùng nếu không cập nhật", type: "info" };
+        }
+        const price = parseFloat(value);
+        if (isNaN(price)) {
+            return { isValid: false, message: "Giá phải là số hợp lệ", type: "error" };
+        }
+        if (price <= 0) {
+            return { isValid: false, message: "Giá phải lớn hơn 0", type: "error" };
+        }
+        if (price > maxPrice) {
+            return { isValid: false, message: "Giá không được vượt quá 900 triệu", type: "error" };
+        }
+        return { isValid: true, message: "", type: "" };
+    }
+
+    // Update save button state
+    function updateSaveButtonState() {
+        const priceInputs = document.querySelectorAll(".new-price-input");
+        const saveButton = document.getElementById("saveButton");
+        let allValid = true;
+
+        priceInputs.forEach(input => {
+            const oldPrice = parseFloat(input.parentElement.querySelector('input[name="oldPrices"]').value);
+            const validation = validatePrice(input.value, oldPrice);
+            if (!validation.isValid) {
+                allValid = false;
+            }
+        });
+
+        saveButton.disabled = !allValid;
+    }
+
+    // Handle checkbox changes and initial state
+    document.addEventListener("DOMContentLoaded", function() {
+        const checkboxes = document.querySelectorAll(".product-checkbox");
+        if (checkboxes.length === 0) {
+            console.error("Không tìm thấy checkbox nào với class 'product-checkbox'");
+            return;
+        }
+
+        // Đặt trạng thái checked ban đầu dựa trên selectedProductIds
+        checkboxes.forEach(checkbox => {
+            const productId = parseInt(checkbox.value);
+            checkbox.checked = selectedProductIds.includes(productId);
+            console.log(`Checkbox ID: ${checkbox.id}, Value: ${checkbox.value}, Checked: ${checkbox.checked}`);
+
+            // Xử lý sự kiện thay đổi
+            checkbox.addEventListener("change", function() {
+                console.log("Sending request to select product ID:", this.value, "Checked:", this.checked);
+                fetch('/dashboard/products/select-product', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        productId: parseInt(this.value),
+                        isChecked: this.checked
+                    })
+                })
+                    .then(response => {
+                        console.log("Response status:", response.status);
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                console.error("Response text:", text.substring(0, 100));
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Response data:", data);
+                        if (data.selectedCount > 5) {
+                            this.checked = false;
+                            Swal.fire("Cảnh báo", "Vui lòng chọn ít hơn hoặc bằng 5 sản phẩm!", "warning");
+                        }
+                        updateSelectedCount(data.selectedCount);
+                    })
+                    .catch(error => {
+                        console.error('Error selecting product:', error);
+                        Swal.fire("Lỗi", "Không thể chọn sản phẩm: " + error.message, "error");
+                    });
+            });
+        });
+
+        // Đồng bộ số lượng ban đầu từ session
+        updateSelectedCount(selectedProductIds.length);
+    });
+
+    // Clear selected products
+    document.getElementById("clearSelectedProducts").addEventListener("click", function() {
+        fetch('/dashboard/products/deselect-products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.querySelectorAll(".product-checkbox").forEach(cb => cb.checked = false);
+                updateSelectedCount(data.selectedCount);
+                hideEditForm();
+            })
+            .catch(error => {
+                console.error('Error deselecting products:', error);
+                Swal.fire("Lỗi", "Không thể bỏ chọn sản phẩm!", "error");
+            });
+    });
+
+    // Show edit form
+    document.getElementById("showEditForm").addEventListener("click", function() {
+        fetch('/dashboard/products/selected-products')
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json();
+            })
+            .then(products => {
+                const container = document.getElementById('selectedProductsContainer');
+                container.innerHTML = '';
+
+                products.forEach(product => {
+                    container.innerHTML += `
+                    <div class="product-card" id="card-${product.productID}">
+                        <div class="product-info">
+                            <div class="product-image">Hình ảnh</div>
+                            <h5 class="product-name">${product.name}</h5>
+                            <div class="old-price">${formatPrice(product.retailPrice)} VND</div>
+                            <input type="number" class="new-price-input" name="newPrices" placeholder="Nhập giá mới">
+                            <div class="validate-message"></div>
+                            <input type="hidden" name="productIds" value="${product.productID}">
+                            <input type="hidden" name="oldPrices" value="${product.retailPrice}">
+                        </div>
+                    </div>
+                `;
+                });
+
+                const modal = document.getElementById("editFormModal");
+                const cardWidth = 220;
+                const minWidth = 300;
+                const maxWidth = 1100;
+                const newWidth = Math.min(maxWidth, Math.max(minWidth, products.length * cardWidth));
+                modal.style.width = `${newWidth}px`;
+                modal.style.overflowX = "hidden"; // Ẩn thanh trượt ngang nếu có
+
+                modal.style.display = "block";
+                document.getElementById("modalBackdrop").style.display = "block";
+                document.getElementById("actionButtons").style.display = "flex";
+
+                // Add validation for each price input
+                const priceInputs = document.querySelectorAll(".new-price-input");
+                priceInputs.forEach(input => {
+                    input.addEventListener("input", function() {
+                        const oldPrice = parseFloat(this.parentElement.querySelector('input[name="oldPrices"]').value);
+                        const validation = validatePrice(this.value, oldPrice);
+                        const messageDiv = this.parentElement.querySelector(".validate-message");
+
+                        if (validation.type === "error") {
+                            messageDiv.className = "validate-message validate-error";
+                            messageDiv.textContent = validation.message;
+                        } else if (validation.type === "info") {
+                            messageDiv.className = "validate-message validate-info";
+                            messageDiv.textContent = validation.message;
+                        } else {
+                            messageDiv.className = "validate-message";
+                            messageDiv.textContent = "";
+                        }
+
+                        updateSaveButtonState();
+                    });
+
+                    // Trigger initial validation
+                    const event = new Event('input');
+                    input.dispatchEvent(event);
+                });
+            })
+            .catch(error => {
+                Swal.fire("Thông báo", error.message, "warning");
+            });
+    });
+
+    // Hide edit form
+    function hideEditForm() {
+        const modal = document.getElementById("editFormModal");
+        const backdrop = document.getElementById("modalBackdrop");
+        const actionButtons = document.getElementById("actionButtons");
+        if (modal) modal.style.display = "none";
+        if (backdrop) backdrop.style.display = "none";
+        if (actionButtons) actionButtons.style.display = "none";
+    }
+
+    // Handle page load
+    window.onload = function() {
+        hideEditForm();
+        const message = "[[${message}]]";
+        const error = "[[${error}]]";
+
+        if (message && message.trim() !== "") {
+            Swal.fire({
+                title: "Thành công!",
+                text: message,
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+
+        if (error && error.trim() !== "") {
+            Swal.fire("Lỗi", error, "error");
+        }
+    };
 </script>
 </body>
 </html>

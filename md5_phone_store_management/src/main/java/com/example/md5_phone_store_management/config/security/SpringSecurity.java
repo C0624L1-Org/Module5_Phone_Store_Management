@@ -42,6 +42,7 @@ public class SpringSecurity {
                                 "/dashboard/stock-in/delete",
                                 "/api/sales/**",
                                 "/dashboard/sales/add",
+                                "/dashboard/products/**",
                                 "/dashboard/admin/transactions/listIn/delete")
                 )
                 .authorizeHttpRequests(auth -> auth
@@ -56,6 +57,12 @@ public class SpringSecurity {
                                 "/clear-session",
                                 "/api/vnpay/**",
                                 "/api/payment/**",
+
+//                                chọn sp
+                                "/dashboard/products/select-product",
+                                "/dashboard/products/deselect-products",
+                                "/dashboard/products/selected-products",
+
                                 "/dashboard/sales/payment-callback",
                                 "/dashboard/sales/invoice-pdf/**",
                                 "/dashboard/sales/download-invoice-pdf/**").permitAll()
