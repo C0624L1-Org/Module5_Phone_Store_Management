@@ -14,7 +14,35 @@
     const selectedCustomerInfo = document.getElementById('selectedCustomerInfo');
     const saveCustomerBtn = document.getElementById('saveNewCustomerBtn');
     const checkoutBtn = document.getElementById('checkoutBtn');
-    
+
+    // Đồng bộ hóa dữ liệu purchaseCount khi tải trang
+    (function synchronizePurchaseCounts() {
+        console.log("Đang đồng bộ hóa dữ liệu purchaseCount...");
+        
+        fetch('/api/sales/sync-purchase-counts')
+            .then(response => response.json())
+            .then(data => {
+                console.log("Kết quả đồng bộ hóa:", data);
+                if (data.success) {
+                    console.log("Đã đồng bộ hóa thành công: " + data.message);
+                    
+                    // Tự động tải lại danh sách khách hàng sau khi đồng bộ hóa thành công
+                    console.log("Đang tải lại danh sách khách hàng sau khi đồng bộ hóa...");
+                    setTimeout(function() {
+                        // Tải lại danh sách khách hàng đã mua
+                        searchCustomers();
+                        // Tải lại danh sách tất cả khách hàng
+                        searchAllCustomers();
+                    }, 500);
+                } else {
+                    console.error("Lỗi khi đồng bộ hóa: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Lỗi kết nối khi đồng bộ hóa: ", error);
+            });
+    })();
+
     // Khai báo biến khác
     let cart = [];
     let currentCustomerPage = 0;
@@ -24,6 +52,10 @@
     let productSearchTimeout;
     let allCustomerSearchTimeout;
     
+    // Cache dữ liệu khách hàng để tránh mất dữ liệu
+    let allCustomersCache = [];
+    let purchasedCustomersCache = []; // Thêm cache cho khách hàng đã mua hàng
+
     // Định dạng tiền tệ
     function formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN', {
@@ -32,7 +64,7 @@
             minimumFractionDigits: 0
         }).format(amount);
     }
-    
+
     // Thêm hàm fetchWithFallback ngay sau hàm formatCurrency
     function fetchWithFallback(url, options = {}) {
         return fetch(url, options)
@@ -43,7 +75,7 @@
                 return response.json();
             });
     }
-    
+
     // Hiển thị toast thông báo
     function showToast(type, message) {
         // Kiểm tra nếu có hàm showToastMessage (từ toast.js)
@@ -56,18 +88,31 @@
     function searchCustomers() {
         let searchInput = document.getElementById('customerSearchInput').value.trim();
         console.log("DEBUG: Tìm kiếm khách hàng đã mua hàng với từ khóa: " + searchInput);
-        
+
         // Hiển thị đang tải
         const customerListElement = document.getElementById('customerList');
         if (customerListElement) {
             customerListElement.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner-border text-primary" role="status"></div></td></tr>';
         }
-        
-        // Tạo URL với tham số "keyword" (đây là điểm quan trọng)
-        const url = `/api/sales/search-customers?keyword=${encodeURIComponent(searchInput)}&page=${currentCustomerPage}&size=${pageSize}&_=${new Date().getTime()}`;
-        
+
+        // Khi tìm kiếm với từ khóa mới, luôn reset về trang đầu tiên
+        if (searchInput) {
+            currentCustomerPage = 0;
+        }
+
+        // Nếu có dữ liệu cache và chỉ là điều hướng phân trang (không tìm kiếm), sử dụng cache
+        if (purchasedCustomersCache.length > 0 && currentCustomerPage > 0 && !searchInput) {
+            console.log("DEBUG: Sử dụng dữ liệu cache cho phân trang khách hàng đã mua");
+            displayCachedPurchasedCustomers(searchInput);
+            return;
+        }
+
+        // Tạo URL với tham số "keyword", trang hiện tại và timestamp để tránh cache
+        const timestamp = new Date().getTime();
+        const url = `/api/sales/search-customers?keyword=${encodeURIComponent(searchInput)}&page=0&size=100&_=${timestamp}`;
+
         console.log(`DEBUG: Gọi API tìm kiếm khách hàng đã mua: ${url}`);
-        
+
         // Gọi API với method GET và thêm headers để tránh cache
         fetch(url, {
             method: 'GET',
@@ -87,33 +132,29 @@
         })
         .then(data => {
             console.log(`DEBUG: API trả về dữ liệu khách hàng đã mua:`, data);
-            // Kiểm tra xem data có chứa nội dung không
-            if (data && data.content) {
-                console.log(`DEBUG: Tìm thấy ${data.content.length} khách hàng trên trang này`);
-                console.log(`DEBUG: Tổng số khách hàng: ${data.totalElements}`);
+            
+            // Thêm debug để kiểm tra chi tiết về dữ liệu trả về
+            console.log(`DEBUG: Cấu trúc data:`, {
+                hasContent: !!data.content,
+                contentLength: data.content ? data.content.length : 0,
+                contentType: data.content ? typeof data.content : 'không có',
+                isArray: data.content ? Array.isArray(data.content) : false,
+                totalElements: data.totalElements,
+                totalPages: data.totalPages,
+                numberOfElements: data.numberOfElements
+            });
+            
+            if (data.content) {
+                // Lưu vào bộ nhớ cache
+                purchasedCustomersCache = [...data.content];
+                console.log(`DEBUG: Đã lưu ${purchasedCustomersCache.length} khách hàng đã mua vào cache`);
                 
-                // Kiểm tra và log chi tiết về các khách hàng tìm được
-                data.content.forEach((customer, index) => {
-                    console.log(`DEBUG: Khách hàng #${index + 1}: ID=${customer.customerID || customer.id}, Tên=${customer.fullName}, SĐT=${customer.phone}, Email=${customer.email}`);
-                });
-                
-                // Cập nhật bảng khách hàng
-                updateCustomerTable(data.content);
-                
-                // Cập nhật phân trang
-                let paginationInfo = {
-                    content: data.content,
-                    totalElements: data.totalElements, 
-                    totalPages: data.totalPages,
-                    number: data.number,
-                    size: data.size,
-                    numberOfElements: data.numberOfElements
-                };
-                
-                updatePagination('customerPagination', paginationInfo, changeCustomerPage);
+                // Hiển thị dữ liệu từ cache
+                displayCachedPurchasedCustomers(searchInput);
             } else {
                 console.error(`DEBUG: API trả về dữ liệu không hợp lệ:`, data);
                 updateCustomerTable([]);
+                
                 // Ẩn phân trang nếu không có dữ liệu
                 let paginationElement = document.getElementById('customerPagination');
                 if (paginationElement) {
@@ -130,25 +171,113 @@
             showToast('error', `Lỗi khi tìm kiếm khách hàng: ${error.message}`);
         });
     }
-    
+
+    // Hiển thị dữ liệu khách hàng đã mua từ cache
+    function displayCachedPurchasedCustomers(searchInput) {
+        // Lọc dữ liệu theo từ khóa nếu cần
+        let filteredCustomers = purchasedCustomersCache;
+        
+        if (searchInput) {
+            const searchLower = searchInput.toLowerCase();
+            filteredCustomers = purchasedCustomersCache.filter(customer => {
+                const nameMatch = (customer.fullName || '').toLowerCase().includes(searchLower);
+                const phoneMatch = (customer.phone || '').includes(searchInput);
+                const emailMatch = (customer.email || '').toLowerCase().includes(searchLower);
+                return nameMatch || phoneMatch || emailMatch;
+            });
+            console.log(`DEBUG: Sau khi lọc với từ khóa "${searchInput}": ${filteredCustomers.length} khách hàng đã mua`);
+        }
+        
+        // Đảm bảo currentCustomerPage không vượt quá số trang tối đa
+        const totalPages = Math.ceil(filteredCustomers.length / pageSize);
+        if (totalPages > 0 && currentCustomerPage >= totalPages) {
+            currentCustomerPage = totalPages - 1;
+            console.log(`DEBUG: Điều chỉnh lại trang hiện tại của khách hàng đã mua = ${currentCustomerPage} vì chỉ có ${totalPages} trang`);
+        }
+        
+        // Tính toán phân trang
+        const start = currentCustomerPage * pageSize;
+        const end = Math.min(start + pageSize, filteredCustomers.length);
+        const customersOnPage = filteredCustomers.slice(start, end);
+        
+        console.log(`DEBUG: Hiển thị ${customersOnPage.length} khách hàng đã mua từ cache (trang ${currentCustomerPage + 1}, từ ${start} đến ${end-1})`);
+        
+        // Nếu trang hiện tại không có dữ liệu, quay về trang đầu tiên
+        if (customersOnPage.length === 0 && filteredCustomers.length > 0) {
+            currentCustomerPage = 0;
+            const newStart = 0;
+            const newEnd = Math.min(pageSize, filteredCustomers.length);
+            const newCustomersOnPage = filteredCustomers.slice(newStart, newEnd);
+            console.log(`DEBUG: Quay về trang đầu tiên vì trang hiện tại không có dữ liệu. Hiển thị ${newCustomersOnPage.length} khách hàng đã mua.`);
+            
+            // Cập nhật bảng với dữ liệu trang đầu tiên
+            updateCustomerTable(newCustomersOnPage);
+            
+            // Cập nhật phân trang với trang đầu tiên
+            const paginationData = {
+                content: newCustomersOnPage,
+                totalElements: filteredCustomers.length,
+                totalPages: totalPages,
+                size: pageSize,
+                number: currentCustomerPage
+            };
+            
+            updatePagination('customerPagination', paginationData, changeCustomerPage);
+            return;
+        }
+        
+        // Cập nhật bảng với dữ liệu trang hiện tại
+        updateCustomerTable(customersOnPage);
+        
+        // Cập nhật phân trang
+        const paginationData = {
+            content: customersOnPage,
+            totalElements: filteredCustomers.length,
+            totalPages: totalPages,
+            size: pageSize,
+            number: currentCustomerPage
+        };
+        
+        updatePagination('customerPagination', paginationData, changeCustomerPage);
+    }
+
     // Chức năng tìm kiếm tất cả khách hàng
     function searchAllCustomers() {
         let searchInput = document.getElementById('allCustomerSearchInput').value.trim();
         console.log("DEBUG: Tìm kiếm tất cả khách hàng với từ khóa: " + searchInput);
-        
+
         // Hiển thị đang tải
         const customerListElement = document.getElementById('customerListWithPurchaseCount');
         if (customerListElement) {
             customerListElement.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner-border text-primary" role="status"></div></td></tr>';
         }
-        
-        // Tạo URL với tham số "keyword" (đây là điểm quan trọng) 
-        const url = `/api/sales/search-all-customers?keyword=${encodeURIComponent(searchInput)}&page=${allCurrentPage}&size=${pageSize}&_=${new Date().getTime()}`;
-        
-        console.log(`DEBUG: Gọi API tìm kiếm tất cả khách hàng: ${url}`);
-        
-        // Gọi API với method GET và thêm headers để tránh cache
-        fetch(url, {
+
+        // Khi tìm kiếm với từ khóa mới, luôn reset về trang đầu tiên
+        if (searchInput) {
+            allCurrentPage = 0;
+        }
+
+        // Tạo URL với tham số "keyword" và timestamp để tránh cache
+        const timestamp = new Date().getTime();
+
+        // Nếu có dữ liệu cache và chỉ là điều hướng phân trang (không tìm kiếm), sử dụng cache
+        if (allCustomersCache.length > 0 && allCurrentPage > 0 && !searchInput) {
+            console.log("DEBUG: Sử dụng dữ liệu cache cho phân trang");
+            displayCachedCustomers(searchInput);
+            return;
+        }
+
+        // Luôn làm mới dữ liệu khi tìm kiếm từ khóa mới
+        const allCustomersUrl = `/api/sales/search-all-customers?keyword=${encodeURIComponent(searchInput)}&page=0&size=100&_=${timestamp}`;
+        const purchasedCustomersUrl = `/api/sales/search-customers?keyword=${encodeURIComponent(searchInput)}&page=0&size=50&_=${timestamp}`;
+
+        console.log(`DEBUG: Gọi API tìm kiếm tất cả khách hàng: ${allCustomersUrl}`);
+        console.log(`DEBUG: Gọi API tìm kiếm khách hàng đã mua: ${purchasedCustomersUrl}`);
+
+        // Sử dụng Promise.all để tải cả hai danh sách cùng lúc
+        Promise.all([
+            // Tải tất cả khách hàng
+            fetch(allCustomersUrl, {
             method: 'GET',
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -156,68 +285,197 @@
                 'Expires': '0'
             },
             credentials: 'same-origin'
-        })
-        .then(response => {
-            console.log(`API tìm kiếm tất cả khách hàng trả về status: ${response.status}`);
-            if (!response.ok) {
-                throw new Error(`Lỗi HTTP: ${response.status}`);
+            }).then(response => {
+                if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
+                return response.json();
+            }),
+            
+            // Tải khách hàng đã mua
+            fetch(purchasedCustomersUrl, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                },
+                credentials: 'same-origin'
+            }).then(response => {
+                if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
+                return response.json();
+            })
+        ])
+        .then(([allCustomersData, purchasedCustomersData]) => {
+            console.log("DEBUG: Đã nhận dữ liệu từ cả hai API:");
+            console.log("- Tất cả khách hàng:", allCustomersData);
+            console.log("- Khách hàng đã mua:", purchasedCustomersData);
+            
+            // Kiểm tra nếu API trả về mảng rỗng
+            if (!allCustomersData || !allCustomersData.content || allCustomersData.content.length === 0) {
+                console.log("CẢNH BÁO: API tất cả khách hàng trả về mảng rỗng");
+                allCustomersCache = [];
+                displayCachedCustomers(searchInput);
+                return;
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log(`DEBUG: API trả về dữ liệu tất cả khách hàng:`, data);
-            // Kiểm tra xem data có chứa nội dung không
-            if (data && data.content) {
-                console.log(`DEBUG: Tìm thấy ${data.content.length} khách hàng trên trang này`);
-                console.log(`DEBUG: Tổng số khách hàng: ${data.totalElements}`);
-                
-                // Kiểm tra và log chi tiết về các khách hàng tìm được
-                data.content.forEach((customer, index) => {
-                    console.log(`DEBUG: Tất cả khách hàng #${index + 1}: ID=${customer.customerID || customer.id}, Tên=${customer.fullName}, SĐT=${customer.phone}, Email=${customer.email}`);
+            
+            // Log chi tiết số lượng khách hàng từ mỗi API
+            console.log(`DEBUG: API tất cả khách hàng trả về ${allCustomersData.content.length} khách hàng`);
+            console.log(`DEBUG: API khách hàng đã mua trả về ${purchasedCustomersData.content ? purchasedCustomersData.content.length : 0} khách hàng`);
+
+            // Tạo map cho khách hàng đã mua để dễ tìm kiếm
+            const purchasedMap = new Map();
+            if (purchasedCustomersData.content && purchasedCustomersData.content.length) {
+                purchasedCustomersData.content.forEach(customer => {
+                    const id = customer.customerID || customer.id;
+                    if (id) {
+                        purchasedMap.set(id.toString(), customer);
+                    }
                 });
-                
-                // Cập nhật bảng khách hàng
-                updateAllCustomerTable(data.content);
-                
-                // Cập nhật phân trang
-                let paginationInfo = {
-                    content: data.content,
-                    totalElements: data.totalElements, 
-                    totalPages: data.totalPages,
-                    number: data.number,
-                    size: data.size,
-                    numberOfElements: data.numberOfElements
-                };
-                
-                updatePagination('allCustomerPagination', paginationInfo, changeAllCustomerPage);
-            } else {
-                console.error(`DEBUG: API trả về dữ liệu không hợp lệ:`, data);
-                updateAllCustomerTable([]);
-                // Ẩn phân trang nếu không có dữ liệu
-                let paginationElement = document.getElementById('allCustomerPagination');
-                if (paginationElement) {
-                    paginationElement.innerHTML = '';
-                    paginationElement.style.display = 'none';
+            }
+            
+            // Dùng trực tiếp dữ liệu từ API tất cả khách hàng
+            let customers = [...allCustomersData.content];
+            
+            // Log danh sách khách hàng trước khi kết hợp
+            console.log(`DEBUG: Danh sách tất cả khách hàng trước khi kết hợp: ${customers.length} khách hàng`);
+            customers.forEach((customer, index) => {
+                if (index < 5) { // Chỉ hiển thị 5 khách hàng đầu tiên để tránh log quá dài
+                    console.log(`  - Khách hàng #${index + 1}: ID=${customer.customerID || customer.id}, Tên=${customer.fullName}, PurchaseCount=${customer.purchaseCount || 0}`);
+                }
+            });
+            
+            // Thêm các khách hàng đã mua không có trong danh sách ban đầu
+            if (purchasedCustomersData.content) {
+                for (const customer of purchasedCustomersData.content) {
+                    const id = customer.customerID || customer.id;
+                    if (id) {
+                        // Kiểm tra xem đã có trong danh sách chưa
+                        const existing = customers.find(c => (c.customerID || c.id) == id);
+                        
+                        if (!existing) {
+                            console.log(`DEBUG: Thêm khách hàng đã mua ID=${id} vào danh sách tổng hợp`);
+                            customers.push(customer);
+                } else {
+                            // Cập nhật purchaseCount từ dữ liệu khách hàng đã mua
+                            existing.purchaseCount = customer.purchaseCount;
+                        }
+                    }
                 }
             }
-        })
-        .catch(error => {
-            console.error(`Lỗi khi tìm kiếm tất cả khách hàng:`, error);
-            if (customerListElement) {
-                customerListElement.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Lỗi khi tải dữ liệu khách hàng: ${error.message}</td></tr>`;
+            
+            // Log danh sách khách hàng sau khi kết hợp
+            console.log(`DEBUG: Danh sách sau khi kết hợp: ${customers.length} khách hàng`);
+            
+            // Lọc theo từ khóa nếu cần
+            if (searchInput) {
+                const searchLower = searchInput.toLowerCase();
+                customers = customers.filter(customer => {
+                    const nameMatch = (customer.fullName || '').toLowerCase().includes(searchLower);
+                    const phoneMatch = (customer.phone || '').includes(searchInput);
+                    const emailMatch = (customer.email || '').toLowerCase().includes(searchLower);
+                    return nameMatch || phoneMatch || emailMatch;
+                });
+                console.log(`DEBUG: Sau khi lọc với từ khóa "${searchInput}": ${customers.length} khách hàng`);
             }
-            showToast('error', `Lỗi khi tìm kiếm khách hàng: ${error.message}`);
-        });
+            
+            // Sắp xếp khách hàng theo ID
+            customers.sort((a, b) => {
+                const idA = a.customerID || a.id || 0;
+                const idB = b.customerID || b.id || 0;
+                return idA - idB;
+            });
+            
+            // Lưu vào cache
+            allCustomersCache = customers;
+            
+            // Hiển thị dữ liệu
+            displayCachedCustomers(searchInput);
+            })
+            .catch(error => {
+                console.error(`Lỗi khi tìm kiếm tất cả khách hàng:`, error);
+                if (customerListElement) {
+                    customerListElement.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Lỗi khi tải dữ liệu khách hàng: ${error.message}</td></tr>`;
+                }
+                showToast('error', `Lỗi khi tìm kiếm khách hàng: ${error.message}`);
+            });
     }
     
+    // Hiển thị dữ liệu khách hàng từ cache
+    function displayCachedCustomers(searchInput) {
+        // Lọc dữ liệu theo từ khóa nếu cần
+        let filteredCustomers = allCustomersCache;
+        
+        if (searchInput) {
+            const searchLower = searchInput.toLowerCase();
+            filteredCustomers = allCustomersCache.filter(customer => {
+                const nameMatch = (customer.fullName || '').toLowerCase().includes(searchLower);
+                const phoneMatch = (customer.phone || '').includes(searchInput);
+                const emailMatch = (customer.email || '').toLowerCase().includes(searchLower);
+                return nameMatch || phoneMatch || emailMatch;
+            });
+            console.log(`DEBUG: Sau khi lọc với từ khóa "${searchInput}": ${filteredCustomers.length} khách hàng`);
+        }
+        
+        // Đảm bảo allCurrentPage không vượt quá số trang tối đa
+        const totalPages = Math.ceil(filteredCustomers.length / pageSize);
+        if (totalPages > 0 && allCurrentPage >= totalPages) {
+            allCurrentPage = totalPages - 1;
+            console.log(`DEBUG: Điều chỉnh lại trang hiện tại = ${allCurrentPage} vì chỉ có ${totalPages} trang`);
+        }
+        
+        // Tính toán phân trang
+        const start = allCurrentPage * pageSize;
+        const end = Math.min(start + pageSize, filteredCustomers.length);
+        const customersOnPage = filteredCustomers.slice(start, end);
+        
+        console.log(`DEBUG: Hiển thị ${customersOnPage.length} khách hàng từ cache (trang ${allCurrentPage + 1}, từ ${start} đến ${end-1})`);
+        
+        // Nếu trang hiện tại không có dữ liệu, quay về trang đầu tiên
+        if (customersOnPage.length === 0 && filteredCustomers.length > 0) {
+            allCurrentPage = 0;
+            const newStart = 0;
+            const newEnd = Math.min(pageSize, filteredCustomers.length);
+            const newCustomersOnPage = filteredCustomers.slice(newStart, newEnd);
+            console.log(`DEBUG: Quay về trang đầu tiên vì trang hiện tại không có dữ liệu. Hiển thị ${newCustomersOnPage.length} khách hàng.`);
+            
+            // Cập nhật bảng với dữ liệu trang đầu tiên
+            updateAllCustomerTable(newCustomersOnPage);
+            
+            // Cập nhật phân trang với trang đầu tiên
+            const paginationData = {
+                content: newCustomersOnPage,
+                totalElements: filteredCustomers.length,
+                totalPages: totalPages,
+                size: pageSize,
+                number: allCurrentPage
+            };
+            
+            updatePagination('allCustomerPagination', paginationData, changeAllCustomerPage);
+            return;
+        }
+        
+        // Cập nhật bảng với dữ liệu trang hiện tại
+        updateAllCustomerTable(customersOnPage);
+        
+        // Cập nhật phân trang
+        const paginationData = {
+            content: customersOnPage,
+            totalElements: filteredCustomers.length,
+            totalPages: totalPages,
+            size: pageSize,
+            number: allCurrentPage
+        };
+        
+        updatePagination('allCustomerPagination', paginationData, changeAllCustomerPage);
+    }
+
     // Tìm kiếm sản phẩm
     function searchProducts(page = 0) {
         // Đảm bảo trang là số không âm
         page = Math.max(0, page);
-        
+
         // Lấy phần tử danh sách sản phẩm
         const productListElement = document.getElementById('productList');
-        
+
         // Hiển thị biểu tượng đang tải
         if (productListElement) {
             productListElement.innerHTML = '<tr><td colspan="4" class="text-center"><div class="spinner-border text-primary" role="status"></div></td></tr>';
@@ -225,22 +483,23 @@
             console.error('Không tìm thấy phần tử ID: productList!');
             return;
         }
-        
+
         // Lấy từ khóa tìm kiếm
         const searchInput = document.getElementById('productSearchInput');
         const keyword = searchInput ? searchInput.value.trim() : '';
         console.log('Từ khóa tìm kiếm sản phẩm:', keyword);
-        
+
         const params = new URLSearchParams();
         params.append('keyword', keyword);
         params.append('page', page);
-        params.append('size', 5);
+        params.append('size', pageSize);
+        params.append('_', new Date().getTime()); // Thêm timestamp để tránh cache
 
         // Sử dụng endpoint chính xác đã cung cấp
         const url = `/api/sales/search-products?${params.toString()}`;
-        
+
         console.log(`DEBUG: Gọi API tìm kiếm sản phẩm: ${url}`);
-        
+
         // Gọi API với method GET
         fetch(url)
             .then(response => {
@@ -253,12 +512,24 @@
             .then(data => {
                 // Debug dữ liệu trả về từ API
                 console.log('Dữ liệu API sản phẩm:', data);
+                
+                // Cập nhật bảng sản phẩm
                 updateProductTable(data, page);
+                
+                // Cập nhật phân trang cho sản phẩm
+                updatePagination('productPagination', data, changeProductPage);
             })
             .catch(error => {
                 console.error(`Lỗi khi tìm kiếm sản phẩm:`, error);
                 productListElement.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Lỗi khi tải dữ liệu sản phẩm: ${error.message}</td></tr>`;
                 showToast('error', `Lỗi khi tìm kiếm sản phẩm: ${error.message}`);
+                
+                // Ẩn phân trang khi có lỗi
+                const paginationElement = document.getElementById('productPagination');
+                if (paginationElement) {
+                    paginationElement.innerHTML = '';
+                    paginationElement.style.display = 'none';
+                }
             });
     }
 
@@ -269,19 +540,19 @@
             console.error('Không tìm thấy phần tử ID: customerList');
             return;
         }
-        
+
         console.log(`DEBUG: Cập nhật bảng khách hàng với ${customers.length} bản ghi`);
-        
+
         if (!customers || customers.length === 0) {
             customerListElement.innerHTML = '<tr><td colspan="6" class="text-center">Không tìm thấy khách hàng nào</td></tr>';
             return;
         }
-        
+
         let html = '';
         customers.forEach(customer => {
             // Log để debug
             console.log(`DEBUG: Xử lý khách hàng: ID=${customer.customerID || customer.id}, Tên=${customer.fullName}, SĐT=${customer.phone}`);
-            
+
             html += `<tr>
                 <td>${customer.fullName || ''}</td>
                 <td>${customer.phone || ''}</td>
@@ -301,9 +572,9 @@
                 </td>
             </tr>`;
         });
-        
+
         customerListElement.innerHTML = html;
-        
+
         // Thêm sự kiện cho nút "Chọn"
         customerListElement.querySelectorAll('.select-customer').forEach(button => {
             button.addEventListener('click', function() {
@@ -312,9 +583,9 @@
                 const customerPhone = this.getAttribute('data-customer-phone');
                 const customerEmail = this.getAttribute('data-customer-email');
                 const customerAddress = this.getAttribute('data-customer-address');
-                
+
                 console.log(`DEBUG: Đã chọn khách hàng - ID=${customerId}, Tên=${customerName}, SĐT=${customerPhone}`);
-                
+
                 // Sử dụng hàm selectCustomer để chọn khách hàng
                 selectCustomer(customerId, customerName, customerPhone, customerEmail, customerAddress);
             });
@@ -328,19 +599,19 @@
             console.error('Không tìm thấy phần tử ID: customerListWithPurchaseCount');
             return;
         }
-        
+
         console.log(`DEBUG: Cập nhật bảng tất cả khách hàng với ${customers.length} bản ghi`);
-        
+
         if (!customers || customers.length === 0) {
             customerListElement.innerHTML = '<tr><td colspan="6" class="text-center">Không tìm thấy khách hàng nào</td></tr>';
             return;
         }
-        
+
         let html = '';
         customers.forEach(customer => {
             // Log để debug
-            console.log(`DEBUG: Xử lý tất cả khách hàng: ID=${customer.customerID || customer.id}, Tên=${customer.fullName}, SĐT=${customer.phone}`);
-            
+            console.log(`DEBUG: Xử lý tất cả khách hàng: ID=${customer.customerID || customer.id}, Tên=${customer.fullName}, SĐT=${customer.phone}, PurchaseCount=${customer.purchaseCount || 0}`);
+
             html += `<tr>
                 <td>${customer.fullName || ''}</td>
                 <td>${customer.phone || ''}</td>
@@ -360,9 +631,9 @@
                 </td>
             </tr>`;
         });
-        
+
         customerListElement.innerHTML = html;
-        
+
         // Thêm sự kiện cho nút "Chọn"
         customerListElement.querySelectorAll('.select-all-customer').forEach(button => {
             button.addEventListener('click', function() {
@@ -371,15 +642,15 @@
                 const customerPhone = this.getAttribute('data-customer-phone');
                 const customerEmail = this.getAttribute('data-customer-email');
                 const customerAddress = this.getAttribute('data-customer-address');
-                
+
                 console.log(`DEBUG: Đã chọn từ tất cả khách hàng - ID=${customerId}, Tên=${customerName}, SĐT=${customerPhone}`);
-                
+
                 // Sử dụng hàm selectCustomer để chọn khách hàng
                 selectCustomer(customerId, customerName, customerPhone, customerEmail, customerAddress);
             });
         });
     }
-    
+
     // Cập nhật bảng sản phẩm
     function updateProductTable(data, currentPage) {
         const productListElement = document.getElementById('productList');
@@ -387,23 +658,23 @@
             console.error('Không tìm thấy phần tử ID: productList!');
             return;
         }
-        
+
         if (data.content && data.content.length > 0) {
             let html = '';
             data.content.forEach(product => {
                 try {
                     // Tránh log toàn bộ đối tượng sản phẩm gây vòng lặp vô hạn
                     console.log(`Xử lý sản phẩm ID: ${product.productID || product.id}, Tên: ${product.name || product.productName}`);
-                    
+
                     // Kiểm tra số lượng tồn kho
                     const isOutOfStock = product.stockQuantity <= 0;
-                    const stockStatus = isOutOfStock ? 
-                        '<span class="badge bg-danger">Hết hàng</span>' : 
+                    const stockStatus = isOutOfStock ?
+                        '<span class="badge bg-danger">Hết hàng</span>' :
                         `<span class="badge bg-success">${product.stockQuantity} trong kho</span>`;
-                    
+
                     // Xử lý ảnh sản phẩm - KHÔNG truy cập trực tiếp đối tượng image
                     let productImage = '/img/no-image.png'; // Đường dẫn ảnh mặc định
-                    
+
                     // Tạo bản sao cạn của đối tượng images để tránh vòng lặp
                     if (product.images && Array.isArray(product.images)) {
                         // Chỉ lấy imageUrl từ phần tử đầu tiên trong mảng
@@ -411,10 +682,10 @@
                             productImage = product.images[0].imageUrl;
                         }
                     }
-                    
+
                     // Thêm đoạn code này để ngừng vòng lặp vô hạn khi ảnh không tồn tại
                     const handleImageError = "this.onerror=null; this.src='/img/no-image.png';";
-                    
+
                     // Xử lý giá sản phẩm
                     let productPrice = 0;
                     if (typeof product.sellingPrice === 'number') {
@@ -429,7 +700,7 @@
                             console.error('Lỗi khi chuyển đổi giá bán:', e);
                         }
                     }
-                    
+
                     html += `
                         <tr>
                             <td>
@@ -465,24 +736,7 @@
                 }
             });
             productListElement.innerHTML = html;
-            
-            // Xử lý phân trang
-            const paginationElement = document.getElementById('productPagination');
-            if (paginationElement) {
-                let paginationInfo = {
-                    content: data.content,
-                    totalElements: data.totalElements,
-                    totalPages: data.totalPages,
-                    number: currentPage,
-                    size: data.size,
-                    numberOfElements: data.numberOfElements
-                };
-                
-                updatePagination('productPagination', paginationInfo, function(page) {
-                    searchProducts(page);
-                });
-            }
-            
+
             // Thêm event listener cho các nút "Chọn"
             productListElement.querySelectorAll('.select-product').forEach(button => {
                 button.addEventListener('click', function() {
@@ -490,10 +744,10 @@
                     const productName = this.getAttribute('data-name');
                     const productPrice = parseFloat(this.getAttribute('data-price') || 0);
                     const stockQuantity = parseInt(this.getAttribute('data-stock') || 0);
-                    
+
                     // Thêm sản phẩm vào giỏ hàng
                     addToCart(productId, productName, productPrice, stockQuantity);
-                    
+
                     // Đóng modal
                     const modal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
                     if (modal) modal.hide();
@@ -503,81 +757,78 @@
             productListElement.innerHTML = '<tr><td colspan="4" class="text-center">Không tìm thấy sản phẩm</td></tr>';
         }
     }
-    
+
     // Thêm hàm cập nhật thông tin hiển thị khách hàng
     function updateCustomerDisplayInfo(name, phone, email, address) {
         // Chúng ta sẽ sử dụng giá trị từ các input này để hiển thị
         console.log(`DEBUG: Cập nhật hiển thị thông tin khách hàng: ${name}, ${phone}, ${email}, ${address}`);
-        
-        // Chúng ta không cần phải cập nhật từng phần riêng lẻ vì đã đổ dữ liệu vào các input
-        // Nếu trong tương lai cần hiển thị ra ngoài, có thể thêm code ở đây
     }
-    
+
     // Chọn khách hàng
     function selectCustomer(id, name, phone, email, address) {
         console.log(`DEBUG: Chọn khách hàng với ID: ${id}, Tên: ${name}`);
-        
+
         const customerIdInput = document.getElementById('customerId');
         if (!customerIdInput) {
             console.error('Không tìm thấy input customerId!');
             return;
         }
-        
+
         // Điền thông tin khách hàng vào form ẩn
         customerIdInput.value = id;
-        
+
         const customerNameInput = document.getElementById('customerName');
         const customerPhoneInput = document.getElementById('customerPhone');
         const customerEmailInput = document.getElementById('customerEmail');
         const customerAddressInput = document.getElementById('customerAddress');
-        
+
         if (customerNameInput) customerNameInput.value = name || '';
         if (customerPhoneInput) customerPhoneInput.value = phone || '';
         if (customerEmailInput) customerEmailInput.value = email || '';
         if (customerAddressInput) customerAddressInput.value = address || '';
-        
+
         // Hiển thị phần thông tin khách hàng
         const selectedCustomerInfo = document.getElementById('selectedCustomerInfo');
         if (selectedCustomerInfo) {
             selectedCustomerInfo.classList.remove('d-none');
         }
-        
+
         // Cập nhật giao diện hiển thị thông tin
         updateCustomerDisplayInfo(name, phone, email, address);
-        
+
         // Đóng modal nếu cần
         const existingCustomerModal = document.getElementById('existingCustomerModal');
         if (existingCustomerModal) {
             const modal = bootstrap.Modal.getInstance(existingCustomerModal);
             if (modal) modal.hide();
         }
-        
+
         const existingAllCustomerModal = document.getElementById('existingAllCustomerModal');
         if (existingAllCustomerModal) {
             const modal = bootstrap.Modal.getInstance(existingAllCustomerModal);
             if (modal) modal.hide();
         }
-        
+
         // Kiểm tra nếu có thể checkout
         validateCheckout();
-        
+
         console.log(`Đã chọn khách hàng: ${name} (ID: ${id})`);
         showToast('success', `Đã chọn khách hàng: ${name}`);
     }
-    
+
     // Thêm sản phẩm vào giỏ hàng
     function addToCart(id, name, price, stock) {
         // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
         const existingItemIndex = cart.findIndex(item => item.productId === id);
-        
+
         if (existingItemIndex !== -1) {
             // Nếu đã có, tăng số lượng nếu còn trong kho
             const newQuantity = cart[existingItemIndex].quantity + 1;
-            
+
             if (newQuantity <= stock) {
                 cart[existingItemIndex].quantity = newQuantity;
                 cart[existingItemIndex].total = newQuantity * price;
-                
+
                 // Cập nhật UI
                 updateCartUI();
                 showToast('success', 'Đã cập nhật số lượng sản phẩm trong giỏ hàng');
@@ -594,34 +845,27 @@
                 stock: stock,
                 total: price
             });
-            
+
             // Cập nhật UI
             updateCartUI();
-            
-            // Đóng modal
-            const productModal = document.getElementById('productModal');
-            if (productModal) {
-                const modal = bootstrap.Modal.getInstance(productModal);
-                if (modal) modal.hide();
-            }
-            
+
             // Thông báo thành công
             showToast('success', 'Đã thêm sản phẩm vào giỏ hàng');
         }
-        
+
         // Kiểm tra nếu có thể checkout
         validateCheckout();
-        
+
         console.log(`Đã thêm sản phẩm: ${name} (ID: ${id}, Giá: ${price}) vào giỏ hàng`);
     }
-    
+
     // Cập nhật UI giỏ hàng
     function updateCartUI() {
         if (!cartItems || !emptyCart || !totalItems || !totalAmount) {
             console.error('Không tìm thấy một hoặc nhiều phần tử giỏ hàng!');
             return;
         }
-        
+
         if (cart.length === 0) {
             emptyCart.classList.remove('d-none');
             cartItems.innerHTML = '';
@@ -629,30 +873,27 @@
             totalAmount.textContent = '0 VND';
             return;
         }
-        
+
         // Ẩn thông báo giỏ hàng trống
         emptyCart.classList.add('d-none');
-        
+
         // Tạo HTML cho các sản phẩm trong giỏ hàng
         let html = '';
         let cartTotal = 0;
         let itemCount = 0;
-        
+
         cart.forEach((item, index) => {
             const itemTotal = item.price * item.quantity;
             cartTotal += itemTotal;
             itemCount += item.quantity;
-            
+
             html += `
                 <tr>
+                    <td>${index + 1}</td>
                     <td>${item.name}</td>
                     <td>${formatCurrency(item.price)}</td>
                     <td>
-                        <div class="input-group input-group-sm">
-                            <button class="btn btn-outline-secondary decrease-quantity" data-index="${index}">-</button>
                             <input type="number" class="form-control text-center quantity-input" value="${item.quantity}" data-index="${index}" min="1" max="${item.stock}">
-                            <button class="btn btn-outline-secondary increase-quantity" data-index="${index}">+</button>
-                        </div>
                     </td>
                     <td>${formatCurrency(itemTotal)}</td>
                     <td>
@@ -663,36 +904,22 @@
                 </tr>
             `;
         });
-        
+
         // Cập nhật nội dung giỏ hàng
         cartItems.innerHTML = html;
-        
+
         // Cập nhật tổng số lượng và tổng tiền
         totalItems.textContent = itemCount;
         totalAmount.textContent = formatCurrency(cartTotal);
-        
+
         // Thêm event listeners cho các nút trong giỏ hàng
-        document.querySelectorAll('.decrease-quantity').forEach(button => {
-            button.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                updateCartItemQuantity(index, cart[index].quantity - 1);
-            });
-        });
-        
-        document.querySelectorAll('.increase-quantity').forEach(button => {
-            button.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                updateCartItemQuantity(index, cart[index].quantity + 1);
-            });
-        });
-        
         document.querySelectorAll('.quantity-input').forEach(input => {
             input.addEventListener('change', function() {
                 const index = parseInt(this.getAttribute('data-index'));
                 updateCartItemQuantity(index, parseInt(this.value) || 1);
             });
         });
-        
+
         document.querySelectorAll('.remove-from-cart').forEach(button => {
             button.addEventListener('click', function() {
                 const index = parseInt(this.getAttribute('data-index'));
@@ -700,617 +927,64 @@
             });
         });
     }
-    
+
     // Cập nhật số lượng sản phẩm trong giỏ hàng
     function updateCartItemQuantity(index, newQuantity) {
         if (index < 0 || index >= cart.length) return;
-        
+
         const item = cart[index];
-        
+
         // Kiểm tra số lượng hợp lệ
         if (newQuantity < 1) {
             removeFromCart(index);
             return;
         }
-        
+
         // Kiểm tra số lượng trong kho
         if (newQuantity > item.stock) {
             showToast('error', 'Số lượng sản phẩm trong kho không đủ');
             return;
         }
-        
+
         // Cập nhật số lượng và tổng tiền
         item.quantity = newQuantity;
         item.total = newQuantity * item.price;
-        
+
         // Cập nhật UI
         updateCartUI();
-        
+
         // Kiểm tra nếu có thể checkout
         validateCheckout();
     }
-    
+
     // Xóa sản phẩm khỏi giỏ hàng
     function removeFromCart(index) {
         if (index < 0 || index >= cart.length) return;
-        
+
         // Xóa sản phẩm
         cart.splice(index, 1);
-        
+
         // Cập nhật UI
         updateCartUI();
-        
+
         // Thông báo
         showToast('success', 'Đã xóa sản phẩm khỏi giỏ hàng');
-        
+
         // Kiểm tra nếu có thể checkout
         validateCheckout();
     }
-    
-    // Lưu khách hàng mới
-    function saveNewCustomer() {
-        const form = document.getElementById('newCustomerForm');
-        if (!form) {
-            console.error('Không tìm thấy form khách hàng mới!');
-            return;
-        }
-        
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return;
-        }
-        
-        const formData = new FormData(form);
-        
-        // Thêm CSRF token vào formData
-        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-        
-        // Hiển thị loading
-        const saveBtn = document.getElementById('saveNewCustomerBtn');
-        if (!saveBtn) {
-            console.error('Không tìm thấy nút lưu khách hàng!');
-            return;
-        }
-        
-        const originalBtnText = saveBtn.innerHTML;
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang lưu...';
-        
-        // Chuẩn bị request
-        let fetchOptions = {
-            method: 'POST',
-            body: formData,
-            credentials: 'same-origin'
-        };
-        
-        // Thêm CSRF header nếu có
-        if (csrfToken && csrfHeader) {
-            const headers = new Headers();
-            headers.append(csrfHeader, csrfToken);
-            fetchOptions.headers = headers;
-        }
-        
-        // Gửi API request để tạo khách hàng mới
-        fetch('/api/create-customer', fetchOptions)
-        .then(response => {
-            console.log('Status:', response.status);
-            console.log('ContentType:', response.headers.get('content-type'));
-            
-            // LƯU Ý: Không redirect, chúng ta chỉ xử lý phản hồi JSON
-            if (!response.ok) {
-                throw new Error(`Lỗi ${response.status}: ${response.statusText}`);
-            }
-            
-            return response.json();
-        })
-        .then(data => {
-            // Xử lý thành công
-            console.log('Data:', data);
-            
-            // Kiểm tra customerId có tồn tại trong response
-            if (data.success === true && data.customerId) {
-                console.log('Thêm khách hàng thành công với ID:', data.customerId);
-                
-                // Lấy thông tin từ form
-                const fullName = document.getElementById('newCustomerName').value;
-                const phone = document.getElementById('newCustomerPhone').value;
-                const email = document.getElementById('newCustomerEmail').value || '';
-                const address = document.getElementById('newCustomerAddress').value || '';
-                
-                // Chọn khách hàng và cập nhật form
-                selectCustomer(
-                    data.customerId,
-                    fullName,
-                    phone,
-                    email,
-                    address
-                );
-                
-                // Đóng modal
-                try {
-                    const modalElement = document.getElementById('newCustomerModal');
-                    if (modalElement) {
-                        const modal = bootstrap.Modal.getInstance(modalElement);
-                        if (modal) {
-                            modal.hide();
-                            console.log('Đã đóng modal');
-                        } else {
-                            console.error('Không tìm thấy instance bootstrap Modal');
-                            // Thử phương pháp khác để đóng modal
-                            const newModal = new bootstrap.Modal(modalElement);
-                            newModal.hide();
-                        }
-                    } else {
-                        console.error('Không tìm thấy modal element');
-                    }
-                } catch (error) {
-                    console.error('Lỗi khi đóng modal:', error);
-                    // Phương pháp cuối cùng nếu các phương pháp khác không thành công
-                    $('#newCustomerModal').modal('hide');
-                }
-                
-                // Thông báo thành công
-                showToast('success', 'Đã thêm khách hàng' + data.fullName + 'thành công');
-                
-                // Reset form
-                form.reset();
-                form.classList.remove('was-validated');
-            } else {
-                console.error('Response không hợp lệ:', data);
-                showToast('error', data.message || 'Lỗi khi thêm khách hàng mới');
-            }
-        })
-        .catch(error => {
-            console.error('Error creating customer:', error);
-            showToast('error', error.message);
-        })
-        .finally(() => {
-            // Khôi phục trạng thái nút
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = originalBtnText;
-        });
-    }
-    
+
     // Kiểm tra điều kiện để có thể checkout
     function validateCheckout() {
         console.log(`Trạng thái checkout: Có khách hàng=${customerId && customerId.value ? 'true' : 'false'}, Có sản phẩm=${cart.length > 0 ? 'true' : 'false'}`);
-        
-        if (!customerId || !customerId.value || cart.length === 0) {
-            showToast('error', 'Vui lòng chọn khách hàng và thêm sản phẩm vào giỏ hàng');
-            return;
-        }
-        
+
         if (!checkoutBtn) {
             console.error('Không tìm thấy nút thanh toán!');
             return;
         }
-        
+
         // Kích hoạt hoặc vô hiệu hóa nút thanh toán
         checkoutBtn.disabled = !(customerId && customerId.value && cart.length > 0);
-    }
-    
-    // Xử lý thanh toán
-    function processCheckout() {
-        const customerId = document.getElementById('customerId');
-        const selectedCustomerInfo = document.getElementById('selectedCustomerInfo');
-        const checkoutBtn = document.getElementById('checkoutBtn');
-        const salesForm = document.getElementById('salesForm');
-        const productInputs = document.getElementById('productInputs');
-        const paymentMethodInput = document.getElementById('paymentMethodInput');
-        
-        console.log(`Trạng thái checkout: Có khách hàng=${customerId && customerId.value ? 'true' : 'false'}, Có sản phẩm=${cart.length > 0 ? 'true' : 'false'}`);
-        
-        if (!customerId || !customerId.value || cart.length === 0) {
-            showToast('error', 'Vui lòng chọn khách hàng và thêm sản phẩm vào giỏ hàng');
-            return;
-        }
-        
-        if (!checkoutBtn) {
-            console.error('Không tìm thấy nút thanh toán!');
-            return;
-        }
-        
-        if (!salesForm) {
-            console.error('Không tìm thấy form thanh toán!');
-            return;
-        }
-        
-        if (!productInputs) {
-            console.error('Không tìm thấy phần tử chứa inputs sản phẩm!');
-            return;
-        }
-        
-        // Xóa các input sản phẩm cũ (nếu có)
-        productInputs.innerHTML = '';
-        
-        // Thêm thông tin sản phẩm vào form
-        cart.forEach((item, index) => {
-            // Tạo input cho productID
-            const productIdInput = document.createElement('input');
-            productIdInput.type = 'hidden';
-            productIdInput.name = 'productID';
-            productIdInput.value = item.productId;
-            productInputs.appendChild(productIdInput);
-            
-            // Tạo input cho quantity
-            const quantityInput = document.createElement('input');
-            quantityInput.type = 'hidden';
-            quantityInput.name = 'quantity';
-            quantityInput.value = item.quantity;
-            productInputs.appendChild(quantityInput);
-        });
-        
-        // Cập nhật phương thức thanh toán
-        const paymentMethodChecked = document.querySelector('input[name="paymentMethod"]:checked');
-        if (!paymentMethodChecked) {
-            showToast('error', 'Vui lòng chọn phương thức thanh toán');
-            return;
-        }
-        paymentMethodInput.value = paymentMethodChecked.value;
-        
-        // Thêm tùy chọn in hóa đơn
-        const printInvoice = document.getElementById('printInvoice');
-        let printInvoiceInput = document.getElementById('printInvoiceInput');
-        
-        if (!printInvoiceInput) {
-            printInvoiceInput = document.createElement('input');
-            printInvoiceInput.type = 'hidden';
-            printInvoiceInput.name = 'printInvoice';
-            printInvoiceInput.id = 'printInvoiceInput';
-            productInputs.appendChild(printInvoiceInput);
-        }
-        
-        printInvoiceInput.value = printInvoice && printInvoice.checked ? 'true' : 'false';
-        
-        // Debug form
-        console.log("Debug Form contents:");
-        const formData = new FormData(salesForm);
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-        
-        // Hiển thị loading
-        checkoutBtn.disabled = true;
-        checkoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
-        
-        // Submit form
-        salesForm.submit();
-    }
-    
-    // Khởi tạo các modal và sự kiện
-    function initModals() {
-        console.log("DEBUG: Khởi tạo các modal...");
-        
-        // Modal Khách hàng đã từng mua
-        const existingCustomerModal = document.getElementById('existingCustomerModal');
-        if (existingCustomerModal) {
-            console.log("DEBUG: Tìm thấy modal khách hàng đã mua, thiết lập sự kiện");
-            
-            // Kiểm tra và tạo phần tử phân trang nếu chưa có
-            const customerPagination = document.getElementById('customerPagination');
-            if (!customerPagination) {
-                console.error("DEBUG: Không tìm thấy phần tử customerPagination, đang tạo mới");
-                const customerModalBody = document.querySelector('#existingCustomerModal .modal-body');
-                if (customerModalBody) {
-                    const paginationDiv = document.createElement('div');
-                    paginationDiv.id = 'customerPagination';
-                    paginationDiv.className = 'd-flex justify-content-end mt-3';
-                    customerModalBody.appendChild(paginationDiv);
-                    console.log("DEBUG: Đã tạo phần tử customerPagination");
-                }
-            } else {
-                console.log("DEBUG: Tìm thấy phần tử customerPagination");
-            }
-            
-            // Thiết lập sự kiện cho modal khách hàng đã từng mua
-            existingCustomerModal.addEventListener('shown.bs.modal', function () {
-                console.log("DEBUG: Modal khách hàng đã mua được mở");
-                // Reset trang về 0 và tìm kiếm
-                currentCustomerPage = 0;
-                // Tìm kiếm khách hàng ngay khi mở modal
-                searchCustomers();
-                // Focus vào ô tìm kiếm
-                const searchInput = document.getElementById('customerSearchInput');
-                if (searchInput) {
-                    searchInput.focus();
-                    console.log("DEBUG: Đã focus vào ô tìm kiếm khách hàng");
-                }
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy modal khách hàng đã mua");
-        }
-        
-        // Modal Tất cả khách hàng
-        const existingAllCustomerModal = document.getElementById('existingAllCustomerModal');
-        if (existingAllCustomerModal) {
-            console.log("DEBUG: Tìm thấy modal tất cả khách hàng, thiết lập sự kiện");
-            
-            const allCustomerPagination = document.getElementById('allCustomerPagination');
-            if (!allCustomerPagination) {
-                console.error("DEBUG: Không tìm thấy phần tử allCustomerPagination, đang tạo mới");
-                const allCustomerModalBody = document.querySelector('#existingAllCustomerModal .modal-body');
-                if (allCustomerModalBody) {
-                    const paginationDiv = document.createElement('div');
-                    paginationDiv.id = 'allCustomerPagination';
-                    paginationDiv.className = 'd-flex justify-content-end mt-3';
-                    allCustomerModalBody.appendChild(paginationDiv);
-                    console.log("DEBUG: Đã tạo phần tử allCustomerPagination");
-                }
-            } else {
-                console.log("DEBUG: Tìm thấy phần tử allCustomerPagination");
-            }
-            
-            // Thiết lập sự kiện cho modal tất cả khách hàng
-            existingAllCustomerModal.addEventListener('shown.bs.modal', function () {
-                console.log("DEBUG: Modal tất cả khách hàng được mở");
-                // Reset trang về 0 và tìm kiếm
-                allCurrentPage = 0;
-                // Tìm kiếm khách hàng ngay khi mở modal
-                searchAllCustomers();
-                // Focus vào ô tìm kiếm
-                const searchInput = document.getElementById('allCustomerSearchInput');
-                if (searchInput) {
-                    searchInput.focus();
-                    console.log("DEBUG: Đã focus vào ô tìm kiếm tất cả khách hàng");
-                }
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy modal tất cả khách hàng");
-        }
-        
-        // Modal Sản phẩm
-        const productModal = document.getElementById('productModal');
-        if (productModal) {
-            console.log("DEBUG: Tìm thấy modal sản phẩm, thiết lập sự kiện");
-            
-            // Thiết lập sự kiện cho modal sản phẩm
-            productModal.addEventListener('shown.bs.modal', function () {
-                console.log("DEBUG: Modal sản phẩm được mở");
-                // Tìm kiếm với từ khóa mặc định
-                searchProducts(0);
-                // Focus vào ô tìm kiếm
-                const searchInput = document.getElementById('productSearchInput');
-                if (searchInput) {
-                    searchInput.focus();
-                    console.log("DEBUG: Đã focus vào ô tìm kiếm sản phẩm");
-                }
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy modal sản phẩm");
-        }
-        
-        console.log("DEBUG: Khởi tạo modal hoàn tất, thiết lập sự kiện tìm kiếm...");
-        
-        // Thiết lập các sự kiện tìm kiếm cho các modal
-        setupSearchListeners();
-        
-        console.log("DEBUG: Khởi tạo modal và sự kiện hoàn tất");
-    }
-    
-    // Thiết lập người nghe sự kiện tìm kiếm
-    function setupSearchListeners() {
-        console.log("DEBUG: Thiết lập các sự kiện tìm kiếm...");
-
-        // Tìm kiếm khách hàng đã mua khi nhập
-        const customerSearchInput = document.getElementById('customerSearchInput');
-        if (customerSearchInput) {
-            console.log("DEBUG: Đã tìm thấy input customerSearchInput, thiết lập sự kiện");
-            
-            // Reset input và tìm kiếm ban đầu (để hiển thị tất cả)
-            setTimeout(function() {
-                customerSearchInput.value = '';
-                // Tìm kiếm ngay lập tức khi khởi tạo, không cần timeout
-                currentCustomerPage = 0;
-                searchCustomers();
-            }, 100);
-            
-            // Tìm kiếm khi gõ với độ trễ
-            customerSearchInput.addEventListener('input', function() {
-                console.log("DEBUG: Sự kiện input đã kích hoạt trên customerSearchInput");
-                clearTimeout(customerSearchTimeout);
-                customerSearchTimeout = setTimeout(function() {
-                    currentCustomerPage = 0; // Reset về trang đầu tiên khi tìm kiếm mới
-                    searchCustomers();
-                }, 500); // Tăng độ trễ lên 500ms để tránh quá nhiều request
-            });
-            
-            // Tìm kiếm khi nhấn Enter
-            customerSearchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    console.log("DEBUG: Phím Enter đã được nhấn trong customerSearchInput");
-                    e.preventDefault();
-                    clearTimeout(customerSearchTimeout);
-                    currentCustomerPage = 0;
-                    searchCustomers();
-                }
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy input tìm kiếm khách hàng đã mua");
-        }
-        
-        // Bắt sự kiện cho nút tìm kiếm khách hàng
-        const searchCustomerBtn = document.getElementById('searchCustomerBtn');
-        if (searchCustomerBtn) {
-            console.log("DEBUG: Đã tìm thấy nút searchCustomerBtn, thiết lập sự kiện");
-            searchCustomerBtn.addEventListener('click', function() {
-                console.log("DEBUG: Nút tìm kiếm khách hàng đã được nhấn");
-                clearTimeout(customerSearchTimeout);
-                currentCustomerPage = 0;
-                searchCustomers();
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy nút tìm kiếm khách hàng đã mua");
-        }
-        
-        // Tìm kiếm tất cả khách hàng khi nhập
-        const allCustomerSearchInput = document.getElementById('allCustomerSearchInput');
-        if (allCustomerSearchInput) {
-            console.log("DEBUG: Đã tìm thấy input allCustomerSearchInput, thiết lập sự kiện");
-            
-            // Reset input và tìm kiếm ban đầu (để hiển thị tất cả)
-            setTimeout(function() {
-                allCustomerSearchInput.value = '';
-                // Tìm kiếm ngay lập tức khi khởi tạo, không cần timeout
-                allCurrentPage = 0;
-                searchAllCustomers();
-            }, 100);
-            
-            // Tìm kiếm khi gõ với độ trễ
-            allCustomerSearchInput.addEventListener('input', function() {
-                console.log("DEBUG: Sự kiện input đã kích hoạt trên allCustomerSearchInput");
-                clearTimeout(allCustomerSearchTimeout);
-                allCustomerSearchTimeout = setTimeout(function() {
-                    allCurrentPage = 0; // Reset về trang đầu tiên khi tìm kiếm mới
-                    searchAllCustomers();
-                }, 500); // Tăng độ trễ lên 500ms để tránh quá nhiều request
-            });
-            
-            // Tìm kiếm khi nhấn Enter
-            allCustomerSearchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    console.log("DEBUG: Phím Enter đã được nhấn trong allCustomerSearchInput");
-                    e.preventDefault();
-                    clearTimeout(allCustomerSearchTimeout);
-                    allCurrentPage = 0;
-                    searchAllCustomers();
-                }
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy input tìm kiếm tất cả khách hàng");
-        }
-        
-        // Bắt sự kiện cho nút tìm kiếm tất cả khách hàng
-        const allSearchCustomerBtn = document.getElementById('allSearchCustomerBtn');
-        if (allSearchCustomerBtn) {
-            console.log("DEBUG: Đã tìm thấy nút allSearchCustomerBtn, thiết lập sự kiện");
-            allSearchCustomerBtn.addEventListener('click', function() {
-                console.log("DEBUG: Nút tìm kiếm tất cả khách hàng đã được nhấn");
-                clearTimeout(allCustomerSearchTimeout);
-                allCurrentPage = 0;
-                searchAllCustomers();
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy nút tìm kiếm tất cả khách hàng");
-        }
-        
-        // Sự kiện tìm kiếm sản phẩm
-        const productSearchInput = document.getElementById('productSearchInput');
-        if (productSearchInput) {
-            console.log("DEBUG: Đã tìm thấy input productSearchInput, thiết lập sự kiện");
-            
-            // Reset input và tìm kiếm ban đầu (để hiển thị tất cả)
-            setTimeout(function() {
-                productSearchInput.value = '';
-                // Tìm kiếm ngay lập tức khi khởi tạo, không cần timeout
-                searchProducts(0);
-            }, 100);
-            
-            // Tìm kiếm khi gõ với độ trễ
-            productSearchInput.addEventListener('input', function() {
-                console.log("DEBUG: Sự kiện input đã kích hoạt trên productSearchInput");
-                clearTimeout(productSearchTimeout);
-                productSearchTimeout = setTimeout(function() {
-                    searchProducts(0);
-                }, 500); // Tăng độ trễ lên 500ms để tránh quá nhiều request
-            });
-            
-            // Tìm kiếm khi nhấn Enter
-            productSearchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    console.log("DEBUG: Phím Enter đã được nhấn trong productSearchInput");
-                    e.preventDefault();
-                    searchProducts(0);
-                }
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy input tìm kiếm sản phẩm");
-        }
-        
-        // Nút tìm kiếm sản phẩm
-        const searchProductBtn = document.getElementById('searchProductBtn');
-        if (searchProductBtn) {
-            console.log("DEBUG: Đã tìm thấy nút searchProductBtn, thiết lập sự kiện");
-            searchProductBtn.addEventListener('click', function() {
-                console.log("DEBUG: Nút tìm kiếm sản phẩm đã được nhấn");
-                searchProducts(0);
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy nút tìm kiếm sản phẩm");
-        }
-        
-        console.log("DEBUG: Thiết lập sự kiện tìm kiếm hoàn tất");
-    }
-    
-    // Thiết lập các event listeners cho giỏ hàng và thanh toán
-    function setupCartAndCheckoutListeners() {
-        console.log('Thiết lập các sự kiện giỏ hàng và thanh toán...');
-        
-        // Nút thanh toán
-        const checkoutBtn = document.getElementById('checkoutBtn');
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', function() {
-                processCheckout();
-            });
-        } else {
-            console.warn('Không tìm thấy nút thanh toán (ID: checkoutBtn)');
-        }
-        
-        console.log('Thiết lập sự kiện giỏ hàng và thanh toán hoàn tất');
-    }
-    
-    // Khởi tạo các sự kiện khi trang được tải
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Trang đã tải xong, bắt đầu khởi tạo...');
-        
-        try {
-            // Khởi tạo các modal (sẽ khởi tạo cả 3 loại modal)
-            initModals();
-            
-            // Thiết lập sự kiện tìm kiếm
-            setupSearchListeners();
-            
-            // Thiết lập sự kiện lưu khách hàng mới (thực hiện trước các listener khác)
-            setupNewCustomer();
-            
-            // Thiết lập các event listeners cho giỏ hàng và thanh toán
-            setupCartAndCheckoutListeners();
-            
-            // Khởi tạo giỏ hàng
-            updateCartUI();
-            
-            // Kiểm tra trạng thái thanh toán ban đầu
-            validateCheckout();
-            
-            console.log('Khởi tạo trang hoàn tất');
-        } catch (error) {
-            console.error('Lỗi trong quá trình khởi tạo trang:', error);
-        }
-    });
-
-    // Kiểm tra nếu chưa có hàm setupNewCustomer, thêm một hàm rỗng để tránh lỗi
-    function setupNewCustomer() {
-        console.log("DEBUG: Thiết lập sự kiện cho khách hàng mới");
-        
-        // Nút lưu khách hàng mới - xóa tất cả các event listener hiện có và thêm lại
-        const saveCustomerBtn = document.getElementById('saveNewCustomerBtn');
-        if (saveCustomerBtn) {
-            console.log("DEBUG: Đã tìm thấy nút saveNewCustomerBtn, thiết lập sự kiện");
-            
-            // Xóa tất cả các event listener hiện có bằng cách clone và thay thế
-            const newSaveBtn = saveCustomerBtn.cloneNode(true);
-            saveCustomerBtn.parentNode.replaceChild(newSaveBtn, saveCustomerBtn);
-            
-            // Thêm event listener mới
-            newSaveBtn.addEventListener('click', function() {
-                console.log("DEBUG: Nút lưu khách hàng đã được nhấn");
-                saveNewCustomer();
-            });
-        } else {
-            console.error("DEBUG: Không tìm thấy nút lưu khách hàng mới (ID: saveNewCustomerBtn)");
-        }
-        
-        console.log("DEBUG: Thiết lập sự kiện khách hàng mới hoàn tất");
     }
 
     // Cập nhật điều khiển phân trang
@@ -1320,102 +994,131 @@
             console.error(`Không tìm thấy phần tử phân trang: ${elementId}`);
             return;
         }
-        
+
         // Lấy thông tin phân trang từ dữ liệu API
-        const totalElements = paginationInfo.totalElements || 0;
-        const size = paginationInfo.size || 5;
-        const totalPages = paginationInfo.totalPages || Math.ceil(totalElements / size);
+        const size = paginationInfo.size || pageSize;
         const currentPage = paginationInfo.number || 0;
         
-        console.log(`DEBUG: Cập nhật phân trang ${elementId} - Tổng phần tử: ${totalElements}, Số trang: ${totalPages}, Trang hiện tại: ${currentPage}`);
+        // FIX: Nếu totalElements hoặc totalPages không tồn tại hoặc không đáng tin cậy, đặt giá trị mặc định
+        let totalElements = paginationInfo.totalElements;
+        let totalPages = paginationInfo.totalPages;
         
-        // Nếu tổng số phần tử ít hơn hoặc bằng số lượng hiển thị trên một trang, ẩn phân trang
-        if (totalElements <= size) {
-            console.log(`DEBUG: Ẩn phân trang ${elementId} vì có ít hơn hoặc bằng ${size} phần tử`);
+        // Nếu đang ở trang khác trang đầu tiên, đảm bảo thông tin phân trang được duy trì
+        if (currentPage > 0) {
+            // Nếu đang ở trang > 0, đảm bảo ít nhất có totalPages = currentPage + 1
+            if (!totalPages || totalPages <= currentPage) {
+                totalPages = currentPage + 1;
+                console.log(`DEBUG: Đang ở trang ${currentPage}, đặt tổng số trang = ${totalPages}`);
+            }
+            
+            // Nếu không có totalElements, ước tính từ totalPages và size
+            if (!totalElements) {
+                totalElements = totalPages * size;
+                console.log(`DEBUG: Ước tính tổng số phần tử = ${totalElements} từ ${totalPages} trang`);
+            }
+        }
+        
+        // Đảm bảo luôn có ít nhất 2 trang nếu đang ở trang thứ 2
+        if (currentPage === 1 && (!totalPages || totalPages < 2)) {
+            totalPages = 2;
+            console.log(`DEBUG: Ở trang 2, đảm bảo ít nhất có 2 trang`);
+        }
+        
+        console.log(`DEBUG: Cập nhật phân trang ${elementId} - Tổng phần tử: ${totalElements}, Số trang: ${totalPages}, Trang hiện tại: ${currentPage}`);
+
+        // FIX: Thay đổi logic kiểm tra khi nào ẩn phân trang
+        // Chỉ ẩn phân trang khi:
+        // 1. Đang ở trang đầu tiên (currentPage = 0)
+        // 2. VÀ (totalElements rõ ràng nhỏ hơn hoặc bằng size HOẶC totalPages = 1)
+        if (currentPage === 0 && (
+            (totalElements !== undefined && totalElements <= size) || 
+            (totalPages !== undefined && totalPages <= 1)
+        )) {
+            console.log(`DEBUG: Ẩn phân trang ${elementId} vì đang ở trang đầu và chỉ có 1 trang`);
             paginationElement.innerHTML = '';
             paginationElement.style.display = 'none';
             return;
         }
-        
+
         // Hiển thị phân trang nếu có nhiều trang
         paginationElement.style.display = 'flex';
-        
+
         // Xóa tất cả event listeners cũ
         paginationElement.innerHTML = '';
-        
+
         // Tạo container phân trang
         const paginationContainer = document.createElement('ul');
-        paginationContainer.className = 'pagination justify-content-end';
-        
+        paginationContainer.className = 'pagination justify-content-end mb-0';
+
         // Nút trang trước
         const prevBtn = document.createElement('li');
         prevBtn.className = `page-item ${currentPage <= 0 ? 'disabled' : ''}`;
-        
+
         const prevLink = document.createElement('a');
         prevLink.className = 'page-link';
         prevLink.href = '#';
         prevLink.setAttribute('aria-label', 'Previous');
         prevLink.innerHTML = '<span aria-hidden="true">&laquo;</span>';
-        
+
         if (currentPage > 0) {
             prevLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 pageChangeFunction(currentPage - 1);
             });
         }
-        
+
         prevBtn.appendChild(prevLink);
         paginationContainer.appendChild(prevBtn);
-        
+
         // Số trang tối đa hiển thị
         const maxPages = 5;
         let startPage = Math.max(0, currentPage - Math.floor(maxPages / 2));
         let endPage = Math.min(totalPages - 1, startPage + maxPages - 1);
-        
+
         // Điều chỉnh phạm vi trang nếu cần
         if (endPage - startPage + 1 < maxPages) {
             startPage = Math.max(0, endPage - maxPages + 1);
         }
-        
+
         // Tạo các nút trang
         for (let i = startPage; i <= endPage; i++) {
             const pageItem = document.createElement('li');
             pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
-            
+
             const pageLink = document.createElement('a');
             pageLink.className = 'page-link';
             pageLink.href = '#';
             pageLink.textContent = i + 1;
-            
+
             pageLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 pageChangeFunction(i);
             });
-            
+
             pageItem.appendChild(pageLink);
             paginationContainer.appendChild(pageItem);
         }
-        
+
         // Nút trang sau
         const nextBtn = document.createElement('li');
         nextBtn.className = `page-item ${currentPage >= totalPages - 1 ? 'disabled' : ''}`;
-        
+
         const nextLink = document.createElement('a');
         nextLink.className = 'page-link';
         nextLink.href = '#';
         nextLink.setAttribute('aria-label', 'Next');
         nextLink.innerHTML = '<span aria-hidden="true">&raquo;</span>';
-        
+
         if (currentPage < totalPages - 1) {
             nextLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 pageChangeFunction(currentPage + 1);
             });
         }
-        
+
         nextBtn.appendChild(nextLink);
         paginationContainer.appendChild(nextBtn);
-        
+
         // Thêm vào DOM
         paginationElement.appendChild(paginationContainer);
     }
@@ -1423,17 +1126,368 @@
     // Hàm thay đổi trang cho khách hàng đã mua
     function changeCustomerPage(page) {
         currentCustomerPage = page;
-        searchCustomers();
+                
+        // Kiểm tra nếu có dữ liệu cache
+        if (purchasedCustomersCache.length > 0) {
+            console.log("DEBUG: Đổi trang khách hàng đã mua sử dụng cache");
+            displayCachedPurchasedCustomers(document.getElementById('customerSearchInput').value.trim());
+        } else {
+            // Nếu không có cache, gọi API
+            searchCustomers();
+        }
     }
 
     // Hàm thay đổi trang cho tất cả khách hàng
     function changeAllCustomerPage(page) {
         allCurrentPage = page;
-        searchAllCustomers();
+        
+        // Kiểm tra nếu có dữ liệu cache
+        if (allCustomersCache.length > 0) {
+            displayCachedCustomers(document.getElementById('allCustomerSearchInput').value.trim());
+        } else {
+            // Nếu không có cache, gọi API
+            searchAllCustomers();
+        }
     }
 
     // Hàm thay đổi trang cho sản phẩm
     function changeProductPage(page) {
         searchProducts(page);
+    }
+    
+    // Thêm event listeners cho các modals và tìm kiếm
+    document.addEventListener('DOMContentLoaded', function() {
+        // Thêm event listeners cho các input tìm kiếm
+        if (customerSearchInput) {
+            customerSearchInput.addEventListener('keyup', function(e) {
+                // Nếu nhấn Enter, tìm kiếm ngay
+                if (e.key === 'Enter') {
+                    searchCustomers();
+                    return;
+                }
+                
+                // Nếu không, đợi một chút rồi mới tìm kiếm (debounce)
+                clearTimeout(customerSearchTimeout);
+                customerSearchTimeout = setTimeout(function() {
+                searchCustomers();
+                }, 500); // Đợi 500ms sau khi người dùng ngừng gõ
+            });
+        }
+        
+        if (document.getElementById('allCustomerSearchInput')) {
+            document.getElementById('allCustomerSearchInput').addEventListener('keyup', function(e) {
+                // Nếu nhấn Enter, tìm kiếm ngay
+                if (e.key === 'Enter') {
+                    searchAllCustomers();
+                    return;
+                }
+                
+                // Nếu không, đợi một chút rồi mới tìm kiếm (debounce)
+                clearTimeout(allCustomerSearchTimeout);
+                allCustomerSearchTimeout = setTimeout(function() {
+                searchAllCustomers();
+                }, 500); // Đợi 500ms sau khi người dùng ngừng gõ
+            });
+        }
+
+        if (productSearchInput) {
+            productSearchInput.addEventListener('keyup', function(e) {
+                // Nếu nhấn Enter, tìm kiếm ngay
+                if (e.key === 'Enter') {
+                searchProducts(0);
+                    return;
+                }
+
+                // Nếu không, đợi một chút rồi mới tìm kiếm (debounce)
+                clearTimeout(productSearchTimeout);
+                productSearchTimeout = setTimeout(function() {
+                    searchProducts(0);
+                }, 500); // Đợi 500ms sau khi người dùng ngừng gõ
+            });
+        }
+        
+        // Thêm event listeners cho các nút tìm kiếm
+        if (customerSearchBtn) {
+            customerSearchBtn.addEventListener('click', function() {
+                searchCustomers();
+            });
+        }
+        
+        if (document.getElementById('searchAllCustomerBtn')) {
+            document.getElementById('searchAllCustomerBtn').addEventListener('click', function() {
+                searchAllCustomers();
+            });
+        }
+        
+        if (productSearchBtn) {
+            productSearchBtn.addEventListener('click', function() {
+                searchProducts(0);
+            });
+        }
+        
+        // Xử lý sự kiện lưu khách hàng mới
+        if (saveCustomerBtn) {
+            saveCustomerBtn.addEventListener('click', function() {
+                saveNewCustomer();
+            });
+        }
+        
+        // Lắng nghe sự kiện hiển thị modal khách hàng đã mua
+        const existingCustomerModal = document.getElementById('existingCustomerModal');
+        if (existingCustomerModal) {
+            existingCustomerModal.addEventListener('shown.bs.modal', function() {
+                console.log("Modal khách hàng đã mua được mở, tự động tìm kiếm...");
+                // Tự động tìm kiếm khách hàng khi modal mở
+                searchCustomers();
+            });
+        }
+        
+        // Lắng nghe sự kiện hiển thị modal tất cả khách hàng
+        const existingAllCustomerModal = document.getElementById('existingAllCustomerModal');
+        if (existingAllCustomerModal) {
+            existingAllCustomerModal.addEventListener('shown.bs.modal', function() {
+                console.log("Modal tất cả khách hàng được mở, tự động tìm kiếm...");
+                // Tự động tìm kiếm tất cả khách hàng khi modal mở
+                searchAllCustomers();
+            });
+        }
+        
+        // Lắng nghe sự kiện hiển thị modal sản phẩm
+        const productModal = document.getElementById('productModal');
+        if (productModal) {
+            productModal.addEventListener('shown.bs.modal', function() {
+                console.log("Modal sản phẩm được mở, tự động tìm kiếm...");
+                // Tự động tìm kiếm sản phẩm khi modal mở
+                searchProducts(0);
+            });
+        }
+
+        // Thêm sự kiện cho nút thanh toán
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                console.log("Nút thanh toán được nhấn");
+                
+                // Lấy phương thức thanh toán đã chọn
+                const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+                console.log("Phương thức thanh toán đã chọn:", paymentMethod);
+                
+                // Cập nhật input ẩn cho phương thức thanh toán
+                document.getElementById('paymentMethodInput').value = paymentMethod;
+                
+                // Tạo input ẩn cho sản phẩm trong giỏ hàng
+                const productInputsContainer = document.getElementById('productInputs');
+                productInputsContainer.innerHTML = ''; // Xóa các input cũ
+                
+                // Thêm input ẩn cho mỗi sản phẩm trong giỏ hàng
+                cart.forEach((item, index) => {
+                    const productIdInput = document.createElement('input');
+                    productIdInput.type = 'hidden';
+                    productIdInput.name = 'productID';
+                    productIdInput.value = item.productId;
+                    productInputsContainer.appendChild(productIdInput);
+                    
+                    const quantityInput = document.createElement('input');
+                    quantityInput.type = 'hidden';
+                    quantityInput.name = 'quantity';
+                    quantityInput.value = item.quantity;
+                    productInputsContainer.appendChild(quantityInput);
+                });
+                
+                // Kiểm tra nếu cần in hóa đơn
+                const printInvoice = document.getElementById('printInvoice');
+                if (printInvoice && printInvoice.checked) {
+                    const printInvoiceInput = document.createElement('input');
+                    printInvoiceInput.type = 'hidden';
+                    printInvoiceInput.name = 'printInvoice';
+                    printInvoiceInput.value = 'true';
+                    productInputsContainer.appendChild(printInvoiceInput);
+                }
+
+                // Lấy form thanh toán và submit
+                const salesForm = document.getElementById('salesForm');
+                if (salesForm) {
+                    console.log("Đang gửi form thanh toán...");
+                    salesForm.submit();
+        } else {
+                    console.error("Không tìm thấy form thanh toán!");
+                    showToast('error', 'Lỗi khi gửi form thanh toán!');
+                }
+            });
+        }
+    });
+
+    // Hàm lưu khách hàng mới
+    function saveNewCustomer() {
+        console.log("Đang lưu khách hàng mới...");
+        
+        // Lấy form và dữ liệu
+        const form = document.getElementById('newCustomerForm');
+        if (!form) {
+            console.error('Không tìm thấy form khách hàng mới!');
+            return;
+        }
+
+        // Lấy dữ liệu từ form
+        const fullName = document.getElementById('newCustomerName').value.trim();
+        const phone = document.getElementById('newCustomerPhone').value.trim();
+        const email = document.getElementById('newCustomerEmail').value.trim();
+        const address = document.getElementById('newCustomerAddress').value.trim();
+        const gender = document.getElementById('newCustomerGender').value;
+        
+        // Xóa thông báo lỗi cũ
+        document.getElementById('fullNameError').textContent = '';
+        document.getElementById('phoneError').textContent = '';
+        document.getElementById('emailError').textContent = '';
+        document.getElementById('addressError').textContent = '';
+        
+        // Validate theo ràng buộc từ model Customer
+        let isValid = true;
+
+        // Validate fullName
+        if (!fullName) {
+            showToast('error', 'Họ và tên không được để trống!');
+            document.getElementById('fullNameError').textContent = 'Họ và tên không được để trống!';
+            isValid = false;
+        } else if (fullName.length > 50) {
+            showToast('error', 'Họ và tên không được vượt quá 50 ký tự!');
+            document.getElementById('fullNameError').textContent = 'Họ và tên không được vượt quá 50 ký tự!';
+            isValid = false;
+        } else if (!/^[\p{L} ]+$/u.test(fullName)) {
+            showToast('error', 'Họ và tên chỉ được chứa chữ cái và khoảng trắng!');
+            document.getElementById('fullNameError').textContent = 'Họ và tên chỉ được chứa chữ cái và khoảng trắng!';
+            isValid = false;
+        }
+
+        // Validate phone
+        if (!phone) {
+            showToast('error', 'Số điện thoại không được để trống!');
+            document.getElementById('phoneError').textContent = 'Số điện thoại không được để trống!';
+            isValid = false;
+        } else if (!/^\d{10,15}$/.test(phone)) {
+            showToast('error', 'Số điện thoại phải chứa từ 10 đến 15 chữ số!');
+            document.getElementById('phoneError').textContent = 'Số điện thoại phải chứa từ 10 đến 15 chữ số!';
+            isValid = false;
+        }
+
+        // Validate email
+        if (!email) {
+            showToast('error', 'Email không được để trống!');
+            document.getElementById('emailError').textContent = 'Email không được để trống!';
+            isValid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showToast('error', 'Định dạng email không hợp lệ!');
+            document.getElementById('emailError').textContent = 'Định dạng email không hợp lệ!';
+            isValid = false;
+        } else if (email.length > 50) {
+            showToast('error', 'Email không được vượt quá 50 ký tự!');
+            document.getElementById('emailError').textContent = 'Email không được vượt quá 50 ký tự!';
+            isValid = false;
+        }
+
+        // Validate address
+        if (!address) {
+            showToast('error', 'Địa chỉ không được để trống!');
+            document.getElementById('addressError').textContent = 'Địa chỉ không được để trống!';
+            isValid = false;
+        } else if (address.length > 500) {
+            showToast('error', 'Địa chỉ không được vượt quá 500 ký tự!');
+            document.getElementById('addressError').textContent = 'Địa chỉ không được vượt quá 500 ký tự!';
+            isValid = false;
+        }
+        
+        // Nếu có lỗi, dừng lại
+        if (!isValid) {
+            return;
+        }
+
+        // Chuẩn bị dữ liệu gửi lên server
+        const customerData = {
+            fullName: fullName,
+            phone: phone,
+            email: email,
+            address: address,
+            gender: gender,
+            dob: "2000-01-01"
+        };
+
+        console.log("Dữ liệu khách hàng:", customerData);
+        
+        // Hiển thị trạng thái đang xử lý
+        saveCustomerBtn.disabled = true;
+        saveCustomerBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang lưu...';
+        
+        // Gửi yêu cầu POST đến API
+        fetch('/api/sales/add-customer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(customerData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Kết quả lưu khách hàng:", data);
+            
+            // Khôi phục nút
+            saveCustomerBtn.disabled = false;
+            saveCustomerBtn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu khách hàng';
+            
+            if (data.success) {
+                // Hiển thị thông báo thành công
+                showToast('success', data.message || 'Đã thêm khách hàng thành công!');
+                
+                // Đóng modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newCustomerModal'));
+                if (modal) modal.hide();
+                
+                // Chọn khách hàng vừa tạo
+                selectCustomer(
+                    data.customerId, 
+                    data.fullName, 
+                    customerData.phone, 
+                    customerData.email, 
+                    customerData.address
+                );
+                
+                // Xóa form
+                form.reset();
+            } else {
+                // Hiển thị lỗi từ server
+                showToast('error', data.message || 'Lỗi khi thêm khách hàng!');
+
+                // Xử lý lỗi từ server
+                if (error && error.errors) {
+                    // Hiển thị lỗi cho từng trường
+                    if (error.errors.fullName) {
+                        document.getElementById('fullNameError').textContent = error.errors.fullName;
+                    }
+                    if (error.errors.phone) {
+                        document.getElementById('phoneError').textContent = error.errors.phone;
+                    }
+                    if (error.errors.email) {
+                        document.getElementById('emailError').textContent = error.errors.email;
+                    }
+                    if (error.errors.address) {
+                        document.getElementById('addressError').textContent = error.errors.address;
+                    }
+
+                    // Hiển thị toast với thông báo lỗi chung
+                    showToast('error', 'Vui lòng kiểm tra lại thông tin khách hàng!');
+                } else {
+                    // Hiển thị thông báo lỗi nếu không có chi tiết lỗi từ server
+                    showToast('error', error.message || 'Đã xảy ra lỗi khi tạo khách hàng mới');
+                }
+            }
+        })
+        .catch(error => {
+            console.error("Lỗi khi thêm khách hàng:", error);
+            
+            // Khôi phục nút
+            saveCustomerBtn.disabled = false;
+            saveCustomerBtn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu khách hàng';
+            
+            // Hiển thị thông báo lỗi
+            showToast('error', 'Lỗi kết nối khi thêm khách hàng: ' + error.message);
+        });
     }
 })();

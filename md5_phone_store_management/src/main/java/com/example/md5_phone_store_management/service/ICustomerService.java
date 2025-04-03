@@ -24,6 +24,10 @@ public interface ICustomerService {
 
     Page<Customer> searchCustomerWithPurchases(String name, String phone, String email, Pageable pageable);
 
+    boolean isEmailExists(String email);
+
+    boolean isPhoneExists(String phone);
+
 }
 
 

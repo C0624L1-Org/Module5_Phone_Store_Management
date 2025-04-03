@@ -62,7 +62,7 @@
         .invoice-items th {
             background-color: #343a40;
             color: white;
-            font-weight: 500;
+            font-weight: 400;
             text-transform: uppercase;
             font-size: 0.875rem;
             padding: 12px;
@@ -165,8 +165,8 @@
             <div class="container-fluid py-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin}">Dashboard</a></li>
+                        <li class="breadcrumb-item" sec:authorize="hasRole('Admin')"><a th:href="@{/dashboard/admin}">Dashboard</a></li>
+                        <li class="breadcrumb-item" sec:authorize="hasRole('SalesPerson')"><a th:href="@{/dashboard/sales-person}">Dashboard</a></li>
                         <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/customers/list}">Quản lý khách hàng</a></li>
                         <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/customers/list}">Lịch sử hóa đơn</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Hóa đơn thanh toán</li>
@@ -267,7 +267,7 @@
                     <div class="actions">
                         <!-- Chỉ hiển thị nút in và tải PDF nếu đơn hàng có trạng thái SUCCESS -->
                         <span th:if="${invoice.status != null && invoice.status.name() == 'SUCCESS'}">
-                            <a href="javascript:window.print()" class="print"><i class="fas fa-print me-2"></i>In hóa đơn</a>
+<!--                            <a href="javascript:window.print()" class="print"><i class="fas fa-print me-2"></i>In hóa đơn</a>-->
                             <a th:href="@{/dashboard/sales/download-invoice-pdf/{id}(id=${invoice.id})}" class="download"><i class="fas fa-file-pdf me-2"></i>Tải PDF</a>
                         </span>
                         

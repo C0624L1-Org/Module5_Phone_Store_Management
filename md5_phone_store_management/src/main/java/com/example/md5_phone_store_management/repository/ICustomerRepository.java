@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.md5_phone_store_management.model.Customer;
 
-import java.util.List;
-
 @Repository
 public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
     @Query("SELECT c FROM Customer c ORDER BY c.customerID")
@@ -84,6 +82,12 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
     @Query(value = "SELECT * FROM customer WHERE purchaseCount > 0 AND LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%')) AND phone LIKE CONCAT('%',:phone,'%') AND LOWER(email) LIKE LOWER(CONCAT('%',:email,'%'))", nativeQuery = true)
     Page<Customer> findCustomersWithPurchasesByNameAndPhoneAndEmail(@Param("name") String name, @Param("phone") String phone, @Param("email") String email, Pageable pageable);
 
+    // check email
+    boolean existsByEmail(String email);
+
+    // check phone
+    boolean existsByPhone(String phone);
+
     // Đếm số người đã mua hàng
     @Query(value = "SELECT COUNT(*) FROM customer WHERE purchaseCount > 0", nativeQuery = true)
     Integer countCustomersWithPurchases();
@@ -91,9 +95,25 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
     // Đếm số người đã mua hàng với tên khách hàng
     @Query(value = "SELECT COUNT(*) FROM customer WHERE purchaseCount > 0 AND LOWER(full_Name) LIKE LOWER(CONCAT('%',:name,'%'))", nativeQuery = true)
     Integer countCustomersWithPurchasesByName(@Param("name") String name);
-
-    // Cung cấp thêm phương thức để lấy khách hàng mẫu khi không tìm thấy khách hàng đã mua
-    @Query(value = "SELECT * FROM customer LIMIT 5", nativeQuery = true)
-    List<Customer> findSampleCustomers();
+    
+    // Đồng bộ hóa số lượng mua hàng với dữ liệu thực tế từ bảng invoice
+    @Modifying
+    @Transactional
+    @Query(value = 
+        "UPDATE customer c " +
+        "SET c.purchaseCount = (SELECT COUNT(DISTINCT i.id) FROM invoice i WHERE i.customer_id = c.customerID AND i.status = 'COMPLETED') " +
+        "WHERE c.customerID > 0", 
+        nativeQuery = true)
+    int synchronizePurchaseCountsFromInvoices();
+    
+    // Đồng bộ hóa số lượng mua hàng cho một khách hàng cụ thể
+    @Modifying
+    @Transactional
+    @Query(value = 
+        "UPDATE customer c " +
+        "SET c.purchaseCount = (SELECT COUNT(DISTINCT i.id) FROM invoice i WHERE i.customer_id = c.customerID AND i.status = 'COMPLETED') " +
+        "WHERE c.customerID = :customerId", 
+        nativeQuery = true)
+    int synchronizePurchaseCountForCustomer(@Param("customerId") Integer customerId);
 
 }

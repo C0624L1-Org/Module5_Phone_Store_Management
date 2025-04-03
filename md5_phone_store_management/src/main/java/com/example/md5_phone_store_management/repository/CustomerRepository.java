@@ -93,15 +93,15 @@ public class CustomerRepository  {
     }
 
     // Kiểm tra số điện thoại đã tồn tại ngoại trừ ID hiện tại
-    public boolean isPhoneExistsExceptId(String phone, Integer id) {
-        String sql = "SELECT COUNT(*) > 0 FROM customer WHERE phone = ? AND (customerID != ? OR ? IS NULL)";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, phone, id, id));
+    public Long isPhoneExistsExceptId(String phone, Integer id) {
+        String sql = "SELECT COUNT(*) FROM customer WHERE phone = ? AND (customerID != ? OR ? IS NULL)";
+        return jdbcTemplate.queryForObject(sql, Long.class, phone, id, id);
     }
 
     // Kiểm tra email đã tồn tại ngoại trừ ID hiện tại
-    public boolean isEmailExistsExceptId(String email, Integer id) {
-        String sql = "SELECT COUNT(*) > 0 FROM customer WHERE email = ? AND (customerID != ? OR ? IS NULL)";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, email, id, id));
+    public Long isEmailExistsExceptId(String email, Integer id) {
+        String sql = "SELECT COUNT(*) FROM customer WHERE email = ? AND (customerID != ? OR ? IS NULL)";
+        return jdbcTemplate.queryForObject(sql, Long.class, email, id, id);
     }
     
     // Lấy danh sách khách hàng có purchaseCount > 0
