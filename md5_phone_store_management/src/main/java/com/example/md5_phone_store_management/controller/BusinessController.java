@@ -1,13 +1,13 @@
 package com.example.md5_phone_store_management.controller;
 
+import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.Product;
-import com.example.md5_phone_store_management.model.ProductImage;
 import com.example.md5_phone_store_management.model.dto.ProductDTO;
 import com.example.md5_phone_store_management.service.CloudinaryService;
+import com.example.md5_phone_store_management.service.IInvoiceService;
 import com.example.md5_phone_store_management.service.implement.ProductService;
 import com.example.md5_phone_store_management.service.implement.SupplierService;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +38,8 @@ public class BusinessController {
     SupplierService supplierService;
     @Autowired
     CloudinaryService cloudinaryService;
+    @Autowired
+    private IInvoiceService invoiceService;
 
 
     //    trang chính quản lý
@@ -43,10 +48,6 @@ public class BusinessController {
     public String showManagementPage(Model model, HttpSession session) {
         return "/business/business-home";
     }
-
-
-
-
     @GetMapping("/dashboard/products/listToChoose")
     public String search1(Model model,
                           @RequestParam(name = "searchProduct", required = false) String searchProduct,
@@ -227,6 +228,53 @@ public class BusinessController {
         }
 
         return "redirect:/dashboard/products/listToChoose";
+    }
+
+    @GetMapping("/dashboard/business/transaction")
+    public String transactionPage(@RequestParam(name = "page", defaultValue = "0", required = false) int page,
+                                  @RequestParam(name = "sortValue", required = false) String sortValue,
+                                  @RequestParam(name = "sortType", defaultValue = "true", required = false) boolean sortType,
+                                  Model model) {
+
+        Pageable pageable = PageRequest.of(page, 2);
+        Page<Invoice> invoicesPage;
+        if (sortValue != null) {
+            invoicesPage = returnSortedInvoicePage(pageable, sortType, sortValue);
+        } else {
+            invoicesPage = invoiceService.findAllSuccessInvoices(pageable);
+        }
+        model.addAttribute("invoices", invoicesPage);
+        model.addAttribute("sortType", sortType);
+        model.addAttribute("sortValue", sortValue);
+        model.addAttribute("currentPage", page);
+
+        return "business/transaction";
+    }
+
+    public Page<Invoice> returnSortedInvoicePage(Pageable pageable, boolean sortType, String sortValue) {
+        System.out.println("--- Running returnSortedInvoicePage ---");
+        System.out.println(sortType);
+        switch (sortValue) {
+            case "time":
+                System.out.println("time");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithTimeAsc(pageable) : invoiceService.findAllSuccessInvoicesWithTimeDesc(pageable);
+            case "customer":
+                System.out.println("customer");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithCustomerNameAsc(pageable) : invoiceService.findAllSuccessInvoicesWithCustomerNameDesc(pageable);
+            case "product":
+                System.out.println("product");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithProductNameAsc(pageable) : invoiceService.findAllSuccessInvoicesWithProductNameDesc(pageable);
+            case "quantity":
+                System.out.println("quantity");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithQuantityAsc(pageable) : invoiceService.findAllSuccessInvoicesWithQuantityDesc(pageable);
+            case "amount":
+                System.out.println("amount");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithAmountAsc(pageable) : invoiceService.findAllSuccessInvoicesWithAmountDesc(pageable);
+            default:
+                System.out.println("default");
+                return invoiceService.findAllSuccessInvoices(pageable);
+        }
+
     }
 
 }

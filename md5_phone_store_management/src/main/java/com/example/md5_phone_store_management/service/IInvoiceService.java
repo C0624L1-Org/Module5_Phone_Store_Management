@@ -11,6 +11,8 @@ import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.InvoiceStatus;
 import com.example.md5_phone_store_management.model.PaymentMethod;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Query;
 
 public interface IInvoiceService {
     Invoice saveInvoice(Invoice invoice);
@@ -18,6 +20,30 @@ public interface IInvoiceService {
     List<Invoice> findAll();
     Page<Invoice> findAll(Pageable pageable);
     void deleteInvoice(Long id);
+
+    // Sắp xếp
+    //Theo thoi gian
+    Page<Invoice> findAllSuccessInvoicesWithTimeAsc(Pageable pageable);
+    Page<Invoice> findAllSuccessInvoicesWithTimeDesc(Pageable pageable);
+
+    //Theo ten khach hang
+    Page<Invoice> findAllSuccessInvoicesWithCustomerNameAsc(Pageable pageable);
+    Page<Invoice> findAllSuccessInvoicesWithCustomerNameDesc(Pageable pageable);
+
+    //Theo tên sản phẩm
+    Page<Invoice> findAllSuccessInvoicesWithProductNameAsc(Pageable pageable);
+    Page<Invoice> findAllSuccessInvoicesWithProductNameDesc(Pageable pageable);
+
+    //Theo so tien
+    Page<Invoice> findAllSuccessInvoicesWithAmountAsc(Pageable pageable);
+    Page<Invoice> findAllSuccessInvoicesWithAmountDesc(Pageable pageable);
+
+    //Theo so luong
+    Page<Invoice> findAllSuccessInvoicesWithQuantityAsc(Pageable pageable);
+    Page<Invoice> findAllSuccessInvoicesWithQuantityDesc(Pageable pageable);
+
+    //lay cac hoa don thanh cong
+    Page<Invoice> findAllSuccessInvoices(Pageable pageable);
 
     // Lấy tất cả hóa đơn của khách hàng
     List<Invoice> findByCustomer(Customer customer);
