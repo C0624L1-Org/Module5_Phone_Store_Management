@@ -34,13 +34,13 @@ public class UniqueValidator implements ConstraintValidator<Unique, String> {
             Integer currentId = getCurrentObjectId();
 
             // Kiểm tra tính duy nhất dựa trên fieldName
-            boolean exists = switch (fieldName) {
+            Long exists = switch (fieldName) {
                 case "phone" -> customerRepository.isPhoneExistsExceptId(value, currentId);
                 case "email" -> customerRepository.isEmailExistsExceptId(value, currentId);
-                default -> false;
+                default -> 0L;
             };
 
-            return !exists;
+            return exists == null || exists == 0;
         } catch (Exception e) {
             System.err.println("Lỗi trong quá trình validate tính duy nhất: " + e.getMessage());
             e.printStackTrace();
