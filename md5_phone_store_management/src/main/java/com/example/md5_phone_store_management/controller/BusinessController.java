@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.List;
 
 @Controller
@@ -26,15 +27,49 @@ public class BusinessController {
 
     @GetMapping("/transaction")
     public String transactionPage(@RequestParam(name = "page", defaultValue = "0", required = false) int page,
+                                  @RequestParam(name = "sortValue", required = false) String sortValue,
+                                  @RequestParam(name = "sortType", defaultValue = "true", required = false) boolean sortType,
+                                  @RequestParam(name = "remain", defaultValue = "false", required = false) boolean remain,
                                   Model model) {
-        List<Invoice> invoices = invoiceService.findAll();
-        for(Invoice i : invoices) {
-            System.out.println(i.toString());
+
+        Pageable pageable = PageRequest.of(page, 2);
+        Page<Invoice> invoicesPage;
+        if (sortValue != null) {
+            invoicesPage = returnSortedInvoicePage(pageable, sortType, sortValue);
+        } else {
+            invoicesPage = invoiceService.findAllSuccessInvoices(pageable);
         }
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<Invoice> invoicesPage = invoiceService.findAllSuccessInvoices(pageable);
         model.addAttribute("invoices", invoicesPage);
+        model.addAttribute("sortType", sortType);
+        model.addAttribute("sortValue", sortValue);
+        model.addAttribute("currentPage", page);
 
         return "dashboard/business-management/transaction";
+    }
+
+    public Page<Invoice> returnSortedInvoicePage(Pageable pageable, boolean sortType, String sortValue) {
+        System.out.println("--- Running returnSortedInvoicePage ---");
+        System.out.println(sortType);
+        switch (sortValue) {
+            case "time":
+                System.out.println("time");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithTimeAsc(pageable) : invoiceService.findAllSuccessInvoicesWithTimeDesc(pageable);
+            case "customer":
+                System.out.println("customer");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithCustomerNameAsc(pageable) : invoiceService.findAllSuccessInvoicesWithCustomerNameDesc(pageable);
+            case "product":
+                System.out.println("product");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithProductNameAsc(pageable) : invoiceService.findAllSuccessInvoicesWithProductNameDesc(pageable);
+            case "quantity":
+                System.out.println("quantity");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithQuantityAsc(pageable) : invoiceService.findAllSuccessInvoicesWithQuantityDesc(pageable);
+            case "amount":
+                System.out.println("amount");
+                return sortType ? invoiceService.findAllSuccessInvoicesWithAmountAsc(pageable) : invoiceService.findAllSuccessInvoicesWithAmountDesc(pageable);
+            default:
+                System.out.println("default");
+                return invoiceService.findAllSuccessInvoices(pageable);
+        }
+
     }
 }
