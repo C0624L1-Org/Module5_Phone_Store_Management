@@ -3,6 +3,7 @@ package com.example.md5_phone_store_management.service.implement;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,11 +23,52 @@ import com.example.md5_phone_store_management.service.IProductService;
 public class ProductService implements IProductService {
 
 
+
     @Autowired
     IProductRepository productRepository;
 
     @Autowired
     CloudinaryService cloudinaryService;
+
+
+
+    @Override
+    public Page<Product> searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(
+            String name, String supplierName, Integer purchasePrice, boolean noRetailPrice, Pageable pageable) {
+        if (noRetailPrice) {
+            // Lọc các sản phẩm có retailPrice là null
+            return productRepository.findByNameContainingAndSupplierNameContainingAndPurchasePriceLessThanEqualAndRetailPriceIsNull(
+                    name != null ? name : "",
+                    supplierName != null ? supplierName : "",
+                    purchasePrice != null ? purchasePrice : Integer.MAX_VALUE,
+                    pageable);
+        } else {
+            // Lọc tất cả sản phẩm (bao gồm cả có và không có retailPrice)
+            return productRepository.findByNameContainingAndSupplierNameContainingAndPurchasePriceLessThanEqual(
+                    name != null ? name : "",
+                    supplierName != null ? supplierName : "",
+                    purchasePrice != null ? purchasePrice : Integer.MAX_VALUE,
+                    pageable);
+        }
+    }
+
+
+
+
+
+
+
+
+    public List<Product> findAllByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Integer> integerIds = ids.stream()
+                .map(Long::intValue)
+                .collect(Collectors.toList());
+        List<Product> products = productRepository.findAllById(integerIds);
+        return products;
+    }
 
     public List<Product> searchProductToChoose(
             String productName,

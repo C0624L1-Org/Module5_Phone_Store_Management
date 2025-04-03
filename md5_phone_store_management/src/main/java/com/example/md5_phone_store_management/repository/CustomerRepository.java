@@ -21,9 +21,52 @@ public class CustomerRepository  {
     private static final String SELECT_ALL_CUSTOMERS = "SELECT * FROM customer";
     private static final String UPDATE_CUSTOMER = "UPDATE customer SET full_Name = ?, phone = ?, address = ?, email = ?, dob = ?, gender = ? WHERE customerID = ?";
     private static final String DELETE_CUSTOMERS_BY_IDS = "DELETE FROM customer WHERE customerID = ?";
+    private static final String DELETE_INVOICES_BY_CUSTOMER_ID = "DELETE FROM invoices WHERE customer_id = ?";
+    private static final String DELETE_INVOICE_DETAILS_BY_INVOICE_IDS = "DELETE FROM invoicedetail WHERE invoice_id IN (SELECT id FROM invoices WHERE customer_id = ?)";
     private static final String SELECT_CUSTOMER_BY_ID = "SELECT * FROM customer WHERE customerID = ?";
     private static final String INSERT_CUSTOMER = "INSERT INTO customer (full_Name, phone, address, email, dob, gender, purchaseCount) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String SELECT_CUSTOMERS_WITH_PURCHASES = "SELECT * FROM customer WHERE purchaseCount > 0 ORDER BY purchaseCount DESC";
+
+    public void deleteCustomer(List<Integer> customerIDs) {
+//        xóa hd ct
+        jdbcTemplate.batchUpdate(DELETE_INVOICE_DETAILS_BY_INVOICE_IDS, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, customerIDs.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return customerIDs.size();
+            }
+        });
+
+        // xóa hd
+        jdbcTemplate.batchUpdate(DELETE_INVOICES_BY_CUSTOMER_ID, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, customerIDs.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return customerIDs.size();
+            }
+        });
+
+        jdbcTemplate.batchUpdate(DELETE_CUSTOMERS_BY_IDS, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, customerIDs.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return customerIDs.size();
+            }
+        });
+    }
+
 
 
     //    List<Customer> customers = customerService.searchCustomers(name, phone, gender);
@@ -87,19 +130,6 @@ public class CustomerRepository  {
     }
 
 
-    public void deleteCustomer(List<Integer> customerIDs) {
-        jdbcTemplate.batchUpdate(DELETE_CUSTOMERS_BY_IDS, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setInt(1, customerIDs.get(i));
-            }
-
-            @Override
-            public int getBatchSize() {
-                return customerIDs.size();
-            }
-        });
-    }
 
 
     public CustomerRepository(JdbcTemplate jdbcTemplate) {

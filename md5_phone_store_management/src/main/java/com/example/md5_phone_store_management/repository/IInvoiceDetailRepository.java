@@ -16,6 +16,8 @@ import com.example.md5_phone_store_management.model.InvoiceDetail;
 
 @Repository
 public interface IInvoiceDetailRepository extends JpaRepository<InvoiceDetail, Integer> {
+
+
     // Lưu chi tiết hóa đơn
     InvoiceDetail save(InvoiceDetail invoiceDetail);
 
@@ -49,4 +51,5 @@ public interface IInvoiceDetailRepository extends JpaRepository<InvoiceDetail, I
     @Query("select  ind from InvoiceDetail ind " +
             "order by  ind.totalPrice asc")
     Page<InvoiceDetail> sortByPrice(Pageable pageable);
+
 }

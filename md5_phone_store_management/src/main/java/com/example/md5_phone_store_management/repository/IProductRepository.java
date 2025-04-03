@@ -18,6 +18,16 @@ import com.example.md5_phone_store_management.model.Product;
 public interface IProductRepository extends JpaRepository<Product, Integer> {
 
 
+    Page<Product> findByNameContainingAndSupplierNameContainingAndPurchasePriceLessThanEqual(
+            String name, String supplierName, Integer purchasePrice, Pageable pageable);
+
+    Page<Product> findByNameContainingAndSupplierNameContainingAndPurchasePriceLessThanEqualAndRetailPriceIsNull(
+            String name, String supplierName, Integer purchasePrice, Pageable pageable);
+
+
+    List<Product> findAllById(Iterable<Integer> ids);
+
+
     @Query("SELECT p FROM Product p " +
             "WHERE (:productName IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%'))) " +
             "AND (:supplierName IS NULL OR LOWER(p.supplier.name) LIKE LOWER(CONCAT('%', :supplierName, '%'))) " +
