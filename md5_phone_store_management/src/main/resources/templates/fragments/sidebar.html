@@ -76,7 +76,7 @@
       </li>
 
       <!-- Quản lý kinh doanh - Thủ kho , Nhân viên kinh doanh, Admin -->
-      <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff', 'SalesStaff')">
+      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">
         <a th:href="@{/dashboard/business/management}" class="nav-link text-white">
           <i class="fas fa-chart-line me-2"></i>Quản lý kinh doanh
         </a>

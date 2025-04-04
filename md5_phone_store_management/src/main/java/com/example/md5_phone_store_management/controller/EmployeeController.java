@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -32,12 +33,12 @@ public class EmployeeController {
 
     //Read(a Đình Anh)
     @GetMapping("/admin/employees/list")
-    public ModelAndView getListEmployees(@RequestParam(name = "page",defaultValue = "0",required = false) int page) {
+    public ModelAndView getListEmployees(@RequestParam(name = "page", defaultValue = "0", required = false) int page) {
         ModelAndView mv = new ModelAndView("dashboard/admin/employees/list-employee");
-        Pageable pageable =  PageRequest.of(page, 5);
+        Pageable pageable = PageRequest.of(page, 5);
         mv.addObject("currentPage", page);
         mv.addObject("employeePage", iEmployeeService.getAllEmployeesExceptAdmin(pageable));
-        mv.addObject("totalPage",iEmployeeService.getAllEmployees(pageable).getTotalPages());
+        mv.addObject("totalPage", iEmployeeService.getAllEmployees(pageable).getTotalPages());
         return mv;
     }
 
@@ -199,20 +200,26 @@ public class EmployeeController {
     //delete
     @GetMapping("/admin/employees/delete/{ids}")
     public String deleteEmployee(@PathVariable List<Integer> ids, Model model, RedirectAttributes redirectAttributes) {
-        Employee currentEmployee = globalControllerAdvice.currentEmployee();
-        if (ids.contains(currentEmployee.getEmployeeID())) {
-            redirectAttributes.addFlashAttribute("messageType", "error");
-            redirectAttributes.addFlashAttribute("message", "Bạn không thể tự xóa chính mình!");
-        } else {
-            try {
-                iEmployeeService.deleteEmployeesById(ids);
-                redirectAttributes.addFlashAttribute("messageType", "success");
-                redirectAttributes.addFlashAttribute("message", "Xóa nhân viên thành công");
-            } catch (Exception e) {
+        List<Integer> defaultAccounts = iEmployeeService.findEmployeeIDOfDefaultAccount();
+        for (Integer id : ids) {
+            System.out.println("ID của employee: " + id);
+            if (defaultAccounts.contains(id)) {
+                System.out.println("bị trùng");
                 redirectAttributes.addFlashAttribute("messageType", "error");
-                redirectAttributes.addFlashAttribute("message", "Xóa nhân viên không thành công");
+                redirectAttributes.addFlashAttribute("message", "Bạn không thể xóa các tài khoản mặc định!");
+                return "redirect:/dashboard/admin/employees/list";
             }
         }
+        try {
+            iEmployeeService.deleteEmployeesById(ids);
+            redirectAttributes.addFlashAttribute("messageType", "success");
+            redirectAttributes.addFlashAttribute("message", "Xóa nhân viên thành công");
+        } catch (Exception e) {
+            System.out.println("Không tể xóa nhân vvien6n: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            redirectAttributes.addFlashAttribute("message", "Xóa nhân viên không thành công! Vui lòng thử lại!");
+        }
+
         return "redirect:/dashboard/admin/employees/list";
     }
 }

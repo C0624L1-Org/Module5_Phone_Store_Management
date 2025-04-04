@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "employee")
@@ -40,6 +41,9 @@ public class Employee {
 
     @Column(name = "avatar", length = 500)
     private String avatar;
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<InventoryTransaction> inventoryTransactions;
 
     // Constructor
     public Employee() {
