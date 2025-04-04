@@ -42,15 +42,6 @@ public class SalesReportService {
             return null;
         }
 
-        // Nếu có productCode, lọc theo sản phẩm
-        if (productCode != null && !productCode.trim().isEmpty()) {
-            invoices = invoices.stream()
-                    .filter(invoice -> invoice.getInvoiceDetailList() != null && invoice.getInvoiceDetailList().stream()
-                            .anyMatch(detail -> detail.getProduct() != null && productCode.equals(String.valueOf(detail.getProduct().getProductID()))))
-                    .collect(Collectors.toList());
-            logger.info("Filtered by productCode " + productCode + ". Invoices remaining: " + invoices.size());
-        }
-
         // Tính tổng số đơn hàng
         long totalOrders = invoices.size();
         logger.info("Total Orders: " + totalOrders);
@@ -80,7 +71,16 @@ public class SalesReportService {
                 })
                 .sum();
 
-        long totalProfit = totalRevenue;
+        // Tính tổng số sản phẩm bán ra
+        long totalProductsSold = invoices.stream()
+                .flatMap(invoice -> {
+                    List<InvoiceDetail> details = invoice.getInvoiceDetailList();
+                    if (details == null || details.isEmpty()) return Stream.empty();
+                    return details.stream();
+                })
+                .filter(detail -> detail.getQuantity() != null)
+                .mapToLong(InvoiceDetail::getQuantity)
+                .sum();
 
         // Tính doanh thu theo khách hàng
         Map<Long, Long> revenueByCustomer = invoices.stream()
@@ -105,33 +105,17 @@ public class SalesReportService {
         Map<Long, Long> profitByCustomer = revenueByCustomer;
 
         logger.info("Total Revenue: " + totalRevenue);
-        logger.info("Total Profit: " + totalProfit);
+        logger.info("Total Products Sold: " + totalProductsSold);
         logger.info("Revenue by Customer: " + revenueByCustomer);
         logger.info("Profit by Customer: " + profitByCustomer);
 
         Map<String, Object> report = new HashMap<>();
         report.put("totalOrders", totalOrders);
         report.put("totalRevenue", totalRevenue);
-        report.put("totalProfit", totalProfit);
+        report.put("totalProductsSold", totalProductsSold);
         report.put("revenueByCustomer", revenueByCustomer);
         report.put("profitByCustomer", profitByCustomer);
 
         return report;
-    }
-
-    public boolean isProductCodeValid(String productCode) {
-        if (productCode == null || productCode.trim().isEmpty()) {
-            return false;
-        }
-        try {
-            Integer productId = Integer.parseInt(productCode);
-            List<Invoice> allInvoices = invoiceRepository.findAll();
-            return allInvoices.stream()
-                    .flatMap(invoice -> invoice.getInvoiceDetailList().stream())
-                    .anyMatch(detail -> detail.getProduct() != null && detail.getProduct().getProductID() != null && detail.getProduct().getProductID().equals(productId));
-        } catch (NumberFormatException e) {
-            logger.error("Invalid product code format: " + productCode);
-            return false;
-        }
     }
 }
