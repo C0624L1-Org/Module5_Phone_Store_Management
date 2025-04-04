@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -151,6 +152,63 @@ public class InvoiceServiceImpl implements IInvoiceService {
             throw e;
         }
     }
+
+    //sap xep
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithTimeAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithTimeAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithTimeDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithTimeDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithCustomerNameAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithCustomerNameAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithCustomerNameDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithCustomerNameDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithProductNameAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithProductNameAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithProductNameDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithProductNameDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithAmountAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithAmountAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithAmountDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithAmountDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithQuantityAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithQuantityAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithQuantityDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithQuantityDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoices(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoices(pageable);
+    }
+
 
     @Override
     @Transactional(readOnly = true)
