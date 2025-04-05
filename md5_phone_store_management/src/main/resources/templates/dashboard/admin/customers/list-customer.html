@@ -552,6 +552,37 @@
             };
         });
     });
+
+
+
+
+    
+    (function synchronizePurchaseCounts() {
+        console.log("Đang đồng bộ hóa dữ liệu purchaseCount...");
+
+        fetch('/api/sales/sync-purchase-counts')
+            .then(response => response.json())
+            .then(data => {
+                console.log("Kết quả đồng bộ hóa:", data);
+                if (data.success) {
+                    console.log("Đã đồng bộ hóa thành công: " + data.message);
+
+                    // Tự động tải lại danh sách khách hàng sau khi đồng bộ hóa thành công
+                    console.log("Đang tải lại danh sách khách hàng sau khi đồng bộ hóa...");
+                    setTimeout(function() {
+                        // Tải lại danh sách khách hàng đã mua
+                        searchCustomers();
+                        // Tải lại danh sách tất cả khách hàng
+                        searchAllCustomers();
+                    }, 500);
+                } else {
+                    console.error("Lỗi khi đồng bộ hóa: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Lỗi kết nối khi đồng bộ hóa: ", error);
+            });
+    })();
 </script>
 </body>
 </html>
