@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,7 +45,8 @@
                             <h2><i class="fas fa-shopping-cart text-primary me-2"></i>Quản lý bán hàng</h2>
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb mb-0">
-                                    <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                                    <li class="breadcrumb-item" sec:authorize="hasRole('Admin')"><a href="/dashboard/admin">Dashboard</a></li>
+                                    <li class="breadcrumb-item" sec:authorize="hasRole('SalesStaff')"><a href="/dashboard/sales-staff">Dashboard</a></li>
                                     <li class="breadcrumb-item active">Bán hàng</li>
                                 </ol>
                             </nav>
