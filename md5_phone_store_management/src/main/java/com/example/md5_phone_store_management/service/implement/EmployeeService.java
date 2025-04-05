@@ -6,6 +6,7 @@ import com.example.md5_phone_store_management.model.Role;
 import com.example.md5_phone_store_management.repository.IEmployeeRepository;
 import com.example.md5_phone_store_management.service.CloudinaryService;
 import com.example.md5_phone_store_management.service.IEmployeeService;
+import com.example.md5_phone_store_management.service.ITransactionOutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -31,6 +33,9 @@ public class EmployeeService implements IEmployeeService {
 
     @Autowired
     private CloudinaryService cloudinaryService;
+
+    @Autowired
+    private ITransactionOutService iTransactionOutService;
 
     @Override
     public void addEmployee(Employee employee) {
@@ -119,9 +124,10 @@ public class EmployeeService implements IEmployeeService {
     public void deleteEmployeesById(List<Integer> employeeIDs) {
         for (Integer employeeID : employeeIDs) {
             System.out.println(employeeID);
+            iTransactionOutService.deleteInventoryTransactionByEmployeeID(employeeID);
             iEmployeeRepository.deleteEmployeeById(employeeID);
         }
-        //iEmployeeRepository.deleteAllByIdInBatch(employeeIDs);
+
     }
 
     @Override
@@ -190,5 +196,15 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public long countWarehouseStaff() {
         return iEmployeeRepository.countWarehouseStaff();
+    }
+
+    @Override
+    public List<Integer> findEmployeeIDOfDefaultAccount() {
+        List<Integer> ids = new ArrayList<>();
+        ids.add(iEmployeeRepository.findEmployeeIdByUsername("admin"));
+        ids.add(iEmployeeRepository.findEmployeeIdByUsername("salesperson"));
+        ids.add(iEmployeeRepository.findEmployeeIdByUsername("salesstaff"));
+        ids.add(iEmployeeRepository.findEmployeeIdByUsername("warehousestaff"));
+        return ids;
     }
 }

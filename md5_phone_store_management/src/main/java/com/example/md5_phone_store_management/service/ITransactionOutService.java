@@ -23,7 +23,8 @@ public interface ITransactionOutService {
 
     Page<InventoryTransaction> getAllOutTransactionsPage(Pageable pageable);
 
-
     Page<InventoryTransaction> searchExportTransactions(String productName, String supplierName, LocalDate startDate, LocalDate endDate, Pageable pageable);
+
+    void deleteInventoryTransactionByEmployeeID(Integer employeeID);
 
 }

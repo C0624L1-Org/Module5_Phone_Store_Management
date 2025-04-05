@@ -63,6 +63,9 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
     @Query(value = "DELETE FROM employee WHERE employeeID = ?1", nativeQuery = true)
     void deleteEmployeeById(Integer id);
 
+    @Query(value = "SELECT employeeID FROM employee WHERE username = ?1", nativeQuery = true)
+    Integer findEmployeeIdByUsername(String username);
+
     //Đếm
     long count();
 
@@ -76,4 +79,7 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
     long countWarehouseStaff();
 
     Employee findByEmployeeID(Integer employeeID);
+
+
+
 }
