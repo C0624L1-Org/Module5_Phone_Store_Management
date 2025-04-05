@@ -24,8 +24,8 @@ public class ProductDTO {
     @DecimalMin(value = "10000", message = "Giá bán phải lớn hơn 10.000")
     @NumberFormat(pattern = "############")
     private BigDecimal sellingPrice;
-    @NotNull(message = "Giá bán không được để trống")
-    @DecimalMin(value = "10000", message = "Giá bán phải lớn hơn 10.000")
+
+
     @NumberFormat(pattern = "############")
     private BigDecimal retailPrice;
 
