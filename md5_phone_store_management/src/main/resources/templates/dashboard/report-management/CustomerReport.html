@@ -82,11 +82,38 @@
                     </h2>
 
                 </div>
-                <div  style="text-align: right;">
+               <!-- <div  style="text-align: right;">
                     <a th:href="@{/dashboard/admin/customers/invoice/list}" class="nav-link text-black">
                         <i class="fas fa-boxes me-2 text-success"></i>Xem lịch sử mua hàng
                     </a>
+                </div>-->
+                <div class="filter-container mb-4">
+                    <form th:action="@{/dashboard/admin/customer/report/filler}" method="get" class="d-flex align-items-center">
+                        <div class="col-md-3">
+                            <label for="gender" class="form-label">Giới tính</label>
+                            <select class="form-select" id="gender" name="gender">
+                                <option value="" th:selected="${param.gender == null}">Tất cả</option>
+                                <option th:each="g : ${T(com.example.md5_phone_store_management.model.Gender).values()}"
+                                        th:value="${g.name()}"
+                                th:text="${g.getLabel()}"
+                                th:selected="${param.gender != null and param.gender == g.name()}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="age" class="form-label">Tuổi</label>
+                            <input type="number" class="form-control" id="age" name="age" th:value="${param.age}" placeholder="Tuổi...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="minPurchaseCount" class="form-label">Số lần mua tối thiểu</label>
+                            <input type="number" class="form-control" id="minPurchaseCount" name="minPurchaseCount" th:value="${param.minPurchaseCount}" placeholder="Số lần mua...">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary ml-3">Lọc</button>
+                        </div>
+                    </form>
                 </div>
+
                 <div>
                     <div class="table-card">
                         <div class="table-responsive">

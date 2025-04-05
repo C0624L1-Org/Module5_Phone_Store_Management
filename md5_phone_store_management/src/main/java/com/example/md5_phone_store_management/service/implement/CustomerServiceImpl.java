@@ -3,6 +3,7 @@ package com.example.md5_phone_store_management.service.implement;
 import java.util.List;
 import java.util.Map;
 
+import com.example.md5_phone_store_management.model.Gender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -303,6 +304,10 @@ public class CustomerServiceImpl implements ICustomerService {
 
     public javax.sql.DataSource getDataSource() {
         return jdbcTemplate.getDataSource();
+    }
+    @Override
+   public List<Customer> filterCustomers(Gender gender, Integer age, Integer minPurchaseCount){
+        return customerRepository.findByFilters(gender, age, minPurchaseCount);
     }
 
 }
