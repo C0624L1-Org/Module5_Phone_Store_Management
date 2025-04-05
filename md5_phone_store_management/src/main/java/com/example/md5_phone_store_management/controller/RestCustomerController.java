@@ -86,6 +86,8 @@ public class RestCustomerController {
     }
 
 
+
+
     @PostMapping("/dashboard/admin/customers/create")
     public ResponseEntity<Map<String, Object>> createCustomer(
             @Valid @ModelAttribute Customer customer,
@@ -107,84 +109,6 @@ public class RestCustomerController {
         return ResponseEntity.ok(response);
     }
 
-//    /** API endpoint để tạo khách hàng mới (Quản lý bán bàng) */
-//    @PostMapping("/api/create-customer")
-//    public ResponseEntity<Map<String, Object>> apiCreateCustomer(
-//            @Valid @ModelAttribute Customer customer,
-//            BindingResult result,
-//            HttpSession session) {
-//        Map<String, Object> response = new HashMap<>();
-//
-//        // Log để debug
-//        System.out.println("API tạo khách hàng mới được gọi với thông tin: " + customer.getFullName() + ", " + customer.getPhone());
-//
-//        // Check for validation errors
-//        if (result.hasErrors()) {
-//            Map<String, String> errors = new HashMap<>();
-//            result.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-//
-//            System.out.println("Lỗi validation khi tạo khách hàng: " + errors);
-//            response.put("success", false);
-//            response.put("errors", errors);
-//            return ResponseEntity.badRequest().body(response);
-//        }
-//
-//        try {
-//            if (customer.getPhone() != null && !customer.getPhone().isEmpty()) {
-//                if (iCustomerService.isPhoneExists(customer.getPhone())) {
-//                    response.put("success", false);
-//                    response.put("message", "Số điện thoại đã tồn tại!");
-//                    return ResponseEntity.badRequest().body(response);
-//                }
-//            }
-//
-//            if (customer.getEmail() != null && !customer.getEmail().isEmpty()) {
-//                // Sử dụng service để kiểm tra
-//                if (iCustomerService.isEmailExists(customer.getEmail())) {
-//                    response.put("success", false);
-//                    response.put("message", "Email đã tồn tại!");
-//                    return ResponseEntity.badRequest().body(response);
-//                }
-//            }
-//
-//            // Đảm bảo ngày sinh không null
-//            if (customer.getDob() == null) {
-//                try {
-//                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//                    customer.setDob(dateFormat.parse("2000-01-01"));
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            // Đảm bảo purchaseCount bắt đầu từ 0
-//            customer.setPurchaseCount(0);
-//
-//            // Lưu khách hàng
-//            Customer savedCustomer = customerService.addNewCustomerAjax(customer);
-//
-//            // Log thông tin khách hàng đã lưu
-//            System.out.println("Đã thêm khách hàng mới: ID=" + savedCustomer.getCustomerID() +
-//                              ", Tên=" + savedCustomer.getFullName() +
-//                              ", SĐT=" + savedCustomer.getPhone());
-//
-//            // Chuẩn bị dữ liệu phản hồi
-//            response.put("success", true);
-//            response.put("customerId", savedCustomer.getCustomerID());
-//            response.put("fullName", savedCustomer.getFullName());
-//            response.put("message", "Thêm khách hàng thành công!");
-//
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            // Xử lý ngoại lệ và ghi log chi tiết
-//            System.err.println("Lỗi khi thêm khách hàng mới: " + e.getMessage());
-//            e.printStackTrace();
-//
-//            response.put("success", false);
-//            response.put("message", "Lỗi khi thêm khách hàng: " + e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-//        }
-//    }
 
     /** API endpoint tìm kiếm và phân trang cho khách hàng cũ (Quản lý bán hàng) */
     @GetMapping("/api/sales/search-customers")

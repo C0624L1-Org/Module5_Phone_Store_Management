@@ -150,76 +150,7 @@
                     <h1 class="mb-0"><i class="fas fa-chart-line me-2"></i>Báo Cáo Bán Hàng</h1>
                 </div>
 
-                <div class="card-body">
-                    <!-- Form nhập liệu -->
-                    <form th:action="@{/sales-report}" method="post" class="row g-3">
-                        <div class="col-md-6">
-                            <label for="startDate" class="form-label">Ngày Bắt Đầu</label>
-                            <input type="date" id="startDate" name="startDate" th:value="${startDate}" class="form-control" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="endDate" class="form-label">Ngày Kết Thúc</label>
-                            <input type="date" id="endDate" name="endDate" th:value="${endDate}" class="form-control" required>
-                        </div>
-                        <div class="col-md-12 text-center mt-3">
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-search me-2"></i>Tìm Báo Cáo</button>
-                        </div>
-                    </form>
 
-                    <!-- Hiển thị thông báo lỗi -->
-                    <div th:if="${errorMessage}" class="alert alert-danger mt-3" role="alert">
-                        <p th:text="${errorMessage}"></p>
-                    </div>
-
-                    <!-- Hiển thị báo cáo -->
-                    <div th:if="${showReport}" class="mt-4">
-                        <h2 class="mb-4">Tổng Quan Báo Cáo</h2>
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <div class="summary-box">
-                                    <h5>Tổng Số Đơn Hàng</h5>
-                                    <p th:text="${totalOrders}"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="summary-box">
-                                    <h5>Tổng Doanh Thu</h5>
-                                    <p th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="summary-box">
-                                    <h5>Tổng Số Sản Phẩm Bán Ra</h5>
-                                    <p th:text="${totalProductsSold}"></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Đồ thị doanh thu theo khách hàng -->
-                        <div class="chart-container">
-                            <canvas id="revenueChart"></canvas>
-                        </div>
-
-                        <div class="row mt-4">
-                            <div class="col-md-6">
-                                <h3>Doanh Thu Theo Khách Hàng</h3>
-                                <ul class="list-group">
-                                    <li class="list-group-item" th:each="entry : ${revenueByCustomer}">
-                                        Mã KH: <span th:text="${entry.key}"></span> - Doanh Thu: <span th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <h3>Lợi Nhuận Theo Khách Hàng</h3>
-                                <ul class="list-group">
-                                    <li class="list-group-item" th:each="entry : ${profitByCustomer}">
-                                        Mã KH: <span th:text="${entry.key}"></span> - Lợi Nhuận: <span th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -234,78 +165,7 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Script cho đồ thị -->
-<script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-        /*[# th:if="${showReport}"]*/
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        // Kiểm tra null và gán giá trị mặc định nếu revenueByCustomer là null
-        const customerIds = /*[[${revenueByCustomer != null ? revenueByCustomer.keySet() : new java.util.HashSet()}]]*/ [];
-        const revenues = /*[[${revenueByCustomer != null ? revenueByCustomer.values() : new java.util.ArrayList()}]]*/ [];
 
-        // Chỉ vẽ biểu đồ nếu có dữ liệu
-        if (customerIds.length > 0 && revenues.length > 0) {
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: customerIds,
-                    datasets: [{
-                        label: 'Doanh Thu Theo Khách Hàng (VNĐ)',
-                        data: revenues,
-                        backgroundColor: 'rgba(30, 144, 255, 0.7)',
-                        borderColor: 'rgba(30, 144, 255, 1)',
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        barThickness: 30
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString('vi-VN') + ' VNĐ';
-                                },
-                                font: { size: 12 }
-                            },
-                            grid: { color: '#e9ecef' }
-                        },
-                        x: {
-                            ticks: { font: { size: 12 } },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: { font: { size: 14, weight: 'bold' } }
-                        },
-                        tooltip: {
-                            backgroundColor: '#333',
-                            titleFont: { size: 14 },
-                            bodyFont: { size: 12 },
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + context.raw.toLocaleString('vi-VN') + ' VNĐ';
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        duration: 1500,
-                        easing: 'easeOutQuart'
-                    }
-                }
-            });
-        } else {
-            // Hiển thị thông báo hoặc để trống nếu không có dữ liệu
-            ctx.canvas.parentNode.innerHTML = '<p class="text-center">Không có dữ liệu để hiển thị biểu đồ.</p>';
-        }
-        /*[/]*/
-    });
-</script>
 </body>
 </html>
 
