@@ -11,11 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/dashboard")
@@ -24,7 +19,6 @@ public class SupplierController {
     @Autowired
     private SupplierService supplierService;
 
-    // Phương thức hiển thị danh sách nhà cung cấp có phân trang và tìm kiếm
     @GetMapping("/suppliers")
     public String getAllSuppliers(
             @RequestParam(value = "name", required = false, defaultValue = "") String name,
@@ -54,7 +48,6 @@ public class SupplierController {
         return "dashboard/supplier/supplier-list";
     }
 
-    // Phương thức tạo nhà cung cấp mới
     @GetMapping("/suppliers/create")
     public String createSupplier(Model model) {
         model.addAttribute("supplierDTO", new SupplierDTO());
@@ -76,7 +69,6 @@ public class SupplierController {
         return "redirect:/dashboard/suppliers";
     }
 
-    // Phương thức cập nhật nhà cung cấp
     @GetMapping("/update-supplierForm/{id}")
     public String updateSupplier(@PathVariable("id") Integer id, Model model) {
         Supplier supplier = supplierService.getSupplier(id);
@@ -100,26 +92,4 @@ public class SupplierController {
 
         return "redirect:/dashboard/suppliers";
     }
-
-    // Phương thức xóa nhà cung cấp
-    @GetMapping("/suppliers/delete/{ids}")
-    public String deleteSuppliers(@PathVariable("ids") String ids, RedirectAttributes redirectAttributes) {
-        try {
-            List<Integer> idList = Arrays.stream(ids.split(","))
-                    .map(Integer::parseInt)
-                    .collect(Collectors.toList());
-
-            supplierService.deleteSupplier(idList);
-
-            redirectAttributes.addFlashAttribute("message", "Xóa nhà cung cấp thành công!");
-            redirectAttributes.addFlashAttribute("messageType", "success");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", "Lỗi khi xóa nhà cung cấp: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("messageType", "error");
-        }
-
-        return "redirect:/dashboard/suppliers";
-    }
-
-
 }

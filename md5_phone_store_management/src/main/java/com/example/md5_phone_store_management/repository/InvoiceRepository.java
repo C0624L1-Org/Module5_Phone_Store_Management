@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,6 +18,36 @@ import com.example.md5_phone_store_management.model.PaymentMethod;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
+    // Sắp xếp
+    //Theo thoi gian
+    @Query(value = "SELECT * FROM invoices WHERE invoices.status = 'SUCCESS' ORDER BY TIME(created_at) ASC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithTimeAsc(Pageable pageable);
+    @Query(value = "SELECT * FROM invoices WHERE invoices.status = 'SUCCESS' ORDER BY TIME(created_at) DESC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithTimeDesc(Pageable pageable);
+    //Theo ten khach hang
+    @Query(value = "SELECT * FROM invoices LEFT JOIN customer ON invoices.customer_id = customer.customerID WHERE invoices.status = 'SUCCESS' ORDER BY customer.full_name ASC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithCustomerNameAsc(Pageable pageable);
+    @Query(value = "SELECT * FROM invoices LEFT JOIN customer ON invoices.customer_id = customer.customerID WHERE invoices.status = 'SUCCESS' ORDER BY customer.full_name DESC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithCustomerNameDesc(Pageable pageable);
+    //Theo tên sản phẩm
+    @Query(value = "SELECT * FROM invoices i LEFT JOIN (SELECT id.invoice_id, MIN(p.name) as first_product_name FROM invoicedetail id JOIN product p ON id.product_id = p.productID GROUP BY id.invoice_id) as product_info ON i.id = product_info.invoice_id WHERE i.status = 'SUCCESS' ORDER BY product_info.first_product_name ASC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithProductNameAsc(Pageable pageable);
+    @Query(value = "SELECT * FROM invoices i LEFT JOIN (SELECT id.invoice_id, MIN(p.name) as first_product_name FROM invoicedetail id JOIN product p ON id.product_id = p.productID GROUP BY id.invoice_id) as product_info ON i.id = product_info.invoice_id WHERE i.status = 'SUCCESS' ORDER BY product_info.first_product_name DESC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithProductNameDesc(Pageable pageable);
+    //Theo so tien
+    @Query(value = "SELECT * FROM invoices WHERE status = 'SUCCESS' ORDER BY amount ASC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithAmountAsc(Pageable pageable);
+    @Query(value = "SELECT * FROM invoices WHERE status = 'SUCCESS' ORDER BY amount DESC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithAmountDesc(Pageable pageable);
+    //Theo so luong
+    @Query(value = "SELECT i.*, SUM(id.quantity) AS quantity FROM invoices i, invoicedetail id WHERE i.id = id.invoice_id AND i.status = 'SUCCESS' GROUP BY id.invoice_id ORDER BY quantity ASC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithQuantityAsc(Pageable pageable);
+    @Query(value = "SELECT i.*, SUM(id.quantity) AS quantity FROM invoices i, invoicedetail id WHERE i.id = id.invoice_id AND i.status = 'SUCCESS' GROUP BY id.invoice_id ORDER BY quantity DESC", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoicesWithQuantityDesc(Pageable pageable);
+
+    //tim tat ca cac hoa don thanh cong
+    @Query(value = "SELECT * FROM invoices WHERE status = 'SUCCESS'", nativeQuery = true)
+    Page<Invoice> findAllSuccessInvoices(Pageable pageable);
 
 
     // Tìm tất cả hóa đơn của một khách hàng

@@ -38,14 +38,10 @@ public class SalesReportController {
     public String generateSalesReport(
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            @RequestParam(required = false) String filterType,
-            @RequestParam(required = false) String productCode,
             Model model) {
 
         model.addAttribute("startDate", startDate != null ? startDate.format(DATE_INPUT_FORMATTER) : "");
         model.addAttribute("endDate", endDate != null ? endDate.format(DATE_INPUT_FORMATTER) : "");
-        model.addAttribute("filterType", filterType);
-        model.addAttribute("productCode", productCode);
 
         if (startDate == null || endDate == null) {
             model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.");
@@ -61,18 +57,7 @@ public class SalesReportController {
             LocalDateTime startDateTime = startDate.atStartOfDay();
             LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
 
-            if ("product".equals(filterType)) {
-                if (productCode == null || productCode.trim().isEmpty()) {
-                    model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại hoặc chưa nhập.");
-                    return "dashboard/sales/sales-report";
-                }
-                if (!salesReportService.isProductCodeValid(productCode)) {
-                    model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại.");
-                    return "dashboard/sales/sales-report";
-                }
-            }
-
-            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, "product".equals(filterType) ? productCode : null);
+            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, null);
             if (report == null) {
                 model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này. Vui lòng nhập lại ngày.");
                 return "dashboard/sales/sales-report";
@@ -80,7 +65,7 @@ public class SalesReportController {
 
             model.addAttribute("totalOrders", report.get("totalOrders"));
             model.addAttribute("totalRevenue", report.get("totalRevenue"));
-            model.addAttribute("totalProfit", report.get("totalProfit"));
+            model.addAttribute("totalProductsSold", report.get("totalProductsSold"));
             model.addAttribute("revenueByCustomer", report.get("revenueByCustomer"));
             model.addAttribute("profitByCustomer", report.get("profitByCustomer"));
             model.addAttribute("showReport", true);

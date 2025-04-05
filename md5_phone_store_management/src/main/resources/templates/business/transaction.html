@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang quản lý Lịch sử mua bán </title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+    <style>
+        .table-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+            font-weight: 500;
+            border-color: #454d55;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+
+    </style>
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+        <!-- Main content -->
+        <div class="content-container">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="mb-0">
+                            <i class="fa-solid fa-bars-staggered me-2 text-primary"></i>
+                            Quản lý lịch sử mua bán
+                        </h2>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-bordered mb-0">
+                                <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Ngày</th>
+                                    <th>
+                                        <div style="display: flex; justify-content: space-between; align-items: center">
+                                            Thời gian
+                                            <i th:if="${sortValue == 'time'}" class="text-light fa-solid"
+                                               th:classappend="${sortType} ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div style="display: flex; justify-content: space-between; align-items: center">
+                                            Họ và tên khách hàng
+                                            <i th:if="${sortValue == 'customer'}" class="text-light fa-solid"
+                                               th:classappend="${sortType} ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div style="display: flex; justify-content: space-between; align-items: center">
+                                            Thông tin mua hàng
+                                            <i th:if="${sortValue == 'product' or sortValue == 'quantity'}"
+                                               class="text-light fa-solid"
+                                               th:classappend="${sortType} ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div style="display: flex; justify-content: space-between; align-items: center">
+                                            Tổng tiền
+                                            <i th:if="${sortValue == 'amount'}" class="text-light fa-solid"
+                                               th:classappend="${sortType} ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                                        </div>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="i,l : ${invoices}">
+                                    <td th:text="${l.count}"></td>
+                                    <td th:text="${i.createdAt != null ? #temporals.format(i.createdAt, 'dd-MM-yyyy') : 'Lỗi'}"></td>
+                                    <td th:text="${i.createdAt != null ? #temporals.format(i.createdAt, 'HH:mm') : 'Lỗi'}"></td>
+                                    <td th:text="${i.customer.fullName}"></td>
+                                    <td><span th:each="detail, loop : ${i.invoiceDetailList}"
+                                              th:text="${detail.quantity + ' ' + detail.product.name + (loop.count == i.invoiceDetailList.size() ? '' : ', ')}"></span>
+                                    </td>
+                                    <td th:text="${#numbers.formatInteger(i.amount, 1, 'POINT') + 'VND'}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                            <!--Sort button-->
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'time', sortType = ${sortValue != 'time' ? 'true' : !sortType})}"
+                               class="btn btn-primary">
+                                Sắp xếp theo thời gian
+                            </a>
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'customer', sortType = ${sortValue != 'customer' ? 'true' : !sortType})}"
+                               class="btn btn-primary">
+                                Sắp xếp theo khách hàng
+                            </a>
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'product', sortType = ${sortValue != 'product' ? 'true' : !sortType})}"
+                               class="btn btn-primary">
+                                Sắp xếp theo sản phẩm
+                            </a>
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'quantity', sortType = ${sortValue != 'quantity' ? 'true' : !sortType})}"
+                               class="btn btn-primary">
+                                Sắp xếp theo số lượng
+                            </a>
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'amount', sortType = ${sortValue != 'amount' ? 'true' : !sortType})}"
+                               class="btn btn-primary">
+                                Sắp xếp theo tổng tiền
+                            </a>
+
+                            <!-- Pagination -->
+                            <nav aria-label="Pagination">
+                                <ul class="pagination mb-0">
+                                    <!-- Nút Trang đầu - luôn hiển thị -->
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/business/transaction(page = 0, sortValue = ${sortValue}, sortType = ${sortType})}">
+                                            Trang đầu
+                                        </a>
+                                    </li>
+
+                                    <!-- Nút Trước - luôn hiển thị -->
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/business/transaction(page = ${currentPage - 1}, sortValue = ${sortValue}, sortType = ${sortType})}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Hiển thị số trang hiện tại / tổng số trang -->
+                                    <li class="page-item active mx-2">
+                                    <span class="page-link">
+                                    <span th:text="${currentPage + 1}"></span> / <span
+                                            th:text="${invoices.totalPages}"></span>
+                                </span>
+                                    </li>
+
+                                    <!-- Nút Tiếp - luôn hiển thị -->
+                                    <li class="page-item"
+                                        th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/business/transaction(page = ${currentPage + 1}, sortValue = ${sortValue}, sortType = ${sortType})}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Nút Trang cuối - luôn hiển thị -->
+                                    <li class="page-item"
+                                        th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/dashboard/business/transaction(page = ${invoices.totalPages - 1}, sortValue = ${sortValue}, sortType = ${sortType})}">
+                                            Trang cuối
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
