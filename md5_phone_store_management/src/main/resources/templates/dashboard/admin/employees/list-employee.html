@@ -336,8 +336,8 @@
                             employee.role?.name() == 'SalesStaff' ? 'badge-sales-staff' :
                             (employee.role?.name() == 'SalesPerson' ? 'badge-sales-person' : 'badge-warehouse')
                           }">
-                      <span th:case="'SalesStaff'">Nhân viên kinh doanh</span>
-                      <span th:case="'SalesPerson'">Nhân viên bán hàng</span>
+                      <span th:case="'SalesStaff'">Nhân viên bán hàng</span>
+                      <span th:case="'SalesPerson'">Nhân viên kinh doanh</span>
                       <span th:case="'WarehouseStaff'">Thủ kho</span>
                       <span th:case="*">Không xác định</span>
                     </span>
