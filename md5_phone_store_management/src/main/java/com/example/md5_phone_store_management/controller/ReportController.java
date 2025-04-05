@@ -33,18 +33,13 @@ public class ReportController {
 
     private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-
     @Autowired
     private CustomerService customerService;
-
-
 
     @GetMapping("/report-home")
     public String showReportHome(Model model) {
         return "dashboard/report-management/report-home";
     }
-
-
 
     @GetMapping("/dashboard/admin/customer/report")
     public ModelAndView adminCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page) {
@@ -54,7 +49,6 @@ public class ReportController {
         mv.addObject("page", page);
         return mv;
     }
-
 
     @GetMapping("/sales-report")
     public String showSalesReportForm(Model model) {
@@ -93,7 +87,7 @@ public class ReportController {
                 parsedProductId = Integer.parseInt(productId);
                 if (!salesReportService.isProductIdValid(parsedProductId)) {
                     model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại.");
-                    return "dashboard/sales/sales-report";
+                    return "dashboard/report-management/sales-report"; // Sửa đường dẫn
                 }
             }
 
@@ -103,7 +97,6 @@ public class ReportController {
                 return "dashboard/report-management/sales-report";
             }
 
-
             model.addAttribute("totalOrders", report.get("totalOrders"));
             model.addAttribute("totalRevenue", report.get("totalRevenue"));
             model.addAttribute("totalProductsSold", report.get("totalProductsSold"));
@@ -112,7 +105,7 @@ public class ReportController {
 
         } catch (NumberFormatException e) {
             model.addAttribute("errorMessage", "Mã sản phẩm phải là số nguyên.");
-            return "dashboard/sales/sales-report";
+            return "dashboard/report-management/sales-report"; // Sửa đường dẫn
         } catch (DateTimeParseException e) {
             logger.error("Error parsing date: " + e.getMessage());
             model.addAttribute("errorMessage", "Ngày không đúng định dạng (yyyy-MM-dd).");
@@ -121,8 +114,4 @@ public class ReportController {
 
         return "dashboard/report-management/sales-report";
     }
-
 }
-
-
-
