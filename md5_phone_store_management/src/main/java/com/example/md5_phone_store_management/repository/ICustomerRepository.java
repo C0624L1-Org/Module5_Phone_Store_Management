@@ -1,5 +1,6 @@
 package com.example.md5_phone_store_management.repository;
 
+import com.example.md5_phone_store_management.model.Gender;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.md5_phone_store_management.model.Customer;
+
+import java.util.List;
 
 @Repository
 public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
@@ -115,5 +118,13 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
         "WHERE c.customerID = :customerId", 
         nativeQuery = true)
     int synchronizePurchaseCountForCustomer(@Param("customerId") Integer customerId);
+    @Query(value = "SELECT * from customer c WHERE (:gender IS NULL OR LOWER(c.gender) = LOWER(:gender)) " +
+            "AND (:age IS NULL OR YEAR(CURDATE()) - YEAR(c.dob) = :age) " +
+            "AND (:minPurchaseCount IS NULL OR c.purchaseCount >= :minPurchaseCount)", nativeQuery = true)
+    List<Customer> findByFilters(
+            @Param("gender") String gender,
+            @Param("age") Integer age,
+            @Param("minPurchaseCount") Integer minPurchaseCount
+    );
 
 }

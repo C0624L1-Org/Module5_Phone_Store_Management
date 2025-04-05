@@ -19,7 +19,34 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-
+        .filter-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #6c8deb;
+            box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);
+        }
+        .table-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+            font-weight: 500;
+            border-color: #454d55;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
         .table th, .table td {
             vertical-align: middle;
         }
@@ -58,6 +85,53 @@
                     </h2>
 
                 </div>
+               <!-- <div  style="text-align: right;">
+                    <a th:href="@{/dashboard/admin/customers/invoice/list}" class="nav-link text-black">
+                        <i class="fas fa-boxes me-2 text-success"></i>Xem lịch sử mua hàng
+                    </a>
+                </div>-->
+                <div class="filter-container">
+                    <form th:action="@{/dashboard/admin/customer/report/filler}" method="get" class="d-flex align-items-center w-100">
+                        <div class="row w-100 g-3">
+                            <div class="col-md-3 col-12">
+                                <label for="gender" class="form-label">Giới tính</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                                    <select class="form-select" id="gender" name="gender">
+                                        <option value="" th:selected="${param.gender == null}">Tất cả</option>
+                                        <option th:each="g : ${T(com.example.md5_phone_store_management.model.Gender).values()}"
+                                                th:value="${g.name()}"
+                                                th:text="${g.getLabel()}"
+                                                th:selected="${param.gender != null and param.gender == g.name()}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <label for="age" class="form-label">Tuổi</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-birthday-cake"></i></span>
+                                    <input type="number" class="form-control" id="age" name="age" th:value="${param.age}" placeholder="Tuổi...">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <label for="minPurchaseCount" class="form-label">Số lần mua tối thiểu</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-shopping-cart"></i></span>
+                                    <input type="number" class="form-control" id="minPurchaseCount" name="minPurchaseCount" th:value="${param.minPurchaseCount}" placeholder="Số lần mua...">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1"><i class="fas fa-filter me-2"></i>Lọc</button>
+                                <a th:href="@{/dashboard/admin/customer/report}" class="btn btn-secondary">
+                                    <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+
                 <div>
                     <div class="table-card">
                         <div class="table-responsive">
@@ -78,7 +152,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="p-3 bg-light border-top d-flex justify-content-center align-items-center" id="pagination-container">
+                    <div class="p-3 bg-light border-top d-flex justify-content-end align-items-center" id="pagination-container" >
                         <nav aria-label="Pagination">
                             <ul class="pagination mb-0" id="pagination">
                             </ul>
@@ -201,8 +275,8 @@
         let group2 = allCustomers.filter(c => c.purchaseCount >= 5 && c.purchaseCount <= 10).length;
         let group3 = allCustomers.filter(c => c.purchaseCount >= 11 && c.purchaseCount <= 15).length;
         let group4 = allCustomers.filter(c => c.purchaseCount > 15).length;
-        let newCustomers = allCustomers.filter(c => c.purchaseCount === 1).length;
-        let oldCustomers = allCustomers.filter(c => c.purchaseCount > 1).length;
+        let newCustomers = allCustomers.filter(c => c.purchaseCount === 0).length;
+        let oldCustomers = allCustomers.filter(c => c.purchaseCount > 0).length;
         new Chart(document.getElementById('genderChart'), {
             type: 'pie',
             data: {

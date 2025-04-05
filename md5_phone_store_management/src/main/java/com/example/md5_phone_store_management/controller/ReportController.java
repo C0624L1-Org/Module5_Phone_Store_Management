@@ -1,8 +1,10 @@
 package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.Customer;
+import com.example.md5_phone_store_management.model.Gender;
 import com.example.md5_phone_store_management.service.CustomerService;
 import com.example.md5_phone_store_management.service.SalesReportService;
+import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -34,17 +38,42 @@ public class ReportController {
     private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
+    private CustomerServiceImpl customerServiceImpl;
+    @Autowired
     private CustomerService customerService;
+
+
 
     @GetMapping("/report-home")
     public String showReportHome(Model model) {
         return "dashboard/report-management/report-home";
     }
 
+
+
     @GetMapping("/dashboard/admin/customer/report")
     public ModelAndView adminCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page) {
         ModelAndView mv = new ModelAndView("/dashboard/report-management/CustomerReport");
         List<Customer> allCustomers = customerService.findAllCustomers();
+        mv.addObject("customers", allCustomers);
+        mv.addObject("page", page);
+        return mv;
+    }
+
+    @GetMapping("/dashboard/admin/customer/report/filler")
+    public ModelAndView fillerCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page,
+                                             @RequestParam(required = false) String gender,
+                                             @RequestParam(required = false) Integer age,
+                                             @RequestParam(required = false) Integer minPurchaseCount) {
+        ModelAndView mv = new ModelAndView("/dashboard/report-management/CustomerReport");
+        Gender genderEnum = null;
+        if (gender != null && !gender.isBlank()) {
+            genderEnum = Arrays.stream(Gender.values())
+                    .filter(g -> g.name().equalsIgnoreCase(gender))
+                    .findFirst()
+                    .orElse(null);
+        }
+        List<Customer> allCustomers = customerServiceImpl.filterCustomers(genderEnum, age, minPurchaseCount);
         mv.addObject("customers", allCustomers);
         mv.addObject("page", page);
         return mv;
@@ -61,12 +90,10 @@ public class ReportController {
     public String generateSalesReport(
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            @RequestParam(required = false) String productId,
             Model model) {
 
         model.addAttribute("startDate", startDate != null ? startDate.format(DATE_INPUT_FORMATTER) : "");
         model.addAttribute("endDate", endDate != null ? endDate.format(DATE_INPUT_FORMATTER) : "");
-        model.addAttribute("productId", productId);
 
         if (startDate == null || endDate == null) {
             model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.");
@@ -82,30 +109,19 @@ public class ReportController {
             LocalDateTime startDateTime = startDate.atStartOfDay();
             LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
 
-            Integer parsedProductId = null;
-            if (productId != null && !productId.trim().isEmpty()) {
-                parsedProductId = Integer.parseInt(productId);
-                if (!salesReportService.isProductIdValid(parsedProductId)) {
-                    model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại.");
-                    return "dashboard/report-management/sales-report"; // Sửa đường dẫn
-                }
-            }
-
-            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, parsedProductId);
+            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, null);
             if (report == null) {
-                model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này hoặc mã sản phẩm không hợp lệ.");
+                model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này. Vui lòng nhập lại ngày.");
                 return "dashboard/report-management/sales-report";
             }
 
             model.addAttribute("totalOrders", report.get("totalOrders"));
             model.addAttribute("totalRevenue", report.get("totalRevenue"));
             model.addAttribute("totalProductsSold", report.get("totalProductsSold"));
-            model.addAttribute("revenueByProduct", report.get("revenueByProduct"));
+            model.addAttribute("revenueByCustomer", report.get("revenueByCustomer"));
+            model.addAttribute("profitByCustomer", report.get("profitByCustomer"));
             model.addAttribute("showReport", true);
 
-        } catch (NumberFormatException e) {
-            model.addAttribute("errorMessage", "Mã sản phẩm phải là số nguyên.");
-            return "dashboard/report-management/sales-report"; // Sửa đường dẫn
         } catch (DateTimeParseException e) {
             logger.error("Error parsing date: " + e.getMessage());
             model.addAttribute("errorMessage", "Ngày không đúng định dạng (yyyy-MM-dd).");
@@ -114,4 +130,8 @@ public class ReportController {
 
         return "dashboard/report-management/sales-report";
     }
+
 }
+
+
+
