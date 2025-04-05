@@ -33,7 +33,6 @@ public class SalesReportService {
 
         logger.info("Querying invoices from " + startDateStr + " to " + endDateStr);
 
-        // Lấy tất cả hóa đơn trong khoảng thời gian
         List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(startDateStr, endDateStr);
 
         logger.info("Invoices found: " + invoices.size());
@@ -42,7 +41,6 @@ public class SalesReportService {
             return null;
         }
 
-        // Lọc hóa đơn theo productId nếu có
         if (productId != null) {
             invoices = invoices.stream()
                     .filter(invoice -> invoice.getInvoiceDetailList() != null && invoice.getInvoiceDetailList().stream()
@@ -55,11 +53,9 @@ public class SalesReportService {
             }
         }
 
-        // Tính tổng số đơn hàng
         long totalOrders = invoices.size();
         logger.info("Total Orders: " + totalOrders);
 
-        // Tính tổng doanh thu từ InvoiceDetail
         long totalRevenue = invoices.stream()
                 .flatMap(invoice -> {
                     List<InvoiceDetail> details = invoice.getInvoiceDetailList();
@@ -84,7 +80,6 @@ public class SalesReportService {
                 })
                 .sum();
 
-        // Tính tổng số sản phẩm bán ra
         long totalProductsSold = invoices.stream()
                 .flatMap(invoice -> {
                     List<InvoiceDetail> details = invoice.getInvoiceDetailList();
@@ -95,7 +90,6 @@ public class SalesReportService {
                 .mapToLong(InvoiceDetail::getQuantity)
                 .sum();
 
-        // Tính doanh thu theo mã sản phẩm
         Map<Integer, Long> revenueByProduct = invoices.stream()
                 .flatMap(invoice -> {
                     List<InvoiceDetail> details = invoice.getInvoiceDetailList();
@@ -105,12 +99,15 @@ public class SalesReportService {
                 .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
                 .collect(Collectors.groupingBy(
                         detail -> detail.getProduct().getProductID(),
-                        Collectors.summingLong(detail -> {
-                            BigDecimal sellingPrice = detail.getProduct().getSellingPrice() != null ? detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                            BigDecimal purchasePrice = detail.getProduct().getPurchasePrice() != null ? detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                            BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                            return revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                        })
+                        Collectors.mapping(
+                                detail -> {
+                                    BigDecimal sellingPrice = detail.getProduct().getSellingPrice() != null ? detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                    BigDecimal purchasePrice = detail.getProduct().getPurchasePrice() != null ? detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                    BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
+                                    return revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                },
+                                Collectors.summingLong(Long::longValue)
+                        )
                 ));
 
         logger.info("Total Revenue: " + totalRevenue);
