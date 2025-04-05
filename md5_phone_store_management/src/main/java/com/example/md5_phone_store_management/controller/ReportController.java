@@ -67,10 +67,12 @@ public class ReportController {
     public String generateSalesReport(
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam(required = false) String productId,
             Model model) {
 
         model.addAttribute("startDate", startDate != null ? startDate.format(DATE_INPUT_FORMATTER) : "");
         model.addAttribute("endDate", endDate != null ? endDate.format(DATE_INPUT_FORMATTER) : "");
+        model.addAttribute("productId", productId);
 
         if (startDate == null || endDate == null) {
             model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.");
@@ -86,19 +88,31 @@ public class ReportController {
             LocalDateTime startDateTime = startDate.atStartOfDay();
             LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
 
-            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, null);
+            Integer parsedProductId = null;
+            if (productId != null && !productId.trim().isEmpty()) {
+                parsedProductId = Integer.parseInt(productId);
+                if (!salesReportService.isProductIdValid(parsedProductId)) {
+                    model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại.");
+                    return "dashboard/sales/sales-report";
+                }
+            }
+
+            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, parsedProductId);
             if (report == null) {
-                model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này. Vui lòng nhập lại ngày.");
+                model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này hoặc mã sản phẩm không hợp lệ.");
                 return "dashboard/report-management/sales-report";
             }
+
 
             model.addAttribute("totalOrders", report.get("totalOrders"));
             model.addAttribute("totalRevenue", report.get("totalRevenue"));
             model.addAttribute("totalProductsSold", report.get("totalProductsSold"));
-            model.addAttribute("revenueByCustomer", report.get("revenueByCustomer"));
-            model.addAttribute("profitByCustomer", report.get("profitByCustomer"));
+            model.addAttribute("revenueByProduct", report.get("revenueByProduct"));
             model.addAttribute("showReport", true);
 
+        } catch (NumberFormatException e) {
+            model.addAttribute("errorMessage", "Mã sản phẩm phải là số nguyên.");
+            return "dashboard/sales/sales-report";
         } catch (DateTimeParseException e) {
             logger.error("Error parsing date: " + e.getMessage());
             model.addAttribute("errorMessage", "Ngày không đúng định dạng (yyyy-MM-dd).");
