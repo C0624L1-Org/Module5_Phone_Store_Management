@@ -160,7 +160,8 @@
                 </div>
 
                 <form th:action="@{/dashboard/admin/employees/edit/{employeeID}(employeeID=${employee.employeeID})}"
-                      th:object="${employee}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                      th:object="${employee}" method="post" enctype="multipart/form-data" class="needs-validation"
+                      id="updateEmployeeForm" data-loading-overlay="true"novalidate>
 
                   <!-- Hidden fields -->
                   <input type="hidden" th:field="*{employeeID}" />
@@ -229,7 +230,7 @@
                       </label>
                       <select th:field="*{role}" class="form-select" id="role">
                         <option value="" selected disabled>-- Chọn vai trò --</option>
-                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r.getLabel()}"></option>
+                        <option th:each="r : ${roles}" th:if="${r != T(com.example.md5_phone_store_management.model.Role).Admin}" th:value="${r}" th:text="${r.getLabel()}"></option>
                       </select>
                       <div class="invalid-feedback">Vui lòng chọn vai trò</div>
                       <div class="text-danger" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
@@ -281,7 +282,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-          <button type="button" class="btn btn-success" id="confirmUpdate">Xác nhận cập nhật</button>
+          <button type="button" class="btn btn-success" id="confirmUpdate" data-submit-form="updateEmployeeForm">Xác nhận cập nhật</button>
         </div>
       </div>
     </div>
@@ -312,6 +313,12 @@
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Thêm script xử lý upload avatar -->
+<script src="/js/dashboard/employee-avatar-upload.js"></script>
+
+<!-- Thêm script xử lý loading khi submit form -->
+<script src="/js/common/form-submit-overlay.js"></script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
