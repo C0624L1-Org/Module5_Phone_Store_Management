@@ -36,6 +36,15 @@ public class TransactionOutService implements ITransactionOutService {
                 productName, supplierName, startDateTime, endDateTime, TransactionType.OUT, pageable);
     }
 
+    @Override
+    public void deleteInventoryTransactionByEmployeeID(Integer employeeID) {
+        try {
+            transactionOutRepository.deleteInventoryTransactionByEmployeeID(employeeID);
+        } catch (Exception e) {
+            System.out.println("Lỗi không thể xóa transaction với employeeID: " + e.getMessage());
+        }
+    }
+
 
     @Override
     public List<InventoryTransaction> getAllOutTransactions() {
@@ -46,8 +55,6 @@ public class TransactionOutService implements ITransactionOutService {
         // Fetch transactions where transactionType is "OUT" (export transactions)
         return transactionOutRepository.getByTransactionType(TransactionType.OUT, pageable);
     }
-
-
 
 
     @Override

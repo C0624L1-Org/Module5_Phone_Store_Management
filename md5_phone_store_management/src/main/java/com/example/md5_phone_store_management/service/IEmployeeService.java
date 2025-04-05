@@ -43,6 +43,9 @@ public interface IEmployeeService {
     long countBusinessStaff();
     long countWarehouseStaff();
 
+    //Lấy ds id của các tài khoản mặc dịnh
+    List<Integer> findEmployeeIDOfDefaultAccount();
+
 }
 
 

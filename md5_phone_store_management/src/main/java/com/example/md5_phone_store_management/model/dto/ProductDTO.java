@@ -25,6 +25,7 @@ public class ProductDTO {
     @NumberFormat(pattern = "############")
     private BigDecimal sellingPrice;
 
+
     @NumberFormat(pattern = "############")
     private BigDecimal retailPrice;
 
@@ -45,6 +46,7 @@ public class ProductDTO {
     @Positive(message = "Số lượng tồn kho phải lớn hơn 0")
     private Integer stockQuantity;
     private String qrCode;
+    @NotNull(message = "Vui lòng chọn nhà cung cấp")
     private Integer supplierID;
 
     public ProductDTO() {}

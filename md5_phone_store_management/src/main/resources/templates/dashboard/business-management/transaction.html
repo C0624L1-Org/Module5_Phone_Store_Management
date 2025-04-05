@@ -22,6 +22,7 @@
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             border: 1px solid #e9ecef;
         }
+
         .table thead th {
             background-color: #343a40;
             color: white;
@@ -32,9 +33,11 @@
             vertical-align: middle;
             white-space: nowrap;
         }
+
         .table-striped tbody tr:nth-of-type(odd) {
             background-color: rgba(0, 0, 0, 0.02);
         }
+
         .table-hover tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.075);
         }
@@ -69,12 +72,37 @@
                             <table class="table table-striped table-hover table-bordered mb-0">
                                 <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>STT</th>
                                     <th>Ngày</th>
-                                    <th>Thời gian</th>
-                                    <th>Họ và tên khách hàng</th>
-                                    <th>Thông tin mua hàng</th>
-                                    <th>Tổng tiền</th>
+                                    <th>
+                                        <div style="display: flex; justify-content: space-between; align-items: center">
+                                            Thời gian
+                                            <i th:if="${sortValue == 'time'}" class="text-light fa-solid"
+                                               th:classappend="${sortType} ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div style="display: flex; justify-content: space-between; align-items: center">
+                                            Họ và tên khách hàng
+                                            <i th:if="${sortValue == 'customer'}" class="text-light fa-solid"
+                                               th:classappend="${sortType} ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div style="display: flex; justify-content: space-between; align-items: center">
+                                            Thông tin mua hàng
+                                            <i th:if="${sortValue == 'product' or sortValue == 'quantity'}"
+                                               class="text-light fa-solid"
+                                               th:classappend="${sortType} ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div style="display: flex; justify-content: space-between; align-items: center">
+                                            Tổng tiền
+                                            <i th:if="${sortValue == 'amount'}" class="text-light fa-solid"
+                                               th:classappend="${sortType} ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                                        </div>
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -136,12 +164,14 @@
                                     <!-- Hiển thị số trang hiện tại / tổng số trang -->
                                     <li class="page-item active mx-2">
                                     <span class="page-link">
-                                    <span th:text="${currentPage + 1}"></span> / <span th:text="${invoices.totalPages}"></span>
+                                    <span th:text="${currentPage + 1}"></span> / <span
+                                            th:text="${invoices.totalPages}"></span>
                                 </span>
                                     </li>
 
                                     <!-- Nút Tiếp - luôn hiển thị -->
-                                    <li class="page-item" th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
+                                    <li class="page-item"
+                                        th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
                                         <a class="page-link"
                                            th:href="@{/dashboard/business/transaction(page = ${currentPage + 1}, sortValue = ${sortValue}, sortType = ${sortType})}">
                                             <i class="fas fa-chevron-right"></i>
@@ -149,7 +179,8 @@
                                     </li>
 
                                     <!-- Nút Trang cuối - luôn hiển thị -->
-                                    <li class="page-item" th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
+                                    <li class="page-item"
+                                        th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
                                         <a class="page-link"
                                            th:href="@{/dashboard/business/transaction(page = ${invoices.totalPages - 1}, sortValue = ${sortValue}, sortType = ${sortType})}">
                                             Trang cuối

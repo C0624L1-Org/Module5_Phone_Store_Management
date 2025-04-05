@@ -41,11 +41,11 @@
       </li>
 
       <!-- Quản lý khách hàng - Nhân viên bán hàng, Admin -->
-      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">
-        <a th:href="@{/dashboard/admin/customers/list}" class="nav-link text-white">
-          <i class="fas fa-id-card me-2"></i>Quản lý khách hàng
-        </a>
-      </li>
+<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">-->
+<!--        <a th:href="@{/dashboard/admin/customers/list}" class="nav-link text-white">-->
+<!--          <i class="fas fa-id-card me-2"></i>Quản lý khách hàng-->
+<!--        </a>-->
+<!--      </li>-->
 
       <!-- Quản lý nhà cung cấp - Thủ kho, Admin -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
@@ -76,31 +76,27 @@
       </li>
 
       <!-- Quản lý kinh doanh - Thủ kho , Nhân viên kinh doanh, Admin -->
-      <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff', 'SalesStaff')">
+      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">
         <a th:href="@{/dashboard/business/management}" class="nav-link text-white">
           <i class="fas fa-chart-line me-2"></i>Quản lý kinh doanh
         </a>
       </li>
 
       <!-- Xem thông tin hàng hóa - Nhân viên bán hàng, Admin -->
-      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">
-        <a th:href="@{/dashboard/products/view}" class="nav-link text-white">
-          <i class="fas fa-boxes me-2"></i>Xem thông tin hàng hóa
-        </a>
-      </li>
+<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">-->
+<!--        <a th:href="@{/dashboard/products/view}" class="nav-link text-white">-->
+<!--          <i class="fas fa-boxes me-2"></i>Xem thông tin hàng hóa-->
+<!--        </a>-->
+<!--      </li>-->
 
       <!-- Quản lý báo cáo - Admin & Nhân viên kinh doanh -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">
-        <a th:href="@{/sales-report}" class="nav-link text-white">
+        <a th:href="@{/report-home}" class="nav-link text-white">
           <i class="fas fa-file-alt me-2"></i>Quản lý báo cáo
         </a>
       </li>
 
-      <li class="nav-item" sec:authorize="hasAnyRole('Admin')">
-        <a th:href="@{/dashboard/admin/customers/invoice/list}" class="nav-link text-white">
-          <i class="fas fa-boxes me-2"></i>Xem lịch sử mua hàng
-        </a>
-      </li>
+
     </ul>
   </div>
 </aside>

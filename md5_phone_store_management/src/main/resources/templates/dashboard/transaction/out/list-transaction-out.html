@@ -59,6 +59,7 @@
         .table-responsive {
             position: relative;
         }
+
         .table thead th {
             position: sticky;
             top: 0;
@@ -87,7 +88,8 @@
             <div class="container-fluid py-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a>
+                        </li>
                         <li class="breadcrumb-item active" aria-current="page">Giao dịch Xuất kho</li>
                     </ol>
                 </nav>
@@ -111,7 +113,8 @@
                     <!-- Filter section (always visible) -->
                     <div class="card-body border-bottom py-3">
 
-                        <form class="row g-3 flex-nowrap" id="filterForm" th:action="@{/dashboard/admin/transactions/listOut/search}" method="get">
+                        <form class="row g-3 flex-nowrap" id="filterForm"
+                              th:action="@{/dashboard/admin/transactions/listOut/search}" method="get">
                             <div class="col-md-3">
                                 <label for="productName" class="form-label">Tên sản phẩm</label>
                                 <input type="text" class="form-control" id="productName" name="productName"
@@ -137,7 +140,8 @@
                                     <button type="submit" class="btn btn-primary h-100">
                                         <i class="fas fa-search me-1"></i>Tìm kiếm
                                     </button>
-                                    <a th:href="@{/dashboard/admin/transactions/listOut}" class="btn btn-outline-secondary h-100">
+                                    <a th:href="@{/dashboard/admin/transactions/listOut}"
+                                       class="btn btn-outline-secondary h-100">
                                         <i class="fas fa-times-circle me-1"></i>Xóa bộ lọc
                                     </a>
                                 </div>
@@ -156,7 +160,7 @@
                                         <input class="form-check-input" type="checkbox" id="selectAll">
                                     </div>
                                 </th>
-                                <th class="text-center">ID</th>
+                                <th class="text-center">Số thứ tự</th>
                                 <th>Tên Sản phẩm</th>
                                 <th class="text-center">Số lượng</th>
                                 <th class="text-center">Giá</th>
@@ -168,22 +172,28 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr th:each="transaction : ${inventoryTransactions}" data-bs-toggle="collapse"
-                                data-bs-target="#details-[[${transaction.transactionID}]]" aria-expanded="false"
-                                aria-controls="details-[[${transaction.transactionID}]]">
+
+                            <tr th:each="transaction, Stat : ${inventoryTransactions}"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#details-[[${transaction?.transactionID ?: Stat.count}]]"
+                                aria-expanded="false"
+                                aria-controls="#details-[[${transaction?.transactionID ?: Stat.count}]]">
                                 <td>
                                     <div class="form-check d-flex justify-content-center">
                                         <input class="form-check-input transaction-checkbox" type="checkbox"
-                                               th:value="${transaction.transactionID}"
+                                               th:value="${transaction?.transactionID ?: Stat.count}"
                                                th:data-name="${transaction.product?.name ?: 'N/A'}">
                                     </div>
                                 </td>
-                                <td class="text-center" th:text="${transaction.transactionID}"></td>
+                                <td class="text-center" th:text="${Stat.count}"></td>
                                 <td th:text="${transaction.product?.name ?: 'N/A'}"></td>
                                 <td class="text-center" th:text="${transaction.quantity}"></td>
-                                <td class="text-center" th:text="${#numbers.formatDecimal(transaction.purchasePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
-                                <td class="text-center" th:text="${#numbers.formatDecimal(transaction.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
-                                <td class="text-center" th:text="${#temporals.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></td>
+                                <td class="text-center"
+                                    th:text="${#numbers.formatDecimal(transaction.purchasePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td class="text-center"
+                                    th:text="${#numbers.formatDecimal(transaction.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td class="text-center"
+                                    th:text="${#temporals.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></td>
                                 <td class="text-center" th:text="${transaction.employee?.fullName ?: 'N/A'}"></td>
                                 <td class="text-center" th:text="${transaction.supplier?.name ?: 'N/A'}"></td>
                                 <td class="text-center">
@@ -275,28 +285,28 @@
                     </div>
                 </div>
 
-                </div>
-
-<!--                <div class="card shadow-sm mt-4">-->
-<!--                    <div class="card-header bg-light py-3">-->
-<!--                        <h5 class="mb-0 fw-bold">-->
-<!--                            <i class="fas fa-chart-line me-2"></i>Biểu đồ Thống kê Xuất Kho-->
-<!--                        </h5>-->
-<!--                    </div>-->
-<!--                    <div class="card-body">-->
-<!--                        <div class="chart-container">-->
-<!--                            <div class="chart-wrapper">-->
-<!--                                <canvas id="exportChart"></canvas>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-
-
             </div>
+
+            <!--                <div class="card shadow-sm mt-4">-->
+            <!--                    <div class="card-header bg-light py-3">-->
+            <!--                        <h5 class="mb-0 fw-bold">-->
+            <!--                            <i class="fas fa-chart-line me-2"></i>Biểu đồ Thống kê Xuất Kho-->
+            <!--                        </h5>-->
+            <!--                    </div>-->
+            <!--                    <div class="card-body">-->
+            <!--                        <div class="chart-container">-->
+            <!--                            <div class="chart-wrapper">-->
+            <!--                                <canvas id="exportChart"></canvas>-->
+            <!--                            </div>-->
+            <!--                        </div>-->
+            <!--                    </div>-->
+            <!--                </div>-->
+
+
         </div>
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
     </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
 
 <!--    <footer th:replace="~{fragments/footer :: footer}"></footer>-->
 
@@ -404,7 +414,7 @@
         // Initialize monthly totals with zeros and first/last point trackers
         for (let i = 1; i <= 12; i++) {
             monthlyData.set(i, 0);
-            firstLastPointsByMonth[i] = { first: null, last: null };
+            firstLastPointsByMonth[i] = {first: null, last: null};
         }
 
         // Process each transaction row to extract date and quantity
@@ -461,7 +471,7 @@
 
         dailyData.sort((a, b) => a.date - b.date);
 
-        const monthlyTotals = Array.from({ length: 12 }, (_, i) => monthlyData.get(i + 1) || 0);
+        const monthlyTotals = Array.from({length: 12}, (_, i) => monthlyData.get(i + 1) || 0);
 
         // Tạo nhãn tháng với tổng số lượng, ví dụ: "Tháng 1 (50)"
         const monthsWithTotals = monthlyTotals.map((total, index) => `Tháng ${index + 1} (${total})`);
@@ -489,26 +499,26 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        title: { display: true, text: 'Số lượng', font: { size: 16, weight: 'bold' } },
-                        ticks: { font: { size: 14 } }
+                        title: {display: true, text: 'Số lượng', font: {size: 16, weight: 'bold'}},
+                        ticks: {font: {size: 14}}
                     },
                     x: {
-                        title: { display: true, text: 'Thời gian', font: { size: 16, weight: 'bold' } },
-                        ticks: { font: { size: 14 } }
+                        title: {display: true, text: 'Thời gian', font: {size: 16, weight: 'bold'}},
+                        ticks: {font: {size: 14}}
                     }
                 },
                 plugins: {
                     title: {
                         display: true,
                         text: 'Chi tiết số lượng hàng hóa xuất kho theo tháng',
-                        font: { size: 20, weight: 'bold' },
-                        padding: { top: 10, bottom: 20 }
+                        font: {size: 20, weight: 'bold'},
+                        padding: {top: 10, bottom: 20}
                     },
                     legend: {
                         position: 'top',
-                        labels: { font: { size: 14, weight: 'bold' }, padding: 20 }
+                        labels: {font: {size: 14, weight: 'bold'}, padding: 20}
                     },
-                    tooltip: { enabled: false }
+                    tooltip: {enabled: false}
                 },
                 onHover: function (event, elements) {
                     const rect = exportChart.canvas.getBoundingClientRect();
@@ -603,7 +613,7 @@
 
                         const yPosition = yScale.getPixelForValue(point.quantity);
 
-                        pointPositions.push({ x: xPosition, y: yPosition, data: point });
+                        pointPositions.push({x: xPosition, y: yPosition, data: point});
 
                         if (currentMonth !== point.month) {
                             if (currentMonth !== null) {
