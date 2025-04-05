@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -126,16 +127,29 @@
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
 <div class="content-wrapper">
+
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
+
         <!-- Nội dung chính -->
         <div class="content-container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/report-home}">Quản lí báo cáo</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Báo Cáo Bán Hàng</li>
+                    </ol>
+                </ol>
+            </nav>
             <div class="card shadow-sm mb-4">
+
                 <div class="card-header">
-                    <h1 class="mb-0"><i class="fas fa-chart-line me-2"></i>Báo Cáo Doanh Thu</h1>
+                    <h1 class="mb-0"><i class="fas fa-chart-line me-2"></i>Báo Cáo Bán Hàng</h1>
                 </div>
+
                 <div class="card-body">
                     <!-- Form nhập liệu -->
                     <form th:action="@{/sales-report}" method="post" class="row g-3">
@@ -148,7 +162,7 @@
                             <input type="date" id="endDate" name="endDate" th:value="${endDate}" class="form-control" required>
                         </div>
                         <div class="col-md-12 text-center mt-3">
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-search me-2"></i>Tạo Báo Cáo</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-search me-2"></i>Tìm Báo Cáo</button>
                         </div>
                     </form>
 
@@ -225,65 +239,73 @@
     document.addEventListener('DOMContentLoaded', function () {
         /*[# th:if="${showReport}"]*/
         const ctx = document.getElementById('revenueChart').getContext('2d');
-        const customerIds = /*[[${revenueByCustomer.keySet()}]]*/ [];
-        const revenues = /*[[${revenueByCustomer.values()}]]*/ [];
+        // Kiểm tra null và gán giá trị mặc định nếu revenueByCustomer là null
+        const customerIds = /*[[${revenueByCustomer != null ? revenueByCustomer.keySet() : new java.util.HashSet()}]]*/ [];
+        const revenues = /*[[${revenueByCustomer != null ? revenueByCustomer.values() : new java.util.ArrayList()}]]*/ [];
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: customerIds,
-                datasets: [{
-                    label: 'Doanh Thu Theo Khách Hàng (VNĐ)',
-                    data: revenues,
-                    backgroundColor: 'rgba(30, 144, 255, 0.7)',
-                    borderColor: 'rgba(30, 144, 255, 1)',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    barThickness: 30
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value.toLocaleString('vi-VN') + ' VNĐ';
-                            },
-                            font: { size: 12 }
-                        },
-                        grid: { color: '#e9ecef' }
-                    },
-                    x: {
-                        ticks: { font: { size: 12 } },
-                        grid: { display: false }
-                    }
+        // Chỉ vẽ biểu đồ nếu có dữ liệu
+        if (customerIds.length > 0 && revenues.length > 0) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: customerIds,
+                    datasets: [{
+                        label: 'Doanh Thu Theo Khách Hàng (VNĐ)',
+                        data: revenues,
+                        backgroundColor: 'rgba(30, 144, 255, 0.7)',
+                        borderColor: 'rgba(30, 144, 255, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        barThickness: 30
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: { font: { size: 14, weight: 'bold' } }
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('vi-VN') + ' VNĐ';
+                                },
+                                font: { size: 12 }
+                            },
+                            grid: { color: '#e9ecef' }
+                        },
+                        x: {
+                            ticks: { font: { size: 12 } },
+                            grid: { display: false }
+                        }
                     },
-                    tooltip: {
-                        backgroundColor: '#333',
-                        titleFont: { size: 14 },
-                        bodyFont: { size: 12 },
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.raw.toLocaleString('vi-VN') + ' VNĐ';
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { font: { size: 14, weight: 'bold' } }
+                        },
+                        tooltip: {
+                            backgroundColor: '#333',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 12 },
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw.toLocaleString('vi-VN') + ' VNĐ';
+                                }
                             }
                         }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
                     }
-                },
-                animation: {
-                    duration: 1500,
-                    easing: 'easeOutQuart'
                 }
-            }
-        });
+            });
+        } else {
+            // Hiển thị thông báo hoặc để trống nếu không có dữ liệu
+            ctx.canvas.parentNode.innerHTML = '<p class="text-center">Không có dữ liệu để hiển thị biểu đồ.</p>';
+        }
         /*[/]*/
     });
 </script>
 </body>
 </html>
+

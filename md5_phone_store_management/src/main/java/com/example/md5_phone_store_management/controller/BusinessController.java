@@ -18,12 +18,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +43,7 @@ public class BusinessController {
 //    http://localhost:8080/dashboard/business/management
     @GetMapping("/dashboard/business/management")
     public String showManagementPage(Model model, HttpSession session) {
-        return "/business/business-home";
+        return "dashboard/business-management/business-home";
     }
     @GetMapping("/dashboard/products/listToChoose")
     public String search1(Model model,
@@ -86,7 +83,7 @@ public class BusinessController {
             session.removeAttribute("SUCCESS_MESSAGE");
         }
 
-        return "/business/choose-product";
+        return "dashboard/business-management/choose-product";
 
     }
 
@@ -191,7 +188,7 @@ public class BusinessController {
         System.out.println("Before updating: " + productDTO.toString());
         model.addAttribute("productDTO", productDTO);
         model.addAttribute("supplier", supplierService.getSupplierList());
-        return "business/update-retail-price";
+        return "dashboard/business-management/update-retail-price";
     }
 
     @PostMapping("/dashboard/products/update-product-retail-price")
@@ -248,7 +245,7 @@ public class BusinessController {
         model.addAttribute("sortValue", sortValue);
         model.addAttribute("currentPage", page);
 
-        return "business/transaction";
+        return "dashboard/business-management/transaction";
     }
 
     public Page<Invoice> returnSortedInvoicePage(Pageable pageable, boolean sortType, String sortValue) {

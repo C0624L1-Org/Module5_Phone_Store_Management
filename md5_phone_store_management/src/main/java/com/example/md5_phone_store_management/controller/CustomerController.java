@@ -1,18 +1,15 @@
 package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.*;
-import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
 import com.example.md5_phone_store_management.service.CustomerService;
 import com.example.md5_phone_store_management.service.IInvoiceDetailService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
 import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -183,49 +180,9 @@ public class CustomerController {
         return mv;
     }
 
-    @GetMapping("admin/customers/invoice/list")
-    public String invoiceDetailList(Model model, @RequestParam(name = "page",defaultValue="0") int page){
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<InvoiceDetail> invoiceDetailList = invoiceDetailService.findAll(pageable);
 
-        model.addAttribute("invoiceDetailList", invoiceDetailList);
-        return "dashboard/invoice/invoice_detail_list";
-    }
 
-    @GetMapping("admin/customers/invoice/sortName")
-    public String invoiceSortName(Model model, @RequestParam(name = "page",defaultValue="0") int page){
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<InvoiceDetail> invoiceDetailList = invoiceDetailService.sortByCustomerFullName(pageable);
 
-        model.addAttribute("invoiceDetailList", invoiceDetailList);
-        return "dashboard/invoice/invoice_detail_list";
-    }
 
-    @GetMapping("admin/customers/invoice/sortProduct")
-    public String invoiceSortProduct(Model model, @RequestParam(name = "page",defaultValue="0") int page){
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<InvoiceDetail> invoiceDetailList = invoiceDetailService.sortByProductName(pageable);
-
-        model.addAttribute("invoiceDetailList", invoiceDetailList);
-        return "dashboard/invoice/invoice_detail_list";
-    }
-
-    @GetMapping("admin/customers/invoice/sortPrice")
-    public String invoiceSortPrice(Model model, @RequestParam(name = "page",defaultValue="0") int page){
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<InvoiceDetail> invoiceDetailList = invoiceDetailService.sortByPrice(pageable);
-
-        model.addAttribute("invoiceDetailList", invoiceDetailList);
-        return "dashboard/invoice/invoice_detail_list";
-    }
-    // Report
-    @GetMapping("/admin/customer/report")
-    public ModelAndView adminCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page) {
-        ModelAndView mv = new ModelAndView("/dashboard/admin/customers/CustomerReport");
-        List<Customer> allCustomers =customerService.findAllCustomers();
-        mv.addObject("customers", allCustomers);
-        mv.addObject("page", page);
-        return mv;
-    }
 
 }

@@ -1345,7 +1345,6 @@
 
         // Validate fullName
         if (!fullName) {
-            showToast('error', 'Họ và tên không được để trống!');
             document.getElementById('fullNameError').textContent = 'Họ và tên không được để trống!';
             isValid = false;
         } else if (fullName.length > 50) {
@@ -1360,7 +1359,6 @@
 
         // Validate phone
         if (!phone) {
-            showToast('error', 'Số điện thoại không được để trống!');
             document.getElementById('phoneError').textContent = 'Số điện thoại không được để trống!';
             isValid = false;
         } else if (!/^\d{10,15}$/.test(phone)) {
@@ -1371,22 +1369,18 @@
 
         // Validate email
         if (!email) {
-            showToast('error', 'Email không được để trống!');
             document.getElementById('emailError').textContent = 'Email không được để trống!';
             isValid = false;
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            showToast('error', 'Định dạng email không hợp lệ!');
             document.getElementById('emailError').textContent = 'Định dạng email không hợp lệ!';
             isValid = false;
         } else if (email.length > 50) {
-            showToast('error', 'Email không được vượt quá 50 ký tự!');
             document.getElementById('emailError').textContent = 'Email không được vượt quá 50 ký tự!';
             isValid = false;
         }
 
         // Validate address
         if (!address) {
-            showToast('error', 'Địa chỉ không được để trống!');
             document.getElementById('addressError').textContent = 'Địa chỉ không được để trống!';
             isValid = false;
         } else if (address.length > 500) {
