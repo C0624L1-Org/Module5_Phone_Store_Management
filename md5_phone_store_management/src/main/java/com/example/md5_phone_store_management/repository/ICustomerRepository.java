@@ -101,7 +101,7 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
     @Transactional
     @Query(value = 
         "UPDATE customer c " +
-        "SET c.purchaseCount = (SELECT COUNT(DISTINCT i.id) FROM invoice i WHERE i.customer_id = c.customerID AND i.status = 'COMPLETED') " +
+        "SET c.purchaseCount = (SELECT COUNT(DISTINCT i.id) FROM invoices i WHERE i.customer_id = c.customerID AND i.status = 'SUCCESS') " +
         "WHERE c.customerID > 0", 
         nativeQuery = true)
     int synchronizePurchaseCountsFromInvoices();
@@ -111,7 +111,7 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
     @Transactional
     @Query(value = 
         "UPDATE customer c " +
-        "SET c.purchaseCount = (SELECT COUNT(DISTINCT i.id) FROM invoice i WHERE i.customer_id = c.customerID AND i.status = 'COMPLETED') " +
+        "SET c.purchaseCount = (SELECT COUNT(DISTINCT i.id) FROM invoices i WHERE i.customer_id = c.customerID AND i.status = 'SUCCESS') " +
         "WHERE c.customerID = :customerId", 
         nativeQuery = true)
     int synchronizePurchaseCountForCustomer(@Param("customerId") Integer customerId);

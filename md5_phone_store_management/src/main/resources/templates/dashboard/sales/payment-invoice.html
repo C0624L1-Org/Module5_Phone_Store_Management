@@ -177,7 +177,20 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <p><strong>Mã giao dịch:</strong> <span th:text="${transactionId}"></span></p>
-                                    <p><strong>Thời gian thanh toán:</strong> <span th:text="${#dates.format(payDate, 'dd/MM/yyyy HH:mm:ss')}"></span></p>
+                                    <p><strong>Thời gian thanh toán:</strong>
+                                        <!-- Hiển thị ngày thanh toán -->
+                                        <span th:if="${invoice.paymentMethod == T(com.example.md5_phone_store_management.model.PaymentMethod).VNPAY && invoice.payDate != null && !invoice.payDate.isEmpty()}">
+                                        <span th:with="formattedDate=${#strings.substring(invoice.payDate, 6, 8) + '/' + #strings.substring(invoice.payDate, 4, 6) + '/' + #strings.substring(invoice.payDate, 0, 4) + ' ' + #strings.substring(invoice.payDate, 8, 10) + ':' + #strings.substring(invoice.payDate, 10, 12) + ':' + #strings.substring(invoice.payDate, 12, 14)}"
+                                              th:text="${formattedDate}">
+                                        </span>
+                                    </span>
+                                        <span th:if="${invoice.paymentMethod == T(com.example.md5_phone_store_management.model.PaymentMethod).CASH}">
+                                        <span th:text="${#temporals.format(invoice.createdAt, 'dd/MM/yyyy HH:mm:ss')}"></span>
+                                    </span>
+                                        <span th:if="${invoice.paymentMethod == T(com.example.md5_phone_store_management.model.PaymentMethod).VNPAY && (invoice.payDate == null || invoice.payDate.isEmpty())}">
+                                        <span th:text="${#temporals.format(invoice.createdAt, 'dd/MM/yyyy HH:mm:ss')}"></span>
+                                    </span>
+                                    </p>
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>Tổng tiền:</strong> <span th:text="${#numbers.formatInteger(amount,1,'POINT') + ' VND'}"></span></p>

@@ -1,18 +1,12 @@
 package com.example.md5_phone_store_management.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.model.InvoiceStatus;
-import com.example.md5_phone_store_management.model.PaymentMethod;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.Query;
 
 public interface IInvoiceService {
     Invoice saveInvoice(Invoice invoice);

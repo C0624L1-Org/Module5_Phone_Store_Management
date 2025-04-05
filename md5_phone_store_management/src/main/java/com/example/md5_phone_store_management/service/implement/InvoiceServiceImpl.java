@@ -7,18 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.InvoiceDetail;
 import com.example.md5_phone_store_management.model.InvoiceStatus;
-import com.example.md5_phone_store_management.model.PaymentMethod;
 import com.example.md5_phone_store_management.repository.InvoiceRepository;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IInvoiceService;

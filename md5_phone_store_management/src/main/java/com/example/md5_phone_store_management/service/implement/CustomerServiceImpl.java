@@ -59,7 +59,6 @@ public class CustomerServiceImpl implements ICustomerService {
     
     @Override
     public void updatePurchaseCount(Integer customerId, int newCount) {
-        // First try to update using the synchronization method
         try {
             int updatedRows = customerRepository.synchronizePurchaseCountForCustomer(customerId);
             if (updatedRows > 0) {
@@ -96,9 +95,9 @@ public class CustomerServiceImpl implements ICustomerService {
                 System.err.println("Không thể kiểm tra bảng invoices: " + e.getMessage());
             }
             
-            // Sử dụng tên bảng ĐÚNG là invoices (số nhiều)
+            // Sử dụng tên bảng ĐÚNG là invoices (số nhiều) và chỉ đếm hóa đơn SUCCESS
             String sql = "UPDATE customer c SET purchaseCount = " +
-                         "(SELECT COUNT(*) FROM invoices i WHERE i.customer_id = c.customerID)";
+                         "(SELECT COUNT(*) FROM invoices i WHERE i.customer_id = c.customerID AND i.status = 'SUCCESS')";
             
             int count = jdbcTemplate.update(sql);
             System.out.println("Đã đồng bộ hóa purchaseCount cho " + count + " khách hàng (sử dụng JDBC trực tiếp)");
@@ -111,8 +110,8 @@ public class CustomerServiceImpl implements ICustomerService {
             try {
                 System.out.println("Thử phương pháp thay thế...");
                 
-                // Lấy danh sách khách hàng có hóa đơn
-                String customerCountSQL = "SELECT customer_id, COUNT(*) as invoice_count FROM invoices GROUP BY customer_id";
+                // Lấy danh sách khách hàng có hóa đơn thành công
+                String customerCountSQL = "SELECT customer_id, COUNT(*) as invoice_count FROM invoices WHERE status = 'SUCCESS' GROUP BY customer_id";
                 List<Map<String, Object>> customerCounts = jdbcTemplate.queryForList(customerCountSQL);
                 
                 int updatedCount = 0;
@@ -218,8 +217,8 @@ public class CustomerServiceImpl implements ICustomerService {
             if (customers.isEmpty()) {
                 System.out.println("Không tìm thấy khách hàng nào có purchaseCount > 0 từ JPA!");
                 
-                // Tự động cập nhật purchaseCount nếu thấy các đơn hàng
-                String updateSql = "UPDATE customer c SET c.purchaseCount = (SELECT COUNT(*) FROM sales s WHERE s.customer_id = c.customerID) WHERE EXISTS (SELECT 1 FROM sales s WHERE s.customer_id = c.customerID) AND c.purchaseCount = 0;";
+                // Tự động cập nhật purchaseCount nếu thấy các đơn hàng thành công
+                String updateSql = "UPDATE customer c SET c.purchaseCount = (SELECT COUNT(*) FROM invoices s WHERE s.customer_id = c.customerID AND s.status = 'SUCCESS') WHERE EXISTS (SELECT 1 FROM invoices s WHERE s.customer_id = c.customerID AND s.status = 'SUCCESS') AND c.purchaseCount = 0;";
                 try {
                     int updatedRows = jdbcTemplate.update(updateSql);
                     System.out.println("Đã cập nhật purchaseCount cho " + updatedRows + " khách hàng");
