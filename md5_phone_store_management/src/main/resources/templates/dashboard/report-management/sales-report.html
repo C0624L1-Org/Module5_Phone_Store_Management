@@ -127,26 +127,28 @@
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
 <div class="content-wrapper">
+
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
+
         <!-- Nội dung chính -->
         <div class="content-container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/report-home}">Quản lí báo cáo</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Báo Cáo Bán Hàng</li>
+                    </ol>
+                </ol>
+            </nav>
             <div class="card shadow-sm mb-4">
+
                 <div class="card-header">
                     <h1 class="mb-0"><i class="fas fa-chart-line me-2"></i>Báo Cáo Bán Hàng</h1>
                 </div>
-
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a th:href="@{/report-home}">Quản lí báo cáo</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Báo Cáo Bán Hàng</li>
-                        </ol>
-                    </ol>
-                </nav>
 
                 <div class="card-body">
                     <!-- Form nhập liệu -->
