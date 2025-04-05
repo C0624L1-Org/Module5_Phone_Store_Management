@@ -169,9 +169,23 @@
                                     <td th:text="${i.createdAt != null ? #temporals.format(i.createdAt, 'dd-MM-yyyy') : 'Lỗi'}"></td>
                                     <td th:text="${i.createdAt != null ? #temporals.format(i.createdAt, 'HH:mm') : 'Lỗi'}"></td>
                                     <td th:text="${i.customer.fullName}"></td>
-                                    <td><span th:each="detail, loop : ${i.invoiceDetailList}"
-                                              th:text="${detail.quantity + ' ' + detail.product.name + (loop.count == i.invoiceDetailList.size() ? '' : ', ')}"></span>
+<!--                                    <td><span th:each="detail, loop : ${i.invoiceDetailList}"-->
+<!--                                              th:text="${detail.quantity + ' ' + detail.product.name + (loop.count == i.invoiceDetailList.size() ? '' : ', ')}"></span>-->
+<!--                                    </td>-->
+                                    <td>
+  <span style="color: red">(
+    <th:block th:text="${#aggregates.sum(i.invoiceDetailList.![quantity])}"></th:block>
+  )</span>
+                                        <span style="color: red">Gồm : </span>
+                                        <span th:each="detail, loop : ${i.invoiceDetailList}">
+    <span th:text="${detail.product.name}"></span>
+    <span style="color: orange">(</span>
+    <span style="color: orange" th:text="${detail.quantity}"></span>
+    <span style="color: orange">)</span>
+    <span th:if="${!loop.last}">, </span>
+  </span>
                                     </td>
+
                                     <td th:text="${#numbers.formatInteger(i.amount, 1, 'POINT') + 'VND'}"></td>
                                 </tr>
                                 </tbody>
