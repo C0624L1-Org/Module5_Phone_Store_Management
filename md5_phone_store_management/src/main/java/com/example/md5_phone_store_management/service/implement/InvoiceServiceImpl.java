@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -152,6 +153,63 @@ public class InvoiceServiceImpl implements IInvoiceService {
         }
     }
 
+    //sap xep
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithTimeAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithTimeAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithTimeDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithTimeDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithCustomerNameAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithCustomerNameAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithCustomerNameDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithCustomerNameDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithProductNameAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithProductNameAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithProductNameDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithProductNameDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithAmountAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithAmountAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithAmountDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithAmountDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithQuantityAsc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithQuantityAsc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoicesWithQuantityDesc(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoicesWithQuantityDesc(pageable);
+    }
+
+    @Override
+    public Page<Invoice> findAllSuccessInvoices(Pageable pageable) {
+        return invoiceRepository.findAllSuccessInvoices(pageable);
+    }
+
+
     @Override
     @Transactional(readOnly = true)
     public List<Invoice> findByCustomer(Customer customer) {
@@ -199,282 +257,5 @@ public class InvoiceServiceImpl implements IInvoiceService {
             return null;
         }
     }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Invoice> findByStatus(InvoiceStatus status) {
-        try {
-            return invoiceRepository.findByStatus(status);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by status: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Invoice> findByStatus(InvoiceStatus status, Pageable pageable) {
-        try {
-            return invoiceRepository.findByStatus(status, pageable);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by status with pagination: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
-    public Invoice updateStatus(Long invoiceId, InvoiceStatus status) {
-        try {
-            Invoice invoice = findById(invoiceId);
-            if (invoice == null) {
-                throw new IllegalArgumentException("Invoice not found with ID: " + invoiceId);
-            }
-            
-            invoice.setStatus(status);
-            return invoiceRepository.save(invoice);
-        } catch (Exception e) {
-            System.err.println("Error updating invoice status: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Invoice> findByPaymentMethod(PaymentMethod paymentMethod) {
-        try {
-            return invoiceRepository.findByPaymentMethod(paymentMethod);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by payment method: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Invoice> findByPaymentMethod(PaymentMethod paymentMethod, Pageable pageable) {
-        try {
-            return invoiceRepository.findByPaymentMethod(paymentMethod, pageable);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by payment method with pagination: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Invoice> findByEmployee(Employee employee) {
-        try {
-            return invoiceRepository.findByEmployee(employee);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by employee: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Invoice> findByEmployee(Employee employee, Pageable pageable) {
-        try {
-            return invoiceRepository.findByEmployee(employee, pageable);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by employee with pagination: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Invoice> findByEmployeeId(Integer employeeID) {
-        try {
-            return invoiceRepository.findByEmployee_EmployeeID(employeeID);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by employee ID: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Invoice> findByEmployeeId(Integer employeeID, Pageable pageable) {
-        try {
-            return invoiceRepository.findByEmployee_EmployeeID(employeeID, pageable);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by employee ID with pagination: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
-    public Invoice assignEmployee(Long invoiceId, Integer employeeId) {
-        try {
-            Invoice invoice = findById(invoiceId);
-            if (invoice == null) {
-                throw new IllegalArgumentException("Invoice not found with ID: " + invoiceId);
-            }
-            
-            Employee employee = employeeService.getEmployeeById(employeeId);
-            if (employee == null) {
-                throw new IllegalArgumentException("Employee not found with ID: " + employeeId);
-            }
-            
-            invoice.setEmployee(employee);
-            return invoiceRepository.save(invoice);
-        } catch (Exception e) {
-            System.err.println("Error assigning employee to invoice: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Invoice> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate) {
-        try {
-            return invoiceRepository.findByCreatedAtBetween(startDate, endDate);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices between dates: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Invoice> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
-        try {
-            return invoiceRepository.findByCreatedAtBetween(startDate, endDate, pageable);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices between dates with pagination: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Invoice> findByStatusAndPaymentMethod(InvoiceStatus status, PaymentMethod paymentMethod) {
-        try {
-            return invoiceRepository.findByStatusAndPaymentMethod(status, paymentMethod);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by status and payment method: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Invoice> findByStatusAndPaymentMethod(InvoiceStatus status, PaymentMethod paymentMethod, Pageable pageable) {
-        try {
-            return invoiceRepository.findByStatusAndPaymentMethod(status, paymentMethod, pageable);
-        } catch (Exception e) {
-            System.err.println("Error finding invoices by status and payment method with pagination: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Long countByStatus(InvoiceStatus status) {
-        try {
-            return invoiceRepository.countByStatus(status);
-        } catch (Exception e) {
-            System.err.println("Error counting invoices by status: " + e.getMessage());
-            e.printStackTrace();
-            return 0L;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Long countByPaymentMethod(PaymentMethod paymentMethod) {
-        try {
-            return invoiceRepository.countByPaymentMethod(paymentMethod);
-        } catch (Exception e) {
-            System.err.println("Error counting invoices by payment method: " + e.getMessage());
-            e.printStackTrace();
-            return 0L;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Long getTotalRevenue() {
-        try {
-            Long revenue = invoiceRepository.getTotalRevenue();
-            return revenue != null ? revenue : 0L;
-        } catch (Exception e) {
-            System.err.println("Error getting total revenue: " + e.getMessage());
-            e.printStackTrace();
-            return 0L;
-        }
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Long getTotalRevenueBetween(LocalDateTime startDate, LocalDateTime endDate) {
-        try {
-            Long revenue = invoiceRepository.getTotalRevenueBetween(startDate, endDate);
-            return revenue != null ? revenue : 0L;
-        } catch (Exception e) {
-            System.err.println("Error getting total revenue between dates: " + e.getMessage());
-            e.printStackTrace();
-            return 0L;
-        }
-    }
-    
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
-    public Invoice processPayment(Long invoiceId, PaymentMethod paymentMethod) {
-        try {
-            Invoice invoice = findById(invoiceId);
-            if (invoice == null) {
-                throw new IllegalArgumentException("Invoice not found with ID: " + invoiceId);
-            }
-            
-            invoice.setPaymentMethod(paymentMethod);
-            invoice.setStatus(InvoiceStatus.PROCESSING);
-            return invoiceRepository.save(invoice);
-        } catch (Exception e) {
-            System.err.println("Error processing payment: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
-    }
-    
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
-    public Invoice completeInvoice(Long invoiceId, Integer employeeId) {
-        try {
-            Invoice invoice = findById(invoiceId);
-            if (invoice == null) {
-                throw new IllegalArgumentException("Invoice not found with ID: " + invoiceId);
-            }
-            
-            Employee employee = employeeService.getEmployeeById(employeeId);
-            if (employee == null) {
-                throw new IllegalArgumentException("Employee not found with ID: " + employeeId);
-            }
-            
-            invoice.setEmployee(employee);
-            invoice.setStatus(InvoiceStatus.SUCCESS);
-            return invoiceRepository.save(invoice);
-        } catch (Exception e) {
-            System.err.println("Error completing invoice: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
-    }
+
 }

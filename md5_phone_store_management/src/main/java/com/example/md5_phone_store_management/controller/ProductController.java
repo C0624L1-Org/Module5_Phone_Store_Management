@@ -37,182 +37,49 @@ public class ProductController {
     @Autowired
     CloudinaryService cloudinaryService;
 
-    // Tuấn Anh
-    /*@GetMapping("/list")
-    public String index(Model model,
-                        @RequestParam(name = "page", defaultValue = "0", required = false) int page) {
-        Pageable pageable = PageRequest.of(page, 2);
-        Page<Product> listProducts = productService.findAll(pageable);
-        model.addAttribute("listProducts", listProducts);
-        return "dashboard/product/home-product";
-    }*/
+    @GetMapping("/list")
+    public String search1(Model model,
+                          @RequestParam(name = "searchProduct", required = false) String searchProduct,
+                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
+                          @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
+                          @RequestParam(name = "haveRetailPrice", required = false, defaultValue = "yes") String haveRetailPrice, // Thêm tham số mới
+                          @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+                          HttpSession session) {
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<Product> listProducts;
 
-//    @GetMapping("/list")
-//    public String search1(Model model,
-//                          @RequestParam(name = "searchProduct", required = false) String searchProduct,
-//                          @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
-//                          @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
-//                          @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-//                          HttpSession session) {
-//        Pageable pageable = PageRequest.of(page, 5);
-//        Page<Product> listProducts;
-//
-//        if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0)) {
-//            listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePrice(
-//                    searchProduct, searchSupplier, rangePrice, pageable);
-//        } else {
-//            listProducts = productService.findAll(pageable);
-//        }
-//
-//        List<Long> selectedProductIds = (List<Long>) session.getAttribute("selectedProductIds");
-//        if (selectedProductIds == null) {
-//            selectedProductIds = new ArrayList<>();
-//        }
-//
-//        model.addAttribute("listProducts", listProducts);
-//        model.addAttribute("selectedProductIds", selectedProductIds); // Truyền danh sách ID đã chọn
-//        model.addAttribute("searchProduct", searchProduct);
-//        model.addAttribute("searchSupplier", searchSupplier);
-//        model.addAttribute("rangePrice", rangePrice);
-//
-//        String successMessage = (String) session.getAttribute("SUCCESS_MESSAGE");
-//        if (successMessage != null) {
-//            model.addAttribute("message", successMessage);
-//            session.removeAttribute("SUCCESS_MESSAGE");
-//        }
-//
-//        return "dashboard/product/home-product";
-//    }
-@GetMapping("/list")
-public String search1(Model model,
-                      @RequestParam(name = "searchProduct", required = false) String searchProduct,
-                      @RequestParam(name = "searchSupplier", required = false) String searchSupplier,
-                      @RequestParam(name = "rangePrice", required = false) Integer rangePrice,
-                      @RequestParam(name = "haveRetailPrice", required = false, defaultValue = "yes") String haveRetailPrice, // Thêm tham số mới
-                      @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-                      HttpSession session) {
-    Pageable pageable = PageRequest.of(page, 5);
-    Page<Product> listProducts;
-
-    // Điều kiện lọc dựa trên haveRetailPrice
-    if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0) || "no".equals(haveRetailPrice)) {
-        listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(
-                searchProduct, searchSupplier, rangePrice, "no".equals(haveRetailPrice), pageable);
-    } else {
-        listProducts = productService.findAll(pageable); // Mặc định là "Tất cả sản phẩm"
-    }
-
-    List<Long> selectedProductIds = (List<Long>) session.getAttribute("selectedProductIds");
-    if (selectedProductIds == null) {
-        selectedProductIds = new ArrayList<>();
-    }
-
-    // Thêm các thuộc tính vào model
-    model.addAttribute("listProducts", listProducts);
-    model.addAttribute("selectedProductIds", selectedProductIds);
-    model.addAttribute("searchProduct", searchProduct);
-    model.addAttribute("searchSupplier", searchSupplier);
-    model.addAttribute("rangePrice", rangePrice);
-    model.addAttribute("haveRetailPrice", haveRetailPrice); // Trả lại giá trị haveRetailPrice
-
-    String successMessage = (String) session.getAttribute("SUCCESS_MESSAGE");
-    if (successMessage != null) {
-        model.addAttribute("message", successMessage);
-        session.removeAttribute("SUCCESS_MESSAGE");
-    }
-
-    return "dashboard/product/home-product";
-}
-
-
-
-
-    @PostMapping("/update-prices")
-    public String updatePrices(@RequestParam("productIds") List<Long> productIds,
-                               @RequestParam(value = "newPrices", required = false) List<String> newPrices,
-                               @RequestParam(value = "oldPrices", required = false) List<String> oldPrices,
-                               HttpSession session,
-                               RedirectAttributes redirectAttributes) {
-        try {
-            // Kiểm tra kích thước danh sách cơ bản
-            if (productIds == null || productIds.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "Không có sản phẩm nào được chọn!");
-                return "redirect:/dashboard/products/list";
-            }
-
-            // Đảm bảo newPrices và oldPrices không null, nếu null thì tạo danh sách rỗng
-            if (newPrices == null) newPrices = new ArrayList<>();
-            if (oldPrices == null) oldPrices = new ArrayList<>();
-
-            // Điều chỉnh kích thước danh sách nếu cần
-            while (newPrices.size() < productIds.size()) newPrices.add("");
-            while (oldPrices.size() < productIds.size()) oldPrices.add("");
-
-            // Kiểm tra kích thước sau khi điều chỉnh
-            if (productIds.size() != newPrices.size() || productIds.size() != oldPrices.size()) {
-                redirectAttributes.addFlashAttribute("error", "Dữ liệu không hợp lệ!");
-                return "redirect:/dashboard/products/list";
-            }
-
-            StringBuilder successMessage = new StringBuilder("Cập nhật giá cho ");
-            List<String> updatedNames = new ArrayList<>();
-
-            for (int i = 0; i < productIds.size(); i++) {
-                Long productId = productIds.get(i);
-                String newPriceStr = newPrices.get(i);
-                String oldPriceStr = oldPrices.get(i);
-
-                // Xử lý giá cũ
-                Integer oldPrice = null;
-                if (oldPriceStr != null && !oldPriceStr.trim().isEmpty() && !"null".equals(oldPriceStr)) {
-                    try {
-                        oldPrice = Integer.parseInt(oldPriceStr);
-                    } catch (NumberFormatException e) {
-                        oldPrice = null; // Nếu không parse được, coi như không có giá cũ
-                    }
-                }
-
-                // Xử lý giá mới
-                Integer newPrice = null;
-                if (newPriceStr != null && !newPriceStr.trim().isEmpty()) {
-                    try {
-                        newPrice = Integer.parseInt(newPriceStr);
-                        if (newPrice <= 0) newPrice = oldPrice; // Giá mới không hợp lệ thì dùng giá cũ
-                    } catch (NumberFormatException e) {
-                        newPrice = oldPrice; // Nếu không parse được, dùng giá cũ
-                    }
-                } else {
-                    newPrice = oldPrice; // Nếu không điền giá mới, dùng giá cũ
-                }
-
-                Product product = productService.findById(Math.toIntExact(productId));
-                if (product != null) {
-                    // Chỉ cập nhật nếu giá mới khác giá hiện tại hoặc giá hiện tại là null mà giá mới được điền
-                    BigDecimal currentPrice = product.getRetailPrice();
-                    if ((currentPrice == null && newPrice != null) ||
-                            (currentPrice != null && newPrice != null && !currentPrice.equals(BigDecimal.valueOf(newPrice)))) {
-                        product.setRetailPrice(newPrice != null ? BigDecimal.valueOf(newPrice) : null);
-                        productService.save(product);
-                        updatedNames.add(product.getName());
-                    }
-                }
-            }
-
-            if (updatedNames.isEmpty()) {
-                session.setAttribute("SUCCESS_MESSAGE", "Không có thay đổi nào được áp dụng!");
-            } else {
-                successMessage.append(String.join(", ", updatedNames)).append(" thành công!");
-                session.setAttribute("SUCCESS_MESSAGE", successMessage.toString());
-            }
-
-            session.setAttribute("selectedProductIds", new ArrayList<>());
-            return "redirect:/dashboard/products/list";
-
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi khi cập nhật giá bán lẻ: " + e.getMessage());
-            return "redirect:/dashboard/products/list";
+        // Điều kiện lọc dựa trên haveRetailPrice
+        if (searchProduct != null || searchSupplier != null || (rangePrice != null && rangePrice > 0) || "no".equals(haveRetailPrice)) {
+            listProducts = productService.searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(
+                    searchProduct, searchSupplier, rangePrice, "no".equals(haveRetailPrice), pageable);
+        } else {
+            listProducts = productService.findAll(pageable); // Mặc định là "Tất cả sản phẩm"
         }
+
+        List<Long> selectedProductIds = (List<Long>) session.getAttribute("selectedProductIds");
+        if (selectedProductIds == null) {
+            selectedProductIds = new ArrayList<>();
+        }
+
+        // Thêm các thuộc tính vào model
+        model.addAttribute("listProducts", listProducts);
+        model.addAttribute("selectedProductIds", selectedProductIds);
+        model.addAttribute("searchProduct", searchProduct);
+        model.addAttribute("searchSupplier", searchSupplier);
+        model.addAttribute("rangePrice", rangePrice);
+        model.addAttribute("haveRetailPrice", haveRetailPrice); // Trả lại giá trị haveRetailPrice
+
+        String successMessage = (String) session.getAttribute("SUCCESS_MESSAGE");
+        if (successMessage != null) {
+            model.addAttribute("message", successMessage);
+            session.removeAttribute("SUCCESS_MESSAGE");
+        }
+
+        return "dashboard/product/home-product";
     }
+
+
+
 
     // Đình Anh
     @GetMapping("/create-form")
@@ -340,7 +207,7 @@ public String search1(Model model,
 
 
         redirectAttr.addFlashAttribute("messageType", "success");
-        redirectAttr.addFlashAttribute("message", "Đã Thêm mới thành công!");
+        redirectAttr.addFlashAttribute("message", "Đã cập nhật thành công!");
         return "redirect:/dashboard/products/list";
     }
 

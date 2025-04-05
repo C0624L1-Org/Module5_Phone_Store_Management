@@ -207,4 +207,7 @@ public class ProductDTO {
                 ", supplierID=" + supplierID +
                 '}';
     }
+    public String toStringHau() {
+        return "ProductDTO{productID=" + productID + ", retailPrice=" + retailPrice + "}";
+    }
 }
