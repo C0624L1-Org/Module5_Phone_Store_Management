@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -61,11 +62,18 @@ public class ReportController {
 
     @GetMapping("/dashboard/admin/customer/report/filler")
     public ModelAndView fillerCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page,
-                                             @RequestParam(required = false) Gender gender,
+                                             @RequestParam(required = false) String gender,
                                              @RequestParam(required = false) Integer age,
                                              @RequestParam(required = false) Integer minPurchaseCount) {
         ModelAndView mv = new ModelAndView("/dashboard/report-management/CustomerReport");
-        List<Customer> allCustomers = customerServiceImpl.filterCustomers(gender, age, minPurchaseCount);
+        Gender genderEnum = null;
+        if (gender != null && !gender.isBlank()) {
+            genderEnum = Arrays.stream(Gender.values())
+                    .filter(g -> g.name().equalsIgnoreCase(gender))
+                    .findFirst()
+                    .orElse(null);
+        }
+        List<Customer> allCustomers = customerServiceImpl.filterCustomers(genderEnum, age, minPurchaseCount);
         mv.addObject("customers", allCustomers);
         mv.addObject("page", page);
         return mv;

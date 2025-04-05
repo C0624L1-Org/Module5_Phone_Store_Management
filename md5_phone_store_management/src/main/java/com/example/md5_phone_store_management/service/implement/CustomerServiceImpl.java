@@ -307,7 +307,12 @@ public class CustomerServiceImpl implements ICustomerService {
     }
     @Override
    public List<Customer> filterCustomers(Gender gender, Integer age, Integer minPurchaseCount){
-        return customerRepository.findByFilters(gender, age, minPurchaseCount);
+
+        String genderValue=null;
+        if(gender!=null){
+            genderValue = gender.name();
+        }
+        return customerRepository.findByFilters(genderValue, age, minPurchaseCount);
     }
 
 }

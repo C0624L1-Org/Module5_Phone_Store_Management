@@ -19,6 +19,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        .filter-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #6c8deb;
+            box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);
+        }
         .table-card {
             border-radius: 10px;
             overflow: hidden;
@@ -78,32 +90,47 @@
                         <i class="fas fa-boxes me-2 text-success"></i>Xem lịch sử mua hàng
                     </a>
                 </div>-->
-                <div class="filter-container mb-4">
-                    <form th:action="@{/dashboard/admin/customer/report/filler}" method="get" class="d-flex align-items-center">
-                        <div class="col-md-3">
-                            <label for="gender" class="form-label">Giới tính</label>
-                            <select class="form-select" id="gender" name="gender">
-                                <option value="" th:selected="${param.gender == null}">Tất cả</option>
-                                <option th:each="g : ${T(com.example.md5_phone_store_management.model.Gender).values()}"
-                                        th:value="${g.name()}"
-                                th:text="${g.getLabel()}"
-                                th:selected="${param.gender != null and param.gender == g.name()}">
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="age" class="form-label">Tuổi</label>
-                            <input type="number" class="form-control" id="age" name="age" th:value="${param.age}" placeholder="Tuổi...">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="minPurchaseCount" class="form-label">Số lần mua tối thiểu</label>
-                            <input type="number" class="form-control" id="minPurchaseCount" name="minPurchaseCount" th:value="${param.minPurchaseCount}" placeholder="Số lần mua...">
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end gap-2">
-                            <button type="submit" class="btn btn-primary ml-3">Lọc</button>
+                <div class="filter-container">
+                    <form th:action="@{/dashboard/admin/customer/report/filler}" method="get" class="d-flex align-items-center w-100">
+                        <div class="row w-100 g-3">
+                            <div class="col-md-3 col-12">
+                                <label for="gender" class="form-label">Giới tính</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                                    <select class="form-select" id="gender" name="gender">
+                                        <option value="" th:selected="${param.gender == null}">Tất cả</option>
+                                        <option th:each="g : ${T(com.example.md5_phone_store_management.model.Gender).values()}"
+                                                th:value="${g.name()}"
+                                                th:text="${g.getLabel()}"
+                                                th:selected="${param.gender != null and param.gender == g.name()}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <label for="age" class="form-label">Tuổi</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-birthday-cake"></i></span>
+                                    <input type="number" class="form-control" id="age" name="age" th:value="${param.age}" placeholder="Tuổi...">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <label for="minPurchaseCount" class="form-label">Số lần mua tối thiểu</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-shopping-cart"></i></span>
+                                    <input type="number" class="form-control" id="minPurchaseCount" name="minPurchaseCount" th:value="${param.minPurchaseCount}" placeholder="Số lần mua...">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1"><i class="fas fa-filter me-2"></i>Lọc</button>
+                                <a th:href="@{/dashboard/admin/customer/report}" class="btn btn-secondary">
+                                    <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
+
 
                 <div>
                     <div class="table-card">

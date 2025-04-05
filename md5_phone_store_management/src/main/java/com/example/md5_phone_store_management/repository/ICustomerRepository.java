@@ -122,7 +122,7 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
             "AND (:age IS NULL OR YEAR(CURDATE()) - YEAR(c.dob) = :age) " +
             "AND (:minPurchaseCount IS NULL OR c.purchaseCount >= :minPurchaseCount)", nativeQuery = true)
     List<Customer> findByFilters(
-            @Param("gender") Gender gender,
+            @Param("gender") String gender,
             @Param("age") Integer age,
             @Param("minPurchaseCount") Integer minPurchaseCount
     );
