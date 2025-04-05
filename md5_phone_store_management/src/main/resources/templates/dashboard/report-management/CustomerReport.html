@@ -257,8 +257,8 @@
         let group2 = allCustomers.filter(c => c.purchaseCount >= 5 && c.purchaseCount <= 10).length;
         let group3 = allCustomers.filter(c => c.purchaseCount >= 11 && c.purchaseCount <= 15).length;
         let group4 = allCustomers.filter(c => c.purchaseCount > 15).length;
-        let newCustomers = allCustomers.filter(c => c.purchaseCount === 1).length;
-        let oldCustomers = allCustomers.filter(c => c.purchaseCount > 1).length;
+        let newCustomers = allCustomers.filter(c => c.purchaseCount === 0).length;
+        let oldCustomers = allCustomers.filter(c => c.purchaseCount > 0).length;
         new Chart(document.getElementById('genderChart'), {
             type: 'pie',
             data: {

@@ -54,13 +54,7 @@ public class ReportController {
     public ModelAndView adminCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page) {
         ModelAndView mv = new ModelAndView("/dashboard/report-management/CustomerReport");
         List<Customer> allCustomers = customerService.findAllCustomers();
-        List<Customer> fillerCustomers = new ArrayList<>();
-        for (Customer customer : allCustomers) {
-            if (customer.getPurchaseCount() > 0) {
-                fillerCustomers.add(customer);
-            }
-        }
-        mv.addObject("customers", fillerCustomers);
+        mv.addObject("customers", allCustomers);
         mv.addObject("page", page);
         return mv;
     }
@@ -72,14 +66,7 @@ public class ReportController {
                                              @RequestParam(required = false) Integer minPurchaseCount) {
         ModelAndView mv = new ModelAndView("/dashboard/report-management/CustomerReport");
         List<Customer> allCustomers = customerServiceImpl.filterCustomers(gender, age, minPurchaseCount);
-        List<Customer> fillerCustomers = new ArrayList<>();
-        System.out.println("Giá trị gender nhận được: " + gender);
-        for (Customer customer : allCustomers) {
-            if (customer.getPurchaseCount() > 0) {
-                fillerCustomers.add(customer);
-            }
-        }
-        mv.addObject("customers", fillerCustomers);
+        mv.addObject("customers", allCustomers);
         mv.addObject("page", page);
         return mv;
     }
