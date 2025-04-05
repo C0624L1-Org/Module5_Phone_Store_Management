@@ -19,7 +19,22 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-
+        .table-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
+        }
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+            font-weight: 500;
+            border-color: #454d55;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
         .table th, .table td {
             vertical-align: middle;
         }
@@ -67,6 +82,11 @@
                     </h2>
 
                 </div>
+                <div  style="text-align: right;">
+                    <a th:href="@{/dashboard/admin/customers/invoice/list}" class="nav-link text-black">
+                        <i class="fas fa-boxes me-2 text-success"></i>Xem lịch sử mua hàng
+                    </a>
+                </div>
                 <div>
                     <div class="table-card">
                         <div class="table-responsive">
@@ -87,7 +107,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center" id="pagination-container">
+                    <div class="p-3 bg-light border-top d-flex justify-content-end align-items-center" id="pagination-container" >
                         <nav aria-label="Pagination">
                             <ul class="pagination mb-0" id="pagination">
                             </ul>
