@@ -134,35 +134,32 @@
 
                                         <!-- Giá nhập -->
                                         <div class="col-md-4 mb-3">
-                                            <label for="purchasePrice" class="form-label">
+                                            <label for="purchasePriceFormatted" class="form-label">
                                                 <i class="fas fa-money-bill-wave me-2"></i>Giá nhập
                                             </label>
-                                            <input type="number" th:field="*{purchasePrice}" id="purchasePrice" class="form-control"
-                                                   placeholder="0">
-                                            <div class="text-danger" th:if="${#fields.hasErrors('purchasePrice')}"
-                                                 th:text="${#fields.errors('purchasePrice')[0]}"></div>
+                                            <input type="text" id="purchasePriceFormatted" class="form-control" placeholder="0" oninput="formatPrice(this, 'purchasePrice')">
+                                            <input type="hidden" th:field="*{purchasePrice}" id="purchasePrice">
+                                            <div class="text-danger" th:if="${#fields.hasErrors('purchasePrice')}" th:text="${#fields.errors('purchasePrice')[0]}"></div>
                                         </div>
 
                                         <!-- Giá bán -->
                                         <div class="col-md-4 mb-3">
-                                            <label for="sellingPrice" class="form-label">
+                                            <label for="sellingPriceFormatted" class="form-label">
                                                 <i class="fas fa-tags me-2"></i>Giá bán
                                             </label>
-                                            <input type="number" th:field="*{sellingPrice}" id="sellingPrice" class="form-control"
-                                                   placeholder="0">
-                                            <div class="text-danger" th:if="${#fields.hasErrors('sellingPrice')}"
-                                                 th:text="${#fields.errors('sellingPrice')[0]}"></div>
+                                            <input type="text" id="sellingPriceFormatted" class="form-control" placeholder="0" oninput="formatPrice(this, 'sellingPrice')">
+                                            <input type="hidden" th:field="*{sellingPrice}" id="sellingPrice">
+                                            <div class="text-danger" th:if="${#fields.hasErrors('sellingPrice')}" th:text="${#fields.errors('sellingPrice')[0]}"></div>
                                         </div>
 
                                         <!-- Giá bán lẻ -->
                                         <div class="col-md-4 mb-3">
-                                            <label for="retailPrice" class="form-label">
+                                            <label for="retailPriceFormatted" class="form-label">
                                                 <i class="fas fa-store me-2"></i>Giá bán lẻ
                                             </label>
-                                            <input type="number" th:field="*{retailPrice}" id="retailPrice" class="form-control"
-                                                   placeholder="0">
-                                            <div class="text-danger" th:if="${#fields.hasErrors('retailPrice')}"
-                                                 th:text="${#fields.errors('retailPrice')[0]}"></div>
+                                            <input type="text" id="retailPriceFormatted" class="form-control" placeholder="0" oninput="formatPrice(this, 'retailPrice')">
+                                            <input type="hidden" th:field="*{retailPrice}" id="retailPrice">
+                                            <div class="text-danger" th:if="${#fields.hasErrors('retailPrice')}" th:text="${#fields.errors('retailPrice')[0]}"></div>
                                         </div>
 
                                         <!-- CPU -->
@@ -264,6 +261,7 @@
                                                 <option value="">-- Chọn nhà cung cấp --</option>
                                                 <option th:each="sup : ${supplier}" th:value="${sup.supplierID}" th:text="${sup.name}"></option>
                                             </select>
+                                            <div class="text-danger" th:if="${#fields.hasErrors('supplierID')}" th:text="${#fields.errors('supplierID')[0]}"></div>
                                         </div>
                                     </div>
 
@@ -359,6 +357,12 @@
                 }, false)
             })
     })()
+    function formatPrice(input, hiddenInputId) {
+        let value = input.value.replace(/\D/g, "");
+        let formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ")+" VND";
+        input.value = formattedValue;
+        document.getElementById(hiddenInputId).value = value;
+    }
 </script>
 </body>
 </html>

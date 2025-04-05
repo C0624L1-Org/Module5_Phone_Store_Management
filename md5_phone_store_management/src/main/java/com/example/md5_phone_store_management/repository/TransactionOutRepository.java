@@ -87,5 +87,9 @@ public interface TransactionOutRepository extends JpaRepository<InventoryTransac
     @Query(value = "DELETE FROM inventoryTransaction WHERE transactionID = ?1 AND transactionType = 'OUT'", nativeQuery = true)
     void deleteOutTransaction(int id);
 
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM inventoryTransaction WHERE employeeID = ?1", nativeQuery = true)
+    void deleteInventoryTransactionByEmployeeID(Integer employeeID);
 
 }
