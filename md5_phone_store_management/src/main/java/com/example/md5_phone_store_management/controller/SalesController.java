@@ -134,14 +134,13 @@ public class SalesController {
                                  HttpSession session,
                                  Model model) {
         try {
-            // Thêm log để debug
             System.out.println("DEBUG: Đã nhận request thanh toán");
             System.out.println("DEBUG: Invoice: " + invoice);
             System.out.println("DEBUG: Customer ID: " + (invoice.getCustomer() != null ? invoice.getCustomer().getCustomerID() : "null"));
             System.out.println("DEBUG: ProductIDs: " + productIDs);
             System.out.println("DEBUG: Quantities: " + quantities);
             System.out.println("DEBUG: Payment Method: " + paymentMethodStr);
-            System.out.println("DEBUG: Print Invoice: " + printInvoice);
+            System.out.println("DEBUG: Print Invoice: " + printInvoice + " (type: " + (printInvoice != null ? printInvoice.getClass().getName() : "null") + ")");
 
             PaymentMethod paymentMethod;
             try {
@@ -153,6 +152,31 @@ public class SalesController {
 
             invoice.setStatus(InvoiceStatus.PROCESSING);
             invoice.setPaymentMethod(paymentMethod);
+            
+            // Gán nhân viên đang đăng nhập cho hóa đơn ngay khi tạo
+            try {
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                if (authentication != null && authentication.isAuthenticated() &&
+                        !"anonymousUser".equals(authentication.getPrincipal())) {
+                    String username = authentication.getName();
+                    System.out.println("Current authenticated user: " + username);
+
+                    // Tìm nhân viên theo username
+                    Optional<Employee> employeeOpt = iEmployeeService.findByUsername(username);
+                    if (employeeOpt.isPresent()) {
+                        invoice.setEmployee(employeeOpt.get());
+                        System.out.println("Assigned employee: " + employeeOpt.get().getFullName());
+                    } else {
+                        System.err.println("Employee not found for username: " + username);
+                    }
+                } else {
+                    System.err.println("No authentication information found");
+                }
+            } catch (Exception e) {
+                System.err.println("Error assigning employee: " + e.getMessage());
+                e.printStackTrace();
+                // Vẫn tiếp tục xử lý nếu có lỗi khi gán nhân viên
+            }
 
             // Kiểm tra các danh sách
             if (productIDs == null || quantities == null || productIDs.size() != quantities.size()) {
@@ -307,6 +331,7 @@ public class SalesController {
     private String processSuccessfulPayment(Long invoiceId, boolean printInvoice, HttpSession session) {
         try {
             System.out.println("Processing successful payment for invoice ID: " + invoiceId);
+            System.out.println("DEBUG: Print Invoice flag value: " + printInvoice + " (primitive boolean)");
 
             // Lấy thông tin hóa đơn
             Invoice invoice = iInvoiceService.findById(invoiceId);
@@ -340,28 +365,33 @@ public class SalesController {
                 }
             }
 
-            // Lấy thông tin nhân viên đang đăng nhập để gán vào hóa đơn
-            try {
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                if (authentication != null && authentication.isAuthenticated() &&
-                        !"anonymousUser".equals(authentication.getPrincipal())) {
-                    String username = authentication.getName();
-                    System.out.println("Current authenticated user: " + username);
+            // Đảm bảo hóa đơn luôn có thông tin nhân viên xử lý
+            if (invoice.getEmployee() == null) {
+                try {
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    if (authentication != null && authentication.isAuthenticated() &&
+                            !"anonymousUser".equals(authentication.getPrincipal())) {
+                        String username = authentication.getName();
+                        System.out.println("Cập nhật Employee cho hóa đơn - Current authenticated user: " + username);
 
-                    // Tìm nhân viên theo username
-                    Optional<Employee> employeeOpt = iEmployeeService.findByUsername(username);
-                    if (employeeOpt.isPresent()) {
-                        invoice.setEmployee(employeeOpt.get());
-                        System.out.println("Assigned employee: " + employeeOpt.get().getFullName());
+                        // Tìm nhân viên theo username
+                        Optional<Employee> employeeOpt = iEmployeeService.findByUsername(username);
+                        if (employeeOpt.isPresent()) {
+                            invoice.setEmployee(employeeOpt.get());
+                            System.out.println("Assigned employee: " + employeeOpt.get().getFullName() + " to invoice ID: " + invoice.getId());
+                        } else {
+                            System.err.println("Employee not found for username: " + username);
+                        }
                     } else {
-                        System.err.println("Employee not found for username: " + username);
+                        System.err.println("No authentication information found");
                     }
-                } else {
-                    System.err.println("No authentication information found");
+                } catch (Exception e) {
+                    System.err.println("Error assigning employee: " + e.getMessage());
+                    e.printStackTrace();
+                    // Vẫn tiếp tục xử lý, không dừng tiến trình
                 }
-            } catch (Exception e) {
-                System.err.println("Error assigning employee: " + e.getMessage());
-                e.printStackTrace();
+            } else {
+                System.out.println("Invoice already has employee assigned: " + invoice.getEmployee().getFullName());
             }
 
             // Cập nhật số lượng trong kho
@@ -423,8 +453,6 @@ public class SalesController {
                 Customer freshCustomer = iCustomerService.findCustomerById(customer.getCustomerID());
                 if (freshCustomer != null) {
                     int newCount = freshCustomer.getPurchaseCount() + 1;
-                    System.out.println("Đang cập nhật số lượng mua hàng cho khách hàng ID = " + freshCustomer.getCustomerID() +
-                            " từ " + freshCustomer.getPurchaseCount() + " thành " + newCount);
 
                     try {
                         Integer customerId = freshCustomer.getCustomerID();
@@ -620,12 +648,7 @@ public class SalesController {
                             Optional<Employee> employeeOpt = iEmployeeService.findByUsername(username);
                             if (employeeOpt.isPresent()) {
                                 invoice.setEmployee(employeeOpt.get());
-                                System.out.println("Assigned employee: " + employeeOpt.get().getFullName());
-                            } else {
-                                System.err.println("Employee not found for username: " + username);
                             }
-                        } else {
-                            System.err.println("No authentication information found");
                         }
                     } catch (Exception e) {
                         System.err.println("Error assigning employee: " + e.getMessage());
@@ -677,9 +700,31 @@ public class SalesController {
                 // Thanh toán thất bại - cập nhật trạng thái thành FAILED
                 System.out.println("Payment failed with code: " + vnpResponseCode);
                 invoice.setStatus(InvoiceStatus.FAILED);
+                
+                // Đảm bảo hóa đơn thất bại vẫn lưu thông tin nhân viên
+                if (invoice.getEmployee() == null) {
+                    try {
+                        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                        if (authentication != null && authentication.isAuthenticated() &&
+                                !"anonymousUser".equals(authentication.getPrincipal())) {
+                            String username = authentication.getName();
+                            System.out.println("Current authenticated user (failed payment): " + username);
+                            
+                            // Tìm nhân viên theo username
+                            Optional<Employee> employeeOpt = iEmployeeService.findByUsername(username);
+                            if (employeeOpt.isPresent()) {
+                                invoice.setEmployee(employeeOpt.get());
+                                System.out.println("Assigned employee to failed invoice: " + employeeOpt.get().getFullName());
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error assigning employee to failed invoice: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+                
                 iInvoiceService.saveInvoice(invoice);
 
-                session.setAttribute("ERROR_MESSAGE", "Thanh toán thất bại: " + vnpResponseCode);
                 return "redirect:/dashboard/sales/form?error=payment_failed&code=" + vnpResponseCode;
             }
         } catch (Exception e) {
@@ -700,13 +745,16 @@ public class SalesController {
             return "redirect:/dashboard/sales/form?error=invoice_not_found";
         }
 
-        // Thêm thông tin để thực hiện tải xuống tự động
+        System.out.println("DEBUG - Auto-download PDF cho hóa đơn ID: " + invoiceId);
+
         model.addAttribute("invoice", invoice);
         model.addAttribute("transactionId", invoice.getId());
         model.addAttribute("amount", invoice.getAmount());
         model.addAttribute("orderInfo", invoice.getOrderInfo());
         model.addAttribute("autoDownload", true);
         model.addAttribute("downloadUrl", "/dashboard/sales/download-invoice-pdf/" + invoiceId);
+        System.out.println("DEBUG - Đã thiết lập thuộc tính autoDownload: true");
+        System.out.println("DEBUG - Đã thiết lập thuộc tính downloadUrl: " + "/dashboard/sales/download-invoice-pdf/" + invoiceId);
 
         // Sử dụng thông tin từ hóa đơn nếu có, không thì mới dùng giá trị mặc định
         Date paymentDate;
