@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý báo cáo</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+    <style>
+        .content-wrapper {
+            display: flex;
+            min-height: calc(100vh - 56px); /* Trừ chiều cao navbar */
+        }
+
+        .management-section {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+            padding: 2rem;
+            margin: 2rem;
+        }
+
+        .btn-custom {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-blue {
+            background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #1c7430 0%, #28a745 100%);
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, #e65c00 0%, #fd7e14 100%);
+        }
+
+        .btn-custom i {
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+    <!-- Sidebar -->
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <!-- Main content area -->
+    <div class="content-container flex-grow-1">
+        <div class="container py-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">Quản lí báo cáo</li>
+                </ol>
+            </nav>
+
+            <div class="management-section">
+                <h3 class="mb-4">
+                    <i class="fas fa-cogs me-2"></i> Bảng điều khiển quản lý
+                </h3>
+                <a href="/sales-report" class="btn-custom btn-blue">
+                    <i class="fas fa-tags"></i> Báo cáo bán hàng
+                </a>
+                <a href="/dashboard/admin/customer/report" class="btn-custom btn-green">
+                    <i class="fas fa-history"></i> Báo Cáo khách hàng
+                </a>
+                <a href="/dashboard/admin/customers/list" class="btn-custom btn-orange">
+                    <i class="fas fa-users"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
