@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang quản lý Lịch sử mua bán </title>
+    <title>Trang quản lý Lịch sử mua bán</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,7 +20,6 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            border: 1px solid #e9ecef;
         }
 
         .table thead th {
@@ -42,6 +41,14 @@
             background-color: rgba(0, 0, 0, 0.075);
         }
 
+        /* Style for sort buttons */
+        .sort-btn {
+            transition: opacity 0.3s ease;
+        }
+
+        .sort-btn.inactive {
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
@@ -58,6 +65,12 @@
 
         <!-- Main content -->
         <div class="content-container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/dashboard/business/management}">Quản lí kinh doanh</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Quản lý lịch sử mua bán</li>
+                </ol>
+            </nav>
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -65,6 +78,51 @@
                             <i class="fa-solid fa-bars-staggered me-2 text-primary"></i>
                             Quản lý lịch sử mua bán
                         </h2>
+                    </div>
+
+                    <!-- Sort buttons moved above the table -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'time', sortType = ${sortValue != 'time' ? 'true' : !sortType})}"
+                               class="btn btn-primary sort-btn"
+                               th:classappend="${sortValue == 'time' ? (sortType ? 'btn-danger' : 'btn-success') : (sortValue != null && sortValue != '' ? 'inactive' : '')}"
+                               data-sort="time">
+                                <i class="fa-solid fa-clock me-1"></i>
+                                <span th:text="${sortValue == 'time' ? (sortType ? 'Sắp xếp theo thời gian tăng dần' : 'Sắp xếp theo thời gian giảm dần') : 'Sắp xếp theo thời gian'}"></span>
+                            </a>
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'customer', sortType = ${sortValue != 'customer' ? 'true' : !sortType})}"
+                               class="btn btn-primary sort-btn"
+                               th:classappend="${sortValue == 'customer' ? (sortType ? 'btn-danger' : 'btn-success') : (sortValue != null && sortValue != '' ? 'inactive' : '')}"
+                               data-sort="customer">
+                                <i class="fa-solid fa-user me-1"></i>
+                                <span th:text="${sortValue == 'customer' ? (sortType ? 'Sắp xếp theo khách hàng tăng dần' : 'Sắp xếp theo khách hàng giảm dần') : 'Sắp xếp theo khách hàng'}"></span>
+                            </a>
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'product', sortType = ${sortValue != 'product' ? 'true' : !sortType})}"
+                               class="btn btn-primary sort-btn"
+                               th:classappend="${sortValue == 'product' ? (sortType ? 'btn-danger' : 'btn-success') : (sortValue != null && sortValue != '' ? 'inactive' : '')}"
+                               data-sort="product">
+                                <i class="fa-solid fa-box me-1"></i>
+                                <span th:text="${sortValue == 'product' ? (sortType ? 'Sắp xếp theo sản phẩm tăng dần' : 'Sắp xếp theo sản phẩm giảm dần') : 'Sắp xếp theo sản phẩm'}"></span>
+                            </a>
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'quantity', sortType = ${sortValue != 'quantity' ? 'true' : !sortType})}"
+                               class="btn btn-primary sort-btn"
+                               th:classappend="${sortValue == 'quantity' ? (sortType ? 'btn-danger' : 'btn-success') : (sortValue != null && sortValue != '' ? 'inactive' : '')}"
+                               data-sort="quantity">
+                                <i class="fa-solid fa-list-ol me-1"></i>
+                                <span th:text="${sortValue == 'quantity' ? (sortType ? 'Sắp xếp theo số lượng tăng dần' : 'Sắp xếp theo số lượng giảm dần') : 'Sắp xếp theo số lượng'}"></span>
+                            </a>
+                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'amount', sortType = ${sortValue != 'amount' ? 'true' : !sortType})}"
+                               class="btn btn-primary sort-btn"
+                               th:classappend="${sortValue == 'amount' ? (sortType ? 'btn-danger' : 'btn-success') : (sortValue != null && sortValue != '' ? 'inactive' : '')}"
+                               data-sort="amount">
+                                <i class="fa-solid fa-money-bill me-1"></i>
+                                <span th:text="${sortValue == 'amount' ? (sortType ? 'Sắp xếp theo tổng tiền tăng dần' : 'Sắp xếp theo tổng tiền giảm dần') : 'Sắp xếp theo tổng tiền'}"></span>
+                            </a>
+                        </div>
+                        <!-- Reset Sort Button moved to the right -->
+                        <a th:href="@{/dashboard/business/transaction}" class="btn btn-secondary">
+                            <i class="fa-solid fa-times me-1"></i> Xóa sắp xếp
+                        </a>
                     </div>
 
                     <div class="table-card">
@@ -111,76 +169,56 @@
                                     <td th:text="${i.createdAt != null ? #temporals.format(i.createdAt, 'dd-MM-yyyy') : 'Lỗi'}"></td>
                                     <td th:text="${i.createdAt != null ? #temporals.format(i.createdAt, 'HH:mm') : 'Lỗi'}"></td>
                                     <td th:text="${i.customer.fullName}"></td>
-                                    <td><span th:each="detail, loop : ${i.invoiceDetailList}"
-                                              th:text="${detail.quantity + ' ' + detail.product.name + (loop.count == i.invoiceDetailList.size() ? '' : ', ')}"></span>
+<!--                                    <td><span th:each="detail, loop : ${i.invoiceDetailList}"-->
+<!--                                              th:text="${detail.quantity + ' ' + detail.product.name + (loop.count == i.invoiceDetailList.size() ? '' : ', ')}"></span>-->
+<!--                                    </td>-->
+                                    <td>
+  <span style="color: red">(
+    <th:block th:text="${#aggregates.sum(i.invoiceDetailList.![quantity])}"></th:block>
+  )</span>
+                                        <span style="color: red">Gồm : </span>
+                                        <span th:each="detail, loop : ${i.invoiceDetailList}">
+    <span th:text="${detail.product.name}"></span>
+    <span style="color: orange">(</span>
+    <span style="color: orange" th:text="${detail.quantity}"></span>
+    <span style="color: orange">)</span>
+    <span th:if="${!loop.last}">, </span>
+  </span>
                                     </td>
+
                                     <td th:text="${#numbers.formatInteger(i.amount, 1, 'POINT') + 'VND'}"></td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
-                            <!--Sort button-->
-                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'time', sortType = ${sortValue != 'time' ? 'true' : !sortType})}"
-                               class="btn btn-primary">
-                                Sắp xếp theo thời gian
-                            </a>
-                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'customer', sortType = ${sortValue != 'customer' ? 'true' : !sortType})}"
-                               class="btn btn-primary">
-                                Sắp xếp theo khách hàng
-                            </a>
-                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'product', sortType = ${sortValue != 'product' ? 'true' : !sortType})}"
-                               class="btn btn-primary">
-                                Sắp xếp theo sản phẩm
-                            </a>
-                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'quantity', sortType = ${sortValue != 'quantity' ? 'true' : !sortType})}"
-                               class="btn btn-primary">
-                                Sắp xếp theo số lượng
-                            </a>
-                            <a th:href="@{/dashboard/business/transaction(page = '0', sortValue = 'amount', sortType = ${sortValue != 'amount' ? 'true' : !sortType})}"
-                               class="btn btn-primary">
-                                Sắp xếp theo tổng tiền
-                            </a>
-
-                            <!-- Pagination -->
+                        <div class="p-3 bg-light border-top d-flex justify-content-end align-items-center">
+                            <!-- Pagination moved to the right -->
                             <nav aria-label="Pagination">
                                 <ul class="pagination mb-0">
-                                    <!-- Nút Trang đầu - luôn hiển thị -->
                                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                         <a class="page-link"
                                            th:href="@{/dashboard/business/transaction(page = 0, sortValue = ${sortValue}, sortType = ${sortType})}">
                                             Trang đầu
                                         </a>
                                     </li>
-
-                                    <!-- Nút Trước - luôn hiển thị -->
                                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                         <a class="page-link"
                                            th:href="@{/dashboard/business/transaction(page = ${currentPage - 1}, sortValue = ${sortValue}, sortType = ${sortType})}">
                                             <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
-
-                                    <!-- Hiển thị số trang hiện tại / tổng số trang -->
                                     <li class="page-item active mx-2">
-                                    <span class="page-link">
-                                    <span th:text="${currentPage + 1}"></span> / <span
-                                            th:text="${invoices.totalPages}"></span>
-                                </span>
+                                        <span class="page-link">
+                                            <span th:text="${currentPage + 1}"></span> / <span th:text="${invoices.totalPages}"></span>
+                                        </span>
                                     </li>
-
-                                    <!-- Nút Tiếp - luôn hiển thị -->
-                                    <li class="page-item"
-                                        th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
+                                    <li class="page-item" th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
                                         <a class="page-link"
                                            th:href="@{/dashboard/business/transaction(page = ${currentPage + 1}, sortValue = ${sortValue}, sortType = ${sortType})}">
                                             <i class="fas fa-chevron-right"></i>
                                         </a>
                                     </li>
-
-                                    <!-- Nút Trang cuối - luôn hiển thị -->
-                                    <li class="page-item"
-                                        th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
+                                    <li class="page-item" th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
                                         <a class="page-link"
                                            th:href="@{/dashboard/business/transaction(page = ${invoices.totalPages - 1}, sortValue = ${sortValue}, sortType = ${sortType})}">
                                             Trang cuối
@@ -204,5 +242,24 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sortButtons = document.querySelectorAll('.sort-btn');
+        const currentSort = '[[${sortValue}]]'; // Thymeleaf variable for current sort value
+
+        sortButtons.forEach(button => {
+            const sortValue = button.getAttribute('data-sort');
+
+            // If this button is the active sort, remove inactive class
+            if (sortValue === currentSort) {
+                button.classList.remove('inactive');
+            } else if (currentSort) { // Only add inactive if there's a sort applied
+                button.classList.add('inactive');
+            }
+        });
+    });
+</script>
 </body>
 </html>
