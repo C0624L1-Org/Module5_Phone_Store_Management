@@ -1319,7 +1319,7 @@
     // Hàm lưu khách hàng mới
     function saveNewCustomer() {
         console.log("Đang lưu khách hàng mới...");
-        
+
         // Lấy form và dữ liệu
         const form = document.getElementById('newCustomerForm');
         if (!form) {
@@ -1333,13 +1333,13 @@
         const email = document.getElementById('newCustomerEmail').value.trim();
         const address = document.getElementById('newCustomerAddress').value.trim();
         const gender = document.getElementById('newCustomerGender').value;
-        
+
         // Xóa thông báo lỗi cũ
         document.getElementById('fullNameError').textContent = '';
         document.getElementById('phoneError').textContent = '';
         document.getElementById('emailError').textContent = '';
         document.getElementById('addressError').textContent = '';
-        
+
         // Validate theo ràng buộc từ model Customer
         let isValid = true;
 
@@ -1388,7 +1388,7 @@
             document.getElementById('addressError').textContent = 'Địa chỉ không được vượt quá 500 ký tự!';
             isValid = false;
         }
-        
+
         // Nếu có lỗi, dừng lại
         if (!isValid) {
             return;
@@ -1405,11 +1405,11 @@
         };
 
         console.log("Dữ liệu khách hàng:", customerData);
-        
+
         // Hiển thị trạng thái đang xử lý
         saveCustomerBtn.disabled = true;
         saveCustomerBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang lưu...';
-        
+
         // Gửi yêu cầu POST đến API
         fetch('/api/sales/add-customer', {
             method: 'POST',
@@ -1418,70 +1418,79 @@
             },
             body: JSON.stringify(customerData)
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Kết quả lưu khách hàng:", data);
-            
-            // Khôi phục nút
-            saveCustomerBtn.disabled = false;
-            saveCustomerBtn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu khách hàng';
-            
-            if (data.success) {
-                // Hiển thị thông báo thành công
-                showToast('success', data.message || 'Đã thêm khách hàng thành công!');
-                
-                // Đóng modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('newCustomerModal'));
-                if (modal) modal.hide();
-                
-                // Chọn khách hàng vừa tạo
-                selectCustomer(
-                    data.customerId, 
-                    data.fullName, 
-                    customerData.phone, 
-                    customerData.email, 
-                    customerData.address
-                );
-                
-                // Xóa form
-                form.reset();
-            } else {
-                // Hiển thị lỗi từ server
-                showToast('error', data.message || 'Lỗi khi thêm khách hàng!');
+            .then(response => response.json())
+            .then(data => {
+                console.log("Kết quả lưu khách hàng:", data);
 
-                // Xử lý lỗi từ server
-                if (error && error.errors) {
-                    // Hiển thị lỗi cho từng trường
-                    if (error.errors.fullName) {
-                        document.getElementById('fullNameError').textContent = error.errors.fullName;
-                    }
-                    if (error.errors.phone) {
-                        document.getElementById('phoneError').textContent = error.errors.phone;
-                    }
-                    if (error.errors.email) {
-                        document.getElementById('emailError').textContent = error.errors.email;
-                    }
-                    if (error.errors.address) {
-                        document.getElementById('addressError').textContent = error.errors.address;
-                    }
+                // Khôi phục nút
+                saveCustomerBtn.disabled = false;
+                saveCustomerBtn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu khách hàng';
 
-                    // Hiển thị toast với thông báo lỗi chung
-                    showToast('error', 'Vui lòng kiểm tra lại thông tin khách hàng!');
+                if (data.success) {
+                    // Hiển thị thông báo thành công
+                    showToast('success', data.message || 'Đã thêm khách hàng thành công!');
+
+                    // Đóng modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('newCustomerModal'));
+                    if (modal) modal.hide();
+
+                    // Chọn khách hàng vừa tạo
+                    selectCustomer(
+                        data.customerId,
+                        data.fullName,
+                        customerData.phone,
+                        customerData.email,
+                        customerData.address
+                    );
+
+                    // Xóa form
+                    form.reset();
                 } else {
-                    // Hiển thị thông báo lỗi nếu không có chi tiết lỗi từ server
-                    showToast('error', error.message || 'Đã xảy ra lỗi khi tạo khách hàng mới');
+                    // Xử lý các loại lỗi khác nhau
+                    if (data.errors) {
+                        // Hiển thị lỗi validation cho từng trường
+                        if (data.errors.fullName) {
+                            document.getElementById('fullNameError').textContent = data.errors.fullName;
+                        }
+                        if (data.errors.phone) {
+                            document.getElementById('phoneError').textContent = data.errors.phone;
+                        }
+                        if (data.errors.email) {
+                            document.getElementById('emailError').textContent = data.errors.email;
+                        }
+                        if (data.errors.address) {
+                            document.getElementById('addressError').textContent = data.errors.address;
+                        }
+
+                        // Hiển thị toast với thông báo lỗi chung
+                        showToast('error', 'Vui lòng kiểm tra lại thông tin khách hàng!');
+                    } else if (data.message) {
+                        // Xử lý lỗi nghiệp vụ (như trùng số điện thoại hoặc email)
+                        if (data.message.includes("Số điện thoại đã tồn tại")) {
+                            document.getElementById('phoneError').textContent = 'Số điện thoại đã tồn tại trong hệ thống!';
+                            showToast('error', 'Số điện thoại đã tồn tại!');
+                        } else if (data.message.includes("Email đã tồn tại")) {
+                            document.getElementById('emailError').textContent = 'Email đã tồn tại trong hệ thống!';
+                            showToast('error', 'Email đã tồn tại!');
+                        } else {
+                            // Hiển thị thông báo lỗi khác
+                            showToast('error', data.message);
+                        }
+                    } else {
+                        // Hiển thị thông báo lỗi nếu không có chi tiết lỗi từ server
+                        showToast('error', 'Đã xảy ra lỗi khi tạo khách hàng mới');
+                    }
                 }
-            }
-        })
-        .catch(error => {
-            console.error("Lỗi khi thêm khách hàng:", error);
-            
-            // Khôi phục nút
-            saveCustomerBtn.disabled = false;
-            saveCustomerBtn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu khách hàng';
-            
-            // Hiển thị thông báo lỗi
-            showToast('error', 'Lỗi kết nối khi thêm khách hàng: ' + error.message);
-        });
+            })
+            .catch(error => {
+                console.error("Lỗi khi thêm khách hàng:", error);
+
+                // Khôi phục nút
+                saveCustomerBtn.disabled = false;
+                saveCustomerBtn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu khách hàng';
+
+                // Hiển thị thông báo lỗi
+                showToast('error', 'Lỗi kết nối khi thêm khách hàng: ' + error.message);
+            });
     }
 })();

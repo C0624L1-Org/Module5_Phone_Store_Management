@@ -134,15 +134,16 @@
                                 <form th:action="@{/dashboard/products/update-product}" method="post"
                                       th:object="${productDTO}"
                                       enctype="multipart/form-data"
-                                      class="needs-validation" novalidate>
+                                      class="needs-validation"
+                                      id="updateProductForm" data-loading-overlay="true" novalidate>
 
                                     <!-- Hidden fields -->
-                                    <input type="hidden" th:field="*{name}">
                                     <input type="hidden" th:field="*{purchasePrice}">
                                     <input type="hidden" th:field="*{retailPrice}">
                                     <input type="hidden" th:field="*{stockQuantity}">
                                     <input type="hidden" th:field="*{qrCode}">
                                     <input type="hidden" th:field="*{supplierID}">
+                                    <input type="hidden" th:field="*{productID}">
 
                                     <div class="row">
                                         <!-- Tên sản phẩm -->
@@ -279,7 +280,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                    <button type="button" class="btn btn-success" id="confirmUpdate">Xác nhận cập nhật</button>
+                    <button type="button" class="btn btn-success" id="confirmUpdate" data-submit-form="updateProductForm">Xác nhận cập nhật</button>
                 </div>
             </div>
         </div>
@@ -310,6 +311,12 @@
 
 <!-- Nhúng script navbar -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Thêm script xử lý upload ảnh sản phẩm trước thẻ đóng body -->
+<script src="/js/dashboard/product-image-upload.js"></script>
+
+<!-- Thêm script xử lý loading khi submit form -->
+<script src="/js/common/form-submit-overlay.js"></script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
