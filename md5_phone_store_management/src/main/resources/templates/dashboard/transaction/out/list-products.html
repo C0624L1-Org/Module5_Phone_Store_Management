@@ -104,6 +104,27 @@
         <!-- Main content -->
         <div class="content-container">
 
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse/inventory}">Quản lý nhập&xuất</a>
+                    </li>
+                    <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/transactions/listOut}">Giao dịch Xuất kho</a></li>
+                    <li th:if="${action == 'add'}" class="breadcrumb-item active">
+                        <a th:href="@{/dashboard/admin/transactions/new/out/0}"> Thêm mới giao dịch xuất
+                        </a>
+                    </li>
+                    <li th:if="${action == 'edit'}" class="breadcrumb-item active">
+                        <a href="#" onclick="setupBackEditButton(event)">Sửa giao dịch xuất</a>
+                    </li>
+                    <li th:if="${action == 'add'}" class="breadcrumb-item active" aria-current="page">Chọn sản phẩm
+                        thêm
+                    </li>
+                    <li th:if="${action == 'edit'}" class="breadcrumb-item active" aria-current="page">Chọn sản phẩm
+                        sửa
+                    </li>
+                </ol>
+            </nav>
+
             <div class="card shadow-sm">
 
 
