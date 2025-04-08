@@ -141,4 +141,7 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
             "name LIKE CONCAT('%', :keyword, '%')",
             nativeQuery = true)
     Page<Product> searchProductsByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT COALESCE(SUM(id.quantity), 0) FROM InvoiceDetail id")
+    Long countSoldProducts();
 }

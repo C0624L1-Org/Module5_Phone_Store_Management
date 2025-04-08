@@ -62,7 +62,7 @@
       </li>
 
       <!-- Quản lý bán hàng - Nhân viên bán hàng & Nhân viên kinh doanh -->
-      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson', 'SalesStaff')">
+      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">
         <a th:href="@{/dashboard/sales/form}" class="nav-link text-white">
           <i class="fas fa-shopping-cart me-2"></i>Quản lý bán hàng
         </a>

@@ -228,5 +228,7 @@
         public Product findById(Integer id) {
             return productRepository.findByProductID(id);
         }
+
+        @Override public Long countSoldProducts() { return productRepository.countSoldProducts(); }
     
     }

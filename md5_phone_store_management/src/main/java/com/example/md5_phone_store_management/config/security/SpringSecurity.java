@@ -67,9 +67,10 @@ public class SpringSecurity {
                                 "/dashboard/sales/invoice-pdf/**",
                                 "/dashboard/sales/download-invoice-pdf/**").permitAll()
                         .requestMatchers("/dashboard/admin/**").hasAnyRole("Admin", "WarehouseStaff", "SalesPerson")
-                        .requestMatchers("/dashboard/sales/create-customer", "/dashboard/business/**").hasAnyRole("Admin", "SalesPerson")
+                        .requestMatchers("/dashboard/sales/create-customer", "/dashboard/business/**").hasAnyRole("Admin", "SalesStaff")
                         .requestMatchers("/api/create-customer").hasAnyRole("Admin", "SalesPerson", "SalesStaff")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "SalesStaff", "SalesPerson", "WarehouseStaff")
+                        .requestMatchers("/dashboard/sales/form").hasAnyRole("Admin", "SalesStaff")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
