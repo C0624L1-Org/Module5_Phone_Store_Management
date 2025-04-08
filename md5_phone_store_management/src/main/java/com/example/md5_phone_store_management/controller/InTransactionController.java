@@ -67,6 +67,7 @@ public class InTransactionController {
         return modelAndView;
     }
 
+
     @GetMapping("/admin/transactions/listIn/search")
     public ModelAndView searchImportTransactions(
             @RequestParam(name = "productName", required = false) String productName,
@@ -134,6 +135,9 @@ public class InTransactionController {
 
         return "dashboard/transaction/in/create-transaction-in";
     }
+
+
+    
     @GetMapping("/admin/transactions/view/{id}")
 public ModelAndView showEditInTransaction(@PathVariable("id") Integer id) {
         ModelAndView modelAndView = new ModelAndView("dashboard/transaction/in/view-in");
