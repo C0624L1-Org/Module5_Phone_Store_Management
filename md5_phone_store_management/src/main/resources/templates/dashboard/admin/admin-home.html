@@ -1,4 +1,3 @@
-
 <!--<!DOCTYPE html>-->
 <!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
 <!--<head>-->
@@ -142,193 +141,193 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bảng Điều Khiển</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển</title>
 
-  <!-- CSS Libraries -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="/css/fragments/navbar.css">
-  <link rel="stylesheet" href="/css/fragments/sidebar.css">
-  <link rel="stylesheet" href="/css/fragments/footer.css">
-  <link rel="stylesheet" href="/css/common/toast.css">
-  <link rel="stylesheet" href="/css/common/layout.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
 
-  <!-- Inline CSS -->
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f7fa;
-      margin: 0;
-      padding: 0;
-    }
+    <!-- Inline CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+        }
 
-    .content-wrapper {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      padding-top: 90px;
-    }
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: 90px;
+        }
 
-    .dashboard-container {
-      display: flex;
-      flex: 1; /* Chiếm không gian còn lại giữa navbar và footer */
-    }
+        .dashboard-container {
+            display: flex;
+            flex: 1; /* Chiếm không gian còn lại giữa navbar và footer */
+        }
 
-    .dash-container {
-      max-width: 100%;
-      margin: 0 auto;
-      padding: 1rem 2rem; /* Khoảng cách trái/phải và trên/dưới */
-      flex: 1;
-    }
+        .dash-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem 2rem; /* Khoảng cách trái/phải và trên/dưới */
+            flex: 1;
+        }
 
-    /* Sidebar */
-    aside {
-      min-width: 250px;
-      background-color: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+        /* Sidebar */
+        aside {
+            min-width: 250px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    /* Dashboard Cards */
-    .dash-cards-wrapper {
-      display: flex;
-      gap: 20px;
-      flex-wrap: nowrap;
-      margin-bottom: 20px;
-      width: 100%;
-    }
+        /* Dashboard Cards */
+        .dash-cards-wrapper {
+            display: flex;
+            gap: 20px;
+            flex-wrap: nowrap;
+            margin-bottom: 20px;
+            width: 100%;
+        }
 
-    .dash-card {
-      flex: 1;
-      min-width: 0;
-    }
+        .dash-card {
+            flex: 1;
+            min-width: 0;
+        }
 
-    /* Update and Arrow Text */
-    .dash-update-text {
-      font-size: 16px;
-      opacity: 0.9;
-      text-align: center;
-    }
+        /* Update and Arrow Text */
+        .dash-update-text {
+            font-size: 16px;
+            opacity: 0.9;
+            text-align: center;
+        }
 
-    .dash-arrow-text {
-      font-size: 12px;
-      opacity: 0.8;
-    }
+        .dash-arrow-text {
+            font-size: 12px;
+            opacity: 0.8;
+        }
 
-    /* Bottom Section */
-    .dash-bottom-section {
-      display: flex;
-      gap: 20px;
-      width: 100%;
-      position: relative;
-      flex-wrap: wrap;
-    }
+        /* Bottom Section */
+        .dash-bottom-section {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            position: relative;
+            flex-wrap: wrap;
+        }
 
-    .dash-sales-analytics, .dash-updates-profile {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      overflow: hidden;
-      flex: 1;
-    }
+        .dash-sales-analytics, .dash-updates-profile {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            flex: 1;
+        }
 
-    .dash-sales-analytics {
-      flex: 7;
-      min-width: 300px;
-      max-height: 600px;
-    }
+        .dash-sales-analytics {
+            flex: 7;
+            min-width: 300px;
+            max-height: 600px;
+        }
 
-    .dash-updates-profile {
-      flex: 3;
-      min-width: 200px;
-      max-height: 600px;
-    }
+        .dash-updates-profile {
+            flex: 3;
+            min-width: 200px;
+            max-height: 600px;
+        }
 
-    .dash-sales-analytics.hidden, .dash-updates-profile.hidden {
-      width: 0;
-      min-width: 0;
-      padding: 0;
-      margin: 0;
-      opacity: 0;
-      flex: 0;
-      overflow: hidden;
-    }
+        .dash-sales-analytics.hidden, .dash-updates-profile.hidden {
+            width: 0;
+            min-width: 0;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+            flex: 0;
+            overflow: hidden;
+        }
 
-    .dash-sales-analytics.expanded, .dash-updates-profile.expanded {
-      position: absolute;
-      left: 0;
-      right: 0;
-      width: calc(100% - 40px);
-      z-index: 1;
-    }
+        .dash-sales-analytics.expanded, .dash-updates-profile.expanded {
+            position: absolute;
+            left: 0;
+            right: 0;
+            width: calc(100% - 40px);
+            z-index: 1;
+        }
 
-    .dash-sales-analytics h3, .dash-updates-profile h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
-    }
+        .dash-sales-analytics h3, .dash-updates-profile h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
 
-    .dash-sales-analytics p {
-      margin: 0 0 20px;
-      font-size: 12px;
-      color: #666;
-    }
+        .dash-sales-analytics p {
+            margin: 0 0 20px;
+            font-size: 12px;
+            color: #666;
+        }
 
-    .dash-chart-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+        .dash-chart-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-    .dash-chart-controls .dash-zoom {
-      display: flex;
-      gap: 5px;
-    }
+        .dash-chart-controls .dash-zoom {
+            display: flex;
+            gap: 5px;
+        }
 
-    .dash-chart-controls .dash-zoom button {
-      background: #f0f0f0;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+        .dash-chart-controls .dash-zoom button {
+            background: #f0f0f0;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    .dash-chart-controls .dash-show-all {
-      background: #f0f0f0;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+        .dash-chart-controls .dash-show-all {
+            background: #f0f0f0;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    .dash-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
 
-    .dash-expand-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      color: #666;
-    }
+        .dash-expand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+        }
 
-    #salesChart {
-      max-height: 300px;
-      width: 100%;
-    }
-  </style>
+        #salesChart {
+            max-height: 300px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
 <!-- Toast -->
@@ -338,181 +337,190 @@
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
 <div class="content-wrapper">
-  <div class="dashboard-container">
-    <!-- Sidebar -->
-    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-    <!-- Main content area -->
-    <div class="dash-container">
-      <!-- Top Section: Cards -->
-      <div class="dash-cards-wrapper">
-        <div class="dash-card bg-orange-400 text-white rounded-lg shadow-lg p-6" onclick="updateChart('revenue')">
-          <div class="flex justify-between items-center">
-            <div>
-              <div class="text-4xl font-bold">15.000.000đ</div>
-              <div class="text-xl">Doanh Thu</div>
-            </div>
-            <div class="text-4xl">
-              <i class="fas fa-chart-bar"></i>
-            </div>
-          </div>
-          <div class="flex justify-end mb-2">
-            <div class="flex items-center dash-arrow-text">
-              <i class="fas fa-arrow-up mr-1"></i>
-              <span>15.000.000đ</span>
-            </div>
-          </div>
-          <div class="border-t border-white my-4 flex justify-center">
-            <div class="flex flex-col items-center dash-update-text">
-              <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-              <div>07/04/2025</div>
-            </div>
-          </div>
-        </div>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-        <div class="dash-card bg-green-500 text-white rounded-lg shadow-lg p-6" onclick="updateChart('income')">
-          <div class="flex justify-between items-center">
-            <div>
-              <div class="text-4xl font-bold">30.200</div>
-              <div class="text-xl">Sản Phẩm</div>
-            </div>
-            <div class="text-4xl">
-              <i class="fas fa-chart-bar"></i>
-            </div>
-          </div>
-          <div class="flex justify-end mb-2">
-            <div class="flex items-center dash-arrow-text">
-              <i class="fas fa-arrow-up mr-1"></i>
-              <span>30.200</span>
-            </div>
-          </div>
-          <div class="border-t border-white my-4 flex justify-center">
-            <div class="flex flex-col items-center dash-update-text">
-              <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-              <div>07/04/2025</div>
-            </div>
-          </div>
-        </div>
+        <div class="dash-container">
 
-        <div class="dash-card bg-pink-400 text-white rounded-lg shadow-lg p-6" onclick="updateChart('views')">
-          <div class="flex justify-between items-center">
-            <div>
-              <div class="text-4xl font-bold">290+</div>
-              <div class="text-xl">Nhà Cung Cấp</div>
-            </div>
-            <div class="text-4xl">
-              <i class="fas fa-chart-bar"></i>
-            </div>
-          </div>
-          <div class="flex justify-end mb-2">
-            <div class="flex items-center dash-arrow-text">
-              <i class="fas fa-arrow-up mr-1"></i>
-              <span>290+</span>
-            </div>
-          </div>
-          <div class="border-t border-white my-4 flex justify-center">
-            <div class="flex flex-col items-center dash-update-text">
-              <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-              <div>07/04/2025</div>
-            </div>
-          </div>
-        </div>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item active" aria-current="page">Thống kê</li>
+            </ol>
+          </nav>
 
-        <div class="dash-card bg-cyan-400 text-white rounded-lg shadow-lg p-6" onclick="updateChart('tasks')">
-          <div class="flex justify-between items-center">
-            <div>
-              <div class="text-4xl font-bold">145</div>
-              <div class="text-xl">Nhân Viên</div>
-            </div>
-            <div class="text-4xl">
-              <i class="fas fa-chart-bar"></i>
-            </div>
-          </div>
-          <div class="flex justify-end mb-2">
-            <div class="flex items-center dash-arrow-text">
-              <i class="fas fa-arrow-up mr-1"></i>
-              <span>145</span>
-            </div>
-          </div>
-          <div class="border-t border-white my-4 flex justify-center">
-            <div class="flex flex-col items-center dash-update-text">
-              <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-              <div>07/04/2025</div>
-            </div>
-          </div>
-        </div>
+            <!-- Top Section: Cards -->
+            <div class="dash-cards-wrapper">
+                <div class="dash-card bg-orange-400 text-white rounded-lg shadow-lg p-6"
+                     onclick="updateChart('revenue')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-4xl font-bold">15.000.000đ</div>
+                            <div class="text-xl">Doanh Thu</div>
+                        </div>
+                        <div class="text-4xl">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mb-2">
+                        <div class="flex items-center dash-arrow-text">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span>15.000.000đ</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-white my-4 flex justify-center">
+                        <div class="flex flex-col items-center dash-update-text">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
+                            <div>07/04/2025</div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="dash-card bg-purple-500 text-white rounded-lg shadow-lg p-6" onclick="updateChart('downloads')">
-          <div class="flex justify-between items-center">
-            <div>
-              <div class="text-4xl font-bold">500</div>
-              <div class="text-xl">Khách Hàng</div>
-            </div>
-            <div class="text-4xl">
-              <i class="fas fa-chart-bar"></i>
-            </div>
-          </div>
-          <div class="flex justify-end mb-2">
-            <div class="flex items-center dash-arrow-text">
-              <i class="fas fa-arrow-up mr-1"></i>
-              <span>500</span>
-            </div>
-          </div>
-          <div class="border-t border-white my-4 flex justify-center">
-            <div class="flex flex-col items-center dash-update-text">
-              <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-              <div>07/04/2025</div>
-            </div>
-          </div>
-        </div>
-      </div>
+                <div class="dash-card bg-green-500 text-white rounded-lg shadow-lg p-6" onclick="updateChart('income')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-4xl font-bold" th:text="${countProducts}"></div>
+                            <div class="text-xl">Sản Phẩm</div>
+                        </div>
+                        <div class="text-4xl">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mb-2">
+                        <div class="flex items-center dash-arrow-text">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span>30.200</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-white my-4 flex justify-center">
+                        <div class="flex flex-col items-center dash-update-text">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
+                            <div>07/04/2025</div>
+                        </div>
+                    </div>
+                </div>
 
-      <!-- Bottom Section -->
-      <div class="dash-bottom-section">
-        <div class="dash-sales-analytics">
-          <div class="dash-header">
-            <h3 id="chart-title">Biểu Đồ - Tổng Thu Nhập</h3>
-            <button class="dash-expand-btn" onclick="toggleExpand('sales')">
-              <i class="fas fa-expand"></i>
-            </button>
-          </div>
-          <p>Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
-          <div class="dash-chart-controls">
-            <div class="dash-zoom">
-              <button>⟐</button>
-              <button>⟑</button>
-            </div>
-            <button class="dash-show-all">Hiển thị tất cả</button>
-          </div>
-          <canvas id="salesChart"></canvas>
-        </div>
+                <div class="dash-card bg-pink-400 text-white rounded-lg shadow-lg p-6" onclick="updateChart('views')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-4xl font-bold" th:text="${countSuppliers}"></div>
+                            <div class="text-xl">Nhà Cung Cấp</div>
+                        </div>
+                        <div class="text-4xl">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mb-2">
+                        <div class="flex items-center dash-arrow-text">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span>290+</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-white my-4 flex justify-center">
+                        <div class="flex flex-col items-center dash-update-text">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
+                            <div>07/04/2025</div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="dash-updates-profile">
-          <div class="dash-header">
-            <h3>Cập Nhật Mới Nhất</h3>
-            <button class="dash-expand-btn" onclick="toggleExpand('updates')">
-              <i class="fas fa-expand"></i>
-            </button>
-          </div>
-          <div class="update-item">
-            <div class="flex items-center">
-              <p class="text-sm text-gray-600 mr-4">4 giờ trước</p>
-              <div class="icon" style="background-color: #ff8a65;">
-                <i class="fas fa-gift"></i>
-              </div>
+                <div class="dash-card bg-cyan-400 text-white rounded-lg shadow-lg p-6" onclick="updateChart('tasks')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-4xl font-bold" th:text="${countEmployee}"></div>
+                            <div class="text-xl">Nhân Viên</div>
+                        </div>
+                        <div class="text-4xl">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mb-2">
+                        <div class="flex items-center dash-arrow-text">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span>145</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-white my-4 flex justify-center">
+                        <div class="flex flex-col items-center dash-update-text">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
+                            <div>07/04/2025</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-card bg-purple-500 text-white rounded-lg shadow-lg p-6"
+                     onclick="updateChart('downloads')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-4xl font-bold" th:text="${countCustomer}"></div>
+                            <div class="text-xl">Khách Hàng</div>
+                        </div>
+                        <div class="text-4xl">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mb-2">
+                        <div class="flex items-center dash-arrow-text">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span>500</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-white my-4 flex justify-center">
+                        <div class="flex flex-col items-center dash-update-text">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
+                            <div>07/04/2025</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="content">
-              <p class="font-semibold">+ 5 Sản phẩm mới đã được thêm!</p>
-              <p class="text-sm text-gray-500">Chúc mừng!</p>
+
+            <!-- Bottom Section -->
+            <div class="dash-bottom-section">
+                <div class="dash-sales-analytics">
+                    <div class="dash-header">
+                        <h3 id="chart-title">Biểu Đồ - Tổng Thu Nhập</h3>
+                        <button class="dash-expand-btn" onclick="toggleExpand('sales')">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                    <p>Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
+                    <div class="dash-chart-controls">
+                        <div class="dash-zoom">
+                            <button>⟐</button>
+                            <button>⟑</button>
+                        </div>
+                        <button class="dash-show-all">Hiển thị tất cả</button>
+                    </div>
+                    <canvas id="salesChart"></canvas>
+                </div>
+
+                <div class="dash-updates-profile">
+                    <div class="dash-header">
+                        <h3>Cập Nhật Mới Nhất</h3>
+                        <button class="dash-expand-btn" onclick="toggleExpand('updates')">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                    <div class="update-item">
+                        <div class="flex items-center">
+                            <p class="text-sm text-gray-600 mr-4">4 giờ trước</p>
+                            <div class="icon" style="background-color: #ff8a65;">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <p class="font-semibold">+ 5 Sản phẩm mới đã được thêm!</p>
+                            <p class="text-sm text-gray-500">Chúc mừng!</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
 
 <!-- Scripts -->
@@ -520,115 +528,115 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 <script>
-  let salesChart;
+    let salesChart;
 
-  const chartData = {
-    income: {
-      labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-      data: [10000, 15000, 20000, 18000, 25000, 30000, 35000],
-      label: 'Doanh Thu'
-    },
-    views: {
-      labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-      data: [200, 250, 300, 280, 350, 400, 450],
-      label: 'Sản Phẩm'
-    },
-    tasks: {
-      labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-      data: [50, 60, 70, 65, 80, 90, 100],
-      label: 'Nhà Cung Cấp'
-    },
-    downloads: {
-      labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-      data: [300, 350, 400, 380, 450, 500, 550],
-      label: 'Nhân Viên'
-    },
-    revenue: {
-      labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-      data: [5000, 7000, 9000, 11000, 13000, 15000, 17000],
-      label: 'Khách Hàng'
-    }
-  };
-
-  const ctx = document.getElementById('salesChart').getContext('2d');
-  salesChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: chartData.income.labels,
-      datasets: [{
-        label: chartData.income.label,
-        data: chartData.income.data,
-        borderColor: '#ff8a65',
-        backgroundColor: '#ff8a65',
-        fill: false,
-        tension: 0.4,
-        pointBackgroundColor: '#ff8a65',
-        pointBorderColor: '#fff',
-        pointRadius: 5,
-        pointHoverRadius: 7
-      }]
-    },
-    options: {
-      scales: {
-        y: {beginAtZero: true, ticks: {stepSize: 5000}},
-        x: {grid: {display: false}}
-      },
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-          labels: {boxWidth: 0, font: {size: 12}}
+    const chartData = {
+        income: {
+            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
+            data: [10000, 15000, 20000, 18000, 25000, 30000, 35000],
+            label: 'Doanh Thu'
+        },
+        views: {
+            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
+            data: [200, 250, 300, 280, 350, 400, 450],
+            label: 'Sản Phẩm'
+        },
+        tasks: {
+            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
+            data: [50, 60, 70, 65, 80, 90, 100],
+            label: 'Nhà Cung Cấp'
+        },
+        downloads: {
+            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
+            data: [300, 350, 400, 380, 450, 500, 550],
+            label: 'Nhân Viên'
+        },
+        revenue: {
+            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
+            data: [5000, 7000, 9000, 11000, 13000, 15000, 17000],
+            label: 'Khách Hàng'
         }
-      },
-      responsive: true,
-      maintainAspectRatio: false
+    };
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.income.labels,
+            datasets: [{
+                label: chartData.income.label,
+                data: chartData.income.data,
+                borderColor: '#ff8a65',
+                backgroundColor: '#ff8a65',
+                fill: false,
+                tension: 0.4,
+                pointBackgroundColor: '#ff8a65',
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            scales: {
+                y: {beginAtZero: true, ticks: {stepSize: 5000}},
+                x: {grid: {display: false}}
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {boxWidth: 0, font: {size: 12}}
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    function updateChart(type) {
+        const data = chartData[type];
+        salesChart.data.labels = data.labels;
+        salesChart.data.datasets[0].label = data.label;
+        salesChart.data.datasets[0].data = data.data;
+        salesChart.update();
+        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;
     }
-  });
 
-  function updateChart(type) {
-    const data = chartData[type];
-    salesChart.data.labels = data.labels;
-    salesChart.data.datasets[0].label = data.label;
-    salesChart.data.datasets[0].data = data.data;
-    salesChart.update();
-    document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;
-  }
+    function toggleExpand(section) {
+        const salesAnalytics = document.querySelector('.dash-sales-analytics');
+        const updatesProfile = document.querySelector('.dash-updates-profile');
+        const salesExpandBtn = salesAnalytics.querySelector('.dash-expand-btn i');
+        const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');
 
-  function toggleExpand(section) {
-    const salesAnalytics = document.querySelector('.dash-sales-analytics');
-    const updatesProfile = document.querySelector('.dash-updates-profile');
-    const salesExpandBtn = salesAnalytics.querySelector('.dash-expand-btn i');
-    const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');
-
-    if (section === 'sales') {
-      if (salesAnalytics.classList.contains('expanded')) {
-        salesAnalytics.classList.remove('expanded');
-        updatesProfile.classList.remove('hidden');
-        salesExpandBtn.classList.remove('fa-compress');
-        salesExpandBtn.classList.add('fa-expand');
-      } else {
-        salesAnalytics.classList.add('expanded');
-        updatesProfile.classList.add('hidden');
-        salesExpandBtn.classList.remove('fa-expand');
-        salesExpandBtn.classList.add('fa-compress');
-        setTimeout(() => salesChart.resize(), 300);
-      }
-    } else if (section === 'updates') {
-      if (updatesProfile.classList.contains('expanded')) {
-        updatesProfile.classList.remove('expanded');
-        salesAnalytics.classList.remove('hidden');
-        updatesExpandBtn.classList.remove('fa-compress');
-        updatesExpandBtn.classList.add('fa-expand');
-      } else {
-        updatesProfile.classList.add('expanded');
-        salesAnalytics.classList.add('hidden');
-        updatesExpandBtn.classList.remove('fa-expand');
-        updatesExpandBtn.classList.add('fa-compress');
-      }
+        if (section === 'sales') {
+            if (salesAnalytics.classList.contains('expanded')) {
+                salesAnalytics.classList.remove('expanded');
+                updatesProfile.classList.remove('hidden');
+                salesExpandBtn.classList.remove('fa-compress');
+                salesExpandBtn.classList.add('fa-expand');
+            } else {
+                salesAnalytics.classList.add('expanded');
+                updatesProfile.classList.add('hidden');
+                salesExpandBtn.classList.remove('fa-expand');
+                salesExpandBtn.classList.add('fa-compress');
+                setTimeout(() => salesChart.resize(), 300);
+            }
+        } else if (section === 'updates') {
+            if (updatesProfile.classList.contains('expanded')) {
+                updatesProfile.classList.remove('expanded');
+                salesAnalytics.classList.remove('hidden');
+                updatesExpandBtn.classList.remove('fa-compress');
+                updatesExpandBtn.classList.add('fa-expand');
+            } else {
+                updatesProfile.classList.add('expanded');
+                salesAnalytics.classList.add('hidden');
+                updatesExpandBtn.classList.remove('fa-expand');
+                updatesExpandBtn.classList.add('fa-compress');
+            }
+        }
     }
-  }
 
-  window.addEventListener('resize', () => salesChart.resize());
+    window.addEventListener('resize', () => salesChart.resize());
 </script>
 </body>
 </html>

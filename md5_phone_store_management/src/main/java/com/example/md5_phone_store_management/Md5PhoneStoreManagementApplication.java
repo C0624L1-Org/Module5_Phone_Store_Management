@@ -11,3 +11,4 @@ public class Md5PhoneStoreManagementApplication {
     }
 
 }
+//@SpringBootApplication(scanBasePackages = "com.example.md5_phone_store_management")

@@ -31,7 +31,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "customer")
-public class Customer {
+public class Customer  extends AuditableEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer customerID;

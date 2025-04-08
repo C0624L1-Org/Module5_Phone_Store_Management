@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- Lịch sử thay đổi nhân viên -->
+
+
+<!-- Lịch sử thay đổi nhà cung cấp -->
+<div class="card">
+    <div class="card-header">
+        <h5>Lịch sử thay đổi nhà cung cấp</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Thao tác</th>
+                    <th>Thời gian</th>
+                    <th>Mô tả</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="log : ${recentSupplierChanges}">
+                    <td th:text="${log.changeType}"></td>
+                    <td th:text="${#temporals.format(log.changedDate, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${log.newValues}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
