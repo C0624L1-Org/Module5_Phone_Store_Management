@@ -59,4 +59,6 @@ public interface IProductService {
 
     Page<Product> searchProductsByKeyword(String keyword, Pageable pageable);
 
+    Long countSoldProducts();
+
 }
