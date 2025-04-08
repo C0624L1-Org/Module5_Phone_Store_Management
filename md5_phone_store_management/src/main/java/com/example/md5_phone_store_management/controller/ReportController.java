@@ -2,7 +2,9 @@ package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Gender;
+import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.service.CustomerService;
+import com.example.md5_phone_store_management.service.IInvoiceService;
 import com.example.md5_phone_store_management.service.SalesReportService;
 import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
 import org.slf4j.Logger;
@@ -11,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
@@ -22,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,12 +35,16 @@ public class ReportController {
     @Autowired
     private SalesReportService salesReportService;
 
+    @Autowired
+    private CustomerServiceImpl customerServiceImpl;
+
+    @Autowired
+    private IInvoiceService iInvoiceService;
+
     private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
     private CustomerService customerService;
-    @Autowired
-    private CustomerServiceImpl customerServiceImpl;
 
     @GetMapping("/report-home")
     public String showReportHome(Model model) {
@@ -55,6 +59,7 @@ public class ReportController {
         mv.addObject("page", page);
         return mv;
     }
+
     @GetMapping("/dashboard/admin/customer/report/filler")
     public ModelAndView fillerCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page,
                                              @RequestParam(required = false) String gender,
@@ -73,6 +78,39 @@ public class ReportController {
         mv.addObject("page", page);
         return mv;
     }
+
+    @GetMapping("/invoice-pdf/{invoiceId}")
+    public String generateInvoicePdf(@PathVariable Long invoiceId, Model model) {
+        Invoice invoice = iInvoiceService.findById(invoiceId);
+        if (invoice == null) {
+            return "redirect:/dashboard/sales/form?error=invoice_not_found";
+        }
+
+        model.addAttribute("invoice", invoice);
+        model.addAttribute("transactionId", invoice.getId());
+        model.addAttribute("amount", invoice.getAmount());
+        model.addAttribute("orderInfo", invoice.getOrderInfo());
+
+        // Sử dụng thông tin từ hóa đơn nếu có, không thì mới dùng giá trị mặc định
+        Date paymentDate;
+        if (invoice.getPayDate() != null && !invoice.getPayDate().isEmpty()) {
+            try {
+                paymentDate = new java.text.SimpleDateFormat("yyyyMMddHHmmss").parse(invoice.getPayDate());
+            } catch (Exception e) {
+                // Nếu có lỗi chuyển đổi, dùng thời gian hiện tại
+                paymentDate = new Date();
+            }
+        } else {
+            paymentDate = new Date();
+        }
+        model.addAttribute("payDate", paymentDate);
+
+        // Thêm phương thức thanh toán vào model
+        model.addAttribute("paymentMethod", invoice.getPaymentMethod());
+
+        return "dashboard/sales/payment-invoice";
+    }
+
     @GetMapping("/sales-report")
     public String showSalesReportForm(Model model) {
         model.addAttribute("startDate", "1970-01-01");

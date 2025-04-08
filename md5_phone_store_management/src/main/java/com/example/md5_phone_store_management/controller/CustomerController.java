@@ -86,6 +86,8 @@ public class CustomerController {
     /**
      * Xem danh sách hóa đơn của khách hàng
      */
+
+//    @todo controler hóa đơn
     @GetMapping("/admin/customers/{customerID}/invoices")
     public String viewCustomerInvoices(@PathVariable("customerID") Integer customerID,
                                        @RequestParam(defaultValue = "0") int page,

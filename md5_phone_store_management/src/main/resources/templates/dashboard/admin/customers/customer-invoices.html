@@ -180,7 +180,26 @@
                                     </span>
                                 </td>
                                 <td th:text="${#numbers.formatDecimal(invoice.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
-                                <td th:text="${invoice.orderInfo}"></td>
+<!--                                <td th:text="${invoice.orderInfo}"></td>-->
+                                <td>
+    <span th:if="${invoice.invoiceDetailList != null and !invoice.invoiceDetailList.isEmpty()}">
+        <span style="color: red">(
+            <th:block th:text="${#aggregates.sum(invoice.invoiceDetailList.![quantity])}"></th:block>
+        )</span>
+        <span style="color: red">Gồm : </span>
+        <span th:each="detail, loop : ${invoice.invoiceDetailList}">
+            <span th:text="${detail.product.name}"></span>
+            <span style="color: orange">(</span>
+            <span style="color: orange" th:text="${detail.quantity}"></span>
+            <span style="color: orange">)</span>
+            <span th:if="${!loop.last}">, </span>
+        </span>
+    </span>
+                                    <span th:if="${invoice.invoiceDetailList == null or invoice.invoiceDetailList.isEmpty()}">
+        Không có sản phẩm
+    </span>
+                                </td>
+
                                 <td class="text-center">
                                     <span th:if="${invoice.paymentMethod == T(com.example.md5_phone_store_management.model.PaymentMethod).CASH}" class="badge bg-success">
                                         <i class="fas fa-money-bill-wave me-1"></i><span th:text="${invoice.paymentMethod.label}"></span>
@@ -202,10 +221,10 @@
                                 </td>
                                 <td class="text-center">
 
-<!--                                    @Todo: sửa đường dẫn tạo trang tạo giao diện-->
-<!--                                    <a th:href="@{/dashboard/sales/invoice-pdf/{id}(id=${invoice.id})}" class="btn btn-primary btn-sm">-->
-<!--                                        <i class="fas fa-eye me-1"></i>Chi tiết-->
-<!--                                    </a>-->
+
+                                    <a th:href="@{/dashboard/sales/invoice-pdf/{id}(id=${invoice.id})}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Hóa Đơn
+                                    </a>
 
 
                                 </td>
