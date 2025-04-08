@@ -1,9 +1,12 @@
 package com.example.md5_phone_store_management.service;
 
+import com.example.md5_phone_store_management.model.Gender;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.example.md5_phone_store_management.model.Customer;
+
+import java.util.List;
 
 public interface ICustomerService {
     Page<Customer> findAllCustomers(Pageable pageable);
@@ -27,6 +30,7 @@ public interface ICustomerService {
     boolean isEmailExists(String email);
 
     boolean isPhoneExists(String phone);
+    List<Customer> filterCustomers(Gender gender, Integer age, Integer minPurchaseCount);
 
 }
 

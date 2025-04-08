@@ -27,13 +27,12 @@ public class SalesReportService {
 
     private static final DateTimeFormatter VNPAY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
-    public Map<String, Object> generateSalesReport(LocalDateTime startDate, LocalDateTime endDate, String productCode) {
+    public Map<String, Object> generateSalesReport(LocalDateTime startDate, LocalDateTime endDate, Integer productId) {
         String startDateStr = startDate.format(VNPAY_FORMATTER);
         String endDateStr = endDate.format(VNPAY_FORMATTER);
 
         logger.info("Querying invoices from " + startDateStr + " to " + endDateStr);
 
-        // Lấy tất cả hóa đơn trong khoảng thời gian
         List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(startDateStr, endDateStr);
 
         logger.info("Invoices found: " + invoices.size());
@@ -42,11 +41,21 @@ public class SalesReportService {
             return null;
         }
 
-        // Tính tổng số đơn hàng
+        if (productId != null) {
+            invoices = invoices.stream()
+                    .filter(invoice -> invoice.getInvoiceDetailList() != null && invoice.getInvoiceDetailList().stream()
+                            .anyMatch(detail -> detail.getProduct() != null && detail.getProduct().getProductID().equals(productId)))
+                    .collect(Collectors.toList());
+            logger.info("Filtered by productId " + productId + ". Invoices remaining: " + invoices.size());
+            if (invoices.isEmpty()) {
+                logger.warn("No invoices found for productId " + productId);
+                return null;
+            }
+        }
+
         long totalOrders = invoices.size();
         logger.info("Total Orders: " + totalOrders);
 
-        // Tính tổng doanh thu từ InvoiceDetail
         long totalRevenue = invoices.stream()
                 .flatMap(invoice -> {
                     List<InvoiceDetail> details = invoice.getInvoiceDetailList();
@@ -71,7 +80,6 @@ public class SalesReportService {
                 })
                 .sum();
 
-        // Tính tổng số sản phẩm bán ra
         long totalProductsSold = invoices.stream()
                 .flatMap(invoice -> {
                     List<InvoiceDetail> details = invoice.getInvoiceDetailList();
@@ -82,40 +90,43 @@ public class SalesReportService {
                 .mapToLong(InvoiceDetail::getQuantity)
                 .sum();
 
-        // Tính doanh thu theo khách hàng
-        Map<Long, Long> revenueByCustomer = invoices.stream()
-                .filter(invoice -> invoice.getCustomer() != null)
+        Map<Integer, Long> revenueByProduct = invoices.stream()
+                .flatMap(invoice -> {
+                    List<InvoiceDetail> details = invoice.getInvoiceDetailList();
+                    if (details == null || details.isEmpty()) return Stream.empty();
+                    return details.stream();
+                })
+                .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
                 .collect(Collectors.groupingBy(
-                        invoice -> invoice.getCustomer().getCustomerID().longValue(),
-                        Collectors.summingLong(invoice -> {
-                            List<InvoiceDetail> details = invoice.getInvoiceDetailList();
-                            if (details == null || details.isEmpty()) return 0L;
-                            return details.stream()
-                                    .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
-                                    .mapToLong(detail -> {
-                                        BigDecimal sellingPrice = detail.getProduct().getSellingPrice() != null ? detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                        BigDecimal purchasePrice = detail.getProduct().getPurchasePrice() != null ? detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                        BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                                        return revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                    })
-                                    .sum();
-                        })
+                        detail -> detail.getProduct().getProductID(),
+                        Collectors.mapping(
+                                detail -> {
+                                    BigDecimal sellingPrice = detail.getProduct().getSellingPrice() != null ? detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                    BigDecimal purchasePrice = detail.getProduct().getPurchasePrice() != null ? detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                    BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
+                                    return revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                },
+                                Collectors.summingLong(Long::longValue)
+                        )
                 ));
-
-        Map<Long, Long> profitByCustomer = revenueByCustomer;
 
         logger.info("Total Revenue: " + totalRevenue);
         logger.info("Total Products Sold: " + totalProductsSold);
-        logger.info("Revenue by Customer: " + revenueByCustomer);
-        logger.info("Profit by Customer: " + profitByCustomer);
+        logger.info("Revenue by Product: " + revenueByProduct);
 
         Map<String, Object> report = new HashMap<>();
         report.put("totalOrders", totalOrders);
         report.put("totalRevenue", totalRevenue);
         report.put("totalProductsSold", totalProductsSold);
-        report.put("revenueByCustomer", revenueByCustomer);
-        report.put("profitByCustomer", profitByCustomer);
+        report.put("revenueByProduct", revenueByProduct);
 
         return report;
+    }
+
+    public boolean isProductIdValid(Integer productId) {
+        List<Invoice> allInvoices = invoiceRepository.findAll();
+        return allInvoices.stream()
+                .flatMap(invoice -> invoice.getInvoiceDetailList().stream())
+                .anyMatch(detail -> detail.getProduct() != null && detail.getProduct().getProductID().equals(productId));
     }
 }

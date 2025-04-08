@@ -87,6 +87,47 @@
             border-color: #6c8deb;
             box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);
         }
+
+        .search-section form {
+            width: 100%;
+        }
+
+        .search-section .flex-grow-1 {
+            min-width: 0; /* Ngăn overflow */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .search-section form {
+                flex-wrap: wrap; /* Cho phép xuống dòng khi màn hình nhỏ */
+            }
+            .search-section .flex-grow-1 {
+                flex-basis: calc(50% - 1rem); /* 2 cột */
+            }
+            .search-section .d-flex.align-self-end {
+                flex-basis: 100%; /* Nút xuống hàng riêng */
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-section .flex-grow-1 {
+                flex-basis: 100%; /* 1 cột */
+            }
+            .search-section .d-flex.align-self-end {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .search-section .d-flex.align-self-end {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .search-section .d-flex.align-self-end .btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -122,12 +163,6 @@
         <!-- Main content -->
         <div class="content-container">
             <div class="container-fluid py-4">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin}">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Quản lý nhà cung cấp</li>
-                    </ol>
-                </nav>
 
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="mb-0">
@@ -142,52 +177,50 @@
 
                 <!-- Search -->
                 <div class="search-section">
-                    <form action="/dashboard/suppliers" method="get">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label for="name" class="form-label">Tên nhà cung cấp</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-building"></i></span>
-                                    <input type="text" class="form-control" id="name" name="name"
-                                           placeholder="Nhập tên nhà cung cấp" th:value="${name}">
-                                </div>
+                    <form class="d-flex flex-nowrap gap-3 align-items-end" action="/dashboard/suppliers" method="get">
+                        <div class="flex-grow-1">
+                            <label for="name" class="form-label">Tên nhà cung cấp</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                <input type="text" class="form-control" id="name" name="name"
+                                       placeholder="Nhập tên nhà cung cấp" th:value="${name}">
                             </div>
+                        </div>
 
-                            <div class="col-md-3">
-                                <label for="address" class="form-label">Địa chỉ</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                                    <input type="text" class="form-control" id="address" name="address"
-                                           placeholder="Nhập địa chỉ" th:value="${address}">
-                                </div>
+                        <div class="flex-grow-1">
+                            <label for="address" class="form-label">Địa chỉ</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                <input type="text" class="form-control" id="address" name="address"
+                                       placeholder="Nhập địa chỉ" th:value="${address}">
                             </div>
+                        </div>
 
-                            <div class="col-md-3">
-                                <label for="phone" class="form-label">Số điện thoại</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                    <input type="text" class="form-control" id="phone" name="phone"
-                                           placeholder="Nhập số điện thoại" th:value="${phone}">
-                                </div>
+                        <div class="flex-grow-1">
+                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <input type="text" class="form-control" id="phone" name="phone"
+                                       placeholder="Nhập số điện thoại" th:value="${phone}">
                             </div>
+                        </div>
 
-                            <div class="col-md-3">
-                                <label for="email" class="form-label">Email</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                    <input type="text" class="form-control" id="email" name="email"
-                                           placeholder="Nhập email" th:value="${email}">
-                                </div>
+                        <div class="flex-grow-1">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="text" class="form-control" id="email" name="email"
+                                       placeholder="Nhập email" th:value="${email}">
                             </div>
+                        </div>
 
-                            <div class="col-md-12 d-flex justify-content-end gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search me-2"></i>Tìm kiếm
-                                </button>
-                                <a th:href="@{/dashboard/suppliers}" class="btn btn-secondary">
-                                    <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
-                                </a>
-                            </div>
+                        <div class="d-flex gap-2 align-self-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Tìm kiếm
+                            </button>
+                            <a th:href="@{/dashboard/suppliers}" class="btn btn-secondary">
+                                <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -235,9 +268,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- Pagination -->
-                    <div class="p-3 bg-light border-top d-flex justify-content-end align-items-center"
-                         th:if="${totalPages > 1}">
+                    <!-- Pagination - Luôn hiển thị kể cả khi chỉ có 1 trang -->
+                    <div class="p-3 bg-light border-top d-flex justify-content-end align-items-center">
                         <nav aria-label="Page navigation">
                             <ul class="pagination mb-0">
                                 <!-- Nút Trang đầu -->
@@ -255,18 +287,18 @@
                                 <!-- Hiển thị trang hiện tại -->
                                 <li class="page-item active">
                                     <span class="page-link">
-                                        <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPages}"></span>
+                                        <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPages != null ? totalPages : 1}"></span>
                                     </span>
                                 </li>
                                 <!-- Nút Sau -->
-                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1 || totalPages == null} ? 'disabled'">
                                     <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${currentPage + 1}, size=${size})}">
                                         ›
                                     </a>
                                 </li>
                                 <!-- Nút Trang cuối -->
-                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${totalPages - 1}, size=${size})}">
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1 || totalPages == null} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/dashboard/suppliers(name=${name}, address=${address}, phone=${phone}, email=${email}, page=${totalPages != null ? totalPages - 1 : 0}, size=${size})}">
                                         Trang cuối
                                     </a>
                                 </li>

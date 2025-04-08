@@ -33,14 +33,6 @@
         <!-- Main content -->
         <div class="content-container">
             <div class="container-fluid py-4">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/customers/list}">Quản lý khách hàng</a></li>
-                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/customers/list}">Lịch sử hóa đơn</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Hóa đơn thanh toán</li>
-                    </ol>
-                </nav>
                 
                 <div class="card shadow-sm">
                     <div class="card-body text-center py-5">
@@ -50,7 +42,7 @@
                         <h3>Hóa đơn đang được tải xuống...</h3>
                         <p class="text-muted">Nếu quá trình tải xuống không tự động bắt đầu, vui lòng nhấn vào nút bên dưới.</p>
                         <div class="mt-4">
-                            <a th:href="${downloadUrl}" class="btn btn-primary">
+                            <a th:href="${downloadUrl}" id="downloadLink" class="btn btn-primary">
                                 <i class="fas fa-download me-2"></i>Tải xuống hóa đơn
                             </a>
                             <a th:href="@{/dashboard/sales/invoice-pdf/{id}(id=${invoice.id})}" class="btn btn-outline-secondary ms-2">
@@ -74,17 +66,15 @@
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
 <!-- Script tự động tải xuống -->
-<script th:inline="javascript">
-    // Lấy URL tải xuống từ model
-    const downloadUrl = /*[[${downloadUrl}]]*/;
-    
-    // Tự động bắt đầu tải xuống khi trang được tải
-    window.onload = function() {
-        // Đợi 1 giây trước khi bắt đầu tải xuống
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Trang đã tải, chuẩn bị tải xuống...");
         setTimeout(function() {
-            window.location.href = downloadUrl;
+            var downloadLink = document.getElementById('downloadLink');
+            console.log("Bắt đầu tải xuống file...");
+            window.location.href = downloadLink.getAttribute('href');
         }, 1000);
-    };
+    });
 </script>
 
 <!-- Bootstrap JS Bundle with Popper -->

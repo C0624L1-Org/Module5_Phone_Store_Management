@@ -1,8 +1,10 @@
 package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.Customer;
+import com.example.md5_phone_store_management.model.Gender;
 import com.example.md5_phone_store_management.service.CustomerService;
 import com.example.md5_phone_store_management.service.SalesReportService;
+import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +37,8 @@ public class ReportController {
 
     private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-
+    @Autowired
+    private CustomerServiceImpl customerServiceImpl;
     @Autowired
     private CustomerService customerService;
 
@@ -55,6 +60,24 @@ public class ReportController {
         return mv;
     }
 
+    @GetMapping("/dashboard/admin/customer/report/filler")
+    public ModelAndView fillerCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page,
+                                             @RequestParam(required = false) String gender,
+                                             @RequestParam(required = false) Integer age,
+                                             @RequestParam(required = false) Integer minPurchaseCount) {
+        ModelAndView mv = new ModelAndView("/dashboard/report-management/CustomerReport");
+        Gender genderEnum = null;
+        if (gender != null && !gender.isBlank()) {
+            genderEnum = Arrays.stream(Gender.values())
+                    .filter(g -> g.name().equalsIgnoreCase(gender))
+                    .findFirst()
+                    .orElse(null);
+        }
+        List<Customer> allCustomers = customerServiceImpl.filterCustomers(genderEnum, age, minPurchaseCount);
+        mv.addObject("customers", allCustomers);
+        mv.addObject("page", page);
+        return mv;
+    }
 
     @GetMapping("/sales-report")
     public String showSalesReportForm(Model model) {
