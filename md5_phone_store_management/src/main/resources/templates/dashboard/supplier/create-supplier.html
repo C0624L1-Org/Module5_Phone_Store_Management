@@ -120,6 +120,8 @@
                             </div>
 
                             <div class="p-4">
+                                <div th:if="${error}" class="text-danger" th:text="${error}"></div>
+
                                 <form th:action="@{/dashboard/suppliers/create}" method="post" th:object="${supplierDTO}"
                                       class="needs-validation" novalidate id="createSupplierForm">
 
