@@ -95,7 +95,13 @@
         <!-- Main content area -->
         <div class="content-container">
             <div class="container py-4">
-
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/suppliers}">Quản lý nhà cung cấp</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Cập nhật nhà cung cấp</li>
+                    </ol>
+                </nav>
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
                         <div class="form-section mb-4">

@@ -333,7 +333,14 @@
         <!-- Main content area -->
         <div class="content-container">
             <div class="container py-4">
-
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/customers/list}">Quản lý khách
+                            hàng</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Cập nhật khách hàng</li>
+                    </ol>
+                </nav>
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
                         <div class="form-section mb-4">

@@ -157,7 +157,11 @@
         <!-- Main content -->
         <div class="content-container">
             <div class="container-fluid py-4">
-
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item active" aria-current="page">Quản lý nhập&xuất</li>
+                    </ol>
+                </nav>
                 <div class="transaction-boxes">
                     <div class="transaction-box import" th:onclick="|window.location.href='@{/dashboard/admin/transactions/listIn}'|">
                         <h3>Nhập kho</h3>
