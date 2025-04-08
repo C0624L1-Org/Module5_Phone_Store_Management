@@ -56,7 +56,13 @@ public class SupplierService implements ISupplierService {
 
     @Override
     public boolean existsByEmail(String email) {
+
         return supplierRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByPhone(String phone) {
+        return supplierRepository.existsByPhone(phone);
     }
 
     @Override

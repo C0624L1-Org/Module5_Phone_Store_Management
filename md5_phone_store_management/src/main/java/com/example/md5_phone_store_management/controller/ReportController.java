@@ -21,10 +21,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("")
@@ -38,18 +38,14 @@ public class ReportController {
     private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
-    private CustomerServiceImpl customerServiceImpl;
-    @Autowired
     private CustomerService customerService;
-
-
+    @Autowired
+    private CustomerServiceImpl customerServiceImpl;
 
     @GetMapping("/report-home")
     public String showReportHome(Model model) {
         return "dashboard/report-management/report-home";
     }
-
-
 
     @GetMapping("/dashboard/admin/customer/report")
     public ModelAndView adminCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page) {
@@ -59,7 +55,6 @@ public class ReportController {
         mv.addObject("page", page);
         return mv;
     }
-
     @GetMapping("/dashboard/admin/customer/report/filler")
     public ModelAndView fillerCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page,
                                              @RequestParam(required = false) String gender,
@@ -78,7 +73,6 @@ public class ReportController {
         mv.addObject("page", page);
         return mv;
     }
-
     @GetMapping("/sales-report")
     public String showSalesReportForm(Model model) {
         model.addAttribute("startDate", "1970-01-01");
@@ -90,10 +84,15 @@ public class ReportController {
     public String generateSalesReport(
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam(required = false) String productId,
+            @RequestParam(defaultValue = "0") int page, // Thêm tham số page
             Model model) {
+
+        final int PAGE_SIZE = 3; // 3 sản phẩm mỗi trang
 
         model.addAttribute("startDate", startDate != null ? startDate.format(DATE_INPUT_FORMATTER) : "");
         model.addAttribute("endDate", endDate != null ? endDate.format(DATE_INPUT_FORMATTER) : "");
+        model.addAttribute("productId", productId);
 
         if (startDate == null || endDate == null) {
             model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.");
@@ -109,19 +108,57 @@ public class ReportController {
             LocalDateTime startDateTime = startDate.atStartOfDay();
             LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
 
-            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, null);
+            Integer parsedProductId = null;
+            if (productId != null && !productId.trim().isEmpty()) {
+                parsedProductId = Integer.parseInt(productId);
+                if (!salesReportService.isProductIdValid(parsedProductId)) {
+                    model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại.");
+                    return "dashboard/report-management/sales-report";
+                }
+            }
+
+            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, parsedProductId);
             if (report == null) {
-                model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này. Vui lòng nhập lại ngày.");
+                model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này hoặc mã sản phẩm không hợp lệ.");
                 return "dashboard/report-management/sales-report";
             }
+
+            logger.info("Report Data - Total Orders: " + report.get("totalOrders"));
+            logger.info("Report Data - Total Revenue: " + report.get("totalRevenue"));
+            logger.info("Report Data - Total Products Sold: " + report.get("totalProductsSold"));
+            logger.info("Report Data - Revenue by Product: " + report.get("revenueByProduct"));
+            logger.info("Report Data - Product Details: " + report.get("productDetails"));
+
+            // Lấy revenueByProduct và phân trang
+            Map<Integer, Long> revenueByProduct = (Map<Integer, Long>) report.get("revenueByProduct");
+            List<Map.Entry<Integer, Long>> revenueList = revenueByProduct.entrySet().stream()
+                    .collect(Collectors.toList());
+
+            // Tính toán phân trang
+            int totalItems = revenueList.size();
+            int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
+            int startIndex = page * PAGE_SIZE;
+            int endIndex = Math.min(startIndex + PAGE_SIZE, totalItems);
+
+            // Lấy danh sách sản phẩm cho trang hiện tại
+            List<Map.Entry<Integer, Long>> paginatedRevenueList = revenueList.subList(startIndex, endIndex);
+            Map<Integer, Long> paginatedRevenueByProduct = paginatedRevenueList.stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
             model.addAttribute("totalOrders", report.get("totalOrders"));
             model.addAttribute("totalRevenue", report.get("totalRevenue"));
             model.addAttribute("totalProductsSold", report.get("totalProductsSold"));
-            model.addAttribute("revenueByCustomer", report.get("revenueByCustomer"));
-            model.addAttribute("profitByCustomer", report.get("profitByCustomer"));
+            model.addAttribute("revenueByProduct", revenueByProduct); // Giữ nguyên để biểu đồ sử dụng
+            model.addAttribute("paginatedRevenueByProduct", paginatedRevenueByProduct); // Danh sách phân trang
+            model.addAttribute("productDetails", report.get("productDetails"));
             model.addAttribute("showReport", true);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("pageSize", PAGE_SIZE);
 
+        } catch (NumberFormatException e) {
+            model.addAttribute("errorMessage", "Mã sản phẩm phải là số nguyên.");
+            return "dashboard/report-management/sales-report";
         } catch (DateTimeParseException e) {
             logger.error("Error parsing date: " + e.getMessage());
             model.addAttribute("errorMessage", "Ngày không đúng định dạng (yyyy-MM-dd).");
@@ -130,8 +167,4 @@ public class ReportController {
 
         return "dashboard/report-management/sales-report";
     }
-
 }
-
-
-

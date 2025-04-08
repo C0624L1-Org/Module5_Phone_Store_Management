@@ -14,6 +14,7 @@ public interface ISupplierService {
     Page<Supplier> getAllSuppliers(int page, int size);
     Page<Supplier> searchSuppliers(String name, String address, String phone, String email, int page, int size);
     boolean existsByEmail(String email);
+    boolean existsByPhone(String phone);
     long countSuppliers();
 
 }

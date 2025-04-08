@@ -67,6 +67,7 @@ public class InTransactionController {
         return modelAndView;
     }
 
+
     @GetMapping("/admin/transactions/listIn/search")
     public ModelAndView searchImportTransactions(
             @RequestParam(name = "productName", required = false) String productName,
@@ -134,6 +135,9 @@ public class InTransactionController {
 
         return "dashboard/transaction/in/create-transaction-in";
     }
+
+
+    
     @GetMapping("/admin/transactions/view/{id}")
 public ModelAndView showEditInTransaction(@PathVariable("id") Integer id) {
         ModelAndView modelAndView = new ModelAndView("dashboard/transaction/in/view-in");
@@ -142,6 +146,7 @@ public ModelAndView showEditInTransaction(@PathVariable("id") Integer id) {
         modelAndView.addObject("suppliers", supplierService.getSupplierList());
         return modelAndView;
     }
+
     @PostMapping("/admin/transaction/saveNew")
     public String processImport(
             @Valid @ModelAttribute("inventoryTransaction") InventoryTransaction transaction,
@@ -161,15 +166,13 @@ public ModelAndView showEditInTransaction(@PathVariable("id") Integer id) {
         Optional<Product> optionalProduct = Optional.ofNullable(product);
 
         if (optionalProduct.isPresent()) {
-
             product.setStockQuantity(product.getStockQuantity() + transaction.getQuantity());
 
-
-            // Set transaction details
+            // Sử dụng giá cố định từ sản phẩm (đã là BigDecimal)
+            BigDecimal fixedPurchasePrice = product.getPurchasePrice(); // Không cần new BigDecimal
+            transaction.setPurchasePrice(fixedPurchasePrice);
+            transaction.setTotalPrice(fixedPurchasePrice.multiply(BigDecimal.valueOf(transaction.getQuantity())));
             transaction.setProduct(product);
-            transaction.setPurchasePrice(transaction.getPurchasePrice());
-            transaction.setTotalPrice(transaction.getPurchasePrice()
-                    .multiply(BigDecimal.valueOf(transaction.getQuantity())));
             transaction.setTransactionType(TransactionType.IN);
             transaction.setTransactionDate(LocalDateTime.now());
             transaction.setSupplier(product.getSupplier());

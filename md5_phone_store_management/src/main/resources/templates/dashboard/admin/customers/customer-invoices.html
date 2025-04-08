@@ -99,7 +99,13 @@
         <!-- Main content -->
         <div class="content-container">
             <div class="container-fluid py-4">
-
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/admin/customers/list}">Quản lý khách hàng</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Lịch sử hóa đơn</li>
+                    </ol>
+                </nav>
                 <div class="back-button">
                     <a th:href="@{/dashboard/admin/customers/list}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách khách hàng
@@ -195,9 +201,13 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <a th:href="@{/dashboard/sales/invoice-pdf/{id}(id=${invoice.id})}" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-eye me-1"></i>Chi tiết
-                                    </a>
+
+<!--                                    @Todo: sửa đường dẫn tạo trang tạo giao diện-->
+<!--                                    <a th:href="@{/dashboard/sales/invoice-pdf/{id}(id=${invoice.id})}" class="btn btn-primary btn-sm">-->
+<!--                                        <i class="fas fa-eye me-1"></i>Chi tiết-->
+<!--                                    </a>-->
+
+
                                 </td>
                             </tr>
                             </tbody>

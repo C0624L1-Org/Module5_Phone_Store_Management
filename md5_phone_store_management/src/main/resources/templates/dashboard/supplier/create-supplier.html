@@ -100,7 +100,13 @@
         <!-- Main content area -->
         <div class="content-container">
             <div class="container py-4">
-
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/suppliers}">Quản lý nhà cung cấp</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thêm mới nhà cung cấp</li>
+                    </ol>
+                </nav>
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
                         <div class="form-section mb-4">
@@ -113,6 +119,8 @@
                             </div>
 
                             <div class="p-4">
+                                <div th:if="${error}" class="text-danger" th:text="${error}"></div>
+
                                 <form th:action="@{/dashboard/suppliers/create}" method="post" th:object="${supplierDTO}"
                                       class="needs-validation" novalidate id="createSupplierForm">
 

@@ -1,3 +1,4 @@
+
 package com.example.md5_phone_store_management.controller;
 
 import java.io.ByteArrayInputStream;
@@ -777,3 +778,4 @@ public class SalesController {
         return "dashboard/sales/auto-download-invoice";
     }
 }
+
