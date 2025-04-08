@@ -33,6 +33,7 @@ public interface ISupplierRepository extends JpaRepository<Supplier, Integer> {
                                           @Param("phone") String phone, @Param("email") String email, Pageable pageable);
 
     boolean existsByEmail(String email);
+    boolean existsByPhone(String phone);
 
     @Query(value = "SELECT COUNT(*) FROM supplier", nativeQuery = true)
     long countSuppliers();

@@ -62,9 +62,21 @@ public class SupplierController {
             return "dashboard/supplier/create-supplier";
         }
 
+        if(supplierService.existsByEmail(supplierDTO.getEmail())) {
+             model.addAttribute("supplierDTO", supplierDTO);
+             model.addAttribute("error","Email da ton tai");
+            return "dashboard/supplier/create-supplier";
+        }
+        if(supplierService.existsByPhone(supplierDTO.getPhone())) {
+            model.addAttribute("supplierDTO", supplierDTO);
+            model.addAttribute("error","Phone da ton tai");
+            return "dashboard/supplier/create-supplier";
+        }
+
         Supplier supplier = new Supplier();
         BeanUtils.copyProperties(supplierDTO, supplier);
         supplierService.saveSupplier(supplier);
+        model.addAttribute("error", "");
 
         return "redirect:/dashboard/suppliers";
     }

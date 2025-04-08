@@ -76,7 +76,7 @@ public class PDFExportService {
             try {
                 // Tải font từ classpath resource stream
                 System.out.println("Bắt đầu tải font...");
-                
+
                 // Kiểm tra nếu resourceLoader không null (đã được inject bởi Spring)
                 if (resourceLoader != null) {
                     try {
@@ -108,7 +108,7 @@ public class PDFExportService {
                     ex.printStackTrace();
                 }
             }
-            
+
             // Kiểm tra nếu baseFont vẫn null sau tất cả các nỗ lực, sử dụng font mặc định
             if (baseFont == null) {
                 try {
@@ -119,10 +119,10 @@ public class PDFExportService {
                     System.out.println("Không thể tải bất kỳ font nào: " + ex.getMessage());
                 }
             }
-            
+
             // Hàm tạo font với giảm độ đậm
             final int SEMI_BOLD_ALPHA = 200;
-            
+
             // Tạo font từ BaseFont với hỗ trợ Unicode
             Font titleFont = new Font(baseFont, 18, Font.BOLD, new BaseColor(0, 0, 0, SEMI_BOLD_ALPHA));
             Font subtitleFont = new Font(baseFont, 12, Font.NORMAL, BaseColor.DARK_GRAY);
@@ -133,7 +133,7 @@ public class PDFExportService {
             Font redBoldFont = new Font(baseFont, 12, Font.BOLD, new BaseColor(
                 redColor.getRed(), redColor.getGreen(), redColor.getBlue(), SEMI_BOLD_ALPHA));
             Font signatureFont = new Font(baseFont, 12, Font.BOLD, new BaseColor(0, 0, 0, SEMI_BOLD_ALPHA));
-            
+
             // Font cho watermark
             Font watermarkFont = new Font(baseFont, 30, Font.NORMAL, BaseColor.LIGHT_GRAY);
 
@@ -147,16 +147,16 @@ public class PDFExportService {
             gState.setFillOpacity(0.09f); // Giảm độ đậm của watermark
             canvas.saveState();
             canvas.setGState(gState);
-            
+
             // Thêm watermark theo đường chéo
             for (int i = 0; i < 5; i++) {
                 for (int j = 0; j < 5; j++) {
-                    ColumnText.showTextAligned(canvas, Element.ALIGN_CENTER, 
-                        new Phrase("Phone Store", watermarkFont), 
+                    ColumnText.showTextAligned(canvas, Element.ALIGN_CENTER,
+                        new Phrase("Phone Store", watermarkFont),
                         100 + j * 150, 100 + i * 150, 45);
                 }
             }
-            
+
             canvas.restoreState();
 
             // Tiêu đề hóa đơn
@@ -171,7 +171,7 @@ public class PDFExportService {
 
             // Thêm khoảng trống
             document.add(new Paragraph(" "));
-            
+
             // Format tiền tệ
             DecimalFormat formatter = new DecimalFormat("#,###");
 
@@ -207,13 +207,13 @@ public class PDFExportService {
             Paragraph leftInfoParagraph = new Paragraph();
             leftInfoParagraph.add(new Phrase("Mã giao dịch: ", normalBold));
             leftInfoParagraph.add(new Phrase("#" + invoice.getId() + "\n", normalFont));
-            
+
             leftInfoParagraph.add(new Phrase("Thời gian thanh toán: ", normalBold));
             leftInfoParagraph.add(new Phrase(formattedDate + "\n", normalFont));
-            
+
             leftInfoParagraph.add(new Phrase("Số tiền: ", normalBold));
             leftInfoParagraph.add(new Phrase(formatter.format(invoice.getAmount()) + " VND\n", normalFont));
-            
+
             leftInfoParagraph.add(new Phrase("Nội dung: ", normalBold));
             leftInfoParagraph.add(new Phrase("Thanh toán đơn hàng #" + invoice.getId(), normalFont));
 
@@ -229,10 +229,10 @@ public class PDFExportService {
             Paragraph rightInfoParagraph = new Paragraph();
             rightInfoParagraph.add(new Phrase("Phương thức thanh toán: ", normalBold));
             rightInfoParagraph.add(new Phrase(invoice.getPaymentMethod().getLabel() + "\n", normalFont));
-            
+
             rightInfoParagraph.add(new Phrase("Trạng thái thanh toán: ", normalBold));
             rightInfoParagraph.add(new Phrase(invoice.getStatus().getLabel() + "\n", normalFont));
-            
+
             // Thêm thông tin nhân viên phụ trách nếu có
             rightInfoParagraph.add(new Phrase("Nhân viên phụ trách: ", normalBold));
             if (invoice.getEmployee() != null) {
@@ -243,7 +243,7 @@ public class PDFExportService {
 
             rightInfoCell.addElement(rightInfoParagraph);
             infoTable.addCell(rightInfoCell);
-            
+
             document.add(infoTable);
 
             // Thông tin khách hàng - HEADER
@@ -256,7 +256,7 @@ public class PDFExportService {
             customerHeaderCell.setBorder(Rectangle.NO_BORDER);
             customerHeaderCell.setBackgroundColor(blueColor);
             customerHeaderCell.setPadding(8);
-            
+
             Paragraph customerHeader = new Paragraph("THÔNG TIN KHÁCH HÀNG", headerFont);
             customerHeader.setAlignment(Element.ALIGN_LEFT);
             customerHeaderCell.addElement(customerHeader);
@@ -277,15 +277,15 @@ public class PDFExportService {
             Paragraph customerParagraph = new Paragraph();
             customerParagraph.add(new Phrase("Họ tên: ", normalBold));
             customerParagraph.add(new Phrase(invoice.getCustomer().getFullName() + "\n", normalFont));
-            
+
             customerParagraph.add(new Phrase("Số điện thoại: ", normalBold));
             customerParagraph.add(new Phrase(invoice.getCustomer().getPhone() + "\n", normalFont));
-            
+
             if (invoice.getCustomer().getEmail() != null && !invoice.getCustomer().getEmail().isEmpty()) {
                 customerParagraph.add(new Phrase("Email: ", normalBold));
                 customerParagraph.add(new Phrase(invoice.getCustomer().getEmail() + "\n", normalFont));
             }
-            
+
             if (invoice.getCustomer().getAddress() != null && !invoice.getCustomer().getAddress().isEmpty()) {
                 customerParagraph.add(new Phrase("Địa chỉ: ", normalBold));
                 customerParagraph.add(new Phrase(invoice.getCustomer().getAddress(), normalFont));
@@ -305,7 +305,7 @@ public class PDFExportService {
             productHeaderCell.setBorder(Rectangle.NO_BORDER);
             productHeaderCell.setBackgroundColor(blueColor);
             productHeaderCell.setPadding(8);
-            
+
             Paragraph productHeader = new Paragraph("CHI TIẾT SẢN PHẨM", headerFont);
             productHeader.setAlignment(Element.ALIGN_LEFT);
             productHeaderCell.addElement(productHeader);
@@ -401,19 +401,19 @@ public class PDFExportService {
             totalTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
             totalTable.setSpacingBefore(10);
             totalTable.setSpacingAfter(30);
-            
+
             PdfPCell totalCell = new PdfPCell();
             totalCell.setBorder(Rectangle.BOX);
             totalCell.setBorderColor(redColor);
             totalCell.setBackgroundColor(lightRed);
             totalCell.setPadding(8);
-            
+
             Paragraph totalParagraph = new Paragraph("Tổng cộng: " + formatter.format(invoice.getAmount()) + " VND", redBoldFont);
             totalParagraph.setAlignment(Element.ALIGN_RIGHT);
-            
+
             totalCell.addElement(totalParagraph);
             totalTable.addCell(totalCell);
-            
+
             document.add(totalTable);
 
             // Phần chữ ký
@@ -421,56 +421,56 @@ public class PDFExportService {
             signatureTable.setWidthPercentage(100);
             signatureTable.setSpacingBefore(10);
             signatureTable.setSpacingAfter(20);
-            
+
             // Cell chữ ký người lập hóa đơn
             PdfPCell signCell1 = new PdfPCell();
             signCell1.setBorder(Rectangle.TOP);
             signCell1.setBorderColor(BaseColor.LIGHT_GRAY);
             signCell1.setPadding(5);
             signCell1.setFixedHeight(60);
-            
+
             Paragraph signParagraph1 = new Paragraph();
             signParagraph1.setAlignment(Element.ALIGN_CENTER);
             signParagraph1.add(new Phrase("Người lập hóa đơn\n\n", smallFont));
-            
+
             // Thêm tên nhân viên nếu có
             if (invoice.getEmployee() != null) {
                 signParagraph1.add(new Phrase(invoice.getEmployee().getFullName(), signatureFont));
             } else {
                 signParagraph1.add(new Phrase("Admin", signatureFont));
             }
-            
+
             signCell1.addElement(signParagraph1);
             signatureTable.addCell(signCell1);
-            
+
             // Cell chữ ký kế toán
             PdfPCell signCell2 = new PdfPCell();
             signCell2.setBorder(Rectangle.TOP);
             signCell2.setBorderColor(BaseColor.LIGHT_GRAY);
             signCell2.setPadding(5);
             signCell2.setFixedHeight(60);
-            
+
             Paragraph signParagraph2 = new Paragraph();
             signParagraph2.setAlignment(Element.ALIGN_CENTER);
             signParagraph2.add(new Phrase("Kế toán\n\n", smallFont));
-            
+
             signCell2.addElement(signParagraph2);
             signatureTable.addCell(signCell2);
-            
+
             // Cell chữ ký khách hàng
             PdfPCell signCell3 = new PdfPCell();
             signCell3.setBorder(Rectangle.TOP);
             signCell3.setBorderColor(BaseColor.LIGHT_GRAY);
             signCell3.setPadding(5);
             signCell3.setFixedHeight(60);
-            
+
             Paragraph signParagraph3 = new Paragraph();
             signParagraph3.setAlignment(Element.ALIGN_CENTER);
             signParagraph3.add(new Phrase("Khách hàng\n\n", smallFont));
-            
+
             signCell3.addElement(signParagraph3);
             signatureTable.addCell(signCell3);
-            
+
             document.add(signatureTable);
 
             // Footer
