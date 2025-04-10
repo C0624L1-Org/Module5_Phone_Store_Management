@@ -1,11 +1,15 @@
 package com.example.md5_phone_store_management.model;
 
+import com.example.md5_phone_store_management.listener.ChangeLogListener;
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 
 @Entity
+@Audited
+@EntityListeners(ChangeLogListener.class)
 @Table(name = "supplier")
-public class Supplier extends AuditableEntity {
+public class Supplier  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "supplierID")

@@ -4,7 +4,6 @@ import com.example.md5_phone_store_management.service.ICustomerService;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IProductService;
 import com.example.md5_phone_store_management.service.ISupplierService;
-import com.example.md5_phone_store_management.service.implement.AuditLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,8 +26,7 @@ public class DashboardController {
     @Autowired
     private ICustomerService iCustomerService;
 
-    @Autowired
-    private AuditLogService auditLogService;
+
 
     @GetMapping("/admin")
     public String admin(Model model) {
@@ -47,11 +45,6 @@ public class DashboardController {
         model.addAttribute("totalProductsSold", iProductService.countSoldProducts());
 //        model.addAttribute("totalRevenue", iProductService.calculateTotalRevenue());
 
-
-        // Lịch sử thay đổi
-        model.addAttribute("recentEmployeeChanges", auditLogService.getRecentChanges("Employee", 5));
-        model.addAttribute("recentSupplierChanges", auditLogService.getRecentChanges("Supplier", 5));
-        model.addAttribute("recentProductChanges", auditLogService.getRecentChanges("Product", 5));
 
 
         return "dashboard/admin/ttlog";
