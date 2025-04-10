@@ -3,12 +3,17 @@ package com.example.md5_phone_store_management.controller;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -31,6 +36,7 @@ import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Gender;
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.InvoiceDetail;
+import com.example.md5_phone_store_management.model.Product;
 import com.example.md5_phone_store_management.repository.IInvoiceRepository;
 import com.example.md5_phone_store_management.service.CustomerService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
@@ -56,6 +62,7 @@ public class ReportController {
     private IInvoiceRepository invoiceRepository;
 
     private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter VNPAY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     @Autowired
     private CustomerService customerService;
@@ -226,92 +233,147 @@ public class ReportController {
     public ResponseEntity<Map<String, Object>> getWeeklyRevenue(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(required = false) String productId) {
-        
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = startDate.plusDays(6).atTime(23, 59, 59);
-        
-        Map<String, Object> response = new HashMap<>();
-        Map<String, Long> dailyRevenue = new HashMap<>();
-        
-        // Tạo danh sách các ngày trong tuần
-        for (int i = 0; i < 7; i++) {
-            LocalDate day = startDate.plusDays(i);
-            String dateStr = day.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            dailyRevenue.put(dateStr, 0L); // Giá trị mặc định ban đầu
-        }
-        
-        try {
-            // Chuyển định dạng ngày thành yyyyMMddHHmmss
-            String start = startDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            String end = endDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
-            Integer parsedProductId = null;
+        try {
+            // startDate là ngày đầu của một tuần trong tháng (1, 8, 15, 22, 29)
+            YearMonth yearMonth = YearMonth.from(startDate);
+            LocalDate firstDayOfMonth = yearMonth.atDay(1);
+            
+            // Tìm tuần chứa startDate (dựa vào ngày trong tháng)
+            int dayOfMonth = startDate.getDayOfMonth();
+            int weekNumber = (dayOfMonth - 1) / 7; // 0-based: tuần 0, 1, 2, 3, 4
+            
+            // Tính ngày bắt đầu của tuần đó (ngày 1, 8, 15, 22, 29)
+            LocalDate weekStartDate = firstDayOfMonth.plusDays(weekNumber * 7);
+            
+            // Tính ngày kết thúc của tuần (hoặc ngày cuối tháng nếu tuần bị cắt)
+            LocalDate lastDayOfMonth = yearMonth.atEndOfMonth();
+            LocalDate weekEndDate = weekStartDate.plusDays(6);
+            if (weekEndDate.isAfter(lastDayOfMonth)) {
+                weekEndDate = lastDayOfMonth;
+            }
+            
+            Map<String, Object> response = new HashMap<>();
+            
+            // Danh sách ngày trong tuần (chỉ trong tháng hiện tại)
+            List<String> labels = new ArrayList<>();
+            List<Long> revenueData = new ArrayList<>();
+            List<Integer> productCountData = new ArrayList<>();
+            List<BigDecimal> purchasePriceData = new ArrayList<>();
+            List<BigDecimal> sellingPriceData = new ArrayList<>();
+            Map<String, Object> productInfo = new HashMap<>();
+            
+            // Format hiển thị ngày Việt Nam: dd/MM
+            DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("dd/MM");
+            
+            // Nếu có mã sản phẩm, lấy thông tin sản phẩm
             if (productId != null && !productId.isEmpty()) {
                 try {
-                    parsedProductId = Integer.parseInt(productId);
+                    Integer parsedProductId = Integer.parseInt(productId);
+                    Product product = salesReportService.findProductById(parsedProductId);
+                    if (product != null) {
+                        productInfo.put("id", product.getProductID());
+                        productInfo.put("name", product.getName());
+                        productInfo.put("purchasePrice", product.getPurchasePrice());
+                        productInfo.put("sellingPrice", product.getSellingPrice());
+                    }
                 } catch (NumberFormatException e) {
-                    logger.error("Error parsing productId: " + productId, e);
-                    response.put("error", "Mã sản phẩm không hợp lệ");
-                    return ResponseEntity.badRequest().body(response);
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
                 }
             }
             
-            // Lấy tất cả hóa đơn trong khoảng thời gian
-            List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(start, end);
-            
-            for (Invoice invoice : invoices) {
-                try {
-                    if (invoice.getPayDate() != null) {
-                        // Chuyển ngày thanh toán thành đối tượng LocalDate
-                        LocalDateTime payDateTime = LocalDateTime.parse(invoice.getPayDate(), 
-                                DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-                        LocalDate payDate = payDateTime.toLocalDate();
+            // Tạo dữ liệu cho từng ngày trong tuần (từ weekStartDate đến weekEndDate)
+            for (LocalDate currentDate = weekStartDate; !currentDate.isAfter(weekEndDate); currentDate = currentDate.plusDays(1)) {
+                String dateLabel = currentDate.format(displayFormatter);
+                labels.add(dateLabel);
+                
+                // Format ngày cho truy vấn database
+                String currentDateStr = currentDate.atStartOfDay().format(VNPAY_FORMATTER);
+                String nextDateStr = currentDate.plusDays(1).atStartOfDay().format(VNPAY_FORMATTER);
+                
+                // Lấy doanh thu cho ngày hiện tại
+                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(currentDateStr, nextDateStr);
+                
+                // Lọc theo mã sản phẩm nếu có
+                long dailyRevenue = 0;
+                int productsCount = 0;
+                BigDecimal purchasePrice = BigDecimal.ZERO;
+                BigDecimal sellingPrice = BigDecimal.ZERO;
+                
+                if (productId != null && !productId.isEmpty()) {
+                    // Parse product ID
+                    try {
+                        Integer parsedProductId = Integer.parseInt(productId);
                         
-                        // Format lại ngày thanh toán theo định dạng dd/MM/yyyy
-                        String dateKey = payDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                        
-                        if (dailyRevenue.containsKey(dateKey)) {
-                            Long currentRevenue = dailyRevenue.get(dateKey);
-                            Long revenue = 0L;
-                            
-                            // Tính doanh thu từ các chi tiết hóa đơn
+                        // Lọc và tính doanh thu cho sản phẩm cụ thể
+                        for (Invoice invoice : invoices) {
                             if (invoice.getInvoiceDetailList() != null) {
                                 for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                    if (parsedProductId != null && 
-                                        (detail.getProduct() == null || !detail.getProduct().getProductID().equals(parsedProductId))) {
-                                        continue;
-                                    }
-                                    
-                                    if (detail.getProduct() != null && detail.getQuantity() != null) {
-                                        BigDecimal sellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                            detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                        BigDecimal purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                            detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                    if (detail.getProduct() != null && 
+                                        detail.getProduct().getProductID().equals(parsedProductId)) {
+                                        sellingPrice = detail.getProduct().getSellingPrice() != null ? 
+                                                   detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                        purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
+                                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
                                         BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                                        revenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                        dailyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                        productsCount += detail.getQuantity();
                                     }
                                 }
                             }
-                            
-                            dailyRevenue.put(dateKey, currentRevenue + revenue);
+                        }
+                        // Thêm giá nhập và giá bán vào danh sách
+                        purchasePriceData.add(purchasePrice);
+                        sellingPriceData.add(sellingPrice);
+                    } catch (NumberFormatException e) {
+                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
+                    }
+                } else {
+                    // Tính tổng doanh thu cho tất cả sản phẩm
+                    for (Invoice invoice : invoices) {
+                        if (invoice.getInvoiceDetailList() != null) {
+                            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                                if (detail.getProduct() != null && detail.getQuantity() != null) {
+                                    BigDecimal currentSellingPrice = detail.getProduct().getSellingPrice() != null ? 
+                                                         detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                    BigDecimal currentPurchasePrice = detail.getProduct().getPurchasePrice() != null ? 
+                                                          detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                    BigDecimal revenuePerUnit = currentSellingPrice.subtract(currentPurchasePrice);
+                                    dailyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                    productsCount += detail.getQuantity();
+                                }
+                            }
                         }
                     }
-                } catch (DateTimeParseException e) {
-                    logger.error("Error parsing invoice date: " + invoice.getPayDate(), e);
+                    purchasePriceData.add(BigDecimal.ZERO);
+                    sellingPriceData.add(BigDecimal.ZERO);
                 }
+                
+                revenueData.add(dailyRevenue);
+                productCountData.add(productsCount);
             }
             
-            response.put("labels", dailyRevenue.keySet().stream().sorted().collect(Collectors.toList()));
-            response.put("data", dailyRevenue.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList()));
+            // Thêm thông tin tuần vào response
+            response.put("labels", labels);
+            response.put("revenue", revenueData);
+            response.put("productCount", productCountData);
+            response.put("startDate", weekStartDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            response.put("endDate", weekEndDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            response.put("weekNumber", weekNumber + 1); // Chuyển từ 0-based sang 1-based
+            response.put("month", yearMonth.getMonth().getDisplayName(TextStyle.FULL, new Locale("vi", "VN")));
+            response.put("year", yearMonth.getYear());
+            
+            // Thêm thông tin sản phẩm và giá nếu có tìm kiếm theo mã sản phẩm
+            if (!productInfo.isEmpty()) {
+                response.put("productInfo", productInfo);
+                response.put("purchasePriceData", purchasePriceData);
+                response.put("sellingPriceData", sellingPriceData);
+            }
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error generating weekly revenue data", e);
-            response.put("error", "Lỗi khi tạo dữ liệu doanh thu theo tuần");
-            return ResponseEntity.badRequest().body(response);
+            logger.error("Error generating weekly revenue report: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo doanh thu theo tuần"));
         }
     }
     
@@ -322,135 +384,149 @@ public class ReportController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM") String monthYear,
             @RequestParam(required = false) String productId) {
         
-        String[] parts = monthYear.split("-");
-        int year = Integer.parseInt(parts[0]);
-        int month = Integer.parseInt(parts[1]);
-        
-        LocalDate firstDayOfMonth = LocalDate.of(year, month, 1);
-        LocalDate lastDayOfMonth = firstDayOfMonth.plusMonths(1).minusDays(1);
-        
-        LocalDateTime startDateTime = firstDayOfMonth.atStartOfDay();
-        LocalDateTime endDateTime = lastDayOfMonth.atTime(23, 59, 59);
-        
-        Map<String, Object> response = new HashMap<>();
-        
         try {
-            // Chuyển định dạng ngày thành yyyyMMddHHmmss
-            String start = startDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            String end = endDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+            // Parse tháng và năm từ tham số
+            YearMonth ym = YearMonth.parse(monthYear);
 
-            Integer parsedProductId = null;
+            LocalDate firstDayOfMonth = ym.atDay(1);
+            LocalDate lastDayOfMonth = ym.atEndOfMonth();
+            
+            Map<String, Object> response = new HashMap<>();
+            
+            // Danh sách các tuần trong tháng (tuần bắt đầu từ ngày 1, mỗi tuần 7 ngày)
+            List<String> labels = new ArrayList<>();
+            List<Long> revenueData = new ArrayList<>();
+            List<Integer> productCountData = new ArrayList<>();
+            List<BigDecimal> purchasePriceData = new ArrayList<>();
+            List<BigDecimal> sellingPriceData = new ArrayList<>();
+            Map<String, Object> productInfo = new HashMap<>();
+            
+            // Nếu có mã sản phẩm, lấy thông tin sản phẩm
             if (productId != null && !productId.isEmpty()) {
                 try {
-                    parsedProductId = Integer.parseInt(productId);
+                    Integer parsedProductId = Integer.parseInt(productId);
+                    Product product = salesReportService.findProductById(parsedProductId);
+                    if (product != null) {
+                        productInfo.put("id", product.getProductID());
+                        productInfo.put("name", product.getName());
+                        productInfo.put("purchasePrice", product.getPurchasePrice());
+                        productInfo.put("sellingPrice", product.getSellingPrice());
+                    }
                 } catch (NumberFormatException e) {
-                    logger.error("Error parsing productId: " + productId, e);
-                    response.put("error", "Mã sản phẩm không hợp lệ");
-                    return ResponseEntity.badRequest().body(response);
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
                 }
             }
             
-            // Lấy tất cả hóa đơn trong khoảng thời gian
-            List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(start, end);
+            // Đếm số tuần trong tháng
+            int numWeeks = (int) Math.ceil((double) lastDayOfMonth.getDayOfMonth() / 7.0);
             
-            // Chia tháng thành các tuần
-            Map<String, Long> weeklyRevenue = new HashMap<>();
-            
-            // Tìm ngày thứ 2 đầu tiên của tháng
-            LocalDate monday = firstDayOfMonth;
-            while (monday.getDayOfWeek().getValue() != 1) {
-                monday = monday.plusDays(1);
-            }
-            
-            // Tạo các tuần trong tháng
-            while (monday.getMonth() == firstDayOfMonth.getMonth() || 
-                  (monday.isBefore(lastDayOfMonth) && monday.plusDays(6).isAfter(firstDayOfMonth))) {
+            // Tạo dữ liệu cho từng tuần
+            for (int weekNum = 0; weekNum < numWeeks; weekNum++) {
+                LocalDate weekStart = firstDayOfMonth.plusDays(weekNum * 7);
+                LocalDate weekEnd;
                 
-                LocalDate sunday = monday.plusDays(6);
-                String weekLabel = monday.format(DateTimeFormatter.ofPattern("dd/MM")) + 
-                                 " - " + 
-                                 sunday.format(DateTimeFormatter.ofPattern("dd/MM"));
+                // Nếu là tuần cuối, kết thúc vào ngày cuối tháng
+                if (weekNum == numWeeks - 1) {
+                    weekEnd = lastDayOfMonth;
+                } else {
+                    // Kết thúc sau 6 ngày hoặc ngày cuối tháng (nếu tuần bị thiếu ngày)
+                    weekEnd = weekStart.plusDays(6);
+                    if (weekEnd.isAfter(lastDayOfMonth)) {
+                        weekEnd = lastDayOfMonth;
+                    }
+                }
                 
-                weeklyRevenue.put(weekLabel, 0L);
-                monday = monday.plusDays(7);
-            }
-            
-            // Tính doanh thu theo tuần
-            for (Invoice invoice : invoices) {
-                try {
-                    if (invoice.getPayDate() != null) {
-                        // Chuyển ngày thanh toán thành đối tượng LocalDate
-                        LocalDateTime payDateTime = LocalDateTime.parse(invoice.getPayDate(), 
-                                DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-                        LocalDate payDate = payDateTime.toLocalDate();
+                // Format hiển thị tuần: "DD/MM - DD/MM"
+                String weekLabel = weekStart.format(DateTimeFormatter.ofPattern("dd/MM")) + 
+                                   " - " + 
+                                   weekEnd.format(DateTimeFormatter.ofPattern("dd/MM"));
+                labels.add(weekLabel);
+                
+                // Format ngày cho truy vấn database
+                String startDateStr = weekStart.atStartOfDay().format(VNPAY_FORMATTER);
+                // Kết thúc là cuối ngày nên thêm 1 ngày rồi lấy lúc 00:00
+                String endDateStr = weekEnd.plusDays(1).atStartOfDay().format(VNPAY_FORMATTER);
+                
+                // Lấy doanh thu cho tuần hiện tại
+                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(startDateStr, endDateStr);
+                
+                // Lọc theo mã sản phẩm nếu có
+                long weeklyRevenue = 0;
+                int productsCount = 0;
+                BigDecimal purchasePrice = BigDecimal.ZERO;
+                BigDecimal sellingPrice = BigDecimal.ZERO;
+                
+                if (productId != null && !productId.isEmpty()) {
+                    // Parse product ID
+                    try {
+                        Integer parsedProductId = Integer.parseInt(productId);
                         
-                        for (String weekLabel : weeklyRevenue.keySet()) {
-                            String[] dateParts = weekLabel.split(" - ");
-                            String startDateStr = dateParts[0];
-                            String endDateStr = dateParts[1];
-                            
-                            // Tách ngày và tháng
-                            String[] startParts = startDateStr.split("/");
-                            String[] endParts = endDateStr.split("/");
-                            
-                            int startDay = Integer.parseInt(startParts[0]);
-                            int startMonth = Integer.parseInt(startParts[1]);
-                            int endDay = Integer.parseInt(endParts[0]);
-                            int endMonth = Integer.parseInt(endParts[1]);
-                            
-                            // Tạo đối tượng LocalDate cho ngày bắt đầu và kết thúc của tuần
-                            LocalDate weekStart = LocalDate.of(year, startMonth, startDay);
-                            // Xử lý trường hợp đặc biệt khi tuần kéo dài từ tháng này sang tháng sau
-                            LocalDate weekEnd;
-                            if (endMonth > startMonth) {
-                                weekEnd = LocalDate.of(year, endMonth, endDay);
-                            } else {
-                                weekEnd = LocalDate.of(year, startMonth, endDay);
-                            }
-                            
-                            if ((payDate.isEqual(weekStart) || payDate.isAfter(weekStart)) && 
-                                (payDate.isEqual(weekEnd) || payDate.isBefore(weekEnd))) {
-                                
-                                Long currentRevenue = weeklyRevenue.get(weekLabel);
-                                Long revenue = 0L;
-                                
-                                // Tính doanh thu từ các chi tiết hóa đơn
-                                if (invoice.getInvoiceDetailList() != null) {
-                                    for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                        if (parsedProductId != null && 
-                                            (detail.getProduct() == null || !detail.getProduct().getProductID().equals(parsedProductId))) {
-                                            continue;
-                                        }
-                                        
-                                        if (detail.getProduct() != null && detail.getQuantity() != null) {
-                                            BigDecimal sellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                                detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                            BigDecimal purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                                detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                            BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                                            revenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                        }
+                        // Lọc và tính doanh thu cho sản phẩm cụ thể
+                        for (Invoice invoice : invoices) {
+                            if (invoice.getInvoiceDetailList() != null) {
+                                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                                    if (detail.getProduct() != null && 
+                                        detail.getProduct().getProductID().equals(parsedProductId)) {
+                                        sellingPrice = detail.getProduct().getSellingPrice() != null ? 
+                                                   detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                        purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
+                                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                        BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
+                                        weeklyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                        productsCount += detail.getQuantity();
                                     }
                                 }
-                                
-                                weeklyRevenue.put(weekLabel, currentRevenue + revenue);
-                                break;
+                            }
+                        }
+                        // Thêm giá nhập và giá bán vào danh sách
+                        purchasePriceData.add(purchasePrice);
+                        sellingPriceData.add(sellingPrice);
+                    } catch (NumberFormatException e) {
+                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
+                    }
+                } else {
+                    // Tính tổng doanh thu cho tất cả sản phẩm
+                    for (Invoice invoice : invoices) {
+                        if (invoice.getInvoiceDetailList() != null) {
+                            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                                if (detail.getProduct() != null && detail.getQuantity() != null) {
+                                    BigDecimal currentSellingPrice = detail.getProduct().getSellingPrice() != null ? 
+                                                         detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                    BigDecimal currentPurchasePrice = detail.getProduct().getPurchasePrice() != null ? 
+                                                          detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                    BigDecimal revenuePerUnit = currentSellingPrice.subtract(currentPurchasePrice);
+                                    weeklyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                    productsCount += detail.getQuantity();
+                                }
                             }
                         }
                     }
-                } catch (DateTimeParseException e) {
-                    logger.error("Error parsing invoice date: " + invoice.getPayDate(), e);
+                    // Thêm giá 0 cho giá nhập và giá bán
+                    purchasePriceData.add(BigDecimal.ZERO);
+                    sellingPriceData.add(BigDecimal.ZERO);
                 }
+                
+                revenueData.add(weeklyRevenue);
+                productCountData.add(productsCount);
             }
             
-            response.put("labels", weeklyRevenue.keySet());
-            response.put("data", weeklyRevenue.values());
+            response.put("labels", labels);
+            response.put("revenue", revenueData);
+            response.put("productCount", productCountData);
+            response.put("month", ym.getMonth().getDisplayName(TextStyle.FULL, new Locale("vi", "VN")));
+            response.put("year", ym.getYear());
+            
+            // Thêm thông tin sản phẩm và giá nếu có tìm kiếm theo mã sản phẩm
+            if (!productInfo.isEmpty()) {
+                response.put("productInfo", productInfo);
+                response.put("purchasePriceData", purchasePriceData);
+                response.put("sellingPriceData", sellingPriceData);
+            }
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error generating monthly revenue data", e);
-            response.put("error", "Lỗi khi tạo dữ liệu doanh thu theo tháng");
-            return ResponseEntity.badRequest().body(response);
+            logger.error("Error generating monthly revenue report: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo doanh thu theo tháng"));
         }
     }
     
@@ -461,78 +537,128 @@ public class ReportController {
             @RequestParam int year,
             @RequestParam(required = false) String productId) {
         
-        Map<String, Object> response = new HashMap<>();
-        Map<String, Long> monthlyRevenue = new HashMap<>();
-        
-        // Khởi tạo doanh thu cho 12 tháng
-        String[] monthLabels = {"Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", 
-                               "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"};
-        
-        for (String month : monthLabels) {
-            monthlyRevenue.put(month, 0L);
-        }
-        
         try {
-            Integer parsedProductId = null;
+            Map<String, Object> response = new HashMap<>();
+            
+            // Danh sách các tháng trong năm
+            List<String> labels = Arrays.asList(
+                "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", 
+                "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+            );
+            
+            List<Long> revenueData = new ArrayList<>();
+            List<Integer> productCountData = new ArrayList<>();
+            List<BigDecimal> purchasePriceData = new ArrayList<>();
+            List<BigDecimal> sellingPriceData = new ArrayList<>();
+            Map<String, Object> productInfo = new HashMap<>();
+            
+            // Nếu có mã sản phẩm, lấy thông tin sản phẩm
             if (productId != null && !productId.isEmpty()) {
                 try {
-                    parsedProductId = Integer.parseInt(productId);
+                    Integer parsedProductId = Integer.parseInt(productId);
+                    Product product = salesReportService.findProductById(parsedProductId);
+                    if (product != null) {
+                        productInfo.put("id", product.getProductID());
+                        productInfo.put("name", product.getName());
+                        productInfo.put("purchasePrice", product.getPurchasePrice());
+                        productInfo.put("sellingPrice", product.getSellingPrice());
+                    }
                 } catch (NumberFormatException e) {
-                    logger.error("Error parsing productId: " + productId, e);
-                    response.put("error", "Mã sản phẩm không hợp lệ");
-                    return ResponseEntity.badRequest().body(response);
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
                 }
             }
             
-            // Lặp qua từng tháng trong năm
+            // Tạo dữ liệu cho từng tháng
             for (int month = 1; month <= 12; month++) {
-                LocalDate firstDayOfMonth = LocalDate.of(year, month, 1);
-                LocalDate lastDayOfMonth = firstDayOfMonth.plusMonths(1).minusDays(1);
+                YearMonth ym = YearMonth.of(year, month);
+
+                LocalDate firstDayOfMonth = ym.atDay(1);
+                LocalDate lastDayOfMonth = ym.atEndOfMonth();
                 
-                LocalDateTime startDateTime = firstDayOfMonth.atStartOfDay();
-                LocalDateTime endDateTime = lastDayOfMonth.atTime(23, 59, 59);
+                // Format ngày cho truy vấn database
+                String startDateStr = firstDayOfMonth.atStartOfDay().format(VNPAY_FORMATTER);
+                // Kết thúc là cuối ngày nên thêm 1 ngày rồi lấy lúc 00:00
+                String endDateStr = lastDayOfMonth.plusDays(1).atStartOfDay().format(VNPAY_FORMATTER);
                 
-                // Chuyển định dạng ngày thành yyyyMMddHHmmss
-                String start = startDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-                String end = endDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+                // Lấy doanh thu cho tháng hiện tại
+                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(startDateStr, endDateStr);
                 
-                // Lấy tất cả hóa đơn trong khoảng thời gian
-                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(start, end);
+                // Lọc theo mã sản phẩm nếu có
+                long monthlyRevenue = 0;
+                int productsCount = 0;
+                BigDecimal purchasePrice = BigDecimal.ZERO;
+                BigDecimal sellingPrice = BigDecimal.ZERO;
                 
-                Long revenue = 0L;
-                
-                // Tính doanh thu tháng
-                for (Invoice invoice : invoices) {
-                    if (invoice.getInvoiceDetailList() != null) {
-                        for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                            if (parsedProductId != null && 
-                                (detail.getProduct() == null || !detail.getProduct().getProductID().equals(parsedProductId))) {
-                                continue;
+                if (productId != null && !productId.isEmpty()) {
+                    // Parse product ID
+                    try {
+                        Integer parsedProductId = Integer.parseInt(productId);
+                        
+                        // Lọc và tính doanh thu cho sản phẩm cụ thể
+                        for (Invoice invoice : invoices) {
+                            if (invoice.getInvoiceDetailList() != null) {
+                                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                                    if (detail.getProduct() != null && 
+                                        detail.getProduct().getProductID().equals(parsedProductId)) {
+                                        sellingPrice = detail.getProduct().getSellingPrice() != null ? 
+                                                   detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                        purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
+                                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                        BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
+                                        monthlyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                        productsCount += detail.getQuantity();
+                                    }
+                                }
                             }
-                            
-                            if (detail.getProduct() != null && detail.getQuantity() != null) {
-                                BigDecimal sellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                    detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                BigDecimal purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                                revenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                        }
+                        // Thêm giá nhập và giá bán vào danh sách
+                        purchasePriceData.add(purchasePrice);
+                        sellingPriceData.add(sellingPrice);
+                    } catch (NumberFormatException e) {
+                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
+                    }
+                } else {
+                    // Tính tổng doanh thu cho tất cả sản phẩm
+                    for (Invoice invoice : invoices) {
+                        if (invoice.getInvoiceDetailList() != null) {
+                            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                                if (detail.getProduct() != null && detail.getQuantity() != null) {
+                                    BigDecimal currentSellingPrice = detail.getProduct().getSellingPrice() != null ? 
+                                                         detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                    BigDecimal currentPurchasePrice = detail.getProduct().getPurchasePrice() != null ? 
+                                                          detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                    BigDecimal revenuePerUnit = currentSellingPrice.subtract(currentPurchasePrice);
+                                    monthlyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                    productsCount += detail.getQuantity();
+                                }
                             }
                         }
                     }
+                    // Thêm giá 0 cho giá nhập và giá bán
+                    purchasePriceData.add(BigDecimal.ZERO);
+                    sellingPriceData.add(BigDecimal.ZERO);
                 }
                 
-                monthlyRevenue.put(monthLabels[month - 1], revenue);
+                revenueData.add(monthlyRevenue);
+                productCountData.add(productsCount);
             }
             
-            response.put("labels", Arrays.asList(monthLabels));
-            response.put("data", Arrays.stream(monthLabels).map(monthlyRevenue::get).collect(Collectors.toList()));
+            response.put("labels", labels);
+            response.put("revenue", revenueData);
+            response.put("productCount", productCountData);
+            response.put("year", year);
+            
+            // Thêm thông tin sản phẩm và giá nếu có tìm kiếm theo mã sản phẩm
+            if (!productInfo.isEmpty()) {
+                response.put("productInfo", productInfo);
+                response.put("purchasePriceData", purchasePriceData);
+                response.put("sellingPriceData", sellingPriceData);
+            }
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error generating yearly revenue data", e);
-            response.put("error", "Lỗi khi tạo dữ liệu doanh thu theo năm");
-            return ResponseEntity.badRequest().body(response);
+            logger.error("Error generating yearly revenue report: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo doanh thu theo năm"));
         }
     }
     
@@ -541,78 +667,128 @@ public class ReportController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getMultiYearRevenue(
             @RequestParam(required = false) String productId) {
-        
-        int currentYear = LocalDate.now().getYear();
-        Map<String, Object> response = new HashMap<>();
-        Map<String, Long> yearlyRevenue = new HashMap<>();
-        
-        // Chuyển đổi productId từ String sang Integer nếu có
-        Integer parsedProductId = null;
-        if (productId != null && !productId.isEmpty()) {
-            try {
-                parsedProductId = Integer.parseInt(productId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing productId: " + productId, e);
-                response.put("error", "Mã sản phẩm không hợp lệ");
-                return ResponseEntity.badRequest().body(response);
-            }
-        }
-        
-        // 3 năm gần đây
-        for (int i = 2; i >= 0; i--) {
-            int year = currentYear - i;
-            yearlyRevenue.put("Năm " + year, 0L);
+
+        try {
+            Map<String, Object> response = new HashMap<>();
             
-            try {
+            // Lấy năm hiện tại và 2 năm trước đó
+            int currentYear = LocalDate.now().getYear();
+            
+            List<String> labels = new ArrayList<>();
+            List<Long> revenueData = new ArrayList<>();
+            List<Integer> productCountData = new ArrayList<>();
+            List<BigDecimal> purchasePriceData = new ArrayList<>();
+            List<BigDecimal> sellingPriceData = new ArrayList<>();
+            Map<String, Object> productInfo = new HashMap<>();
+            
+            // Nếu có mã sản phẩm, lấy thông tin sản phẩm
+            if (productId != null && !productId.isEmpty()) {
+                try {
+                    Integer parsedProductId = Integer.parseInt(productId);
+                    Product product = salesReportService.findProductById(parsedProductId);
+                    if (product != null) {
+                        productInfo.put("id", product.getProductID());
+                        productInfo.put("name", product.getName());
+                        productInfo.put("purchasePrice", product.getPurchasePrice());
+                        productInfo.put("sellingPrice", product.getSellingPrice());
+                    }
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
+                }
+            }
+            
+            // Tạo dữ liệu cho 3 năm gần đây
+            for (int i = 2; i >= 0; i--) {
+                int year = currentYear - i;
+                labels.add(String.valueOf(year));
+                
+                // Tính doanh thu cho cả năm
                 LocalDate firstDayOfYear = LocalDate.of(year, 1, 1);
                 LocalDate lastDayOfYear = LocalDate.of(year, 12, 31);
                 
-                LocalDateTime startDateTime = firstDayOfYear.atStartOfDay();
-                LocalDateTime endDateTime = lastDayOfYear.atTime(23, 59, 59);
+                // Format ngày cho truy vấn database
+                String startDateStr = firstDayOfYear.atStartOfDay().format(VNPAY_FORMATTER);
+                String endDateStr = lastDayOfYear.plusDays(1).atStartOfDay().format(VNPAY_FORMATTER);
                 
-                // Chuyển định dạng ngày thành yyyyMMddHHmmss
-                String start = startDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-                String end = endDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+                // Lấy doanh thu cho năm hiện tại
+                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(startDateStr, endDateStr);
                 
-                // Lấy tất cả hóa đơn trong khoảng thời gian
-                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(start, end);
+                // Lọc theo mã sản phẩm nếu có
+                long yearlyRevenue = 0;
+                int productsCount = 0;
+                BigDecimal purchasePrice = BigDecimal.ZERO;
+                BigDecimal sellingPrice = BigDecimal.ZERO;
                 
-                Long revenue = 0L;
-                
-                // Tính doanh thu năm
-                for (Invoice invoice : invoices) {
-                    if (invoice.getInvoiceDetailList() != null) {
-                        for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                            // Kiểm tra nếu productId được chỉ định thì chỉ tính doanh thu cho sản phẩm đó
-                            if (parsedProductId != null && 
-                                (detail.getProduct() == null || !detail.getProduct().getProductID().equals(parsedProductId))) {
-                                continue;
+                if (productId != null && !productId.isEmpty()) {
+                    // Parse product ID
+                    try {
+                        Integer parsedProductId = Integer.parseInt(productId);
+                        
+                        // Lọc và tính doanh thu cho sản phẩm cụ thể
+                        for (Invoice invoice : invoices) {
+                            if (invoice.getInvoiceDetailList() != null) {
+                                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                                    if (detail.getProduct() != null && 
+                                        detail.getProduct().getProductID().equals(parsedProductId)) {
+                                        sellingPrice = detail.getProduct().getSellingPrice() != null ? 
+                                                   detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                        purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
+                                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                        BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
+                                        yearlyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                        productsCount += detail.getQuantity();
+                                    }
+                                }
                             }
-                            
-                            if (detail.getProduct() != null && detail.getQuantity() != null) {
-                                BigDecimal sellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                    detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                BigDecimal purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                                revenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                        }
+                        // Thêm giá nhập và giá bán vào danh sách
+                        purchasePriceData.add(purchasePrice);
+                        sellingPriceData.add(sellingPrice);
+                    } catch (NumberFormatException e) {
+                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
+                    }
+                } else {
+                    // Tính tổng doanh thu cho tất cả sản phẩm
+                    for (Invoice invoice : invoices) {
+                        if (invoice.getInvoiceDetailList() != null) {
+                            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                                if (detail.getProduct() != null && detail.getQuantity() != null) {
+                                    BigDecimal currentSellingPrice = detail.getProduct().getSellingPrice() != null ? 
+                                                         detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
+                                    BigDecimal currentPurchasePrice = detail.getProduct().getPurchasePrice() != null ? 
+                                                          detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
+                                    BigDecimal revenuePerUnit = currentSellingPrice.subtract(currentPurchasePrice);
+                                    yearlyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                                    productsCount += detail.getQuantity();
+                                }
                             }
                         }
                     }
+                    // Thêm giá 0 cho giá nhập và giá bán
+                    purchasePriceData.add(BigDecimal.ZERO);
+                    sellingPriceData.add(BigDecimal.ZERO);
                 }
                 
-                yearlyRevenue.put("Năm " + year, revenue);
-            } catch (Exception e) {
-                logger.error("Error calculating revenue for year " + year, e);
+                revenueData.add(yearlyRevenue);
+                productCountData.add(productsCount);
             }
+            
+            response.put("labels", labels);
+            response.put("revenue", revenueData);
+            response.put("productCount", productCountData);
+            response.put("currentYear", currentYear);
+            
+            // Thêm thông tin sản phẩm và giá nếu có tìm kiếm theo mã sản phẩm
+            if (!productInfo.isEmpty()) {
+                response.put("productInfo", productInfo);
+                response.put("purchasePriceData", purchasePriceData);
+                response.put("sellingPriceData", sellingPriceData);
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error generating multi-year revenue report: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo doanh thu nhiều năm"));
         }
-        
-        response.put("labels", yearlyRevenue.keySet().stream().sorted().collect(Collectors.toList()));
-        response.put("data", yearlyRevenue.entrySet().stream()
-            .sorted(Map.Entry.comparingByKey())
-            .map(Map.Entry::getValue)
-            .collect(Collectors.toList()));
-        
-        return ResponseEntity.ok(response);
     }
 }

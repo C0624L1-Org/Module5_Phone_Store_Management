@@ -589,6 +589,20 @@
                                             </button>
                                         </div>
                                     </div>
+                                    <!-- Thẻ hiển thị tổng lợi nhuận trong tuần -->
+                                    <div class="total-revenue-container mb-3">
+                                        <div class="card shadow-sm">
+                                            <div class="card-body d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <i class="fas fa-chart-line me-2 text-primary" style="font-size: 1.5rem;"></i>
+                                                    <span class="fw-bold">Lợi nhuận trong tuần:</span>
+                                                </div>
+                                                <div>
+                                                    <span id="weeklyTotalRevenue" class="fs-5 fw-bold text-primary">0 VNĐ</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="chart-wrapper">
                                         <canvas id="weeklyRevenueChart"></canvas>
                                     </div>
@@ -614,6 +628,20 @@
                                                 Tháng Sau
                                                 <i class="fas fa-chevron-right"></i>
                                             </button>
+                                        </div>
+                                    </div>
+                                    <!-- Thẻ hiển thị tổng lợi nhuận trong tháng -->
+                                    <div class="total-revenue-container mb-3">
+                                        <div class="card shadow-sm">
+                                            <div class="card-body d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <i class="fas fa-chart-line me-2 text-success" style="font-size: 1.5rem;"></i>
+                                                    <span class="fw-bold">Lợi nhuận trong tháng:</span>
+                                                </div>
+                                                <div>
+                                                    <span id="monthlyTotalRevenue" class="fs-5 fw-bold text-success">0 VNĐ</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="chart-wrapper">
@@ -643,6 +671,20 @@
                                             </button>
                                         </div>
                                     </div>
+                                    <!-- Thẻ hiển thị tổng lợi nhuận trong năm -->
+                                    <div class="total-revenue-container mb-3">
+                                        <div class="card shadow-sm">
+                                            <div class="card-body d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <i class="fas fa-chart-line me-2 text-warning" style="font-size: 1.5rem;"></i>
+                                                    <span class="fw-bold">Lợi nhuận trong năm:</span>
+                                                </div>
+                                                <div>
+                                                    <span id="yearlyTotalRevenue" class="fs-5 fw-bold text-warning">0 VNĐ</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="chart-wrapper">
                                         <canvas id="yearlyRevenueChart"></canvas>
                                     </div>
@@ -655,6 +697,20 @@
                                             <i class="fas fa-chart-line me-2"></i>
                                             Doanh Thu 3 Năm Gần Đây
                                         </h5>
+                                    </div>
+                                    <!-- Thẻ hiển thị tổng lợi nhuận trong 3 năm gần đây -->
+                                    <div class="total-revenue-container mb-3">
+                                        <div class="card shadow-sm">
+                                            <div class="card-body d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <i class="fas fa-chart-line me-2 text-info" style="font-size: 1.5rem;"></i>
+                                                    <span class="fw-bold">Lợi nhuận trong 3 năm gần đây:</span>
+                                                </div>
+                                                <div>
+                                                    <span id="multiYearTotalRevenue" class="fs-5 fw-bold text-info">0 VNĐ</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="chart-wrapper">
                                         <canvas id="multiYearRevenueChart"></canvas>
@@ -844,28 +900,6 @@
             return `${day}/${month}/${year}`;
         }
 
-        // Format tháng/năm: MM/YYYY
-        function formatMonthYear(date) {
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear();
-            return `${month}/${year}`;
-        }
-
-        // Hàm lấy ngày đầu tuần (thứ 2) từ một ngày bất kỳ
-        function getMonday(d) {
-            const date = new Date(d);
-            const day = date.getDay();
-            const diff = date.getDate() - day + (day === 0 ? -6 : 1); // điều chỉnh khi ngày hiện tại là chủ nhật
-            return new Date(date.setDate(diff));
-        }
-
-        // Hàm lấy ngày cuối tuần (chủ nhật) từ một ngày đầu tuần
-        function getSunday(monday) {
-            const sunday = new Date(monday);
-            sunday.setDate(monday.getDate() + 6);
-            return sunday;
-        }
-
         // Hàm lấy ngày đầu tháng và cuối tháng
         function getMonthBounds(date) {
             const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -885,511 +919,996 @@
                         "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
 
         // ----- BIỂU ĐỒ THEO TUẦN -----
-        let currentWeekDate = new Date();
-        let currentWeekMonday = getMonday(currentWeekDate);
-        let currentWeekSunday = getSunday(currentWeekMonday);
-        
-        // Cập nhật label tuần
+        let currentWeekStartDate = new Date();
+        // Đặt ngày về ngày 1 của tháng hiện tại
+        currentWeekStartDate.setDate(1);
+        let weeklyChart;
+        let weeklyData = {
+            labels: [],
+            revenue: [],
+            productCount: []
+        };
+        let currentWeekNumber = 0; // Tuần hiện tại (0-based)
+
+        // Khởi tạo và cập nhật nhãn tuần
         function updateWeekLabel() {
-            document.getElementById('weekLabel').innerText = `Tuần: ${formatDate(currentWeekMonday)} - ${formatDate(currentWeekSunday)}`;
+            // Format date để gửi API
+            const formattedDate = `${currentWeekStartDate.getFullYear()}-${String(currentWeekStartDate.getMonth() + 1).padStart(2, '0')}-${String(currentWeekStartDate.getDate()).padStart(2, '0')}`;
+            
+            const monthNames = [
+                "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", 
+                "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+            ];
+            
+            const month = monthNames[currentWeekStartDate.getMonth()];
+            const year = currentWeekStartDate.getFullYear();
+            const weekNum = Math.floor((currentWeekStartDate.getDate() - 1) / 7) + 1;
+            
+            document.getElementById('weekLabel').innerHTML = `<i class="far fa-calendar-alt me-2"></i>Tuần ${weekNum} (${month}/${year})`;
         }
-        
-        // Nút điều hướng tuần
-        document.getElementById('prevWeek').addEventListener('click', function() {
-            currentWeekMonday.setDate(currentWeekMonday.getDate() - 7);
-            currentWeekSunday.setDate(currentWeekSunday.getDate() - 7);
-            updateWeekLabel();
-            fetchWeeklyData();
-        });
-        
-        document.getElementById('nextWeek').addEventListener('click', function() {
-            currentWeekMonday.setDate(currentWeekMonday.getDate() + 7);
-            currentWeekSunday.setDate(currentWeekSunday.getDate() + 7);
-            updateWeekLabel();
-            fetchWeeklyData();
-        });
-        
-        document.getElementById('currentWeek').addEventListener('click', function() {
-            currentWeekDate = new Date();
-            currentWeekMonday = getMonday(currentWeekDate);
-            currentWeekSunday = getSunday(currentWeekMonday);
-            updateWeekLabel();
-            fetchWeeklyData();
-        });
-        
-        // Lấy dữ liệu doanh thu theo tuần từ API
+
+        // Hàm để lấy dữ liệu biểu đồ theo tuần
         function fetchWeeklyData() {
-            // Format ngày thành yyyy-MM-dd cho API
-            const startDateFormatted = `${currentWeekMonday.getFullYear()}-${String(currentWeekMonday.getMonth() + 1).padStart(2, '0')}-${String(currentWeekMonday.getDate()).padStart(2, '0')}`;
+            // Format date để gửi API
+            const formattedDate = `${currentWeekStartDate.getFullYear()}-${String(currentWeekStartDate.getMonth() + 1).padStart(2, '0')}-${String(currentWeekStartDate.getDate()).padStart(2, '0')}`;
+            const productId = /*[[${productId}]]*/ '';
             
-            // Kiểm tra nếu có mã sản phẩm được chỉ định từ form tìm kiếm
-            const productIdInput = document.getElementById('productId');
-            const productId = productIdInput && productIdInput.value ? productIdInput.value.trim() : '';
-            const productParam = productId ? `&productId=${encodeURIComponent(productId)}` : '';
-            
-            // Gọi API để lấy dữ liệu
-            fetch(`/api/revenue/weekly?startDate=${startDateFormatted}${productParam}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Error fetching weekly data:', data.error);
-                        return;
+            fetch(`/api/revenue/weekly?startDate=${formattedDate}${productId ? '&productId=' + productId : ''}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Lỗi khi tải dữ liệu doanh thu theo tuần');
                     }
-                    updateWeeklyChart(data.labels, data.data);
+                    return response.json();
+                })
+                .then(data => {
+                    weeklyData = data;
+                    // Cập nhật lại label với thông tin tuần chính xác từ API
+                    document.getElementById('weekLabel').innerHTML = `<i class="far fa-calendar-alt me-2"></i>Tuần ${data.weekNumber} : ${data.startDate} - ${data.endDate}`;
+                    
+                    // Tính tổng lợi nhuận và hiển thị
+                    const totalRevenue = data.revenue.reduce((sum, current) => sum + current, 0);
+                    document.getElementById('weeklyTotalRevenue').textContent = formatVND(totalRevenue);
+                    
+                    renderWeeklyChart();
                 })
                 .catch(error => {
                     console.error('Error fetching weekly data:', error);
-                    // Fallback khi API lỗi - dùng dữ liệu mẫu
-                    const days = [];
-                    const revenues = [];
-                    
-                    for (let i = 0; i < 7; i++) {
-                        const day = new Date(currentWeekMonday);
-                        day.setDate(day.getDate() + i);
-                        days.push(formatDate(day));
-                        const revenue = Math.floor(Math.random() * 50000000) + 10000000;
-                        revenues.push(revenue);
-                    }
-                    
-                    updateWeeklyChart(days, revenues);
+                    showToast('error', 'Lỗi', 'Không thể tải dữ liệu doanh thu theo tuần');
                 });
         }
-        
-        // Biểu đồ doanh thu theo tuần
-        let weeklyChart;
-        function updateWeeklyChart(labels, data) {
+
+        // Render biểu đồ doanh thu theo tuần
+        function renderWeeklyChart() {
             const ctx = document.getElementById('weeklyRevenueChart').getContext('2d');
             
-            // Destroy biểu đồ cũ nếu tồn tại
+            // Hủy biểu đồ cũ nếu đã tồn tại
             if (weeklyChart) {
                 weeklyChart.destroy();
             }
             
-            // Kiểm tra nếu đang xem một sản phẩm cụ thể
-            const productIdInput = document.getElementById('productId');
-            const productId = productIdInput && productIdInput.value ? productIdInput.value.trim() : '';
-            const isSingleProduct = productId !== '';
-            const chartTitle = isSingleProduct ? 
-                `Doanh thu theo ngày cho sản phẩm: ${productId}` : 
-                'Doanh thu theo ngày';
+            // Kiểm tra nếu có thông tin sản phẩm (trường hợp tìm kiếm theo mã sản phẩm)
+            const hasProductInfo = weeklyData.productInfo !== undefined;
+            
+            // Tạo dataset cho biểu đồ
+            let datasets = [];
+            
+            if (hasProductInfo) {
+                // Hiển thị biểu đồ nhóm với giá nhập, giá bán và doanh thu
+                const productInfo = weeklyData.productInfo;
+                
+                // Tạo gradient cho các cột
+                const purchaseGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                purchaseGradient.addColorStop(0, 'rgba(244, 63, 94, 0.8)');
+                purchaseGradient.addColorStop(1, 'rgba(244, 63, 94, 0.2)');
+                
+                const sellingGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                sellingGradient.addColorStop(0, 'rgba(14, 165, 233, 0.8)');
+                sellingGradient.addColorStop(1, 'rgba(14, 165, 233, 0.2)');
+                
+                const revenueGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                revenueGradient.addColorStop(0, 'rgba(34, 197, 94, 0.8)');
+                revenueGradient.addColorStop(1, 'rgba(34, 197, 94, 0.2)');
+                
+                // Tạo dữ liệu giá nhập
+                let purchasePriceTotal = 0;
+                const purchasePriceDatasets = weeklyData.purchasePriceData.map((price, index) => {
+                    const quantity = weeklyData.productCount[index];
+                    const totalPrice = price * quantity;
+                    purchasePriceTotal += totalPrice;
+                    return totalPrice;
+                });
+                
+                // Tạo dữ liệu giá bán
+                let sellingPriceTotal = 0;
+                const sellingPriceDatasets = weeklyData.sellingPriceData.map((price, index) => {
+                    const quantity = weeklyData.productCount[index];
+                    const totalPrice = price * quantity;
+                    sellingPriceTotal += totalPrice;
+                    return totalPrice;
+                });
+                
+                // Thêm datasets
+                datasets = [
+                    {
+                        label: 'Giá Nhập',
+                        data: purchasePriceDatasets,
+                        backgroundColor: purchaseGradient,
+                        borderColor: 'rgba(244, 63, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Giá Bán',
+                        data: sellingPriceDatasets,
+                        backgroundColor: sellingGradient,
+                        borderColor: 'rgba(14, 165, 233, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Doanh Thu',
+                        data: weeklyData.revenue,
+                        backgroundColor: revenueGradient,
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    }
+                ];
+                
+                // Thêm thông tin sản phẩm vào title
+                document.getElementById('weekLabel').innerHTML = `<i class="far fa-calendar-alt me-2"></i>Tuần ${weeklyData.weekNumber} (${weeklyData.startDate} - ${weeklyData.endDate}) - Sản phẩm: ${productInfo.name} (ID: ${productInfo.id})`;
+            } else {
+                // Hiển thị biểu đồ đơn chỉ với doanh thu
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(37, 99, 235, 0.8)');
+                gradient.addColorStop(1, 'rgba(37, 99, 235, 0.2)');
+                
+                datasets = [{
+                    label: 'Doanh Thu',
+                    data: weeklyData.revenue,
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(37, 99, 235, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.7
+                }];
+            }
             
             weeklyChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: chartTitle,
-                        data: data,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
+                    labels: weeklyData.labels,
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) { return formatVND(value); }
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 20,
+                                font: { size: 14, weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            titleFont: { size: 16, weight: 'bold' },
+                            bodyFont: { size: 15 },
+                            padding: 15,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) { 
+                                    return `${context.dataset.label}: ${formatVND(context.raw)}`; 
+                                },
+                                title: function(context) { 
+                                    const title = `Ngày: ${context[0].label}`;
+                                    return hasProductInfo ? 
+                                        `${title} - Số lượng: ${weeklyData.productCount[context[0].dataIndex]}` : 
+                                        title;
+                                }
                             }
                         }
                     },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) { return 'Doanh thu: ' + formatVND(context.raw); }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(226, 232, 240, 0.8)', drawBorder: false },
+                            border: { display: false },
+                            ticks: {
+                                callback: function(value) { return formatVND(value); },
+                                font: { size: 12, weight: '500' },
+                                color: '#64748b',
+                                padding: 10
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                font: { size: 12, weight: '500' },
+                                color: '#64748b',
+                                padding: 10
                             }
                         }
-                    }
+                    },
+                    animation: { duration: 1000, easing: 'easeOutQuart' }
                 }
             });
         }
+
+        // Xử lý sự kiện cho các nút điều hướng tuần
+        document.getElementById('prevWeek').addEventListener('click', function() {
+            // Lấy tuần trước đó trong tháng
+            const currentDay = currentWeekStartDate.getDate();
+            if (currentDay > 7) {
+                // Nếu không phải tuần đầu tháng, trừ 7 ngày
+                currentWeekStartDate.setDate(currentDay - 7);
+            } else {
+                // Nếu đang ở tuần đầu tháng, chuyển sang tháng trước
+                const currentMonth = currentWeekStartDate.getMonth();
+                // Đặt về tháng trước
+                currentWeekStartDate.setMonth(currentMonth - 1);
+                // Đặt về ngày 1 của tháng trước đó
+                currentWeekStartDate.setDate(1);
+                // Tính tuần cuối cùng của tháng trước
+                const daysInMonth = new Date(currentWeekStartDate.getFullYear(), currentWeekStartDate.getMonth() + 1, 0).getDate();
+                const lastWeekStart = Math.floor((daysInMonth - 1) / 7) * 7 + 1;
+                currentWeekStartDate.setDate(lastWeekStart);
+            }
+            updateWeekLabel();
+            fetchWeeklyData();
+        });
+
+        document.getElementById('nextWeek').addEventListener('click', function() {
+            // Lấy tuần kế tiếp trong tháng
+            const currentDay = currentWeekStartDate.getDate();
+            const daysInMonth = new Date(currentWeekStartDate.getFullYear(), currentWeekStartDate.getMonth() + 1, 0).getDate();
+            
+            // Kiểm tra xem có còn tuần tiếp theo trong tháng không
+            if (currentDay + 7 <= daysInMonth) {
+                // Còn tuần tiếp theo trong tháng hiện tại
+                currentWeekStartDate.setDate(currentDay + 7);
+            } else {
+                // Chuyển sang tháng tiếp theo, tuần đầu tiên
+                const currentMonth = currentWeekStartDate.getMonth();
+                currentWeekStartDate.setMonth(currentMonth + 1);
+                currentWeekStartDate.setDate(1); // Ngày 1 của tháng mới
+            }
+            updateWeekLabel();
+            fetchWeeklyData();
+        });
+
+        document.getElementById('currentWeek').addEventListener('click', function() {
+            // Reset về tuần hiện tại trong tháng hiện tại
+            const today = new Date();
+            // Lấy ngày 1 của tháng hiện tại
+            currentWeekStartDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            // Tính tuần chứa ngày hiện tại
+            const dayOfMonth = today.getDate();
+            const weekNumber = Math.floor((dayOfMonth - 1) / 7);
+            // Đặt ngày bắt đầu tuần (1, 8, 15, 22, 29)
+            currentWeekStartDate.setDate(weekNumber * 7 + 1);
+            
+            updateWeekLabel();
+            fetchWeeklyData();
+        });
         
         // ----- BIỂU ĐỒ THEO THÁNG -----
-        let currentMonthDate = new Date();
-        let currentMonthBounds = getMonthBounds(currentMonthDate);
-        
-        // Cập nhật label tháng
+        let currentMonth = new Date();
+        let monthlyChart;
+        let monthlyData = {
+            labels: [],
+            revenue: [],
+            productCount: []
+        };
+
+        // Khởi tạo và cập nhật nhãn tháng
         function updateMonthLabel() {
-            document.getElementById('monthLabel').innerText = `Tháng ${formatMonthYear(currentMonthDate)}`;
+            document.getElementById('monthLabel').innerHTML = `<i class="far fa-calendar-alt me-2"></i>Tháng ${currentMonth.getMonth() + 1}/${currentMonth.getFullYear()}`;
         }
-        
-        // Nút điều hướng tháng
-        document.getElementById('prevMonth').addEventListener('click', function() {
-            currentMonthDate.setMonth(currentMonthDate.getMonth() - 1);
-            currentMonthBounds = getMonthBounds(currentMonthDate);
-            updateMonthLabel();
-            fetchMonthlyData();
-        });
-        
-        document.getElementById('nextMonth').addEventListener('click', function() {
-            currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
-            currentMonthBounds = getMonthBounds(currentMonthDate);
-            updateMonthLabel();
-            fetchMonthlyData();
-        });
-        
-        document.getElementById('currentMonth').addEventListener('click', function() {
-            currentMonthDate = new Date();
-            currentMonthBounds = getMonthBounds(currentMonthDate);
-            updateMonthLabel();
-            fetchMonthlyData();
-        });
-        
-        // Lấy dữ liệu doanh thu theo tháng từ API
+
+        // Hàm để lấy dữ liệu biểu đồ theo tháng
         function fetchMonthlyData() {
-            // Format tháng thành yyyy-MM cho API
-            const monthYearFormatted = `${currentMonthDate.getFullYear()}-${String(currentMonthDate.getMonth() + 1).padStart(2, '0')}`;
+            // Format date để gửi API: yyyy-MM
+            const formattedMonth = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+            const productId = /*[[${productId}]]*/ '';
             
-            // Kiểm tra nếu có mã sản phẩm được chỉ định từ form tìm kiếm
-            const productIdInput = document.getElementById('productId');
-            const productId = productIdInput && productIdInput.value ? productIdInput.value.trim() : '';
-            const productParam = productId ? `&productId=${encodeURIComponent(productId)}` : '';
-            
-            // Gọi API để lấy dữ liệu
-            fetch(`/api/revenue/monthly?monthYear=${monthYearFormatted}${productParam}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Error fetching monthly data:', data.error);
-                        return;
+            fetch(`/api/revenue/monthly?monthYear=${formattedMonth}${productId ? '&productId=' + productId : ''}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Lỗi khi tải dữ liệu doanh thu theo tháng');
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    monthlyData = data;
                     
-                    // Tạo mảng nhãn mới với định dạng "Tuần X" và ngày để hiển thị mờ phía dưới tuần
-                    const originalLabels = data.labels;
-                    const weekLabels = originalLabels.map((date, index) => `Tuần ${index + 1}`);
-                    const subtitleLabels = originalLabels; // Giữ nguyên định dạng ngày làm phụ đề
+                    // Tính tổng lợi nhuận và hiển thị
+                    const totalRevenue = data.revenue.reduce((sum, current) => sum + current, 0);
+                    document.getElementById('monthlyTotalRevenue').textContent = formatVND(totalRevenue);
                     
-                    updateMonthlyChart(weekLabels, data.data, subtitleLabels);
+                    renderMonthlyChart();
                 })
                 .catch(error => {
                     console.error('Error fetching monthly data:', error);
-                    // Fallback khi API lỗi - dùng dữ liệu mẫu
-                    const weeks = [];
-                    const weekDates = [];
-                    const revenues = [];
-                    
-                    // Tìm thứ 2 đầu tiên của tháng (hoặc ngày đầu tháng nếu là thứ 2)
-                    let firstMonday = getMonday(currentMonthBounds.firstDay);
-                    if (firstMonday < currentMonthBounds.firstDay) {
-                        // Nếu thứ 2 đầu tiên ở tháng trước, lấy thứ 2 tiếp theo
-                        firstMonday.setDate(firstMonday.getDate() + 7);
-                    }
-                    
-                    // Tạo các tuần trong tháng
-                    let weekCount = 0;
-                    let weekStart = new Date(firstMonday);
-                    while (weekStart <= currentMonthBounds.lastDay && weekCount < 5) {
-                        weekCount++;
-                        const weekEnd = new Date(weekStart);
-                        weekEnd.setDate(weekStart.getDate() + 6);
-                        
-                        weeks.push(`Tuần ${weekCount}`);
-                        weekDates.push(`${formatDate(weekStart)} - ${formatDate(weekEnd)}`);
-                        
-                        // Random doanh thu để demo
-                        const revenue = Math.floor(Math.random() * 200000000) + 50000000;
-                        revenues.push(revenue);
-                        
-                        // Chuyển sang tuần kế tiếp
-                        weekStart.setDate(weekStart.getDate() + 7);
-                    }
-                    
-                    updateMonthlyChart(weeks, revenues, weekDates);
+                    showToast('error', 'Lỗi', 'Không thể tải dữ liệu doanh thu theo tháng');
                 });
         }
-        
-        // Biểu đồ doanh thu theo tháng
-        let monthlyChart;
-        function updateMonthlyChart(labels, data, subtitleLabels) {
+
+        // Render biểu đồ doanh thu theo tháng
+        function renderMonthlyChart() {
             const ctx = document.getElementById('monthlyRevenueChart').getContext('2d');
             
-            // Destroy biểu đồ cũ nếu tồn tại
+            // Hủy biểu đồ cũ nếu đã tồn tại
             if (monthlyChart) {
                 monthlyChart.destroy();
             }
             
-            // Kiểm tra nếu đang xem một sản phẩm cụ thể
-            const productIdInput = document.getElementById('productId');
-            const productId = productIdInput && productIdInput.value ? productIdInput.value.trim() : '';
-            const isSingleProduct = productId !== '';
-            const chartTitle = isSingleProduct ? 
-                `Doanh thu theo tuần cho sản phẩm: ${productId}` : 
-                'Doanh thu theo tuần';
+            // Kiểm tra nếu có thông tin sản phẩm (trường hợp tìm kiếm theo mã sản phẩm)
+            const hasProductInfo = monthlyData.productInfo !== undefined;
             
-            // Thêm CSS cho phụ đề
-            Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+            // Tạo dataset cho biểu đồ
+            let datasets = [];
+            
+            if (hasProductInfo) {
+                // Hiển thị biểu đồ nhóm với giá nhập, giá bán và doanh thu
+                const productInfo = monthlyData.productInfo;
+                
+                // Tạo gradient cho các cột
+                const purchaseGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                purchaseGradient.addColorStop(0, 'rgba(244, 63, 94, 0.8)');
+                purchaseGradient.addColorStop(1, 'rgba(244, 63, 94, 0.2)');
+                
+                const sellingGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                sellingGradient.addColorStop(0, 'rgba(14, 165, 233, 0.8)');
+                sellingGradient.addColorStop(1, 'rgba(14, 165, 233, 0.2)');
+                
+                const revenueGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                revenueGradient.addColorStop(0, 'rgba(34, 197, 94, 0.8)');
+                revenueGradient.addColorStop(1, 'rgba(34, 197, 94, 0.2)');
+                
+                // Tạo dữ liệu giá nhập
+                let purchasePriceTotal = 0;
+                const purchasePriceDatasets = monthlyData.purchasePriceData.map((price, index) => {
+                    const quantity = monthlyData.productCount[index];
+                    const totalPrice = price * quantity;
+                    purchasePriceTotal += totalPrice;
+                    return totalPrice;
+                });
+                
+                // Tạo dữ liệu giá bán
+                let sellingPriceTotal = 0;
+                const sellingPriceDatasets = monthlyData.sellingPriceData.map((price, index) => {
+                    const quantity = monthlyData.productCount[index];
+                    const totalPrice = price * quantity;
+                    sellingPriceTotal += totalPrice;
+                    return totalPrice;
+                });
+                
+                // Thêm datasets
+                datasets = [
+                    {
+                        label: 'Giá Nhập',
+                        data: purchasePriceDatasets,
+                        backgroundColor: purchaseGradient,
+                        borderColor: 'rgba(244, 63, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Giá Bán',
+                        data: sellingPriceDatasets,
+                        backgroundColor: sellingGradient,
+                        borderColor: 'rgba(14, 165, 233, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Doanh Thu',
+                        data: monthlyData.revenue,
+                        backgroundColor: revenueGradient,
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    }
+                ];
+                
+                // Thêm thông tin sản phẩm vào title
+                document.getElementById('monthLabel').innerHTML = `<i class="far fa-calendar-alt me-2"></i>${monthlyData.month} ${monthlyData.year} - Sản phẩm: ${productInfo.name} (ID: ${productInfo.id})`;
+            } else {
+                // Hiển thị biểu đồ đơn chỉ với doanh thu
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(16, 185, 129, 0.8)');
+                gradient.addColorStop(1, 'rgba(16, 185, 129, 0.2)');
+                
+                datasets = [{
+                    label: 'Doanh Thu',
+                    data: monthlyData.revenue,
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.7
+                }];
+            }
             
             monthlyChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: chartTitle,
-                        data: data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
+                    labels: monthlyData.labels,
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) { return formatVND(value); }
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 20,
+                                font: { size: 14, weight: '600' }
                             }
                         },
-                        x: {
-                            ticks: {
-                                callback: function(value, index) {
-                                    return labels[index];
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            titleFont: { size: 16, weight: 'bold' },
+                            bodyFont: { size: 15 },
+                            padding: 15,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) { 
+                                    return `${context.dataset.label}: ${formatVND(context.raw)}`; 
+                                },
+                                title: function(context) { 
+                                    const title = `Tuần: ${context[0].label}`;
+                                    return hasProductInfo ? 
+                                        `${title} - Số lượng: ${monthlyData.productCount[context[0].dataIndex]}` : 
+                                        title;
                                 }
-                            },
-                            afterTickToLabelConversion: function(scaleInstance) {
-                                // Lưu trữ nhãn gốc
-                                const originalLabels = scaleInstance.ticks;
-                                
-                                // Thêm dòng phụ đề
-                                scaleInstance.ticks.forEach((tick, index) => {
-                                    if (subtitleLabels && index < subtitleLabels.length) {
-                                        tick.label = [
-                                            tick.label, 
-                                            `\n\n${subtitleLabels[index]}`
-                                        ];
-                                    }
-                                });
                             }
                         }
                     },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    const index = context[0].dataIndex;
-                                    return `${labels[index]} (${subtitleLabels[index]})`;
-                                },
-                                label: function(context) { 
-                                    return 'Doanh thu: ' + formatVND(context.raw); 
-                                }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(226, 232, 240, 0.8)', drawBorder: false },
+                            border: { display: false },
+                            ticks: {
+                                callback: function(value) { return formatVND(value); },
+                                font: { size: 12, weight: '500' },
+                                color: '#64748b',
+                                padding: 10
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                font: { size: 12, weight: '500' },
+                                color: '#64748b',
+                                padding: 10
                             }
                         }
-                    }
+                    },
+                    animation: { duration: 1000, easing: 'easeOutQuart' }
                 }
             });
         }
+
+        // Xử lý sự kiện cho các nút điều hướng tháng
+        document.getElementById('prevMonth').addEventListener('click', function() {
+            const newDate = new Date(currentMonth);
+            newDate.setMonth(newDate.getMonth() - 1);
+            currentMonth = newDate;
+            updateMonthLabel();
+            fetchMonthlyData();
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', function() {
+            const newDate = new Date(currentMonth);
+            newDate.setMonth(newDate.getMonth() + 1);
+            currentMonth = newDate;
+            updateMonthLabel();
+            fetchMonthlyData();
+        });
+
+        document.getElementById('currentMonth').addEventListener('click', function() {
+            currentMonth = new Date();
+            updateMonthLabel();
+            fetchMonthlyData();
+        });
         
         // ----- BIỂU ĐỒ THEO NĂM -----
-        let currentYearDate = new Date();
-        let currentYearBounds = getYearBounds(currentYearDate);
-        
-        // Cập nhật label năm
+        let currentYear = new Date().getFullYear();
+        let yearlyChart;
+        let yearlyData = {
+            labels: [],
+            revenue: [],
+            productCount: []
+        };
+
+        // Khởi tạo và cập nhật nhãn năm
         function updateYearLabel() {
-            document.getElementById('yearLabel').innerText = `Năm ${currentYearDate.getFullYear()}`;
+            document.getElementById('yearLabel').innerHTML = `<i class="far fa-calendar-alt me-2"></i>Năm ${currentYear}`;
         }
-        
-        // Nút điều hướng năm
-        document.getElementById('prevYear').addEventListener('click', function() {
-            currentYearDate.setFullYear(currentYearDate.getFullYear() - 1);
-            currentYearBounds = getYearBounds(currentYearDate);
-            updateYearLabel();
-            fetchYearlyData();
-        });
-        
-        document.getElementById('nextYear').addEventListener('click', function() {
-            currentYearDate.setFullYear(currentYearDate.getFullYear() + 1);
-            currentYearBounds = getYearBounds(currentYearDate);
-            updateYearLabel();
-            fetchYearlyData();
-        });
-        
-        document.getElementById('currentYear').addEventListener('click', function() {
-            currentYearDate = new Date();
-            currentYearBounds = getYearBounds(currentYearDate);
-            updateYearLabel();
-            fetchYearlyData();
-        });
-        
-        // Lấy dữ liệu doanh thu theo năm từ API
+
+        // Hàm để lấy dữ liệu biểu đồ theo năm
         function fetchYearlyData() {
-            // Kiểm tra nếu có mã sản phẩm được chỉ định từ form tìm kiếm
-            const productIdInput = document.getElementById('productId');
-            const productId = productIdInput && productIdInput.value ? productIdInput.value.trim() : '';
-            const productParam = productId ? `&productId=${encodeURIComponent(productId)}` : '';
+            const productId = /*[[${productId}]]*/ '';
             
-            // Gọi API để lấy dữ liệu
-            fetch(`/api/revenue/yearly?year=${currentYearDate.getFullYear()}${productParam}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Error fetching yearly data:', data.error);
-                        return;
+            fetch(`/api/revenue/yearly?year=${currentYear}${productId ? '&productId=' + productId : ''}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Lỗi khi tải dữ liệu doanh thu theo năm');
                     }
-                    updateYearlyChart(data.labels, data.data);
+                    return response.json();
+                })
+                .then(data => {
+                    yearlyData = data;
+                    
+                    // Tính tổng lợi nhuận và hiển thị
+                    const totalRevenue = data.revenue.reduce((sum, current) => sum + current, 0);
+                    document.getElementById('yearlyTotalRevenue').textContent = formatVND(totalRevenue);
+                    
+                    renderYearlyChart();
                 })
                 .catch(error => {
                     console.error('Error fetching yearly data:', error);
-                    // Fallback khi API lỗi - dùng dữ liệu mẫu
-                    const revenues = [];
-                    
-                    // Doanh thu 12 tháng trong năm
-                    for (let i = 0; i < 12; i++) {
-                        // Random doanh thu để demo
-                        const revenue = Math.floor(Math.random() * 800000000) + 200000000;
-                        revenues.push(revenue);
-                    }
-                    
-                    updateYearlyChart(months, revenues);
+                    showToast('error', 'Lỗi', 'Không thể tải dữ liệu doanh thu theo năm');
                 });
         }
-        
-        // Biểu đồ doanh thu theo năm
-        let yearlyChart;
-        function updateYearlyChart(labels, data) {
+
+        // Render biểu đồ doanh thu theo năm
+        function renderYearlyChart() {
             const ctx = document.getElementById('yearlyRevenueChart').getContext('2d');
             
-            // Destroy biểu đồ cũ nếu tồn tại
+            // Hủy biểu đồ cũ nếu đã tồn tại
             if (yearlyChart) {
                 yearlyChart.destroy();
             }
             
-            // Kiểm tra nếu đang xem một sản phẩm cụ thể
-            const productIdInput = document.getElementById('productId');
-            const productId = productIdInput && productIdInput.value ? productIdInput.value.trim() : '';
-            const isSingleProduct = productId !== '';
-            const chartTitle = isSingleProduct ? 
-                `Doanh thu theo tháng cho sản phẩm: ${productId}` : 
-                'Doanh thu theo tháng';
+            // Kiểm tra nếu có thông tin sản phẩm (trường hợp tìm kiếm theo mã sản phẩm)
+            const hasProductInfo = yearlyData.productInfo !== undefined;
+            
+            // Tạo dataset cho biểu đồ
+            let datasets = [];
+            
+            if (hasProductInfo) {
+                // Hiển thị biểu đồ nhóm với giá nhập, giá bán và doanh thu
+                const productInfo = yearlyData.productInfo;
+                
+                // Tạo gradient cho các cột
+                const purchaseGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                purchaseGradient.addColorStop(0, 'rgba(244, 63, 94, 0.8)');
+                purchaseGradient.addColorStop(1, 'rgba(244, 63, 94, 0.2)');
+                
+                const sellingGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                sellingGradient.addColorStop(0, 'rgba(14, 165, 233, 0.8)');
+                sellingGradient.addColorStop(1, 'rgba(14, 165, 233, 0.2)');
+                
+                const revenueGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                revenueGradient.addColorStop(0, 'rgba(34, 197, 94, 0.8)');
+                revenueGradient.addColorStop(1, 'rgba(34, 197, 94, 0.2)');
+                
+                // Tạo dữ liệu giá nhập
+                let purchasePriceTotal = 0;
+                const purchasePriceDatasets = yearlyData.purchasePriceData.map((price, index) => {
+                    const quantity = yearlyData.productCount[index];
+                    const totalPrice = price * quantity;
+                    purchasePriceTotal += totalPrice;
+                    return totalPrice;
+                });
+                
+                // Tạo dữ liệu giá bán
+                let sellingPriceTotal = 0;
+                const sellingPriceDatasets = yearlyData.sellingPriceData.map((price, index) => {
+                    const quantity = yearlyData.productCount[index];
+                    const totalPrice = price * quantity;
+                    sellingPriceTotal += totalPrice;
+                    return totalPrice;
+                });
+                
+                // Thêm datasets
+                datasets = [
+                    {
+                        label: 'Giá Nhập',
+                        data: purchasePriceDatasets,
+                        backgroundColor: purchaseGradient,
+                        borderColor: 'rgba(244, 63, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Giá Bán',
+                        data: sellingPriceDatasets,
+                        backgroundColor: sellingGradient,
+                        borderColor: 'rgba(14, 165, 233, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Doanh Thu',
+                        data: yearlyData.revenue,
+                        backgroundColor: revenueGradient,
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    }
+                ];
+                
+                // Thêm thông tin sản phẩm vào title
+                document.getElementById('yearLabel').innerHTML = `<i class="far fa-calendar-alt me-2"></i>Năm ${yearlyData.year} - Sản phẩm: ${productInfo.name} (ID: ${productInfo.id})`;
+            } else {
+                // Hiển thị biểu đồ đơn chỉ với doanh thu
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.8)');
+                gradient.addColorStop(1, 'rgba(245, 158, 11, 0.2)');
+                
+                datasets = [{
+                    label: 'Doanh Thu',
+                    data: yearlyData.revenue,
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(245, 158, 11, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.7
+                }];
+            }
             
             yearlyChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: chartTitle,
-                        data: data,
-                        backgroundColor: 'rgba(153, 102, 255, 0.7)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
+                    labels: yearlyData.labels,
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) { return formatVND(value); }
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 20,
+                                font: { size: 14, weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            titleFont: { size: 16, weight: 'bold' },
+                            bodyFont: { size: 15 },
+                            padding: 15,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) { 
+                                    return `${context.dataset.label}: ${formatVND(context.raw)}`; 
+                                },
+                                title: function(context) { 
+                                    const title = context[0].label;
+                                    return hasProductInfo ? 
+                                        `${title} - Số lượng: ${yearlyData.productCount[context[0].dataIndex]}` : 
+                                        title;
+                                }
                             }
                         }
                     },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) { return 'Doanh thu: ' + formatVND(context.raw); }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(226, 232, 240, 0.8)', drawBorder: false },
+                            border: { display: false },
+                            ticks: {
+                                callback: function(value) { return formatVND(value); },
+                                font: { size: 12, weight: '500' },
+                                color: '#64748b',
+                                padding: 10
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                font: { size: 12, weight: '500' },
+                                color: '#64748b',
+                                padding: 10
                             }
                         }
-                    }
+                    },
+                    animation: { duration: 1000, easing: 'easeOutQuart' }
                 }
             });
         }
+
+        // Xử lý sự kiện cho các nút điều hướng năm
+        document.getElementById('prevYear').addEventListener('click', function() {
+            currentYear--;
+            updateYearLabel();
+            fetchYearlyData();
+        });
+
+        document.getElementById('nextYear').addEventListener('click', function() {
+            currentYear++;
+            updateYearLabel();
+            fetchYearlyData();
+        });
+
+        document.getElementById('currentYear').addEventListener('click', function() {
+            currentYear = new Date().getFullYear();
+            updateYearLabel();
+            fetchYearlyData();
+        });
         
         // ----- BIỂU ĐỒ 3 NĂM GẦN ĐÂY -----
-        // Lấy dữ liệu doanh thu 3 năm gần đây từ API
+        let multiYearChart;
+        let multiYearData = {
+            labels: [],
+            revenue: [],
+            productCount: []
+        };
+
+        // Hàm để lấy dữ liệu biểu đồ 3 năm gần đây
         function fetchMultiYearData() {
-            // Kiểm tra nếu có mã sản phẩm được chỉ định từ form tìm kiếm
-            const productIdInput = document.getElementById('productId');
-            const productId = productIdInput && productIdInput.value ? productIdInput.value.trim() : '';
-            const productParam = productId ? `?productId=${encodeURIComponent(productId)}` : '';
+            const productId = /*[[${productId}]]*/ '';
             
-            // Gọi API để lấy dữ liệu
-            fetch(`/api/revenue/multi-year${productParam}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Error fetching multi-year data:', data.error);
-                        return;
+            fetch(`/api/revenue/multi-year${productId ? '?productId=' + productId : ''}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Lỗi khi tải dữ liệu doanh thu 3 năm gần đây');
                     }
-                    updateMultiYearChart(data.labels, data.data);
+                    return response.json();
+                })
+                .then(data => {
+                    multiYearData = data;
+                    
+                    // Tính tổng lợi nhuận và hiển thị
+                    const totalRevenue = data.revenue.reduce((sum, current) => sum + current, 0);
+                    document.getElementById('multiYearTotalRevenue').textContent = formatVND(totalRevenue);
+                    
+                    renderMultiYearChart();
                 })
                 .catch(error => {
                     console.error('Error fetching multi-year data:', error);
-                    // Fallback khi API lỗi - dùng dữ liệu mẫu
-                    const currentYear = new Date().getFullYear();
-                    const years = [currentYear - 2, currentYear - 1, currentYear];
-                    const yearLabels = years.map(year => `Năm ${year}`);
-                    const revenues = [];
-                    
-                    // Giả lập doanh thu 3 năm gần đây
-                    for (let i = 0; i < 3; i++) {
-                        // Random doanh thu để demo
-                        const revenue = Math.floor(Math.random() * 5000000000) + 1000000000;
-                        revenues.push(revenue);
-                    }
-                    
-                    updateMultiYearChart(yearLabels, revenues);
+                    showToast('error', 'Lỗi', 'Không thể tải dữ liệu doanh thu 3 năm gần đây');
                 });
         }
-        
-        // Biểu đồ doanh thu 3 năm gần đây
-        let multiYearChart;
-        function updateMultiYearChart(labels, data) {
+
+        // Render biểu đồ doanh thu 3 năm gần đây
+        function renderMultiYearChart() {
             const ctx = document.getElementById('multiYearRevenueChart').getContext('2d');
             
-            // Destroy biểu đồ cũ nếu tồn tại
+            // Hủy biểu đồ cũ nếu đã tồn tại
             if (multiYearChart) {
                 multiYearChart.destroy();
             }
             
-            // Kiểm tra nếu đang xem một sản phẩm cụ thể
-            const productIdInput = document.getElementById('productId');
-            const productId = productIdInput && productIdInput.value ? productIdInput.value.trim() : '';
-            const isSingleProduct = productId !== '';
-            const chartTitle = isSingleProduct ? 
-                `Doanh thu theo năm cho sản phẩm: ${productId}` : 
-                'Doanh thu theo năm';
+            // Kiểm tra nếu có thông tin sản phẩm (trường hợp tìm kiếm theo mã sản phẩm)
+            const hasProductInfo = multiYearData.productInfo !== undefined;
+            
+            // Tạo dataset cho biểu đồ
+            let datasets = [];
+            
+            if (hasProductInfo) {
+                // Hiển thị biểu đồ nhóm với giá nhập, giá bán và doanh thu
+                const productInfo = multiYearData.productInfo;
+                
+                // Tạo gradient cho các cột
+                const purchaseGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                purchaseGradient.addColorStop(0, 'rgba(244, 63, 94, 0.8)');
+                purchaseGradient.addColorStop(1, 'rgba(244, 63, 94, 0.2)');
+                
+                const sellingGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                sellingGradient.addColorStop(0, 'rgba(14, 165, 233, 0.8)');
+                sellingGradient.addColorStop(1, 'rgba(14, 165, 233, 0.2)');
+                
+                const revenueGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                revenueGradient.addColorStop(0, 'rgba(34, 197, 94, 0.8)');
+                revenueGradient.addColorStop(1, 'rgba(34, 197, 94, 0.2)');
+                
+                // Tạo dữ liệu giá nhập
+                let purchasePriceTotal = 0;
+                const purchasePriceDatasets = multiYearData.purchasePriceData.map((price, index) => {
+                    const quantity = multiYearData.productCount[index];
+                    const totalPrice = price * quantity;
+                    purchasePriceTotal += totalPrice;
+                    return totalPrice;
+                });
+                
+                // Tạo dữ liệu giá bán
+                let sellingPriceTotal = 0;
+                const sellingPriceDatasets = multiYearData.sellingPriceData.map((price, index) => {
+                    const quantity = multiYearData.productCount[index];
+                    const totalPrice = price * quantity;
+                    sellingPriceTotal += totalPrice;
+                    return totalPrice;
+                });
+                
+                // Thêm datasets
+                datasets = [
+                    {
+                        label: 'Giá Nhập',
+                        data: purchasePriceDatasets,
+                        backgroundColor: purchaseGradient,
+                        borderColor: 'rgba(244, 63, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Giá Bán',
+                        data: sellingPriceDatasets,
+                        backgroundColor: sellingGradient,
+                        borderColor: 'rgba(14, 165, 233, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Doanh Thu',
+                        data: multiYearData.revenue,
+                        backgroundColor: revenueGradient,
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    }
+                ];
+                
+                // Cập nhật tiêu đề với thông tin sản phẩm
+                const titleElement = document.querySelector('#multi-year-chart .chart-navigation h5');
+                titleElement.innerHTML = `<i class="fas fa-chart-line me-2"></i>Doanh Thu 3 Năm Gần Đây - Sản phẩm: ${productInfo.name} (ID: ${productInfo.id})`;
+            } else {
+                // Hiển thị biểu đồ đơn chỉ với doanh thu
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(14, 165, 233, 0.8)');
+                gradient.addColorStop(1, 'rgba(14, 165, 233, 0.2)');
+                
+                datasets = [{
+                    label: 'Doanh Thu',
+                    data: multiYearData.revenue,
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(14, 165, 233, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.7
+                }];
+            }
             
             multiYearChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: chartTitle,
-                        data: data,
-                        backgroundColor: 'rgba(255, 159, 64, 0.7)',
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
+                    labels: multiYearData.labels,
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) { return formatVND(value); }
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 20,
+                                font: { size: 14, weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            titleFont: { size: 16, weight: 'bold' },
+                            bodyFont: { size: 15 },
+                            padding: 15,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) { 
+                                    return `${context.dataset.label}: ${formatVND(context.raw)}`; 
+                                },
+                                title: function(context) { 
+                                    const title = `Năm: ${context[0].label}`;
+                                    return hasProductInfo ? 
+                                        `${title} - Số lượng: ${multiYearData.productCount[context[0].dataIndex]}` : 
+                                        title;
+                                }
                             }
                         }
                     },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) { return 'Doanh thu: ' + formatVND(context.raw); }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(226, 232, 240, 0.8)', drawBorder: false },
+                            border: { display: false },
+                            ticks: {
+                                callback: function(value) { return formatVND(value); },
+                                font: { size: 12, weight: '500' },
+                                color: '#64748b',
+                                padding: 10
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                font: { size: 12, weight: '500' },
+                                color: '#64748b',
+                                padding: 10
                             }
                         }
-                    }
+                    },
+                    animation: { duration: 1000, easing: 'easeOutQuart' }
                 }
             });
+        }
+
+        // Hàm hiện thông báo toast
+        function showToast(type, title, message) {
+            // Check if showToast function exists globally (from toast.html)
+            if (typeof window.showToast === 'function') {
+                window.showToast(type, title, message);
+            } else {
+                console.error(title + ': ' + message);
+            }
         }
         
         // Xử lý sự kiện khi chuyển tab

@@ -139,9 +139,12 @@ public class SalesReportService {
     }
 
     public boolean isProductIdValid(Integer productId) {
-        List<Invoice> allInvoices = invoiceRepository.findAll();
-        return allInvoices.stream()
-                .flatMap(invoice -> invoice.getInvoiceDetailList().stream())
-                .anyMatch(detail -> detail.getProduct() != null && detail.getProduct().getProductID().equals(productId));
+        if (productId == null) return false;
+        return productService.findById(productId) != null;
+    }
+
+    public Product findProductById(Integer productId) {
+        if (productId == null) return null;
+        return productService.findById(productId);
     }
 }
