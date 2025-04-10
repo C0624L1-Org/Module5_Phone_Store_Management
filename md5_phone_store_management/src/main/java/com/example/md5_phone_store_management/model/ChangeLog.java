@@ -14,9 +14,11 @@ public class ChangeLog {
     private String entityName; // Tên của entity bị thay đổi (VD: "User", "Order")
     private Long entityId;    // ID của bản ghi bị thay đổi
     private String action;    // Hành động: "INSERT", "UPDATE", "DELETE"
-    private String oldValue;  // Giá trị cũ (có thể lưu dạng JSON hoặc String)
-    private String newValue;  // Giá trị mới
+    private String oldValue;  // Giá trị cũ (giới hạn độ dài)
+    private String newValue;  // Giá trị mới (giới hạn độ dài)
     private LocalDateTime timestamp; // Thời điểm thay đổi
+
+    private static final int MAX_LENGTH = 4000; // Giới hạn độ dài tối đa
 
     // Getters và Setters
     public Long getId() { return id; }
@@ -27,10 +29,25 @@ public class ChangeLog {
     public void setEntityId(Long entityId) { this.entityId = entityId; }
     public String getAction() { return action; }
     public void setAction(String action) { this.action = action; }
+
     public String getOldValue() { return oldValue; }
-    public void setOldValue(String oldValue) { this.oldValue = oldValue; }
+    public void setOldValue(String oldValue) {
+        if (oldValue != null && oldValue.length() > MAX_LENGTH) {
+            this.oldValue = oldValue.substring(0, MAX_LENGTH - 3) + "..."; // Cắt ngắn và thêm dấu ...
+        } else {
+            this.oldValue = oldValue;
+        }
+    }
+
     public String getNewValue() { return newValue; }
-    public void setNewValue(String newValue) { this.newValue = newValue; }
+    public void setNewValue(String newValue) {
+        if (newValue != null && newValue.length() > MAX_LENGTH) {
+            this.newValue = newValue.substring(0, MAX_LENGTH - 3) + "..."; // Cắt ngắn và thêm dấu ...
+        } else {
+            this.newValue = newValue;
+        }
+    }
+
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 }
