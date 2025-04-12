@@ -4,6 +4,7 @@ import com.example.md5_phone_store_management.service.ICustomerService;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IProductService;
 import com.example.md5_phone_store_management.service.ISupplierService;
+import com.example.md5_phone_store_management.service.implement.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +31,6 @@ public class DashboardController {
 
     @GetMapping("/admin")
     public String admin(Model model) {
-        // Thống kê nhân viên
         model.addAttribute("countEmployee", iEmployeeService.countEmployee());
         model.addAttribute("countSalesStaff", iEmployeeService.countSalesStaff());
         model.addAttribute("countBusinessStaff", iEmployeeService.countBusinessStaff());
@@ -44,10 +44,7 @@ public class DashboardController {
         model.addAttribute("countProducts", iProductService.countProducts());
         model.addAttribute("totalProductsSold", iProductService.countSoldProducts());
 //        model.addAttribute("totalRevenue", iProductService.calculateTotalRevenue());
-
-
-
-        return "dashboard/admin/ttlog";
+        return "dashboard/admin/admin-home";
     }
 
     @GetMapping("/warehouse-staff")

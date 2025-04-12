@@ -495,6 +495,45 @@
                     <canvas id="salesChart"></canvas>
                 </div>
 
+<!--                <div class="dash-updates-profile">-->
+<!--                    <div class="dash-header">-->
+<!--                        <h3>Cập Nhật Mới Nhất</h3>-->
+<!--                        <button class="dash-expand-btn" onclick="toggleExpand('updates')">-->
+<!--                            <i class="fas fa-expand"></i>-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <div th:each="log : ${changeLogs}" class="update-item">-->
+<!--                        <div class="flex items-center">-->
+<!--                            &lt;!&ndash; Thời gian tương đối &ndash;&gt;-->
+<!--                            <p class="text-sm text-gray-600 mr-4" th:text="${#temporals.format(log.timestamp, 'dd/MM/yyyy HH:mm')}"></p>-->
+<!--                            &lt;!&ndash; Icon dựa trên action &ndash;&gt;-->
+<!--                            <div class="icon"-->
+<!--                                 th:classappend="${log.action == 'INSERT' ? 'bg-green-500' : log.action == 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'}">-->
+<!--                                <i th:class="${log.action == 'INSERT' ? 'fas fa-plus' : log.action == 'UPDATE' ? 'fas fa-edit' : 'fas fa-trash'}"></i>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="content">-->
+<!--                            &lt;!&ndash; Nội dung mô tả &ndash;&gt;-->
+<!--                            <p class="font-semibold" th:switch="${log.action}">-->
+<!--                                <span th:case="'INSERT'">Nhân viên ID <span th:text="${log.employeeId}"></span> đã thêm <span th:text="${log.entityName}"></span> tên <span th:text="${log.newValue}"></span></span>-->
+<!--                                <span th:case="'UPDATE'">Nhân viên ID <span th:text="${log.employeeId}"></span> đã cập nhật <span th:text="${log.entityName}"></span> tên <span th:text="${log.newValue}"></span></span>-->
+<!--                                <span th:case="'DELETE'">Nhân viên ID <span th:text="${log.employeeId}"></span> đã xóa <span th:text="${log.entityName}"></span> tên <span th:text="${log.oldValue}"></span></span>-->
+<!--                            </p>-->
+<!--                            <p class="text-sm text-gray-500" th:switch="${log.action}">-->
+<!--                                <span th:case="'INSERT'">Thêm mới thành công!</span>-->
+<!--                                <span th:case="'UPDATE'">Cập nhật thành công!</span>-->
+<!--                                <span th:case="'DELETE'">Xóa thành công!</span>-->
+<!--                            </p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash; Hiển thị thông báo nếu không có log &ndash;&gt;-->
+<!--                    <div th:if="${#lists.isEmpty(changeLogs)}" class="update-item">-->
+<!--                        <div class="content">-->
+<!--                            <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
                 <div class="dash-updates-profile">
                     <div class="dash-header">
                         <h3>Cập Nhật Mới Nhất</h3>
@@ -502,19 +541,12 @@
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
-                    <div class="update-item">
-                        <div class="flex items-center">
-                            <p class="text-sm text-gray-600 mr-4">4 giờ trước</p>
-                            <div class="icon" style="background-color: #ff8a65;">
-                                <i class="fas fa-gift"></i>
-                            </div>
-                        </div>
-                        <div class="content">
-                            <p class="font-semibold">+ 5 Sản phẩm mới đã được thêm!</p>
-                            <p class="text-sm text-gray-500">Chúc mừng!</p>
-                        </div>
+                    <div id="changeLogsContainer">
+                        <!-- Change logs will be dynamically inserted here -->
                     </div>
                 </div>
+
+
             </div>
         </div>
     </div>
@@ -524,6 +556,96 @@
 </div>
 
 <!-- Scripts -->
+<script>
+    // Function to format relative time
+    function formatRelativeTime(timestamp) {
+        const now = new Date();
+        const logTime = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - logTime) / 1000);
+
+        if (diffInSeconds < 60) {
+            return "vừa xong";
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes} phút trước`;
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours} giờ trước`;
+        } else {
+            // Format as dd/MM/yyyy HH:mm for times older than 24 hours
+            return logTime.toLocaleString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    }
+
+    // Function to render change logs
+    function renderChangeLogs(logs) {
+        const container = document.getElementById('changeLogsContainer');
+        if (logs.length === 0) {
+            container.innerHTML = `
+            <div class="update-item">
+                <div class="content">
+                    <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
+                </div>
+            </div>
+        `;
+            return;
+        }
+
+        container.innerHTML = logs.map(log => `
+        <div class="update-item">
+            <div class="flex items-center">
+                <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>
+                <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'}">
+                    <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'}"></i>
+                </div>
+            </div>
+            <div class="content">
+                <p class="font-semibold">
+                    ${log.action === 'INSERT' ? `Nhân viên ID ${log.employeeId} đã thêm ${log.entityName} tên ${log.newValue}` :
+            log.action === 'UPDATE' ? `Nhân viên ID ${log.employeeId} đã cập nhật ${log.entityName} tên ${log.newValue}` :
+                `Nhân viên ID ${log.employeeId} đã xóa ${log.entityName} tên ${log.oldValue}`}
+                </p>
+                <p class="text-sm text-gray-500">
+                    ${log.action === 'INSERT' ? 'Thêm mới thành công!' :
+            log.action === 'UPDATE' ? 'Cập nhật thành công!' :
+                'Xóa thành công!'}
+                </p>
+            </div>
+        </div>
+    `).join('');
+    }
+
+    // Function to fetch change logs
+    function fetchChangeLogs() {
+        fetch('/api/changelogs')
+            .then(response => response.json())
+            .then(data => renderChangeLogs(data))
+            .catch(error => {
+                console.error('Error fetching change logs:', error);
+                document.getElementById('changeLogsContainer').innerHTML = `
+                <div class="update-item">
+                    <div class="content">
+                        <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+                    </div>
+                </div>
+            `;
+            });
+    }
+
+    // Initial fetch
+    fetchChangeLogs();
+
+    // Poll every 3 seconds
+    setInterval(fetchChangeLogs, 3000);
+</script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>

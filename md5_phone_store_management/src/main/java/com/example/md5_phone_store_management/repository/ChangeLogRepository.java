@@ -4,6 +4,16 @@ import com.example.md5_phone_store_management.model.ChangeLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
+    // Tìm các thay đổi theo entityName và entityId
+    List<ChangeLog> findByEntityNameAndEntityId(String entityName, Long entityId);
+
+    // Tìm các thay đổi theo employeeId
+    List<ChangeLog> findByEmployeeId(Long employeeId);
+
+    // Tìm các thay đổi theo action và entityName
+    List<ChangeLog> findByActionAndEntityName(String action, String entityName);
 }
