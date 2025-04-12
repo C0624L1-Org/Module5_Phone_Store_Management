@@ -2,7 +2,9 @@ package com.example.md5_phone_store_management.service;
 
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.InvoiceDetail;
+import com.example.md5_phone_store_management.model.Product;
 import com.example.md5_phone_store_management.repository.IInvoiceRepository;
+import com.example.md5_phone_store_management.service.implement.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class SalesReportService {
 
     @Autowired
     private IInvoiceRepository invoiceRepository;
+
+    @Autowired
+    private ProductService productService; // Thêm ProductService
 
     private static final DateTimeFormatter VNPAY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
@@ -110,15 +115,24 @@ public class SalesReportService {
                         )
                 ));
 
+        // Lấy thông tin chi tiết sản phẩm từ ProductService
+        Map<Integer, Product> productDetails = revenueByProduct.keySet().stream()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        id -> productService.findById(id) // Sử dụng ProductService
+                ));
+
         logger.info("Total Revenue: " + totalRevenue);
         logger.info("Total Products Sold: " + totalProductsSold);
         logger.info("Revenue by Product: " + revenueByProduct);
+        logger.info("Product Details: " + productDetails);
 
         Map<String, Object> report = new HashMap<>();
         report.put("totalOrders", totalOrders);
         report.put("totalRevenue", totalRevenue);
         report.put("totalProductsSold", totalProductsSold);
         report.put("revenueByProduct", revenueByProduct);
+        report.put("productDetails", productDetails);
 
         return report;
     }

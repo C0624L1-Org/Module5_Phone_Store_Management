@@ -40,7 +40,7 @@ public class DashboardController {
 
         // Thống kê sản phẩm và doanh thu
         model.addAttribute("countProducts", iProductService.countProducts());
-//        model.addAttribute("countSoldProducts", iProductService.countSoldProducts());
+        model.addAttribute("totalProductsSold", iProductService.countSoldProducts());
 //        model.addAttribute("totalRevenue", iProductService.calculateTotalRevenue());
 
         return "dashboard/admin/admin-home";
