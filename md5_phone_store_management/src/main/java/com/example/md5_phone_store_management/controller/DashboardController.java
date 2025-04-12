@@ -15,35 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/dashboard")
 public class DashboardController {
-    @Autowired
-    private IEmployeeService iEmployeeService;
-
-    @Autowired
-    private ISupplierService iSupplierService;
-
-    @Autowired
-    private IProductService iProductService;
-
-    @Autowired
-    private ICustomerService iCustomerService;
-
-
 
     @GetMapping("/admin")
-    public String admin(Model model) {
-        model.addAttribute("countEmployee", iEmployeeService.countEmployee());
-        model.addAttribute("countSalesStaff", iEmployeeService.countSalesStaff());
-        model.addAttribute("countBusinessStaff", iEmployeeService.countBusinessStaff());
-        model.addAttribute("countWarehouseStaff", iEmployeeService.countWarehouseStaff());
-        model.addAttribute("countCustomer", iCustomerService.countTotalCustomers());
-
-        // Thống kê nhà cung cấp
-        model.addAttribute("countSuppliers", iSupplierService.countSuppliers());
-
-        // Thống kê sản phẩm và doanh thu
-        model.addAttribute("countProducts", iProductService.countProducts());
-        model.addAttribute("totalProductsSold", iProductService.countSoldProducts());
-//        model.addAttribute("totalRevenue", iProductService.calculateTotalRevenue());
+    public String admin() {
         return "dashboard/admin/admin-home";
     }
 

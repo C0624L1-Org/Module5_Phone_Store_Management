@@ -213,6 +213,15 @@ public class ChangeLogService {
         this.entityManager = entityManager;
     }
 
+
+    public LocalDateTime getLastUpdateTime(String entityName) {
+        List<ChangeLog> changeLogs = changeLogRepository.findTopByEntityNameOrderByTimestampDesc(entityName);
+        if (changeLogs != null && !changeLogs.isEmpty()) {
+            return changeLogs.get(0).getTimestamp();
+        }
+        return null;
+    }
+
     /**
      * Lấy tất cả bản ghi ChangeLog, sắp xếp theo thời gian giảm dần.
      */

@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
+
+    List<ChangeLog> findTopByEntityNameOrderByTimestampDesc(String entityName);
     // Tìm các thay đổi theo entityName và entityId
     List<ChangeLog> findByEntityNameAndEntityId(String entityName, Long entityId);
 

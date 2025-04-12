@@ -1,142 +1,719 @@
 <!--<!DOCTYPE html>-->
-<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<html lang="vi">-->
 <!--<head>-->
-<!--  <meta charset="UTF-8">-->
-<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--  <title>Trang quản lý của Quản trị viên</title>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Bảng Điều Khiển</title>-->
 
-<!--  &lt;!&ndash; Bootstrap CSS &ndash;&gt;-->
-<!--  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
-<!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">-->
+<!--    &lt;!&ndash; CSS Libraries &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
 
-<!--  &lt;!&ndash; Custom CSS &ndash;&gt;-->
-<!--  <link rel="stylesheet" href="/css/fragments/navbar.css">-->
-<!--  <link rel="stylesheet" href="/css/fragments/sidebar.css">-->
-<!--  <link rel="stylesheet" href="/css/fragments/footer.css">-->
-<!--  <link rel="stylesheet" href="/css/common/toast.css">-->
-<!--  <link rel="stylesheet" href="/css/common/layout.css">-->
+<!--    &lt;!&ndash; Tailwind CSS &ndash;&gt;-->
+<!--    <script src="https://cdn.tailwindcss.com"></script>-->
+
+<!--    &lt;!&ndash; Custom CSS &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="/css/fragments/navbar.css">-->
+<!--    <link rel="stylesheet" href="/css/fragments/sidebar.css">-->
+<!--    <link rel="stylesheet" href="/css/fragments/footer.css">-->
+<!--    <link rel="stylesheet" href="/css/common/toast.css">-->
+<!--    <link rel="stylesheet" href="/css/common/layout.css">-->
+
+<!--    &lt;!&ndash; Inline CSS &ndash;&gt;-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            background-color: #f4f7fa;-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--        }-->
+
+<!--        .content-wrapper {-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            min-height: 100vh;-->
+<!--            padding-top: 90px;-->
+<!--        }-->
+
+<!--        .dashboard-container {-->
+<!--            display: flex;-->
+<!--            flex: 1; /* Chiếm không gian còn lại giữa navbar và footer */-->
+<!--        }-->
+
+<!--        .dash-container {-->
+<!--            max-width: 100%;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 1rem 2rem; /* Khoảng cách trái/phải và trên/dưới */-->
+<!--            flex: 1;-->
+<!--        }-->
+
+<!--        /* Sidebar */-->
+<!--        aside {-->
+<!--            min-width: 250px;-->
+<!--            background-color: #fff;-->
+<!--            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        /* Dashboard Cards */-->
+<!--        .dash-cards-wrapper {-->
+<!--            display: flex;-->
+<!--            gap: 20px;-->
+<!--            flex-wrap: nowrap;-->
+<!--            margin-bottom: 20px;-->
+<!--            width: 100%;-->
+<!--        }-->
+
+<!--        .dash-card {-->
+<!--            flex: 1;-->
+<!--            min-width: 0;-->
+<!--        }-->
+
+<!--        /* Update and Arrow Text */-->
+<!--        .dash-update-text {-->
+<!--            font-size: 16px;-->
+<!--            opacity: 0.9;-->
+<!--            text-align: center;-->
+<!--        }-->
+
+<!--        .dash-arrow-text {-->
+<!--            font-size: 12px;-->
+<!--            opacity: 0.8;-->
+<!--        }-->
+
+<!--        /* Bottom Section */-->
+<!--        .dash-bottom-section {-->
+<!--            display: flex;-->
+<!--            gap: 20px;-->
+<!--            width: 100%;-->
+<!--            position: relative;-->
+<!--            flex-wrap: wrap;-->
+<!--        }-->
+
+<!--        .dash-sales-analytics, .dash-updates-profile {-->
+<!--            background: white;-->
+<!--            border-radius: 10px;-->
+<!--            padding: 20px;-->
+<!--            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);-->
+<!--            transition: all 0.3s ease;-->
+<!--            overflow: hidden;-->
+<!--            flex: 1;-->
+<!--        }-->
+
+<!--        .dash-sales-analytics {-->
+<!--            flex: 7;-->
+<!--            min-width: 300px;-->
+<!--            max-height: 600px;-->
+<!--            background: white;-->
+<!--            border-radius: 10px;-->
+<!--            padding: 20px;-->
+<!--            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);-->
+<!--            transition: all 0.3s ease;-->
+<!--            overflow: hidden;-->
+<!--        }-->
+
+<!--        .dash-updates-profile {-->
+<!--            flex: 3;-->
+<!--            min-width: 200px;-->
+<!--            max-height: 600px;-->
+<!--        }-->
+
+<!--        .dash-sales-analytics.hidden, .dash-updates-profile.hidden {-->
+<!--            width: 0;-->
+<!--            min-width: 0;-->
+<!--            padding: 0;-->
+<!--            margin: 0;-->
+<!--            opacity: 0;-->
+<!--            flex: 0;-->
+<!--            overflow: hidden;-->
+<!--        }-->
+
+<!--        .dash-sales-analytics.expanded, .dash-updates-profile.expanded {-->
+<!--            position: absolute;-->
+<!--            left: 0;-->
+<!--            right: 0;-->
+<!--            width: calc(100% - 40px);-->
+<!--            z-index: 1;-->
+<!--        }-->
+
+<!--        .dash-sales-analytics h3, .dash-updates-profile h3 {-->
+<!--            margin: 0 0 10px;-->
+<!--            font-size: 18px;-->
+<!--        }-->
+
+<!--        .dash-sales-analytics p {-->
+<!--            margin: 0 0 20px;-->
+<!--            font-size: 12px;-->
+<!--            color: #666;-->
+<!--        }-->
+
+<!--        .dash-chart-controls {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: center;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        .dash-chart-controls .dash-zoom {-->
+<!--            display: flex;-->
+<!--            gap: 5px;-->
+<!--        }-->
+
+<!--        .dash-chart-controls .dash-zoom button {-->
+<!--            background: #f0f0f0;-->
+<!--            border: none;-->
+<!--            padding: 5px 10px;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+
+<!--        .dash-chart-controls .dash-show-all {-->
+<!--            background: #f0f0f0;-->
+<!--            border: none;-->
+<!--            padding: 5px 10px;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+
+<!--        .dash-header {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: center;-->
+<!--            margin-bottom: 10px;-->
+<!--        }-->
+
+<!--        .dash-expand-btn {-->
+<!--            background: none;-->
+<!--            border: none;-->
+<!--            cursor: pointer;-->
+<!--            font-size: 16px;-->
+<!--            color: #666;-->
+<!--        }-->
+
+<!--        #salesChart {-->
+<!--            max-height: 300px;-->
+<!--            width: 100%;-->
+<!--        }-->
+<!--    </style>-->
 <!--</head>-->
-<!--<body>-->
-<!--&lt;!&ndash; Hiển thị thông báo &ndash;&gt;-->
+<!--<body class="font-sans bg-gray-100 m-0 p-0"></body>-->
+<!--&lt;!&ndash; Toast &ndash;&gt;-->
 <!--<div th:replace="~{common/toast}"></div>-->
 
-<!--&lt;!&ndash; Nhúng navbar &ndash;&gt;-->
+<!--&lt;!&ndash; Navbar &ndash;&gt;-->
 <!--<nav th:replace="~{fragments/navbar :: navbar}"></nav>-->
 
-<!--<div class="content-wrapper">-->
-<!--  <div class="dashboard-container">-->
+<!--<div class="content-wrapper flex flex-col min-h-screen pt-[90px]"></div>-->
+
+<!--<div class="dashboard-container">-->
 <!--    &lt;!&ndash; Sidebar &ndash;&gt;-->
 <!--    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>-->
 
-<!--    &lt;!&ndash; Main content &ndash;&gt;-->
-<!--    <div class="content-container">-->
-<!--      <div class="card shadow-sm mb-4">-->
-<!--        <div class="card-body">-->
-<!--          <h1 class="mb-4">Trang quản lý của Quản trị viên</h1>-->
+<!--    <div class="dash-container">-->
 
-<!--          <div class="row">-->
-<!--            <div class="col-md-6">-->
-<!--              <div class="card shadow-sm mb-4">-->
-<!--                <div class="card-header bg-primary text-white">-->
-<!--                  <h3 class="mb-0"><i class="fas fa-users me-2"></i>Thống kê nhân viên</h3>-->
-<!--                </div>-->
-<!--                <div class="card-body">-->
-<!--                  <div class="list-group">-->
-<!--                    <div class="list-group-item">-->
-<!--                      <h4>Tổng số nhân viên: <span class="badge bg-primary" th:text="${countEmployee}"></span></h4>-->
-<!--                    </div>-->
-<!--                    <div class="list-group-item">-->
-<!--                      <h4>Nhân viên bán hàng: <span class="badge bg-success" th:text="${countSalesStaff}"></span></h4>-->
-<!--                    </div>-->
-<!--                    <div class="list-group-item">-->
-<!--                      <h4>Nhân viên kinh doanh: <span class="badge bg-info" th:text="${countBusinessStaff}"></span></h4>-->
-<!--                    </div>-->
-<!--                    <div class="list-group-item">-->
-<!--                      <h4>Nhân viên kho: <span class="badge bg-warning" th:text="${countWarehouseStaff}"></span></h4>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
+<!--        <nav aria-label="breadcrumb">-->
+<!--            <ol class="breadcrumb">-->
+<!--                <li class="breadcrumb-item active" aria-current="page">Thống kê Admin</li>-->
+<!--            </ol>-->
+<!--        </nav>-->
 
-<!--              <div class="card shadow-sm mb-4">-->
-<!--                <div class="card-header bg-success text-white">-->
-<!--                  <h3 class="mb-0"><i class="fas fa-building me-2"></i>Thống kê nhà cung cấp</h3>-->
-<!--                </div>-->
-<!--                <div class="card-body">-->
-<!--                  <div class="list-group">-->
-<!--                    <div class="list-group-item">-->
-<!--                      <h4>Tổng số nhà cung cấp: <span class="badge bg-success" th:text="${countSuppliers}"></span></h4>-->
+<!--        &lt;!&ndash; Top Section: Cards &ndash;&gt;-->
+<!--        <div class="dash-cards-wrapper">-->
+<!--            <div class="dash-card flex-1 min-w-0 bg-orange-400 text-white rounded-lg shadow-lg p-6"-->
+<!--                 onclick="updateChart('revenue')">-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <div>-->
+<!--                        <div class="text-4xl font-bold" id="total-revenue">0đ</div>-->
+<!--                        <div class="text-xl">Doanh Thu</div>-->
 <!--                    </div>-->
-<!--                  </div>-->
+<!--                    <div class="text-4xl">-->
+<!--                        <i class="fas fa-chart-bar"></i>-->
+<!--                    </div>-->
 <!--                </div>-->
-<!--              </div>-->
+<!--                <div class="flex justify-end mb-2">-->
+<!--                    <div class="flex items-center dash-arrow-text">-->
+<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
+<!--                        <span id="revenue-change">0đ</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="border-t border-white my-4 flex justify-center">-->
+<!--                    <div class="flex flex-col items-center dash-update-text">-->
+<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="revenue-update-time"></span>-->
+<!--                        </div>-->
+<!--                        <div id="revenue-update-date"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
 <!--            </div>-->
 
-<!--            <div class="col-md-6">-->
-<!--              <div class="card shadow-sm mb-4">-->
-<!--                <div class="card-header bg-danger text-white">-->
-<!--                  <h3 class="mb-0"><i class="fas fa-mobile-alt me-2"></i>Thống kê sản phẩm</h3>-->
-<!--                </div>-->
-<!--                <div class="card-body">-->
-<!--                  <div class="list-group">-->
-<!--                    <div class="list-group-item">-->
-<!--                      <h4>Tổng số sản phẩm: <span class="badge bg-danger" th:text="${countProducts}"></span></h4>-->
+<!--            <div class="dash-card flex-1 min-w-0 bg-green-500 text-white rounded-lg shadow-lg p-6"-->
+<!--                 onclick="updateChart('products')">-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <div>-->
+<!--                        <div class="text-4xl font-bold" id="total-products">0</div>-->
+<!--                        <div class="text-xl">Sản Phẩm</div>-->
 <!--                    </div>-->
-<!--                    <div class="list-group-item">-->
-<!--                      <h4>Số lượng sản phẩm đã bán: <span class="badge bg-danger" th:text="${countSoldProducts ?: '0'}"></span></h4>-->
+<!--                    <div class="text-4xl">-->
+<!--                        <i class="fas fa-chart-bar"></i>-->
 <!--                    </div>-->
-<!--                  </div>-->
 <!--                </div>-->
-<!--              </div>-->
-
-<!--              <div class="card shadow-sm mb-4">-->
-<!--                <div class="card-header bg-warning text-white">-->
-<!--                  <h3 class="mb-0"><i class="fas fa-user-friends me-2"></i>Thống kê khách hàng</h3>-->
-<!--                </div>-->
-<!--                <div class="card-body">-->
-<!--                  <div class="list-group">-->
-<!--                    <div class="list-group-item">-->
-<!--                      <h4>Tổng số khách hàng: <span class="badge bg-warning" th:text="${countCustomer}"></span></h4>-->
+<!--                <div class="flex justify-end mb-2">-->
+<!--                    <div class="flex items-center dash-arrow-text">-->
+<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
+<!--                        <span id="products-change">0</span>-->
 <!--                    </div>-->
-<!--                  </div>-->
 <!--                </div>-->
-<!--              </div>-->
-
-
-<!--              &lt;!&ndash;Thống kê doanh thu tạm thời comment lại do chưa hoạt động-->
-<!--              <div class="card shadow-sm mb-4">-->
-<!--                <div class="card-header bg-info text-white">-->
-<!--                  <h3 class="mb-0"><i class="fas fa-chart-line me-2"></i>Thống kê doanh thu</h3>-->
-<!--                </div>-->
-<!--                <div class="card-body">-->
-<!--                  <div class="list-group">-->
-<!--                    <div class="list-group-item">-->
-<!--                      <h4>Tổng doanh thu: <span class="badge bg-info" th:text="${#numbers.formatDecimal(totalRevenue ?: 0, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span></h4>-->
+<!--                <div class="border-t border-white my-4 flex justify-center">-->
+<!--                    <div class="flex flex-col items-center dash-update-text">-->
+<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="products-update-time"></span>-->
+<!--                        </div>-->
+<!--                        <div id="products-update-date"></div>-->
 <!--                    </div>-->
-<!--                  </div>-->
 <!--                </div>-->
-<!--              </div>&ndash;&gt;-->
-
 <!--            </div>-->
-<!--          </div>-->
+
+<!--            <div class="dash-card flex-1 min-w-0 bg-pink-400 text-white rounded-lg shadow-lg p-6"-->
+<!--                 onclick="updateChart('suppliers')">-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <div>-->
+<!--                        <div class="text-4xl font-bold" id="total-suppliers">0</div>-->
+<!--                        <div class="text-xl">Nhà Cung Cấp</div>-->
+<!--                    </div>-->
+<!--                    <div class="text-4xl">-->
+<!--                        <i class="fas fa-chart-bar"></i>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="flex justify-end mb-2">-->
+<!--                    <div class="flex items-center dash-arrow-text">-->
+<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
+<!--                        <span id="suppliers-change">0</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="border-t border-white my-4 flex justify-center">-->
+<!--                    <div class="flex flex-col items-center dash-update-text">-->
+<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="suppliers-update-time"></span>-->
+<!--                        </div>-->
+<!--                        <div id="suppliers-update-date"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="dash-card flex-1 min-w-0 bg-cyan-400 text-white rounded-lg shadow-lg p-6"-->
+<!--                 onclick="updateChart('employees')">-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <div>-->
+<!--                        <div class="text-4xl font-bold" id="total-employees">0</div>-->
+<!--                        <div class="text-xl">Nhân Viên</div>-->
+<!--                    </div>-->
+<!--                    <div class="text-4xl">-->
+<!--                        <i class="fas fa-chart-bar"></i>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="flex justify-end mb-2">-->
+<!--                    <div class="flex items-center dash-arrow-text">-->
+<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
+<!--                        <span id="employees-change">0</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="border-t border-white my-4 flex justify-center">-->
+<!--                    <div class="flex flex-col items-center dash-update-text">-->
+<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="employees-update-time"></span>-->
+<!--                        </div>-->
+<!--                        <div id="employees-update-date"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="dash-card flex-1 min-w-0 bg-purple-500 text-white rounded-lg shadow-lg p-6"-->
+<!--                 onclick="updateChart('customers')">-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <div>-->
+<!--                        <div class="text-4xl font-bold" id="total-customers">0</div>-->
+<!--                        <div class="text-xl">Khách Hàng</div>-->
+<!--                    </div>-->
+<!--                    <div class="text-4xl">-->
+<!--                        <i class="fas fa-chart-bar"></i>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="flex justify-end mb-2">-->
+<!--                    <div class="flex items-center dash-arrow-text">-->
+<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
+<!--                        <span id="customers-change">0</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="border-t border-white my-4 flex justify-center">-->
+<!--                    <div class="flex flex-col items-center dash-update-text">-->
+<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="customers-update-time"></span>-->
+<!--                        </div>-->
+<!--                        <div id="customers-update-date"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
 <!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
 
-<!--  &lt;!&ndash; Footer &ndash;&gt;-->
-<!--  <footer th:replace="~{fragments/footer :: footer}"></footer>-->
+<!--        &lt;!&ndash; Bottom Section &ndash;&gt;-->
+<!--        <div class="dash-bottom-section">-->
+<!--            <div class="dash-sales-analytics flex-[7] min-w-[300px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden"></div>-->
+<!--            <div class="dash-header">-->
+<!--                <h3 id="chart-title">Biểu Đồ - Doanh Thu</h3>-->
+<!--                <button class="dash-expand-btn" onclick="toggleExpand('sales')">-->
+<!--                    <i class="fas fa-expand"></i>-->
+<!--                </button>-->
+<!--            </div>-->
+<!--            <p>Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>-->
+<!--            <div class="dash-chart-controls">-->
+<!--                <div class="dash-zoom">-->
+<!--                    <button>⟐</button>-->
+<!--                    <button>⟑</button>-->
+<!--                </div>-->
+<!--                <button class="dash-show-all">Hiển thị tất cả</button>-->
+<!--            </div>-->
+<!--            <canvas id="salesChart"></canvas>-->
+<!--        </div>-->
+
+
+<!--        <div class="dash-updates-profile">-->
+<!--            <div class="dash-header">-->
+<!--                <h3>Cập Nhật Mới Nhất</h3>-->
+<!--                <button class="dash-expand-btn" onclick="toggleExpand('updates')">-->
+<!--                    <i class="fas fa-expand"></i>-->
+<!--                </button>-->
+<!--            </div>-->
+<!--            <div id="changeLogsContainer">-->
+
+<!--            </div>-->
+<!--        </div>-->
+
+
+<!--    </div>-->
+<!--</div>-->
 <!--</div>-->
 
-<!--&lt;!&ndash; Nhúng script navbar &ndash;&gt;-->
-<!--<div th:replace="~{fragments/navbar :: navbar-script}"></div>-->
-
-<!--&lt;!&ndash; Bootstrap JS &ndash;&gt;-->
+<!--&lt;!&ndash; Footer &ndash;&gt;-->
+<!--<footer th:replace="~{fragments/footer :: footer}"></footer>-->
+<!--</div>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
 <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<div th:replace="~{fragments/navbar :: navbar-script}"></div>-->
+<!--<script>-->
+<!--    // Function to format relative time-->
+<!--    function formatRelativeTime(timestamp) {-->
+<!--        if (!timestamp || isNaN(new Date(timestamp))) {-->
+<!--            return "vừa xong";-->
+<!--        }-->
+<!--        const now = new Date();-->
+<!--        const logTime = new Date(timestamp);-->
+<!--        const diffInSeconds = Math.floor((now - logTime) / 1000);-->
 
+<!--        if (diffInSeconds < 60) {-->
+<!--            return "vừa xong";-->
+<!--        } else if (diffInSeconds < 3600) {-->
+<!--            const minutes = Math.floor(diffInSeconds / 60);-->
+<!--            return `${minutes} phút trước`;-->
+<!--        } else if (diffInSeconds < 86400) {-->
+<!--            const hours = Math.floor(diffInSeconds / 3600);-->
+<!--            return `${hours} giờ trước`;-->
+<!--        } else {-->
+<!--            return logTime.toLocaleString('vi-VN', {-->
+<!--                day: '2-digit',-->
+<!--                month: '2-digit',-->
+<!--                year: 'numeric',-->
+<!--                hour: '2-digit',-->
+<!--                minute: '2-digit'-->
+<!--            });-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Function to format date and time from LocalDateTime-->
+<!--    function formatDateTimeFromLocal(timestamp) {-->
+<!--        if (!timestamp || isNaN(new Date(timestamp))) {-->
+<!--            return {time: '&#45;&#45;:&#45;&#45;', date: '&#45;&#45;/&#45;&#45;/&#45;&#45;&#45;&#45;'};-->
+<!--        }-->
+<!--        const dateObj = new Date(timestamp);-->
+<!--        const time = dateObj.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});-->
+<!--        const date = dateObj.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'});-->
+<!--        return {time, date};-->
+<!--    }-->
+
+<!--    // Function to format currency-->
+<!--    function formatCurrency(value) {-->
+<!--        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(value || 0);-->
+<!--    }-->
+
+<!--    // Function to render change logs-->
+<!--    function renderChangeLogs(logs) {-->
+<!--        const container = document.getElementById('changeLogsContainer');-->
+<!--        if (!logs || !Array.isArray(logs) || logs.length === 0) {-->
+<!--            container.innerHTML = `-->
+<!--<div class="update-item">-->
+<!--    <div class="content">-->
+<!--        <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>-->
+<!--    </div>-->
+<!--</div>-->
+<!--`;-->
+<!--            return;-->
+<!--        }-->
+
+<!--        container.innerHTML = logs.map(log => {-->
+<!--            if (!log || !log.timestamp || !log.action) {-->
+<!--                return '';-->
+<!--            }-->
+<!--            return `-->
+<!--<div class="update-item">-->
+<!--    <div class="flex items-center">-->
+<!--        <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>-->
+<!--        <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'}">-->
+<!--            <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'}"></i>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="content">-->
+<!--        <p class="font-semibold">-->
+<!--            ${log.action === 'INSERT' ? `Nhân viên ID ${log.employeeId || 'N/A'} đã thêm ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :-->
+<!--                log.action === 'UPDATE' ? `Nhân viên ID ${log.employeeId || 'N/A'} đã cập nhật ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :-->
+<!--                    `Nhân viên ID ${log.employeeId || 'N/A'} đã xóa ${log.entityName || 'N/A'} tên ${log.oldValue || 'N/A'}`}-->
+<!--        </p>-->
+<!--        <p class="text-sm text-gray-500">-->
+<!--            ${log.action === 'INSERT' ? 'Thêm mới thành công!' :-->
+<!--                log.action === 'UPDATE' ? 'Cập nhật thành công!' :-->
+<!--                    'Xóa thành công!'}-->
+<!--        </p>-->
+<!--    </div>-->
+<!--</div>-->
+<!--`;-->
+<!--        }).join('');-->
+<!--    }-->
+
+<!--    // Function to fetch dashboard data-->
+<!--    let previousData = {-->
+<!--        revenue: 0,-->
+<!--        products: 0,-->
+<!--        suppliers: 0,-->
+<!--        employees: 0,-->
+<!--        customers: 0-->
+<!--    };-->
+
+<!--    async function fetchDashboardData() {-->
+<!--        try {-->
+<!--            const [-->
+<!--                revenueRes,-->
+<!--                productsRes,-->
+<!--                suppliersRes,-->
+<!--                employeesRes,-->
+<!--                customersRes,-->
+<!--                changeLogsRes,-->
+<!--                revenueTimeRes,-->
+<!--                productsTimeRes,-->
+<!--                suppliersTimeRes,-->
+<!--                employeesTimeRes,-->
+<!--                customersTimeRes-->
+<!--            ] = await Promise.all([-->
+<!--                fetch('/api/changelogs/count/all/total-revenue').catch(() => null),-->
+<!--                fetch('/api/changelogs/count/all/products').catch(() => null),-->
+<!--                fetch('/api/changelogs/count/all/suppliers').catch(() => null),-->
+<!--                fetch('/api/changelogs/count/all/employees').catch(() => null),-->
+<!--                fetch('/api/changelogs/count/all/customers').catch(() => null),-->
+<!--                fetch('/api/changelogs/notification').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/total-revenue').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/products').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/suppliers').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/employees').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/customers').catch(() => null)-->
+<!--            ]);-->
+
+<!--            const revenue = (await revenueRes?.json()) ?? 0;-->
+<!--            const products = (await productsRes?.json()) ?? 0;-->
+<!--            const suppliers = (await suppliersRes?.json()) ?? 0;-->
+<!--            const employees = (await employeesRes?.json()) ?? 0;-->
+<!--            const customers = (await customersRes?.json()) ?? 0;-->
+<!--            const changeLogs = (await changeLogsRes?.json()) ?? [];-->
+<!--            const revenueTime = (await revenueTimeRes?.json()) ?? null;-->
+<!--            const productsTime = (await productsTimeRes?.json()) ?? null;-->
+<!--            const suppliersTime = (await suppliersTimeRes?.json()) ?? null;-->
+<!--            const employeesTime = (await employeesTimeRes?.json()) ?? null;-->
+<!--            const customersTime = (await customersTimeRes?.json()) ?? null;-->
+
+<!--            const revenueDateTime = formatDateTimeFromLocal(revenueTime);-->
+<!--            const productsDateTime = formatDateTimeFromLocal(productsTime);-->
+<!--            const suppliersDateTime = formatDateTimeFromLocal(suppliersTime);-->
+<!--            const employeesDateTime = formatDateTimeFromLocal(employeesTime);-->
+<!--            const customersDateTime = formatDateTimeFromLocal(customersTime);-->
+
+<!--            document.getElementById('total-revenue').textContent = formatCurrency(revenue);-->
+<!--            document.getElementById('revenue-change').textContent = formatCurrency(revenue - previousData.revenue);-->
+<!--            document.getElementById('revenue-update-time').textContent = revenueDateTime.time;-->
+<!--            document.getElementById('revenue-update-date').textContent = revenueDateTime.date;-->
+
+<!--            document.getElementById('total-products').textContent = products;-->
+<!--            document.getElementById('products-change').textContent = (products - previousData.products).toString();-->
+<!--            document.getElementById('products-update-time').textContent = productsDateTime.time;-->
+<!--            document.getElementById('products-update-date').textContent = productsDateTime.date;-->
+
+<!--            document.getElementById('total-suppliers').textContent = suppliers;-->
+<!--            document.getElementById('suppliers-change').textContent = (suppliers - previousData.suppliers).toString();-->
+<!--            document.getElementById('suppliers-update-time').textContent = suppliersDateTime.time;-->
+<!--            document.getElementById('suppliers-update-date').textContent = suppliersDateTime.date;-->
+
+<!--            document.getElementById('total-employees').textContent = employees;-->
+<!--            document.getElementById('employees-change').textContent = (employees - previousData.employees).toString();-->
+<!--            document.getElementById('employees-update-time').textContent = employeesDateTime.time;-->
+<!--            document.getElementById('employees-update-date').textContent = employeesDateTime.date;-->
+
+<!--            document.getElementById('total-customers').textContent = customers;-->
+<!--            document.getElementById('customers-change').textContent = (customers - previousData.customers).toString();-->
+<!--            document.getElementById('customers-update-time').textContent = customersDateTime.time;-->
+<!--            document.getElementById('customers-update-date').textContent = customersDateTime.date;-->
+
+<!--            previousData = {revenue, products, suppliers, employees, customers};-->
+
+<!--            renderChangeLogs(changeLogs);-->
+
+<!--            updateChartData('revenue', revenue);-->
+<!--        } catch (error) {-->
+<!--            console.error('Error fetching dashboard data:', error);-->
+<!--            document.getElementById('changeLogsContainer').innerHTML = `-->
+<!--<div class="update-item">-->
+<!--    <div class="content">-->
+<!--        <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>-->
+<!--    </div>-->
+<!--</div>-->
+<!--`;-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Chart setup-->
+<!--    let salesChart;-->
+<!--    const chartData = {-->
+<!--        revenue: {labels: [], data: [], label: 'Doanh Thu'},-->
+<!--        products: {labels: [], data: [], label: 'Sản Phẩm'},-->
+<!--        suppliers: {labels: [], data: [], label: 'Nhà Cung Cấp'},-->
+<!--        employees: {labels: [], data: [], label: 'Nhân Viên'},-->
+<!--        customers: {labels: [], data: [], label: 'Khách Hàng'}-->
+<!--    };-->
+
+<!--    function initializeChart() {-->
+<!--        const ctx = document.getElementById('salesChart').getContext('2d');-->
+<!--        salesChart = new Chart(ctx, {-->
+<!--            type: 'line',-->
+<!--            data: {-->
+<!--                labels: chartData.revenue.labels,-->
+<!--                datasets: [{-->
+<!--                    label: chartData.revenue.label,-->
+<!--                    data: chartData.revenue.data,-->
+<!--                    borderColor: '#ff8a65',-->
+<!--                    backgroundColor: '#ff8a65',-->
+<!--                    fill: false,-->
+<!--                    tension: 0.4,-->
+<!--                    pointBackgroundColor: '#ff8a65',-->
+<!--                    pointBorderColor: '#fff',-->
+<!--                    pointRadius: 5,-->
+<!--                    pointHoverRadius: 7-->
+<!--                }]-->
+<!--            },-->
+<!--            options: {-->
+<!--                scales: {-->
+<!--                    y: {beginAtZero: true, ticks: {stepSize: 5000000}},-->
+<!--                    x: {grid: {display: false}}-->
+<!--                },-->
+<!--                plugins: {-->
+<!--                    legend: {-->
+<!--                        display: true,-->
+<!--                        position: 'top',-->
+<!--                        labels: {boxWidth: 0, font: {size: 12}}-->
+<!--                    }-->
+<!--                },-->
+<!--                responsive: true,-->
+<!--                maintainAspectRatio: false-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+
+<!--    function updateChartData(type, newData) {-->
+<!--        const data = chartData[type];-->
+<!--        const now = new Date();-->
+<!--        const label = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});-->
+
+<!--        data.labels.push(label);-->
+<!--        data.data.push(type === 'revenue' ? (newData || 0) : parseInt(newData || 0, 10));-->
+
+<!--        if (data.labels.length > 10) {-->
+<!--            data.labels.shift();-->
+<!--            data.data.shift();-->
+<!--        }-->
+
+<!--        salesChart.data.labels = data.labels;-->
+<!--        salesChart.data.datasets[0].label = data.label;-->
+<!--        salesChart.data.datasets[0].data = data.data;-->
+<!--        salesChart.update();-->
+
+<!--        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;-->
+<!--    }-->
+
+<!--    function updateChart(type) {-->
+<!--        const data = chartData[type];-->
+<!--        salesChart.data.labels = data.labels;-->
+<!--        salesChart.data.datasets[0].label = data.label;-->
+<!--        salesChart.data.datasets[0].data = data.data;-->
+<!--        salesChart.update();-->
+<!--        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;-->
+<!--    }-->
+
+<!--    function zoomChart(direction) {-->
+<!--        const yAxis = salesChart.options.scales.y;-->
+<!--        if (direction === 'in') {-->
+<!--            yAxis.ticks.stepSize /= 2;-->
+<!--        } else {-->
+<!--            yAxis.ticks.stepSize *= 2;-->
+<!--        }-->
+<!--        salesChart.update();-->
+<!--    }-->
+
+<!--    function resetChart() {-->
+<!--        salesChart.options.scales.y.ticks.stepSize = 5000000;-->
+<!--        salesChart.update();-->
+<!--    }-->
+
+<!--    function toggleExpand(section) {-->
+<!--        const salesAnalytics = document.querySelector('.dash-sales-analytics');-->
+<!--        const updatesProfile = document.querySelector('.dash-updates-profile');-->
+<!--        const salesExpandBtn = salesAnalytics.querySelector('.dash-expand-btn i');-->
+<!--        const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');-->
+
+<!--        if (section === 'sales') {-->
+<!--            if (salesAnalytics.classList.contains('expanded')) {-->
+<!--                salesAnalytics.classList.remove('expanded');-->
+<!--                updatesProfile.classList.remove('hidden');-->
+<!--                salesExpandBtn.classList.remove('fa-compress');-->
+<!--                salesExpandBtn.classList.add('fa-expand');-->
+<!--            } else {-->
+<!--                salesAnalytics.classList.add('expanded');-->
+<!--                updatesProfile.classList.add('hidden');-->
+<!--                salesExpandBtn.classList.remove('fa-expand');-->
+<!--                salesExpandBtn.classList.add('fa-compress');-->
+<!--                setTimeout(() => salesChart.resize(), 300);-->
+<!--            }-->
+<!--        } else if (section === 'updates') {-->
+<!--            if (updatesProfile.classList.contains('expanded')) {-->
+<!--                updatesProfile.classList.remove('expanded');-->
+<!--                salesAnalytics.classList.remove('hidden');-->
+<!--                updatesExpandBtn.classList.remove('fa-compress');-->
+<!--                updatesExpandBtn.classList.add('fa-expand');-->
+<!--            } else {-->
+<!--                updatesProfile.classList.add('expanded');-->
+<!--                salesAnalytics.classList.add('hidden');-->
+<!--                updatesExpandBtn.classList.remove('fa-expand');-->
+<!--                updatesExpandBtn.classList.add('fa-compress');-->
+<!--            }-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Initialize chart and fetch data-->
+<!--    initializeChart();-->
+<!--    fetchDashboardData();-->
+<!--    setInterval(fetchDashboardData, 3000);-->
+
+<!--    // Resize chart on window resize-->
+<!--    window.addEventListener('resize', () => salesChart.resize());-->
+<!--</script>-->
 <!--</body>-->
 <!--</html>-->
-
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -161,96 +738,6 @@
 
     <!-- Inline CSS -->
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7fa;
-            margin: 0;
-            padding: 0;
-        }
-
-        .content-wrapper {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding-top: 90px;
-        }
-
-        .dashboard-container {
-            display: flex;
-            flex: 1; /* Chiếm không gian còn lại giữa navbar và footer */
-        }
-
-        .dash-container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 1rem 2rem; /* Khoảng cách trái/phải và trên/dưới */
-            flex: 1;
-        }
-
-        /* Sidebar */
-        aside {
-            min-width: 250px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Dashboard Cards */
-        .dash-cards-wrapper {
-            display: flex;
-            gap: 20px;
-            flex-wrap: nowrap;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .dash-card {
-            flex: 1;
-            min-width: 0;
-        }
-
-        /* Update and Arrow Text */
-        .dash-update-text {
-            font-size: 16px;
-            opacity: 0.9;
-            text-align: center;
-        }
-
-        .dash-arrow-text {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        /* Bottom Section */
-        .dash-bottom-section {
-            display: flex;
-            gap: 20px;
-            width: 100%;
-            position: relative;
-            flex-wrap: wrap;
-        }
-
-        .dash-sales-analytics, .dash-updates-profile {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            overflow: hidden;
-            flex: 1;
-        }
-
-        .dash-sales-analytics {
-            flex: 7;
-            min-width: 300px;
-            max-height: 600px;
-        }
-
-        .dash-updates-profile {
-            flex: 3;
-            min-width: 200px;
-            max-height: 600px;
-        }
-
         .dash-sales-analytics.hidden, .dash-updates-profile.hidden {
             width: 0;
             min-width: 0;
@@ -269,94 +756,37 @@
             z-index: 1;
         }
 
-        .dash-sales-analytics h3, .dash-updates-profile h3 {
-            margin: 0 0 10px;
-            font-size: 18px;
-        }
-
-        .dash-sales-analytics p {
-            margin: 0 0 20px;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .dash-chart-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .dash-chart-controls .dash-zoom {
-            display: flex;
-            gap: 5px;
-        }
-
-        .dash-chart-controls .dash-zoom button {
-            background: #f0f0f0;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .dash-chart-controls .dash-show-all {
-            background: #f0f0f0;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .dash-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .dash-expand-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            color: #666;
-        }
-
         #salesChart {
             max-height: 300px;
             width: 100%;
         }
     </style>
 </head>
-<body>
+<body class="font-sans bg-gray-100 m-0 p-0">
 <!-- Toast -->
 <div th:replace="~{common/toast}"></div>
 
 <!-- Navbar -->
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-<div class="content-wrapper">
-
-    <div class="dashboard-container">
+<div class="content-wrapper flex flex-col min-h-screen pt-[90px]">
+    <div class="dashboard-container flex flex-1">
         <!-- Sidebar -->
-        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <aside th:replace="~{fragments/sidebar :: sidebar}" class="min-w-[250px] bg-white shadow-md"></aside>
 
-        <div class="dash-container">
-
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item active" aria-current="page">Thống kê</li>
-            </ol>
-          </nav>
+        <div class="dash-container flex-1 max-w-full mx-auto p-4 md:p-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">Thống kê Admin</li>
+                </ol>
+            </nav>
 
             <!-- Top Section: Cards -->
-            <div class="dash-cards-wrapper">
-                <div class="dash-card bg-orange-400 text-white rounded-lg shadow-lg p-6"
-                     onclick="updateChart('revenue')">
+            <div class="dash-cards-wrapper flex gap-5 flex-wrap md:flex-nowrap mb-5 w-full">
+                <div class="dash-card flex-1 min-w-0 bg-orange-400 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('revenue')">
                     <div class="flex justify-between items-center">
                         <div>
-                            <div class="text-4xl font-bold">15.000.000đ</div>
+                            <div class="text-4xl font-bold" id="total-revenue">0đ</div>
                             <div class="text-xl">Doanh Thu</div>
                         </div>
                         <div class="text-4xl">
@@ -364,23 +794,23 @@
                         </div>
                     </div>
                     <div class="flex justify-end mb-2">
-                        <div class="flex items-center dash-arrow-text">
+                        <div class="flex items-center text-sm opacity-80">
                             <i class="fas fa-arrow-up mr-1"></i>
-                            <span>15.000.000đ</span>
+                            <span id="revenue-change">0đ</span>
                         </div>
                     </div>
                     <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center dash-update-text">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-                            <div>07/04/2025</div>
+                        <div class="flex flex-col items-center text-base opacity-90">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="revenue-update-time"></span></div>
+                            <div id="revenue-update-date"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="dash-card bg-green-500 text-white rounded-lg shadow-lg p-6" onclick="updateChart('income')">
+                <div class="dash-card flex-1 min-w-0 bg-green-500 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('products')">
                     <div class="flex justify-between items-center">
                         <div>
-                            <div class="text-4xl font-bold" th:text="${countProducts}"></div>
+                            <div class="text-4xl font-bold" id="total-products">0</div>
                             <div class="text-xl">Sản Phẩm</div>
                         </div>
                         <div class="text-4xl">
@@ -388,23 +818,23 @@
                         </div>
                     </div>
                     <div class="flex justify-end mb-2">
-                        <div class="flex items-center dash-arrow-text">
+                        <div class="flex items-center text-sm opacity-80">
                             <i class="fas fa-arrow-up mr-1"></i>
-                            <span>30.200</span>
+                            <span id="products-change">0</span>
                         </div>
                     </div>
                     <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center dash-update-text">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-                            <div>07/04/2025</div>
+                        <div class="flex flex-col items-center text-base opacity-90">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="products-update-time"></span></div>
+                            <div id="products-update-date"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="dash-card bg-pink-400 text-white rounded-lg shadow-lg p-6" onclick="updateChart('views')">
+                <div class="dash-card flex-1 min-w-0 bg-pink-400 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('suppliers')">
                     <div class="flex justify-between items-center">
                         <div>
-                            <div class="text-4xl font-bold" th:text="${countSuppliers}"></div>
+                            <div class="text-4xl font-bold" id="total-suppliers">0</div>
                             <div class="text-xl">Nhà Cung Cấp</div>
                         </div>
                         <div class="text-4xl">
@@ -412,23 +842,23 @@
                         </div>
                     </div>
                     <div class="flex justify-end mb-2">
-                        <div class="flex items-center dash-arrow-text">
+                        <div class="flex items-center text-sm opacity-80">
                             <i class="fas fa-arrow-up mr-1"></i>
-                            <span>290+</span>
+                            <span id="suppliers-change">0</span>
                         </div>
                     </div>
                     <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center dash-update-text">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-                            <div>07/04/2025</div>
+                        <div class="flex flex-col items-center text-base opacity-90">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="suppliers-update-time"></span></div>
+                            <div id="suppliers-update-date"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="dash-card bg-cyan-400 text-white rounded-lg shadow-lg p-6" onclick="updateChart('tasks')">
+                <div class="dash-card flex-1 min-w-0 bg-cyan-400 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('employees')">
                     <div class="flex justify-between items-center">
                         <div>
-                            <div class="text-4xl font-bold" th:text="${countEmployee}"></div>
+                            <div class="text-4xl font-bold" id="total-employees">0</div>
                             <div class="text-xl">Nhân Viên</div>
                         </div>
                         <div class="text-4xl">
@@ -436,24 +866,23 @@
                         </div>
                     </div>
                     <div class="flex justify-end mb-2">
-                        <div class="flex items-center dash-arrow-text">
+                        <div class="flex items-center text-sm opacity-80">
                             <i class="fas fa-arrow-up mr-1"></i>
-                            <span>145</span>
+                            <span id="employees-change">0</span>
                         </div>
                     </div>
                     <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center dash-update-text">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-                            <div>07/04/2025</div>
+                        <div class="flex flex-col items-center text-base opacity-90">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="employees-update-time"></span></div>
+                            <div id="employees-update-date"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="dash-card bg-purple-500 text-white rounded-lg shadow-lg p-6"
-                     onclick="updateChart('downloads')">
+                <div class="dash-card flex-1 min-w-0 bg-purple-500 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('customers')">
                     <div class="flex justify-between items-center">
                         <div>
-                            <div class="text-4xl font-bold" th:text="${countCustomer}"></div>
+                            <div class="text-4xl font-bold" id="total-customers">0</div>
                             <div class="text-xl">Khách Hàng</div>
                         </div>
                         <div class="text-4xl">
@@ -461,104 +890,67 @@
                         </div>
                     </div>
                     <div class="flex justify-end mb-2">
-                        <div class="flex items-center dash-arrow-text">
+                        <div class="flex items-center text-sm opacity-80">
                             <i class="fas fa-arrow-up mr-1"></i>
-                            <span>500</span>
+                            <span id="customers-change">0</span>
                         </div>
                     </div>
                     <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center dash-update-text">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: 2:15</div>
-                            <div>07/04/2025</div>
+                        <div class="flex flex-col items-center text-base opacity-90">
+                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="customers-update-time"></span></div>
+                            <div id="customers-update-date"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Bottom Section -->
-            <div class="dash-bottom-section">
-                <div class="dash-sales-analytics">
-                    <div class="dash-header">
-                        <h3 id="chart-title">Biểu Đồ - Tổng Thu Nhập</h3>
-                        <button class="dash-expand-btn" onclick="toggleExpand('sales')">
+            <div class="dash-bottom-section flex gap-5 w-full relative flex-wrap">
+                <div class="dash-sales-analytics flex-[7] min-w-[300px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
+                    <div class="dash-header flex justify-between items-center mb-2">
+                        <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>
+                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer" onclick="toggleExpand('sales')">
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
-                    <p>Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
-                    <div class="dash-chart-controls">
-                        <div class="dash-zoom">
-                            <button>⟐</button>
-                            <button>⟑</button>
+                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
+                    <div class="dash-chart-controls flex justify-between items-center mb-5">
+                        <div class="dash-zoom flex gap-2">
+                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer" onclick="zoomChart('in')">⟐</button>
+                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer" onclick="zoomChart('out')">⟑</button>
                         </div>
-                        <button class="dash-show-all">Hiển thị tất cả</button>
+                        <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer" onclick="resetChart()">Hiển thị tất cả</button>
                     </div>
                     <canvas id="salesChart"></canvas>
                 </div>
 
-<!--                <div class="dash-updates-profile">-->
-<!--                    <div class="dash-header">-->
-<!--                        <h3>Cập Nhật Mới Nhất</h3>-->
-<!--                        <button class="dash-expand-btn" onclick="toggleExpand('updates')">-->
-<!--                            <i class="fas fa-expand"></i>-->
-<!--                        </button>-->
-<!--                    </div>-->
-<!--                    <div th:each="log : ${changeLogs}" class="update-item">-->
-<!--                        <div class="flex items-center">-->
-<!--                            &lt;!&ndash; Thời gian tương đối &ndash;&gt;-->
-<!--                            <p class="text-sm text-gray-600 mr-4" th:text="${#temporals.format(log.timestamp, 'dd/MM/yyyy HH:mm')}"></p>-->
-<!--                            &lt;!&ndash; Icon dựa trên action &ndash;&gt;-->
-<!--                            <div class="icon"-->
-<!--                                 th:classappend="${log.action == 'INSERT' ? 'bg-green-500' : log.action == 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'}">-->
-<!--                                <i th:class="${log.action == 'INSERT' ? 'fas fa-plus' : log.action == 'UPDATE' ? 'fas fa-edit' : 'fas fa-trash'}"></i>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="content">-->
-<!--                            &lt;!&ndash; Nội dung mô tả &ndash;&gt;-->
-<!--                            <p class="font-semibold" th:switch="${log.action}">-->
-<!--                                <span th:case="'INSERT'">Nhân viên ID <span th:text="${log.employeeId}"></span> đã thêm <span th:text="${log.entityName}"></span> tên <span th:text="${log.newValue}"></span></span>-->
-<!--                                <span th:case="'UPDATE'">Nhân viên ID <span th:text="${log.employeeId}"></span> đã cập nhật <span th:text="${log.entityName}"></span> tên <span th:text="${log.newValue}"></span></span>-->
-<!--                                <span th:case="'DELETE'">Nhân viên ID <span th:text="${log.employeeId}"></span> đã xóa <span th:text="${log.entityName}"></span> tên <span th:text="${log.oldValue}"></span></span>-->
-<!--                            </p>-->
-<!--                            <p class="text-sm text-gray-500" th:switch="${log.action}">-->
-<!--                                <span th:case="'INSERT'">Thêm mới thành công!</span>-->
-<!--                                <span th:case="'UPDATE'">Cập nhật thành công!</span>-->
-<!--                                <span th:case="'DELETE'">Xóa thành công!</span>-->
-<!--                            </p>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    &lt;!&ndash; Hiển thị thông báo nếu không có log &ndash;&gt;-->
-<!--                    <div th:if="${#lists.isEmpty(changeLogs)}" class="update-item">-->
-<!--                        <div class="content">-->
-<!--                            <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-
-                <div class="dash-updates-profile">
-                    <div class="dash-header">
-                        <h3>Cập Nhật Mới Nhất</h3>
-                        <button class="dash-expand-btn" onclick="toggleExpand('updates')">
+                <div class="dash-updates-profile flex-[3] min-w-[200px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
+                    <div class="dash-header flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>
+                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer" onclick="toggleExpand('updates')">
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
-                    <div id="changeLogsContainer">
-                        <!-- Change logs will be dynamically inserted here -->
-                    </div>
+                    <div id="changeLogsContainer"></div>
                 </div>
-
-
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <footer th:replace="~{fragments/footer :: footer}" class="bg-white shadow-md p-4"></footer>
 </div>
 
-<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
 <script>
     // Function to format relative time
     function formatRelativeTime(timestamp) {
+        if (!timestamp || isNaN(new Date(timestamp))) {
+            return "vừa xong";
+        }
         const now = new Date();
         const logTime = new Date(timestamp);
         const diffInSeconds = Math.floor((now - logTime) / 1000);
@@ -572,7 +964,6 @@
             const hours = Math.floor(diffInSeconds / 3600);
             return `${hours} giờ trước`;
         } else {
-            // Format as dd/MM/yyyy HH:mm for times older than 24 hours
             return logTime.toLocaleString('vi-VN', {
                 day: '2-digit',
                 month: '2-digit',
@@ -583,137 +974,253 @@
         }
     }
 
+    // Function to format date and time from LocalDateTime
+    function formatDateTimeFromLocal(timestamp) {
+        if (!timestamp || isNaN(new Date(timestamp))) {
+            return { time: '--:--', date: '--/--/----' };
+        }
+        const dateObj = new Date(timestamp);
+        const time = dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        const date = dateObj.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return { time, date };
+    }
+
+    // Function to format currency
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value || 0);
+    }
+
     // Function to render change logs
     function renderChangeLogs(logs) {
         const container = document.getElementById('changeLogsContainer');
-        if (logs.length === 0) {
+        if (!logs || !Array.isArray(logs) || logs.length === 0) {
             container.innerHTML = `
-            <div class="update-item">
-                <div class="content">
-                    <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
-                </div>
-            </div>
-        `;
+                    <div class="update-item">
+                        <div class="content">
+                            <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
+                        </div>
+                    </div>
+                `;
             return;
         }
 
-        container.innerHTML = logs.map(log => `
-        <div class="update-item">
-            <div class="flex items-center">
-                <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>
-                <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'}">
-                    <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'}"></i>
-                </div>
-            </div>
-            <div class="content">
-                <p class="font-semibold">
-                    ${log.action === 'INSERT' ? `Nhân viên ID ${log.employeeId} đã thêm ${log.entityName} tên ${log.newValue}` :
-            log.action === 'UPDATE' ? `Nhân viên ID ${log.employeeId} đã cập nhật ${log.entityName} tên ${log.newValue}` :
-                `Nhân viên ID ${log.employeeId} đã xóa ${log.entityName} tên ${log.oldValue}`}
-                </p>
-                <p class="text-sm text-gray-500">
-                    ${log.action === 'INSERT' ? 'Thêm mới thành công!' :
-            log.action === 'UPDATE' ? 'Cập nhật thành công!' :
-                'Xóa thành công!'}
-                </p>
-            </div>
-        </div>
-    `).join('');
-    }
-
-    // Function to fetch change logs
-    function fetchChangeLogs() {
-        fetch('/api/changelogs')
-            .then(response => response.json())
-            .then(data => renderChangeLogs(data))
-            .catch(error => {
-                console.error('Error fetching change logs:', error);
-                document.getElementById('changeLogsContainer').innerHTML = `
-                <div class="update-item">
-                    <div class="content">
-                        <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+        container.innerHTML = logs.map(log => {
+            if (!log || !log.timestamp || !log.action) {
+                return '';
+            }
+            return `
+                    <div class="update-item mb-4">
+                        <div class="flex items-center">
+                            <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>
+                            <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'} p-2 rounded-full">
+                                <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white"></i>
+                            </div>
+                        </div>
+                        <div class="content mt-2">
+                            <p class="font-semibold text-sm">
+                                ${log.action === 'INSERT' ? `Nhân viên ID ${log.employeeId || 'N/A'} đã thêm ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :
+                log.action === 'UPDATE' ? `Nhân viên ID ${log.employeeId || 'N/A'} đã cập nhật ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :
+                    `Nhân viên ID ${log.employeeId || 'N/A'} đã xóa ${log.entityName || 'N/A'} tên ${log.oldValue || 'N/A'}`}
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                ${log.action === 'INSERT' ? 'Thêm mới thành công!' :
+                log.action === 'UPDATE' ? 'Cập nhật thành công!' :
+                    'Xóa thành công!'}
+                            </p>
+                        </div>
                     </div>
-                </div>
-            `;
-            });
+                `;
+        }).join('');
     }
 
-    // Initial fetch
-    fetchChangeLogs();
-
-    // Poll every 3 seconds
-    setInterval(fetchChangeLogs, 3000);
-</script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<div th:replace="~{fragments/navbar :: navbar-script}"></div>
-<script>
-    let salesChart;
-
-    const chartData = {
-        income: {
-            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-            data: [10000, 15000, 20000, 18000, 25000, 30000, 35000],
-            label: 'Doanh Thu'
-        },
-        views: {
-            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-            data: [200, 250, 300, 280, 350, 400, 450],
-            label: 'Sản Phẩm'
-        },
-        tasks: {
-            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-            data: [50, 60, 70, 65, 80, 90, 100],
-            label: 'Nhà Cung Cấp'
-        },
-        downloads: {
-            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-            data: [300, 350, 400, 380, 450, 500, 550],
-            label: 'Nhân Viên'
-        },
-        revenue: {
-            labels: ['1950', '1955', '1960', '1965', '1970', '1975', '1980'],
-            data: [5000, 7000, 9000, 11000, 13000, 15000, 17000],
-            label: 'Khách Hàng'
-        }
+    // Function to fetch dashboard data
+    let previousData = {
+        revenue: 0,
+        products: 0,
+        suppliers: 0,
+        employees: 0,
+        customers: 0
     };
 
-    const ctx = document.getElementById('salesChart').getContext('2d');
-    salesChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: chartData.income.labels,
-            datasets: [{
-                label: chartData.income.label,
-                data: chartData.income.data,
-                borderColor: '#ff8a65',
-                backgroundColor: '#ff8a65',
-                fill: false,
-                tension: 0.4,
-                pointBackgroundColor: '#ff8a65',
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            }]
-        },
-        options: {
-            scales: {
-                y: {beginAtZero: true, ticks: {stepSize: 5000}},
-                x: {grid: {display: false}}
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {boxWidth: 0, font: {size: 12}}
+    async function fetchDashboardData() {
+        try {
+            const [
+                revenueRes,
+                productsRes,
+                suppliersRes,
+                employeesRes,
+                customersRes,
+                changeLogsRes,
+                revenueTimeRes,
+                productsTimeRes,
+                suppliersTimeRes,
+                employeesTimeRes,
+                customersTimeRes
+            ] = await Promise.all([
+                fetch('/api/changelogs/count/all/total-revenue').catch(() => null),
+                fetch('/api/changelogs/count/all/products').catch(() => null),
+                fetch('/api/changelogs/count/all/suppliers').catch(() => null),
+                fetch('/api/changelogs/count/all/employees').catch(() => null),
+                fetch('/api/changelogs/count/all/customers').catch(() => null),
+                fetch('/api/changelogs/notification').catch(() => null),
+                fetch('/api/changelogs/lastUpdate/time/total-revenue').catch(() => null),
+                fetch('/api/changelogs/lastUpdate/time/products').catch(() => null),
+                fetch('/api/changelogs/lastUpdate/time/suppliers').catch(() => null),
+                fetch('/api/changelogs/lastUpdate/time/employees').catch(() => null),
+                fetch('/api/changelogs/lastUpdate/time/customers').catch(() => null)
+            ]);
+
+            // Hàm helper để parse JSON an toàn
+            const parseJson = async (res, endpoint) => {
+                if (!res) {
+                    console.warn(`Request failed for ${endpoint}: No response`);
+                    return null;
                 }
-            },
-            responsive: true,
-            maintainAspectRatio: false
+                if (!res.ok) {
+                    console.warn(`Request failed for ${endpoint}: Status ${res.status}`);
+                    return null;
+                }
+                try {
+                    const text = await res.text();
+                    if (!text) {
+                        console.warn(`Empty response for ${endpoint}`);
+                        return null;
+                    }
+                    return JSON.parse(text);
+                } catch (error) {
+                    console.error(`Failed to parse JSON for ${endpoint}:`, error);
+                    return null;
+                }
+            };
+
+            // Parse từng response
+            const revenue = (await parseJson(revenueRes, '/api/changelogs/count/all/total-revenue')) ?? 0;
+            const products = (await parseJson(productsRes, '/api/changelogs/count/all/products')) ?? 0;
+            const suppliers = (await parseJson(suppliersRes, '/api/changelogs/count/all/suppliers')) ?? 0;
+            const employees = (await parseJson(employeesRes, '/api/changelogs/count/all/employees')) ?? 0;
+            const customers = (await parseJson(customersRes, '/api/changelogs/count/all/customers')) ?? 0;
+            const changeLogs = (await parseJson(changeLogsRes, '/api/changelogs/notification')) ?? [];
+            const revenueTime = (await parseJson(revenueTimeRes, '/api/changelogs/lastUpdate/time/total-revenue')) ?? null;
+            const productsTime = (await parseJson(productsTimeRes, '/api/changelogs/lastUpdate/time/products')) ?? null;
+            const suppliersTime = (await parseJson(suppliersTimeRes, '/api/changelogs/lastUpdate/time/suppliers')) ?? null;
+            const employeesTime = (await parseJson(employeesTimeRes, '/api/changelogs/lastUpdate/time/employees')) ?? null;
+            const customersTime = (await parseJson(customersTimeRes, '/api/changelogs/lastUpdate/time/customers')) ?? null;
+
+            const revenueDateTime = formatDateTimeFromLocal(revenueTime);
+            const productsDateTime = formatDateTimeFromLocal(productsTime);
+            const suppliersDateTime = formatDateTimeFromLocal(suppliersTime);
+            const employeesDateTime = formatDateTimeFromLocal(employeesTime);
+            const customersDateTime = formatDateTimeFromLocal(customersTime);
+
+            document.getElementById('total-revenue').textContent = formatCurrency(revenue);
+            document.getElementById('revenue-change').textContent = formatCurrency(revenue - previousData.revenue);
+            document.getElementById('revenue-update-time').textContent = revenueDateTime.time;
+            document.getElementById('revenue-update-date').textContent = revenueDateTime.date;
+
+            document.getElementById('total-products').textContent = products;
+            document.getElementById('products-change').textContent = (products - previousData.products).toString();
+            document.getElementById('products-update-time').textContent = productsDateTime.time;
+            document.getElementById('products-update-date').textContent = productsDateTime.date;
+
+            document.getElementById('total-suppliers').textContent = suppliers;
+            document.getElementById('suppliers-change').textContent = (suppliers - previousData.suppliers).toString();
+            document.getElementById('suppliers-update-time').textContent = suppliersDateTime.time;
+            document.getElementById('suppliers-update-date').textContent = suppliersDateTime.date;
+
+            document.getElementById('total-employees').textContent = employees;
+            document.getElementById('employees-change').textContent = (employees - previousData.employees).toString();
+            document.getElementById('employees-update-time').textContent = employeesDateTime.time;
+            document.getElementById('employees-update-date').textContent = employeesDateTime.date;
+
+            document.getElementById('total-customers').textContent = customers;
+            document.getElementById('customers-change').textContent = (customers - previousData.customers).toString();
+            document.getElementById('customers-update-time').textContent = customersDateTime.time;
+            document.getElementById('customers-update-date').textContent = customersDateTime.date;
+
+            previousData = { revenue, products, suppliers, employees, customers };
+
+            renderChangeLogs(changeLogs);
+
+            updateChartData('revenue', revenue);
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+            document.getElementById('changeLogsContainer').innerHTML = `
+            <div class="update-item">
+                <div class="content">
+                    <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+                </div>
+            </div>
+        `;
         }
-    });
+    }
+
+    // Chart setup
+    let salesChart;
+    const chartData = {
+        revenue: { labels: [], data: [], label: 'Doanh Thu' },
+        products: { labels: [], data: [], label: 'Sản Phẩm' },
+        suppliers: { labels: [], data: [], label: 'Nhà Cung Cấp' },
+        employees: { labels: [], data: [], label: 'Nhân Viên' },
+        customers: { labels: [], data: [], label: 'Khách Hàng' }
+    };
+
+    function initializeChart() {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.revenue.labels,
+                datasets: [{
+                    label: chartData.revenue.label,
+                    data: chartData.revenue.data,
+                    borderColor: '#ff8a65',
+                    backgroundColor: '#ff8a65',
+                    fill: false,
+                    tension: 0.4,
+                    pointBackgroundColor: '#ff8a65',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 5000000 } },
+                    x: { grid: { display: false } }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { boxWidth: 0, font: { size: 12 } }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    function updateChartData(type, newData) {
+        const data = chartData[type];
+        const now = new Date();
+        const label = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+        data.labels.push(label);
+        data.data.push(type === 'revenue' ? (newData || 0) : parseInt(newData || 0, 10));
+
+        if (data.labels.length > 10) {
+            data.labels.shift();
+            data.data.shift();
+        }
+
+        salesChart.data.labels = data.labels;
+        salesChart.data.datasets[0].label = data.label;
+        salesChart.data.datasets[0].data = data.data;
+        salesChart.update();
+
+        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;
+    }
 
     function updateChart(type) {
         const data = chartData[type];
@@ -722,6 +1229,21 @@
         salesChart.data.datasets[0].data = data.data;
         salesChart.update();
         document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;
+    }
+
+    function zoomChart(direction) {
+        const yAxis = salesChart.options.scales.y;
+        if (direction === 'in') {
+            yAxis.ticks.stepSize /= 2;
+        } else {
+            yAxis.ticks.stepSize *= 2;
+        }
+        salesChart.update();
+    }
+
+    function resetChart() {
+        salesChart.options.scales.y.ticks.stepSize = 5000000;
+        salesChart.update();
     }
 
     function toggleExpand(section) {
@@ -758,6 +1280,12 @@
         }
     }
 
+    // Initialize chart and fetch data
+    initializeChart();
+    fetchDashboardData();
+    setInterval(fetchDashboardData, 3000);
+
+    // Resize chart on window resize
     window.addEventListener('resize', () => salesChart.resize());
 </script>
 </body>
