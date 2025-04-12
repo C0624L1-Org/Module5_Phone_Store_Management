@@ -61,7 +61,12 @@
         <!-- Nội dung chính -->
         <div class="content-container">
             <div class="container-fluid py-4">
-
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard/warehouse-staff}">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Nhập kho</li>
+                    </ol>
+                </nav>
                 <div class="card">
                     <div class="card-header">
                         <h2 class="mb-0">
