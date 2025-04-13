@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.md5_phone_store_management.model.Customer;
@@ -110,4 +111,13 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     // Tính tổng doanh thu theo khoảng thời gian
     @Query("SELECT SUM(i.amount) FROM Invoice i WHERE i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS AND i.createdAt BETWEEN ?1 AND ?2")
     Long getTotalRevenueBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    // Tính tổng số đơn hàng theo năm
+    @Query("SELECT count(i) FROM Invoice i WHERE FUNCTION('YEAR', i.createdAt) = :year")
+    int getTotalInvoicesYear(@Param("year") int year);
+
+    // Tính tổng số tiền mua bán theo năm
+    @Query("select sum(i.amount) from Invoice i where FUNCTION('YEAR',i.createdAt) = :year")
+    Long getTotalMoneyInvoicesYear(@Param("year") int year);
+
 }

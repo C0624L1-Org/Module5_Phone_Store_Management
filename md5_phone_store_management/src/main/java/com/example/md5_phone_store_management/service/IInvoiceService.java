@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 
 import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Invoice;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface IInvoiceService {
     Invoice saveInvoice(Invoice invoice);
@@ -50,4 +52,10 @@ public interface IInvoiceService {
 
     // Lấy tất cả hóa đơn của khách hàng theo ID với phân trang
     Page<Invoice> findByCustomerId(Integer customerID, Pageable pageable);
+
+    //Tính tổng số tien mua bán theo năm
+    int getTotalInvoicesYear(@Param("year") int year);
+
+    // Tính tổng số tiền mua bán theo năm
+    Long getTotalMoneyInvoicesYear(@Param("year") int year);
 }
