@@ -49,6 +49,7 @@ public class ReportController {
     @GetMapping("/report-home")
     public String showReportHome(Model model) {
         return "dashboard/report-management/report-home";
+
     }
 
     @GetMapping("/dashboard/admin/customer/report")
@@ -115,6 +116,8 @@ public class ReportController {
     public String showSalesReportForm(Model model) {
         model.addAttribute("startDate", "1970-01-01");
         model.addAttribute("endDate", LocalDate.now().format(DATE_INPUT_FORMATTER));
+        int  currentYear = LocalDate.now().getYear();
+        model.addAttribute("currentYear", currentYear);
         return "dashboard/report-management/sales-report";
     }
 
@@ -193,6 +196,8 @@ public class ReportController {
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("pageSize", PAGE_SIZE);
+            int  currentYear = LocalDate.now().getYear();
+            model.addAttribute("currentYear", currentYear);
 
         } catch (NumberFormatException e) {
             model.addAttribute("errorMessage", "Mã sản phẩm phải là số nguyên.");
@@ -204,5 +209,39 @@ public class ReportController {
         }
 
         return "dashboard/report-management/sales-report";
+    }
+
+    @GetMapping("/sales-report-year")
+    public String showSalesReportFormYear(Model model,
+                                          @RequestParam(name = "year") int year) {
+
+        model.addAttribute("startDate", "1970-01-01");
+        model.addAttribute("endDate", LocalDate.now().format(DATE_INPUT_FORMATTER));
+        int  currentYear = LocalDate.now().getYear();
+        model.addAttribute("currentYear", currentYear);
+
+        // tong so don hang theo nam 1
+        int totalInvoiceYear1 = iInvoiceService.getTotalInvoicesYear(year);
+        Long totalMoneyInvoiceYear1 = iInvoiceService.getTotalMoneyInvoicesYear(year);
+
+        // tong so don hang theo nam 2
+        int totalInvoiceYear2 = iInvoiceService.getTotalInvoicesYear(year-1);
+        Long totalMoneyInvoiceYear2 = iInvoiceService.getTotalMoneyInvoicesYear(year-1);
+
+        // tong so don hang theo nam 3
+        int totalInvoiceYear3 = iInvoiceService.getTotalInvoicesYear(year-2);
+        Long totalMoneyInvoiceYear3 = iInvoiceService.getTotalMoneyInvoicesYear(year-2);
+
+        model.addAttribute("totalInvoiceYear1", totalInvoiceYear1);
+        model.addAttribute("totalInvoiceYear2", totalInvoiceYear2);
+        model.addAttribute("totalInvoiceYear3", totalInvoiceYear3);
+        model.addAttribute("totalMoneyInvoiceYear1", totalMoneyInvoiceYear1);
+        model.addAttribute("totalMoneyInvoiceYear2", totalMoneyInvoiceYear2);
+        model.addAttribute("totalMoneyInvoiceYear3", totalMoneyInvoiceYear3);
+        model.addAttribute("year", year);
+        System.out.println(totalMoneyInvoiceYear1);
+        System.out.println(totalMoneyInvoiceYear2);
+        System.out.println(totalMoneyInvoiceYear3);
+        return "dashboard/report-management/sales-report-year";
     }
 }

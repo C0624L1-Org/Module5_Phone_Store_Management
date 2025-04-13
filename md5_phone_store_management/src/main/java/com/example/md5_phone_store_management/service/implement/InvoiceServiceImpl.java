@@ -255,4 +255,14 @@ public class InvoiceServiceImpl implements IInvoiceService {
         }
     }
 
+    @Override
+    public int getTotalInvoicesYear(int year) {
+        return invoiceRepository.getTotalInvoicesYear(year);
+    }
+
+    @Override
+    public Long getTotalMoneyInvoicesYear(int year) {
+        return invoiceRepository.getTotalMoneyInvoicesYear(year);
+    }
+
 }
