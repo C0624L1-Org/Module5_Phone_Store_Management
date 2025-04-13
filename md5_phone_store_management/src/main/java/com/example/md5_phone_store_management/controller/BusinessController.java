@@ -233,7 +233,7 @@ public class BusinessController {
                                   @RequestParam(name = "sortType", defaultValue = "true", required = false) boolean sortType,
                                   Model model) {
 
-        Pageable pageable = PageRequest.of(page, 2);
+        Pageable pageable = PageRequest.of(page, 5);
         Page<Invoice> invoicesPage;
         if (sortValue != null) {
             invoicesPage = returnSortedInvoicePage(pageable, sortType, sortValue);

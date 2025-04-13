@@ -1,6 +1,7 @@
 package com.example.md5_phone_store_management.repository;
 
 import com.example.md5_phone_store_management.model.Invoice;
+import com.example.md5_phone_store_management.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +22,7 @@ public interface IInvoiceRepository extends JpaRepository<Invoice, Long> {
     // Tính tổng doanh thu trong khoảng thời gian
     @Query("SELECT SUM(i.amount) FROM Invoice i WHERE i.payDate >= :startDate AND i.payDate <= :endDate")
     Long sumAmountByDateRange(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    @Query("SELECT p FROM Product p WHERE p.productID = :productId")
+    Product findProductById(Integer productId);
 }
