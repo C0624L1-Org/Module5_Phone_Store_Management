@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.example.md5_phone_store_management.repository.IInvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -258,7 +257,17 @@ public class InvoiceServiceImpl implements IInvoiceService {
             return null;
         }
     }
-    // biểu đồ theo tháng
+
+    @Override
+    public int getTotalInvoicesYear(int year) {
+        return invoiceRepository.getTotalInvoicesYear(year);
+    }
+
+    @Override
+    public Long getTotalMoneyInvoicesYear(int year) {
+        return invoiceRepository.getTotalMoneyInvoicesYear(year);
+    }
+    // biểu đồ theo tháng (Đình Anh)
     @Override
     public List<Object[]> getMonthlyRevenueByYear(int year){
         List<Object[]> result = invoiceRepository.getMonthlyReceiptsByYear(year);
