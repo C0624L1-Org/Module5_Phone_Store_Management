@@ -144,6 +144,9 @@ public class ReportController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
             @RequestParam(required = false) String productId,
+            @RequestParam(defaultValue = "false") boolean compareEnabled,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate compareStartDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate compareEndDate,
             @RequestParam(defaultValue = "0") int page, // Thêm tham số page
             Model model) {
 
@@ -152,6 +155,9 @@ public class ReportController {
         model.addAttribute("startDate", startDate != null ? startDate.format(DATE_INPUT_FORMATTER) : "");
         model.addAttribute("endDate", endDate != null ? endDate.format(DATE_INPUT_FORMATTER) : "");
         model.addAttribute("productId", productId);
+        model.addAttribute("compareEnabled", compareEnabled);
+        model.addAttribute("compareStartDate", compareStartDate != null ? compareStartDate.format(DATE_INPUT_FORMATTER) : "");
+        model.addAttribute("compareEndDate", compareEndDate != null ? compareEndDate.format(DATE_INPUT_FORMATTER) : "");
 
         if (startDate == null || endDate == null) {
             model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.");
@@ -162,6 +168,19 @@ public class ReportController {
             if (endDate.isBefore(startDate)) {
                 model.addAttribute("errorMessage", "Thời gian không hợp lệ: Ngày kết thúc phải sau ngày bắt đầu.");
                 return "dashboard/report-management/sales-report";
+            }
+            
+            // Kiểm tra dữ liệu so sánh nếu được bật
+            if (compareEnabled) {
+                if (compareStartDate == null || compareEndDate == null) {
+                    model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ ngày bắt đầu và kết thúc cho khoảng thời gian so sánh.");
+                    return "dashboard/report-management/sales-report";
+                }
+                
+                if (compareEndDate.isBefore(compareStartDate)) {
+                    model.addAttribute("errorMessage", "Thời gian so sánh không hợp lệ: Ngày kết thúc phải sau ngày bắt đầu.");
+                    return "dashboard/report-management/sales-report";
+                }
             }
 
             LocalDateTime startDateTime = startDate.atStartOfDay();
@@ -180,6 +199,34 @@ public class ReportController {
             if (report == null) {
                 model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này hoặc mã sản phẩm không hợp lệ.");
                 return "dashboard/report-management/sales-report";
+            }
+            
+            // Xử lý báo cáo so sánh nếu được bật
+            Map<String, Object> compareReport = null;
+            if (compareEnabled && compareStartDate != null && compareEndDate != null) {
+                LocalDateTime compareStartDateTime = compareStartDate.atStartOfDay();
+                LocalDateTime compareEndDateTime = compareEndDate.atTime(23, 59, 59);
+                
+                compareReport = salesReportService.generateSalesReport(compareStartDateTime, compareEndDateTime, parsedProductId);
+                model.addAttribute("compareReport", compareReport);
+                
+                // Tính các chỉ số so sánh giữa hai khoảng thời gian
+                if (compareReport != null) {
+                    long mainRevenue = (long) report.get("totalRevenue");
+                    long compareRevenue = (long) compareReport.get("totalRevenue");
+                    double revenueChange = mainRevenue - compareRevenue;
+                    double revenueChangePercent = compareRevenue != 0 ? (revenueChange / compareRevenue) * 100 : 0;
+                    
+                    long mainProductsSold = (long) report.get("totalProductsSold");
+                    long compareProductsSold = (long) compareReport.get("totalProductsSold");
+                    double productsSoldChange = mainProductsSold - compareProductsSold;
+                    double productsSoldChangePercent = compareProductsSold != 0 ? (productsSoldChange / compareProductsSold) * 100 : 0;
+                    
+                    model.addAttribute("revenueChange", revenueChange);
+                    model.addAttribute("revenueChangePercent", revenueChangePercent);
+                    model.addAttribute("productsSoldChange", productsSoldChange);
+                    model.addAttribute("productsSoldChangePercent", productsSoldChangePercent);
+                }
             }
 
             logger.info("Report Data - Total Orders: " + report.get("totalOrders"));
@@ -789,6 +836,99 @@ public class ReportController {
         } catch (Exception e) {
             logger.error("Error generating multi-year revenue report: " + e.getMessage(), e);
             return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo doanh thu nhiều năm"));
+        }
+    }
+
+    // API cho biểu đồ doanh thu theo tuần với tùy chọn so sánh
+    @GetMapping("/api/revenue/weekly/compare")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getWeeklyRevenueCompare(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate compareStartDate,
+            @RequestParam(required = false) String productId) {
+
+        try {
+            Map<String, Object> response = new HashMap<>();
+            
+            // Lấy dữ liệu khoảng thời gian chính
+            Map<String, Object> primaryData = getWeeklyRevenue(startDate, productId).getBody();
+            
+            // Lấy dữ liệu khoảng thời gian so sánh
+            Map<String, Object> compareData = getWeeklyRevenue(compareStartDate, productId).getBody();
+            
+            if (primaryData == null || compareData == null) {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Không thể lấy dữ liệu so sánh"));
+            }
+            
+            response.put("primaryData", primaryData);
+            response.put("compareData", compareData);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error generating weekly revenue comparison: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo so sánh doanh thu theo tuần"));
+        }
+    }
+    
+    // API cho biểu đồ doanh thu theo tháng với tùy chọn so sánh
+    @GetMapping("/api/revenue/monthly/compare")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getMonthlyRevenueCompare(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") String monthYear,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") String compareMonthYear,
+            @RequestParam(required = false) String productId) {
+        
+        try {
+            Map<String, Object> response = new HashMap<>();
+            
+            // Lấy dữ liệu khoảng thời gian chính
+            Map<String, Object> primaryData = getMonthlyRevenue(monthYear, productId).getBody();
+            
+            // Lấy dữ liệu khoảng thời gian so sánh
+            Map<String, Object> compareData = getMonthlyRevenue(compareMonthYear, productId).getBody();
+            
+            if (primaryData == null || compareData == null) {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Không thể lấy dữ liệu so sánh"));
+            }
+            
+            response.put("primaryData", primaryData);
+            response.put("compareData", compareData);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error generating monthly revenue comparison: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo so sánh doanh thu theo tháng"));
+        }
+    }
+    
+    // API cho biểu đồ doanh thu theo năm với tùy chọn so sánh
+    @GetMapping("/api/revenue/yearly/compare")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getYearlyRevenueCompare(
+            @RequestParam int year,
+            @RequestParam int compareYear,
+            @RequestParam(required = false) String productId) {
+        
+        try {
+            Map<String, Object> response = new HashMap<>();
+            
+            // Lấy dữ liệu khoảng thời gian chính
+            Map<String, Object> primaryData = getYearlyRevenue(year, productId).getBody();
+            
+            // Lấy dữ liệu khoảng thời gian so sánh
+            Map<String, Object> compareData = getYearlyRevenue(compareYear, productId).getBody();
+            
+            if (primaryData == null || compareData == null) {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Không thể lấy dữ liệu so sánh"));
+            }
+            
+            response.put("primaryData", primaryData);
+            response.put("compareData", compareData);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error generating yearly revenue comparison: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo so sánh doanh thu theo năm"));
         }
     }
 }
