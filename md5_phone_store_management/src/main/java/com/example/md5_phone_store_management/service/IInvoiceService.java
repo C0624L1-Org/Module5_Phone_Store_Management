@@ -50,4 +50,6 @@ public interface IInvoiceService {
 
     // Lấy tất cả hóa đơn của khách hàng theo ID với phân trang
     Page<Invoice> findByCustomerId(Integer customerID, Pageable pageable);
+    public List<Object[]> getMonthlyRevenueByYear(int year);
+    public List<Object[]> findAllSuccessInvoices();
 }

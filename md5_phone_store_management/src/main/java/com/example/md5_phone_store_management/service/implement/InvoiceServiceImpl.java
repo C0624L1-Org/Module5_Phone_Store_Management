@@ -1,8 +1,12 @@
 package com.example.md5_phone_store_management.service.implement;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.example.md5_phone_store_management.repository.IInvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -254,5 +258,27 @@ public class InvoiceServiceImpl implements IInvoiceService {
             return null;
         }
     }
-
+    // biểu đồ theo tháng
+    @Override
+    public List<Object[]> getMonthlyRevenueByYear(int year){
+        List<Object[]> result = invoiceRepository.getMonthlyReceiptsByYear(year);
+        Map<Integer, Long> revenueMap = new HashMap<>();
+        for (int month = 1; month <= 12; month++) {
+            revenueMap.put(month, 0L);
+        }
+        for (Object[] row : result) {
+            Integer month = (Integer) row[0];
+            Long revenue = (Long) row[1];
+            revenueMap.put(month, revenue);
+        }
+        List<Object[]> monthlyRevenueList = new ArrayList<>();
+        for (Map.Entry<Integer, Long> entry : revenueMap.entrySet()) {
+            monthlyRevenueList.add(new Object[]{entry.getKey(), entry.getValue()});
+        }
+        return monthlyRevenueList;
+    }
+    @Override
+    public  List<Object[]> findAllSuccessInvoices(){
+        return invoiceRepository.getDailyRevenue();
+    }
 }
