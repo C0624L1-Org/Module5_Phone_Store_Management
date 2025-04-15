@@ -1,5 +1,6 @@
 package com.example.md5_phone_store_management.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.md5_phone_store_management.model.Customer;
@@ -18,6 +20,18 @@ import com.example.md5_phone_store_management.model.PaymentMethod;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     // Sắp xếp
+    @Query("SELECT COUNT(i) FROM Invoice i WHERE i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS")
+    Integer countAllSuccessInvoices();
+
+    @Query("SELECT COUNT(i) FROM Invoice i WHERE i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS AND FUNCTION('DATE', i.createdAt) = :date")
+    Integer countSuccessInvoicesByDate(@Param("date") LocalDate date);
+
+    @Query("SELECT COUNT(i) FROM Invoice i WHERE i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS AND i.createdAt >= :startDate AND i.createdAt <= :endDate")
+    Integer countSuccessInvoicesBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+
+
+
     //Theo thoi gian
     @Query(value = "SELECT * FROM invoices WHERE invoices.status = 'SUCCESS' ORDER BY TIME(created_at) ASC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithTimeAsc(Pageable pageable);

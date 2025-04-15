@@ -1,6 +1,8 @@
 package com.example.md5_phone_store_management.service.implement;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -205,6 +207,33 @@ public class InvoiceServiceImpl implements IInvoiceService {
     public Page<Invoice> findAllSuccessInvoices(Pageable pageable) {
         return invoiceRepository.findAllSuccessInvoices(pageable);
     }
+
+
+    @Override
+    public Integer countAllSuccessInvoices() {
+        return invoiceRepository.countAllSuccessInvoices();
+    }
+
+    @Override
+    public Integer countTodaySuccessInvoices() {
+        LocalDate today = LocalDate.now(); // Service computes "today"
+        return invoiceRepository.countSuccessInvoicesByDate(today);
+    }
+
+    @Override
+    public Integer countThisMonthSuccessInvoices() {
+        LocalDate now = LocalDate.now();
+        YearMonth thisMonth = YearMonth.from(now); // Service computes "this month"
+        LocalDate startOfMonth = thisMonth.atDay(1);
+        LocalDateTime startDateTime = startOfMonth.atStartOfDay(); // 00:00:00
+        LocalDateTime endDateTime = thisMonth.atEndOfMonth().atTime(23, 59, 59, 999999999); // End of last day
+        return invoiceRepository.countSuccessInvoicesBetweenDates(startDateTime, endDateTime);
+    }
+
+
+
+
+
 
 
     @Override

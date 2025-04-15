@@ -21,8 +21,8 @@
     @Service
     @Transactional
     public class ProductService implements IProductService {
-    
-    
+
+
     
         @Autowired
         IProductRepository productRepository;
@@ -197,7 +197,15 @@
         public long countProducts() {
             return productRepository.count();
         }
-    
+
+
+        @Override
+        public Integer countProductsHaveRetailPrice() {
+            return productRepository.countProductsHaveRetailPrice();
+        }
+
+
+
         @Override
         public Page<Product> searchProductsByKeyword(String keyword, Pageable pageable) {
             if (keyword == null || keyword.trim().isEmpty()) {

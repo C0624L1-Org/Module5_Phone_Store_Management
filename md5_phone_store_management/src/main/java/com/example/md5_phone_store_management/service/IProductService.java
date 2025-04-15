@@ -11,6 +11,9 @@ import java.util.List;
 
 public interface IProductService {
 
+    Integer countProductsHaveRetailPrice();
+
+
     public List<Product> findAllByIds(List<Long> ids);
 
     Page<Product> searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(

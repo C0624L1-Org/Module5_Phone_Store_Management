@@ -18,6 +18,10 @@ import com.example.md5_phone_store_management.model.Product;
 public interface IProductRepository extends JpaRepository<Product, Integer> {
 
 
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.retailPrice IS NOT NULL")
+    Integer countProductsHaveRetailPrice();
+
+
     Page<Product> findByNameContainingAndSupplierNameContainingAndPurchasePriceLessThanEqual(
             String name, String supplierName, Integer purchasePrice, Pageable pageable);
 
@@ -135,7 +139,7 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
             Pageable pageable);
 
     Page<Product> findByNameContainingOrSupplier_NameContaining(
-        String name, String supplierName, Pageable pageable);
+            String name, String supplierName, Pageable pageable);
 
     @Query(value = "SELECT * FROM product WHERE " +
             "name LIKE CONCAT('%', :keyword, '%')",

@@ -413,6 +413,7 @@
             .card-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
+
             .stat-card-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
@@ -450,63 +451,67 @@
                         <div class="split-card product">
                             <div class="center-text">
                                 <i class="fas fa-boxes"></i>
-                                <p>300 sản phẩm</p>
+                                <p th:text="${countAllProducts != null} ? ${countAllProducts} + ' sản phẩm' : '0 sản phẩm'"></p>
                             </div>
                             <div class="left-side">
                                 <div class="content">
                                     <h5>Sản phẩm đã có giá bán lẻ</h5>
-                                    <p>50</p>
+                                    <p th:text="${countProductsHaveRetailPrice != null} ? ${countProductsHaveRetailPrice} : 0"></p>
                                 </div>
                             </div>
                             <div class="right-side">
                                 <div class="content">
                                     <h5>Sản phẩm chưa có giá bán lẻ</h5>
-                                    <p>250</p>
+                                    <p th:text="${countAllProducts != null and countProductsHaveRetailPrice != null} ? ${countAllProducts - countProductsHaveRetailPrice} : 0"></p>
                                 </div>
                             </div>
                         </div>
-                        <!-- Doanh thu hôm nay (sửa thành tổng doanh thu) -->
+
                         <div class="split-card revenue">
                             <div class="center-text">
-                                <i class="fas fa-dollar-sign"></i>
-                                <p>Tổng doanh thu</p>
+                                <i class="fas fa-shopping-cart"></i>
+                                <p th:text="${countAllSuccessInvoices != null} ? ${countAllSuccessInvoices} + ' đơn hàng' : '0 đơn hàng'"></p>
                             </div>
                             <div class="left-side">
                                 <div class="content">
-                                    <h5>Doanh thu hôm nay</h5>
-                                    <p>15,000,000 VNĐ</p>
+                                    <h5>Hôm nay (<span
+                                            th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}"></span>)</h5>
+                                    <p th:text="${countTodaySuccessInvoices != null} ? ${countTodaySuccessInvoices} + ' đơn' : '0 đơn'"></p>
                                 </div>
                             </div>
                             <div class="right-side">
                                 <div class="content">
-                                    <h5>Doanh thu tuần này</h5>
-                                    <p>52,000,000 VNĐ</p>
+                                    <h5>Tháng này (<span
+                                            th:text="${#dates.format(#dates.createNow(), 'MM/yyyy')}"></span>)</h5>
+                                    <p th:text="${countThisMonthSuccessInvoices != null} ? ${countThisMonthSuccessInvoices} + ' đơn' : '0 đơn'"></p>
                                 </div>
                             </div>
                         </div>
+
+
                         <!-- Tổng số khách hàng -->
                         <div class="split-card customer">
                             <div class="center-text">
                                 <i class="fas fa-users"></i>
-                                <p>500 khách hàng</p>
+                                <p th:text="${totalCustomers != null} ? ${totalCustomers} + ' khách hàng' : '0 khách hàng'"></p>
                             </div>
                             <div class="gender-sections">
                                 <div class="gender-section male">
                                     <div class="content">
                                         <h5>Giới tính nam</h5>
-                                        <p>100</p>
+                                        <p th:text="${maleCustomers != null} ? ${maleCustomers} : 0"></p>
                                     </div>
                                 </div>
                                 <div class="gender-section female">
                                     <div class="content">
                                         <h5>Giới tính nữ</h5>
-                                        <p>250</p>
+                                        <p th:text="${femaleCustomers != null} ? ${femaleCustomers} : 0"></p>
                                     </div>
                                 </div>
                                 <div class="gender-section other">
                                     <div class="content">
                                         <h5>Giới tính khác</h5>
-                                        <p>150</p>
+                                        <p th:text="${totalCustomers != null and maleCustomers != null and femaleCustomers != null} ? ${totalCustomers - maleCustomers - femaleCustomers} : 0"></p>
                                     </div>
                                 </div>
                             </div>

@@ -16,6 +16,13 @@ import java.util.List;
 
 @Repository
 public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
+
+    @Query("SELECT COUNT(c) FROM Customer c WHERE c.gender = 'Male'")
+    Integer countMaleCustomers();
+
+    @Query("SELECT COUNT(c) FROM Customer c WHERE c.gender = 'Female'")
+    Integer countFemaleCustomers();
+
     @Query("SELECT c FROM Customer c ORDER BY c.customerID")
     Page<Customer> getAllCustomerPageable(Pageable pageable);
 

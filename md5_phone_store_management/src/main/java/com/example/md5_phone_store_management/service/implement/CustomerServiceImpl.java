@@ -57,7 +57,17 @@ public class CustomerServiceImpl implements ICustomerService {
     public Integer countTotalCustomers() {
         return customerRepository.countTotalCustomers();
     }
-    
+
+    @Override
+    public Integer countMaleCustomers() {
+        return customerRepository.countMaleCustomers();
+    }
+
+    @Override
+    public Integer countFemaleCustomers() {
+        return customerRepository.countFemaleCustomers();
+    }
+
     @Override
     public void updatePurchaseCount(Integer customerId, int newCount) {
         try {

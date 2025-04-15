@@ -39,6 +39,12 @@ public interface IInvoiceService {
     //lay cac hoa don thanh cong
     Page<Invoice> findAllSuccessInvoices(Pageable pageable);
 
+    Integer countAllSuccessInvoices();
+    Integer countTodaySuccessInvoices();
+    Integer countThisMonthSuccessInvoices();
+
+
+
     // Lấy tất cả hóa đơn của khách hàng
     List<Invoice> findByCustomer(Customer customer);
 

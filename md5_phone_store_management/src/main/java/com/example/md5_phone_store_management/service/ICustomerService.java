@@ -9,6 +9,12 @@ import com.example.md5_phone_store_management.model.Customer;
 import java.util.List;
 
 public interface ICustomerService {
+
+
+    Integer countMaleCustomers();
+
+    Integer countFemaleCustomers();
+
     Page<Customer> findAllCustomers(Pageable pageable);
 
     Integer countTotalCustomers();
