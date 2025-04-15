@@ -29,7 +29,7 @@ public class SalesReportService {
     private IInvoiceRepository invoiceRepository;
 
     @Autowired
-    private ProductService productService; // Thêm ProductService
+    private ProductService productService;
 
     private static final DateTimeFormatter VNPAY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 

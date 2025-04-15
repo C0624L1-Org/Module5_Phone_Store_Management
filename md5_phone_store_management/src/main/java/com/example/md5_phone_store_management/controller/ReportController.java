@@ -1,19 +1,16 @@
 package com.example.md5_phone_store_management.controller;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -29,15 +26,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Gender;
 import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.model.InvoiceDetail;
-import com.example.md5_phone_store_management.model.Product;
-import com.example.md5_phone_store_management.repository.IInvoiceRepository;
 import com.example.md5_phone_store_management.service.CustomerService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
 import com.example.md5_phone_store_management.service.SalesReportService;
@@ -57,9 +50,7 @@ public class ReportController {
 
     @Autowired
     private IInvoiceService iInvoiceService;
-    
-    @Autowired
-    private IInvoiceRepository invoiceRepository;
+
 
     private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter VNPAY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -165,23 +156,6 @@ public class ReportController {
         }
 
         try {
-            if (endDate.isBefore(startDate)) {
-                model.addAttribute("errorMessage", "Thời gian không hợp lệ: Ngày kết thúc phải sau ngày bắt đầu.");
-                return "dashboard/report-management/sales-report";
-            }
-            
-            // Kiểm tra dữ liệu so sánh nếu được bật
-            if (compareEnabled) {
-                if (compareStartDate == null || compareEndDate == null) {
-                    model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ ngày bắt đầu và kết thúc cho khoảng thời gian so sánh.");
-                    return "dashboard/report-management/sales-report";
-                }
-                
-                if (compareEndDate.isBefore(compareStartDate)) {
-                    model.addAttribute("errorMessage", "Thời gian so sánh không hợp lệ: Ngày kết thúc phải sau ngày bắt đầu.");
-                    return "dashboard/report-management/sales-report";
-                }
-            }
 
             LocalDateTime startDateTime = startDate.atStartOfDay();
             LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
@@ -197,43 +171,19 @@ public class ReportController {
 
             Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, parsedProductId);
             if (report == null) {
-                model.addAttribute("errorMessage", "Không có dữ liệu trong khoảng thời gian này hoặc mã sản phẩm không hợp lệ.");
+                model.addAttribute("messageType", "error");
+                model.addAttribute("message", "Không có dữ liệu trong khoảng thời gian này hoặc mã sản phẩm không hợp lệ.");
                 return "dashboard/report-management/sales-report";
             }
-            
-            // Xử lý báo cáo so sánh nếu được bật
-            Map<String, Object> compareReport = null;
-            if (compareEnabled && compareStartDate != null && compareEndDate != null) {
-                LocalDateTime compareStartDateTime = compareStartDate.atStartOfDay();
-                LocalDateTime compareEndDateTime = compareEndDate.atTime(23, 59, 59);
-                
-                compareReport = salesReportService.generateSalesReport(compareStartDateTime, compareEndDateTime, parsedProductId);
-                model.addAttribute("compareReport", compareReport);
-                
-                // Tính các chỉ số so sánh giữa hai khoảng thời gian
-                if (compareReport != null) {
-                    long mainRevenue = (long) report.get("totalRevenue");
-                    long compareRevenue = (long) compareReport.get("totalRevenue");
-                    double revenueChange = mainRevenue - compareRevenue;
-                    double revenueChangePercent = compareRevenue != 0 ? (revenueChange / compareRevenue) * 100 : 0;
-                    
-                    long mainProductsSold = (long) report.get("totalProductsSold");
-                    long compareProductsSold = (long) compareReport.get("totalProductsSold");
-                    double productsSoldChange = mainProductsSold - compareProductsSold;
-                    double productsSoldChangePercent = compareProductsSold != 0 ? (productsSoldChange / compareProductsSold) * 100 : 0;
-                    
-                    model.addAttribute("revenueChange", revenueChange);
-                    model.addAttribute("revenueChangePercent", revenueChangePercent);
-                    model.addAttribute("productsSoldChange", productsSoldChange);
-                    model.addAttribute("productsSoldChangePercent", productsSoldChangePercent);
+
+            // Nếu có mã sản phẩm, lấy thông tin sản phẩm và gán cho biểu đồ
+            if (parsedProductId != null) {
+                String productName = getProductNameFromReport(parsedProductId, report);
+                if (productName != null) {
+                    model.addAttribute("chartProductName", productName);
+                    model.addAttribute("chartProductId", parsedProductId);
                 }
             }
-
-            logger.info("Report Data - Total Orders: " + report.get("totalOrders"));
-            logger.info("Report Data - Total Revenue: " + report.get("totalRevenue"));
-            logger.info("Report Data - Total Products Sold: " + report.get("totalProductsSold"));
-            logger.info("Report Data - Revenue by Product: " + report.get("revenueByProduct"));
-            logger.info("Report Data - Product Details: " + report.get("productDetails"));
 
             // Lấy revenueByProduct và phân trang
             Map<Integer, Long> revenueByProduct = (Map<Integer, Long>) report.get("revenueByProduct");
@@ -274,661 +224,173 @@ public class ReportController {
         return "dashboard/report-management/sales-report";
     }
 
-    // API cho biểu đồ doanh thu theo tuần
-    @GetMapping("/api/revenue/weekly")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getWeeklyRevenue(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam(required = false) String productId) {
+    // Thêm phương thức lấy tên sản phẩm
+    private String getProductNameFromReport(Integer productId, Map<String, Object> report) {
+        if (productId == null) {
+            return null;
+        }
 
         try {
-            // startDate là ngày đầu của một tuần trong tháng (1, 8, 15, 22, 29)
-            YearMonth yearMonth = YearMonth.from(startDate);
-            LocalDate firstDayOfMonth = yearMonth.atDay(1);
-            
-            // Tìm tuần chứa startDate (dựa vào ngày trong tháng)
-            int dayOfMonth = startDate.getDayOfMonth();
-            int weekNumber = (dayOfMonth - 1) / 7; // 0-based: tuần 0, 1, 2, 3, 4
-            
-            // Tính ngày bắt đầu của tuần đó (ngày 1, 8, 15, 22, 29)
-            LocalDate weekStartDate = firstDayOfMonth.plusDays(weekNumber * 7);
-            
-            // Tính ngày kết thúc của tuần (hoặc ngày cuối tháng nếu tuần bị cắt)
-            LocalDate lastDayOfMonth = yearMonth.atEndOfMonth();
-            LocalDate weekEndDate = weekStartDate.plusDays(6);
-            if (weekEndDate.isAfter(lastDayOfMonth)) {
-                weekEndDate = lastDayOfMonth;
-            }
-            
-            Map<String, Object> response = new HashMap<>();
-            
-            // Danh sách ngày trong tuần (chỉ trong tháng hiện tại)
-            List<String> labels = new ArrayList<>();
-            List<Long> revenueData = new ArrayList<>();
-            List<Integer> productCountData = new ArrayList<>();
-            List<BigDecimal> purchasePriceData = new ArrayList<>();
-            List<BigDecimal> sellingPriceData = new ArrayList<>();
-            Map<String, Object> productInfo = new HashMap<>();
-            
-            // Format hiển thị ngày Việt Nam: dd/MM
-            DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("dd/MM");
-            
-            // Nếu có mã sản phẩm, lấy thông tin sản phẩm
-            if (productId != null && !productId.isEmpty()) {
-                try {
-                    Integer parsedProductId = Integer.parseInt(productId);
-                    Product product = salesReportService.findProductById(parsedProductId);
-                    if (product != null) {
-                        productInfo.put("id", product.getProductID());
-                        productInfo.put("name", product.getName());
-                        productInfo.put("purchasePrice", product.getPurchasePrice());
-                        productInfo.put("sellingPrice", product.getSellingPrice());
-                    }
-                } catch (NumberFormatException e) {
-                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
+            // Lấy thông tin từ productDetails nếu có
+            if (report != null && report.containsKey("productDetails")) {
+                Map<Integer, String> productDetails = (Map<Integer, String>) report.get("productDetails");
+                if (productDetails.containsKey(productId)) {
+                    return productDetails.get(productId);
                 }
             }
-            
-            // Tạo dữ liệu cho từng ngày trong tuần (từ weekStartDate đến weekEndDate)
-            for (LocalDate currentDate = weekStartDate; !currentDate.isAfter(weekEndDate); currentDate = currentDate.plusDays(1)) {
-                String dateLabel = currentDate.format(displayFormatter);
-                labels.add(dateLabel);
-                
-                // Format ngày cho truy vấn database
-                String currentDateStr = currentDate.atStartOfDay().format(VNPAY_FORMATTER);
-                String nextDateStr = currentDate.plusDays(1).atStartOfDay().format(VNPAY_FORMATTER);
-                
-                // Lấy doanh thu cho ngày hiện tại
-                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(currentDateStr, nextDateStr);
-                
-                // Lọc theo mã sản phẩm nếu có
-                long dailyRevenue = 0;
-                int productsCount = 0;
-                BigDecimal purchasePrice = BigDecimal.ZERO;
-                BigDecimal sellingPrice = BigDecimal.ZERO;
-                
-                if (productId != null && !productId.isEmpty()) {
-                    // Parse product ID
-                    try {
-                        Integer parsedProductId = Integer.parseInt(productId);
-                        
-                        // Lọc và tính doanh thu cho sản phẩm cụ thể
-                        for (Invoice invoice : invoices) {
-                            if (invoice.getInvoiceDetailList() != null) {
-                                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                    if (detail.getProduct() != null && 
-                                        detail.getProduct().getProductID().equals(parsedProductId)) {
-                                        sellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                                   detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                        purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                        BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                                        dailyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                        productsCount += detail.getQuantity();
-                                    }
-                                }
-                            }
-                        }
-                        // Thêm giá nhập và giá bán vào danh sách
-                        purchasePriceData.add(purchasePrice);
-                        sellingPriceData.add(sellingPrice);
-                    } catch (NumberFormatException e) {
-                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
-                    }
-                } else {
-                    // Tính tổng doanh thu cho tất cả sản phẩm
-                    for (Invoice invoice : invoices) {
-                        if (invoice.getInvoiceDetailList() != null) {
-                            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                if (detail.getProduct() != null && detail.getQuantity() != null) {
-                                    BigDecimal currentSellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                                         detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                    BigDecimal currentPurchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                                          detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                    BigDecimal revenuePerUnit = currentSellingPrice.subtract(currentPurchasePrice);
-                                    dailyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                    productsCount += detail.getQuantity();
-                                }
-                            }
-                        }
-                    }
-                    purchasePriceData.add(BigDecimal.ZERO);
-                    sellingPriceData.add(BigDecimal.ZERO);
-                }
-                
-                revenueData.add(dailyRevenue);
-                productCountData.add(productsCount);
-            }
-            
-            // Thêm thông tin tuần vào response
-            response.put("labels", labels);
-            response.put("revenue", revenueData);
-            response.put("productCount", productCountData);
-            response.put("startDate", weekStartDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            response.put("endDate", weekEndDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            response.put("weekNumber", weekNumber + 1); // Chuyển từ 0-based sang 1-based
-            response.put("month", yearMonth.getMonth().getDisplayName(TextStyle.FULL, new Locale("vi", "VN")));
-            response.put("year", yearMonth.getYear());
-            
-            // Thêm thông tin sản phẩm và giá nếu có tìm kiếm theo mã sản phẩm
-            if (!productInfo.isEmpty()) {
-                response.put("productInfo", productInfo);
-                response.put("purchasePriceData", purchasePriceData);
-                response.put("sellingPriceData", sellingPriceData);
-            }
-            
-            return ResponseEntity.ok(response);
+            return "Sản phẩm #" + productId;
         } catch (Exception e) {
-            logger.error("Error generating weekly revenue report: " + e.getMessage(), e);
-            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo doanh thu theo tuần"));
+            System.err.println("Error getting product name: " + e.getMessage());
+            e.printStackTrace();
+            return "Sản phẩm #" + productId;
         }
     }
-    
-    // API cho biểu đồ doanh thu theo tháng (chia thành các tuần)
+
+    // API cho biểu đồ doanh thu theo ngày trong tháng
+    @GetMapping("/api/chart/day")
+    public ResponseEntity<?> getDailyRevenueChart(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer productId) {
+
+        List<Object[]> data;
+
+        if (month != null && year != null) {
+            if (productId != null) {
+                // Lấy dữ liệu theo ngày trong tháng và sản phẩm
+                data = iInvoiceService.getDailyInvoiceStatsByMonthAndYear(month, year);
+            } else {
+                // Lấy dữ liệu theo ngày trong tháng
+                data = iInvoiceService.getDailyInvoiceStatsByMonthAndYear(month, year);
+            }
+        } else {
+            // Lấy dữ liệu mặc định
+            data = iInvoiceService.getDailyInvoiceStats();
+        }
+
+        if (data == null || data.isEmpty()) {
+            return ResponseEntity.ok(Collections.emptyMap());
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        List<Integer> days = new ArrayList<>();
+        List<Long> invoiceCounts = new ArrayList<>();
+        List<Long> revenueSums = new ArrayList<>();
+
+        for (Object[] row : data) {
+            days.add(((Number) row[0]).intValue());              // Ngày
+            invoiceCounts.add(((Number) row[1]).longValue());    // Số hóa đơn
+            revenueSums.add(((Number) row[2]).longValue());      // Tổng doanh thu
+        }
+
+        response.put("days", days);
+        response.put("invoiceCounts", invoiceCounts);
+        response.put("revenueSums", revenueSums);
+
+        // Thêm thông tin sản phẩm nếu có
+        if (productId != null) {
+            response.put("productId", productId);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    // API cho biểu đồ doanh thu theo tháng trong năm
     @GetMapping("/api/revenue/monthly")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getMonthlyRevenue(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") String monthYear,
-            @RequestParam(required = false) String productId) {
-        
-        try {
-            // Parse tháng và năm từ tham số
-            YearMonth ym = YearMonth.parse(monthYear);
+    public ResponseEntity<?> getMonthlyRevenueChart(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer productId) {
 
-            LocalDate firstDayOfMonth = ym.atDay(1);
-            LocalDate lastDayOfMonth = ym.atEndOfMonth();
-            
-            Map<String, Object> response = new HashMap<>();
-            
-            // Danh sách các tuần trong tháng (tuần bắt đầu từ ngày 1, mỗi tuần 7 ngày)
-            List<String> labels = new ArrayList<>();
-            List<Long> revenueData = new ArrayList<>();
-            List<Integer> productCountData = new ArrayList<>();
-            List<BigDecimal> purchasePriceData = new ArrayList<>();
-            List<BigDecimal> sellingPriceData = new ArrayList<>();
-            Map<String, Object> productInfo = new HashMap<>();
-            
-            // Nếu có mã sản phẩm, lấy thông tin sản phẩm
-            if (productId != null && !productId.isEmpty()) {
-                try {
-                    Integer parsedProductId = Integer.parseInt(productId);
-                    Product product = salesReportService.findProductById(parsedProductId);
-                    if (product != null) {
-                        productInfo.put("id", product.getProductID());
-                        productInfo.put("name", product.getName());
-                        productInfo.put("purchasePrice", product.getPurchasePrice());
-                        productInfo.put("sellingPrice", product.getSellingPrice());
-                    }
-                } catch (NumberFormatException e) {
-                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
-                }
+        List<Object[]> data;
+
+        if (year != null) {
+            if (productId != null) {
+                // Lấy dữ liệu theo tháng trong năm và sản phẩm
+                data = iInvoiceService.getMonthlyInvoiceStatsByYear(year);
+            } else {
+                // Lấy dữ liệu theo tháng trong năm
+                data = iInvoiceService.getMonthlyInvoiceStatsByYear(year);
             }
-            
-            // Đếm số tuần trong tháng
-            int numWeeks = (int) Math.ceil((double) lastDayOfMonth.getDayOfMonth() / 7.0);
-            
-            // Tạo dữ liệu cho từng tuần
-            for (int weekNum = 0; weekNum < numWeeks; weekNum++) {
-                LocalDate weekStart = firstDayOfMonth.plusDays(weekNum * 7);
-                LocalDate weekEnd;
-                
-                // Nếu là tuần cuối, kết thúc vào ngày cuối tháng
-                if (weekNum == numWeeks - 1) {
-                    weekEnd = lastDayOfMonth;
-                } else {
-                    // Kết thúc sau 6 ngày hoặc ngày cuối tháng (nếu tuần bị thiếu ngày)
-                    weekEnd = weekStart.plusDays(6);
-                    if (weekEnd.isAfter(lastDayOfMonth)) {
-                        weekEnd = lastDayOfMonth;
-                    }
-                }
-                
-                // Format hiển thị tuần: "DD/MM - DD/MM"
-                String weekLabel = weekStart.format(DateTimeFormatter.ofPattern("dd/MM")) + 
-                                   " - " + 
-                                   weekEnd.format(DateTimeFormatter.ofPattern("dd/MM"));
-                labels.add(weekLabel);
-                
-                // Format ngày cho truy vấn database
-                String startDateStr = weekStart.atStartOfDay().format(VNPAY_FORMATTER);
-                // Kết thúc là cuối ngày nên thêm 1 ngày rồi lấy lúc 00:00
-                String endDateStr = weekEnd.plusDays(1).atStartOfDay().format(VNPAY_FORMATTER);
-                
-                // Lấy doanh thu cho tuần hiện tại
-                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(startDateStr, endDateStr);
-                
-                // Lọc theo mã sản phẩm nếu có
-                long weeklyRevenue = 0;
-                int productsCount = 0;
-                BigDecimal purchasePrice = BigDecimal.ZERO;
-                BigDecimal sellingPrice = BigDecimal.ZERO;
-                
-                if (productId != null && !productId.isEmpty()) {
-                    // Parse product ID
-                    try {
-                        Integer parsedProductId = Integer.parseInt(productId);
-                        
-                        // Lọc và tính doanh thu cho sản phẩm cụ thể
-                        for (Invoice invoice : invoices) {
-                            if (invoice.getInvoiceDetailList() != null) {
-                                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                    if (detail.getProduct() != null && 
-                                        detail.getProduct().getProductID().equals(parsedProductId)) {
-                                        sellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                                   detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                        purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                        BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                                        weeklyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                        productsCount += detail.getQuantity();
-                                    }
-                                }
-                            }
-                        }
-                        // Thêm giá nhập và giá bán vào danh sách
-                        purchasePriceData.add(purchasePrice);
-                        sellingPriceData.add(sellingPrice);
-                    } catch (NumberFormatException e) {
-                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
-                    }
-                } else {
-                    // Tính tổng doanh thu cho tất cả sản phẩm
-                    for (Invoice invoice : invoices) {
-                        if (invoice.getInvoiceDetailList() != null) {
-                            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                if (detail.getProduct() != null && detail.getQuantity() != null) {
-                                    BigDecimal currentSellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                                         detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                    BigDecimal currentPurchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                                          detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                    BigDecimal revenuePerUnit = currentSellingPrice.subtract(currentPurchasePrice);
-                                    weeklyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                    productsCount += detail.getQuantity();
-                                }
-                            }
-                        }
-                    }
-                    // Thêm giá 0 cho giá nhập và giá bán
-                    purchasePriceData.add(BigDecimal.ZERO);
-                    sellingPriceData.add(BigDecimal.ZERO);
-                }
-                
-                revenueData.add(weeklyRevenue);
-                productCountData.add(productsCount);
-            }
-            
-            response.put("labels", labels);
-            response.put("revenue", revenueData);
-            response.put("productCount", productCountData);
-            response.put("month", ym.getMonth().getDisplayName(TextStyle.FULL, new Locale("vi", "VN")));
-            response.put("year", ym.getYear());
-            
-            // Thêm thông tin sản phẩm và giá nếu có tìm kiếm theo mã sản phẩm
-            if (!productInfo.isEmpty()) {
-                response.put("productInfo", productInfo);
-                response.put("purchasePriceData", purchasePriceData);
-                response.put("sellingPriceData", sellingPriceData);
-            }
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error generating monthly revenue report: " + e.getMessage(), e);
-            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo doanh thu theo tháng"));
+        } else {
+            // Lấy dữ liệu mặc định
+            data = iInvoiceService.getMonthlyInvoiceStats();
         }
+
+        if (data == null || data.isEmpty()) {
+            return ResponseEntity.ok(Collections.emptyMap());
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        List<Integer> months = new ArrayList<>();
+        List<Long> invoiceCounts = new ArrayList<>();
+        List<Long> revenueSums = new ArrayList<>();
+
+        for (Object[] row : data) {
+            months.add(((Number) row[0]).intValue());            // Tháng
+            invoiceCounts.add(((Number) row[1]).longValue());    // Số hóa đơn
+            revenueSums.add(((Number) row[2]).longValue());      // Tổng doanh thu
+        }
+
+        response.put("months", months);
+        response.put("invoiceCounts", invoiceCounts);
+        response.put("revenueSums", revenueSums);
+
+        // Thêm thông tin sản phẩm nếu có
+        if (productId != null) {
+            response.put("productId", productId);
+        }
+
+        return ResponseEntity.ok(response);
     }
-    
-    // API cho biểu đồ doanh thu theo năm (theo tháng)
+
+    // API cho biểu đồ doanh thu theo 3 năm gần nhất
     @GetMapping("/api/revenue/yearly")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getYearlyRevenue(
-            @RequestParam int year,
-            @RequestParam(required = false) String productId) {
-        
-        try {
-            Map<String, Object> response = new HashMap<>();
-            
-            // Danh sách các tháng trong năm
-            List<String> labels = Arrays.asList(
-                "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", 
-                "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
-            );
-            
-            List<Long> revenueData = new ArrayList<>();
-            List<Integer> productCountData = new ArrayList<>();
-            List<BigDecimal> purchasePriceData = new ArrayList<>();
-            List<BigDecimal> sellingPriceData = new ArrayList<>();
-            Map<String, Object> productInfo = new HashMap<>();
-            
-            // Nếu có mã sản phẩm, lấy thông tin sản phẩm
-            if (productId != null && !productId.isEmpty()) {
-                try {
-                    Integer parsedProductId = Integer.parseInt(productId);
-                    Product product = salesReportService.findProductById(parsedProductId);
-                    if (product != null) {
-                        productInfo.put("id", product.getProductID());
-                        productInfo.put("name", product.getName());
-                        productInfo.put("purchasePrice", product.getPurchasePrice());
-                        productInfo.put("sellingPrice", product.getSellingPrice());
-                    }
-                } catch (NumberFormatException e) {
-                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
-                }
-            }
-            
-            // Tạo dữ liệu cho từng tháng
-            for (int month = 1; month <= 12; month++) {
-                YearMonth ym = YearMonth.of(year, month);
+    public ResponseEntity<?> getYearlyRevenueChart(
+            @RequestParam(required = false) Integer productId) {
 
-                LocalDate firstDayOfMonth = ym.atDay(1);
-                LocalDate lastDayOfMonth = ym.atEndOfMonth();
-                
-                // Format ngày cho truy vấn database
-                String startDateStr = firstDayOfMonth.atStartOfDay().format(VNPAY_FORMATTER);
-                // Kết thúc là cuối ngày nên thêm 1 ngày rồi lấy lúc 00:00
-                String endDateStr = lastDayOfMonth.plusDays(1).atStartOfDay().format(VNPAY_FORMATTER);
-                
-                // Lấy doanh thu cho tháng hiện tại
-                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(startDateStr, endDateStr);
-                
-                // Lọc theo mã sản phẩm nếu có
-                long monthlyRevenue = 0;
-                int productsCount = 0;
-                BigDecimal purchasePrice = BigDecimal.ZERO;
-                BigDecimal sellingPrice = BigDecimal.ZERO;
-                
-                if (productId != null && !productId.isEmpty()) {
-                    // Parse product ID
-                    try {
-                        Integer parsedProductId = Integer.parseInt(productId);
-                        
-                        // Lọc và tính doanh thu cho sản phẩm cụ thể
-                        for (Invoice invoice : invoices) {
-                            if (invoice.getInvoiceDetailList() != null) {
-                                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                    if (detail.getProduct() != null && 
-                                        detail.getProduct().getProductID().equals(parsedProductId)) {
-                                        sellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                                   detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                        purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                        BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                                        monthlyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                        productsCount += detail.getQuantity();
-                                    }
-                                }
-                            }
-                        }
-                        // Thêm giá nhập và giá bán vào danh sách
-                        purchasePriceData.add(purchasePrice);
-                        sellingPriceData.add(sellingPrice);
-                    } catch (NumberFormatException e) {
-                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
-                    }
-                } else {
-                    // Tính tổng doanh thu cho tất cả sản phẩm
-                    for (Invoice invoice : invoices) {
-                        if (invoice.getInvoiceDetailList() != null) {
-                            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                if (detail.getProduct() != null && detail.getQuantity() != null) {
-                                    BigDecimal currentSellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                                         detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                    BigDecimal currentPurchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                                          detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                    BigDecimal revenuePerUnit = currentSellingPrice.subtract(currentPurchasePrice);
-                                    monthlyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                    productsCount += detail.getQuantity();
-                                }
-                            }
-                        }
-                    }
-                    // Thêm giá 0 cho giá nhập và giá bán
-                    purchasePriceData.add(BigDecimal.ZERO);
-                    sellingPriceData.add(BigDecimal.ZERO);
-                }
-                
-                revenueData.add(monthlyRevenue);
-                productCountData.add(productsCount);
-            }
-            
-            response.put("labels", labels);
-            response.put("revenue", revenueData);
-            response.put("productCount", productCountData);
-            response.put("year", year);
-            
-            // Thêm thông tin sản phẩm và giá nếu có tìm kiếm theo mã sản phẩm
-            if (!productInfo.isEmpty()) {
-                response.put("productInfo", productInfo);
-                response.put("purchasePriceData", purchasePriceData);
-                response.put("sellingPriceData", sellingPriceData);
-            }
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error generating yearly revenue report: " + e.getMessage(), e);
-            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo doanh thu theo năm"));
-        }
-    }
-    
-    // API cho biểu đồ doanh thu 3 năm gần đây
-    @GetMapping("/api/revenue/multi-year")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getMultiYearRevenue(
-            @RequestParam(required = false) String productId) {
+        List<Object[]> allYearlyData;
 
-        try {
-            Map<String, Object> response = new HashMap<>();
-            
-            // Lấy năm hiện tại và 2 năm trước đó
-            int currentYear = LocalDate.now().getYear();
-            
-            List<String> labels = new ArrayList<>();
-            List<Long> revenueData = new ArrayList<>();
-            List<Integer> productCountData = new ArrayList<>();
-            List<BigDecimal> purchasePriceData = new ArrayList<>();
-            List<BigDecimal> sellingPriceData = new ArrayList<>();
-            Map<String, Object> productInfo = new HashMap<>();
-            
-            // Nếu có mã sản phẩm, lấy thông tin sản phẩm
-            if (productId != null && !productId.isEmpty()) {
-                try {
-                    Integer parsedProductId = Integer.parseInt(productId);
-                    Product product = salesReportService.findProductById(parsedProductId);
-                    if (product != null) {
-                        productInfo.put("id", product.getProductID());
-                        productInfo.put("name", product.getName());
-                        productInfo.put("purchasePrice", product.getPurchasePrice());
-                        productInfo.put("sellingPrice", product.getSellingPrice());
-                    }
-                } catch (NumberFormatException e) {
-                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
-                }
-            }
-            
-            // Tạo dữ liệu cho 3 năm gần đây
-            for (int i = 2; i >= 0; i--) {
-                int year = currentYear - i;
-                labels.add(String.valueOf(year));
-                
-                // Tính doanh thu cho cả năm
-                LocalDate firstDayOfYear = LocalDate.of(year, 1, 1);
-                LocalDate lastDayOfYear = LocalDate.of(year, 12, 31);
-                
-                // Format ngày cho truy vấn database
-                String startDateStr = firstDayOfYear.atStartOfDay().format(VNPAY_FORMATTER);
-                String endDateStr = lastDayOfYear.plusDays(1).atStartOfDay().format(VNPAY_FORMATTER);
-                
-                // Lấy doanh thu cho năm hiện tại
-                List<Invoice> invoices = invoiceRepository.findInvoicesByDateRange(startDateStr, endDateStr);
-                
-                // Lọc theo mã sản phẩm nếu có
-                long yearlyRevenue = 0;
-                int productsCount = 0;
-                BigDecimal purchasePrice = BigDecimal.ZERO;
-                BigDecimal sellingPrice = BigDecimal.ZERO;
-                
-                if (productId != null && !productId.isEmpty()) {
-                    // Parse product ID
-                    try {
-                        Integer parsedProductId = Integer.parseInt(productId);
-                        
-                        // Lọc và tính doanh thu cho sản phẩm cụ thể
-                        for (Invoice invoice : invoices) {
-                            if (invoice.getInvoiceDetailList() != null) {
-                                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                    if (detail.getProduct() != null && 
-                                        detail.getProduct().getProductID().equals(parsedProductId)) {
-                                        sellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                                   detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                        purchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                                    detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                        BigDecimal revenuePerUnit = sellingPrice.subtract(purchasePrice);
-                                        yearlyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                        productsCount += detail.getQuantity();
-                                    }
-                                }
-                            }
-                        }
-                        // Thêm giá nhập và giá bán vào danh sách
-                        purchasePriceData.add(purchasePrice);
-                        sellingPriceData.add(sellingPrice);
-                    } catch (NumberFormatException e) {
-                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Mã sản phẩm không hợp lệ"));
-                    }
-                } else {
-                    // Tính tổng doanh thu cho tất cả sản phẩm
-                    for (Invoice invoice : invoices) {
-                        if (invoice.getInvoiceDetailList() != null) {
-                            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-                                if (detail.getProduct() != null && detail.getQuantity() != null) {
-                                    BigDecimal currentSellingPrice = detail.getProduct().getSellingPrice() != null ? 
-                                                         detail.getProduct().getSellingPrice() : BigDecimal.ZERO;
-                                    BigDecimal currentPurchasePrice = detail.getProduct().getPurchasePrice() != null ? 
-                                                          detail.getProduct().getPurchasePrice() : BigDecimal.ZERO;
-                                    BigDecimal revenuePerUnit = currentSellingPrice.subtract(currentPurchasePrice);
-                                    yearlyRevenue += revenuePerUnit.multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
-                                    productsCount += detail.getQuantity();
-                                }
-                            }
-                        }
-                    }
-                    // Thêm giá 0 cho giá nhập và giá bán
-                    purchasePriceData.add(BigDecimal.ZERO);
-                    sellingPriceData.add(BigDecimal.ZERO);
-                }
-                
-                revenueData.add(yearlyRevenue);
-                productCountData.add(productsCount);
-            }
-            
-            response.put("labels", labels);
-            response.put("revenue", revenueData);
-            response.put("productCount", productCountData);
-            response.put("currentYear", currentYear);
-            
-            // Thêm thông tin sản phẩm và giá nếu có tìm kiếm theo mã sản phẩm
-            if (!productInfo.isEmpty()) {
-                response.put("productInfo", productInfo);
-                response.put("purchasePriceData", purchasePriceData);
-                response.put("sellingPriceData", sellingPriceData);
-            }
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error generating multi-year revenue report: " + e.getMessage(), e);
-            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo doanh thu nhiều năm"));
+        if (productId != null) {
+            // Lấy dữ liệu theo năm và sản phẩm
+            allYearlyData = iInvoiceService.getYearlyInvoiceStats();
+        } else {
+            // Lấy dữ liệu theo năm
+            allYearlyData = iInvoiceService.getYearlyInvoiceStats();
         }
-    }
 
-    // API cho biểu đồ doanh thu theo tuần với tùy chọn so sánh
-    @GetMapping("/api/revenue/weekly/compare")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getWeeklyRevenueCompare(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate compareStartDate,
-            @RequestParam(required = false) String productId) {
+        if (allYearlyData == null || allYearlyData.isEmpty()) {
+            return ResponseEntity.ok(Collections.emptyMap());
+        }
 
-        try {
-            Map<String, Object> response = new HashMap<>();
-            
-            // Lấy dữ liệu khoảng thời gian chính
-            Map<String, Object> primaryData = getWeeklyRevenue(startDate, productId).getBody();
-            
-            // Lấy dữ liệu khoảng thời gian so sánh
-            Map<String, Object> compareData = getWeeklyRevenue(compareStartDate, productId).getBody();
-            
-            if (primaryData == null || compareData == null) {
-                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Không thể lấy dữ liệu so sánh"));
-            }
-            
-            response.put("primaryData", primaryData);
-            response.put("compareData", compareData);
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error generating weekly revenue comparison: " + e.getMessage(), e);
-            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo so sánh doanh thu theo tuần"));
+        // Sắp xếp theo năm giảm dần và chỉ lấy 3 năm gần nhất
+        List<Object[]> data = allYearlyData.stream()
+                .sorted((a, b) -> ((Number) b[0]).intValue() - ((Number) a[0]).intValue())
+                .limit(3)
+                .collect(Collectors.toList());
+
+        // Sắp xếp lại theo năm tăng dần để hiển thị trên biểu đồ
+        Collections.sort(data, Comparator.comparingInt(row -> ((Number) row[0]).intValue()));
+
+        Map<String, Object> response = new HashMap<>();
+        List<Integer> years = new ArrayList<>();
+        List<Long> invoiceCounts = new ArrayList<>();
+        List<Long> revenueSums = new ArrayList<>();
+
+        for (Object[] row : data) {
+            years.add(((Number) row[0]).intValue());             // Năm
+            invoiceCounts.add(((Number) row[1]).longValue());    // Số hóa đơn
+            revenueSums.add(((Number) row[2]).longValue());      // Tổng doanh thu
         }
-    }
-    
-    // API cho biểu đồ doanh thu theo tháng với tùy chọn so sánh
-    @GetMapping("/api/revenue/monthly/compare")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getMonthlyRevenueCompare(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") String monthYear,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") String compareMonthYear,
-            @RequestParam(required = false) String productId) {
-        
-        try {
-            Map<String, Object> response = new HashMap<>();
-            
-            // Lấy dữ liệu khoảng thời gian chính
-            Map<String, Object> primaryData = getMonthlyRevenue(monthYear, productId).getBody();
-            
-            // Lấy dữ liệu khoảng thời gian so sánh
-            Map<String, Object> compareData = getMonthlyRevenue(compareMonthYear, productId).getBody();
-            
-            if (primaryData == null || compareData == null) {
-                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Không thể lấy dữ liệu so sánh"));
-            }
-            
-            response.put("primaryData", primaryData);
-            response.put("compareData", compareData);
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error generating monthly revenue comparison: " + e.getMessage(), e);
-            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo so sánh doanh thu theo tháng"));
+
+        response.put("years", years);
+        response.put("invoiceCounts", invoiceCounts);
+        response.put("revenueSums", revenueSums);
+
+        // Thêm thông tin sản phẩm nếu có
+        if (productId != null) {
+            response.put("productId", productId);
         }
-    }
-    
-    // API cho biểu đồ doanh thu theo năm với tùy chọn so sánh
-    @GetMapping("/api/revenue/yearly/compare")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getYearlyRevenueCompare(
-            @RequestParam int year,
-            @RequestParam int compareYear,
-            @RequestParam(required = false) String productId) {
-        
-        try {
-            Map<String, Object> response = new HashMap<>();
-            
-            // Lấy dữ liệu khoảng thời gian chính
-            Map<String, Object> primaryData = getYearlyRevenue(year, productId).getBody();
-            
-            // Lấy dữ liệu khoảng thời gian so sánh
-            Map<String, Object> compareData = getYearlyRevenue(compareYear, productId).getBody();
-            
-            if (primaryData == null || compareData == null) {
-                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Không thể lấy dữ liệu so sánh"));
-            }
-            
-            response.put("primaryData", primaryData);
-            response.put("compareData", compareData);
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error generating yearly revenue comparison: " + e.getMessage(), e);
-            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo báo cáo so sánh doanh thu theo năm"));
-        }
+
+        return ResponseEntity.ok(response);
     }
 }

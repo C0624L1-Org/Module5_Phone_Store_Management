@@ -255,4 +255,67 @@ public class InvoiceServiceImpl implements IInvoiceService {
         }
     }
 
+    // Triển khai các phương thức biểu đồ theo ngày
+    @Override
+    @Transactional(readOnly = true)
+    public List<Object[]> getDailyInvoiceStats() {
+        try {
+            return invoiceRepository.getDailyInvoiceStats();
+        } catch (Exception e) {
+            System.err.println("Error getting daily invoice stats: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Object[]> getDailyInvoiceStatsByMonthAndYear(int month, int year) {
+        try {
+            return invoiceRepository.getDailyInvoiceStatsByMonthAndYear(month, year);
+        } catch (Exception e) {
+            System.err.println("Error getting daily invoice stats by month and year: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Triển khai các phương thức biểu đồ theo tháng
+    @Override
+    @Transactional(readOnly = true)
+    public List<Object[]> getMonthlyInvoiceStats() {
+        try {
+            return invoiceRepository.getMonthlyInvoiceStats();
+        } catch (Exception e) {
+            System.err.println("Error getting monthly invoice stats: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Object[]> getMonthlyInvoiceStatsByYear(int year) {
+        try {
+            return invoiceRepository.getMonthlyInvoiceStatsByYear(year);
+        } catch (Exception e) {
+            System.err.println("Error getting monthly invoice stats by year: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Triển khai phương thức biểu đồ theo năm
+    @Override
+    @Transactional(readOnly = true)
+    public List<Object[]> getYearlyInvoiceStats() {
+        try {
+            return invoiceRepository.getYearlyInvoiceStats();
+        } catch (Exception e) {
+            System.err.println("Error getting yearly invoice stats: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }
