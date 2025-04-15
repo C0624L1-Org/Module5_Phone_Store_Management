@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="/css/common/toast.css">
     <link rel="stylesheet" href="/css/common/layout.css">
     <style>
+        /* [Your existing CSS unchanged] */
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f0f2f5 0%, #e9ecef 100%);
@@ -488,7 +489,6 @@
                             </div>
                         </div>
 
-
                         <!-- Tổng số khách hàng -->
                         <div class="split-card customer">
                             <div class="center-text">
@@ -532,34 +532,12 @@
                     </div>
 
                     <!-- Notification Section -->
-<!--                    <div class="notification-section">-->
-<!--                        <h5 class="mb-3"><i class="fas fa-bell"></i> Thông báo mới nhất</h5>-->
-<!--                        <div class="notification-grid">-->
-<!--                            <div class="notification-card">-->
-<!--                                <h6>Quản lý giá bán lẻ</h6>-->
-<!--                                <p>Giá sản phẩm "Áo thun" vừa được cập nhật.</p>-->
-<!--                                <div class="notification-badge">3</div>-->
-<!--                            </div>-->
-<!--                            <div class="notification-card">-->
-<!--                                <h6>Quản lý lịch sử mua bán</h6>-->
-<!--                                <p>Giao dịch #1234 cần xác nhận.</p>-->
-<!--                                <div class="notification-badge">5</div>-->
-<!--                            </div>-->
-<!--                            <div class="notification-card">-->
-<!--                                <h6>Quản lý khách hàng</h6>-->
-<!--                                <p>Khách hàng mới đăng ký: Nguyễn Văn D.</p>-->
-<!--                                <div class="notification-badge">2</div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
                     <div class="notification-section">
                         <h5 class="mb-3"><i class="fas fa-bell"></i> Thông báo mới nhất</h5>
                         <div class="notification-grid" id="notification-grid">
                             <!-- Notifications will be populated dynamically -->
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>
@@ -573,9 +551,9 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
 
-    document.addEventListener('DOMContentLoaded', async () => {
+<script>
+    const updateNotifications = async () => {
         const notificationGrid = document.getElementById('notification-grid');
 
         const endpoints = [
@@ -587,11 +565,12 @@
         const createNotificationCard = (title, message, changeCount) => {
             const card = document.createElement('div');
             card.className = 'notification-card';
+            card.dataset.endpoint = endpoints.find(e => e.title === title)?.url; // Store endpoint URL
             card.innerHTML = `
-            <h6>${title}</h6>
-            <p>${message}</p>
-            ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
-        `;
+                <h6>${title}</h6>
+                <p>${message}</p>
+                ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
+            `;
             return card;
         };
 
@@ -606,7 +585,20 @@
                     data = text ? JSON.parse(text) : {};
                 } else {
                     console.error(`HTTP error ${response.status} for ${endpoint.url}`);
-                    notificationGrid.appendChild(createNotificationCard(endpoint.title, 'Lỗi khi tải thông báo', 0));
+                    // Update or append error card
+                    const existingCard = Array.from(notificationGrid.children).find(
+                        card => card.dataset.endpoint === endpoint.url
+                    );
+                    const errorMessage = 'Lỗi khi tải thông báo';
+                    if (existingCard) {
+                        const existingMessage = existingCard.querySelector('p').textContent;
+                        if (existingMessage !== errorMessage) {
+                            existingCard.querySelector('p').textContent = errorMessage;
+                            existingCard.querySelector('.notification-badge')?.remove();
+                        }
+                    } else {
+                        notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
+                    }
                     continue;
                 }
 
@@ -616,38 +608,87 @@
 
                 if (data && data.action && data.fieldName) {
                     switch (data.action.toUpperCase()) {
-                        case 'INSERT_PW_NO_PRICE':
-                            message = `Thêm mới sản phẩm không có giá bán lẻ`;
-                            break;
-                        case 'INSERT_PW_PRICE':
-                            message = `Thêm mới sản phẩm với giá bán lẻ ${data.newValue || 'không xác định'}`;
-                            break;
-                        case 'UPDATE_RETAIL_PRICE':
-                            message = `Cập nhật giá bán lẻ: từ '${data.oldValue || 'không có'}' thành '${data.newValue || 'không có'}'`;
-                            break;
                         case 'INSERT':
-                            message = `Thêm mới ${data.fieldName}: ${data.newValue || 'không xác định'}`;
-                            break;
-                        case 'UPDATE':
-                            message = `Cập nhật ${data.fieldName}: từ '${data.oldValue || 'không có'}' thành '${data.newValue || 'không có'}'`;
-                            break;
-                        case 'DELETE':
-                            message = `Xóa ${data.fieldName}: ${data.oldValue || 'không xác định'}`;
+                            if (data.fieldName.toLowerCase() === 'retailprice') {
+                                message = data.newValue === 'No Retail Price'
+                                    ? `Thêm mới sản phẩm ${data.details || 'chưa có giá bán lẻ'}`
+                                    : `Sản phẩm với giá bán lẻ: ${
+                                        isNaN(parseFloat(data.newValue))
+                                            ? 'không xác định'
+                                            : new Intl.NumberFormat('vi-VN', {
+                                                style: 'currency',
+                                                currency: 'VND',
+                                                minimumFractionDigits: 0
+                                            }).format(parseFloat(data.newValue))
+                                    }`;
+                            } else {
+                                message = `Lỗi khi tải !`;
+                            }
                             break;
                         default:
-                            message = `Thay đổi ${data.fieldName}: ${data.newValue || 'không xác định'}`;
+                            message = `Lỗi khi tải !`;
                     }
                     changeCount = 1;
                 }
 
+                // Find existing card for this endpoint
+                const existingCard = Array.from(notificationGrid.children).find(
+                    card => card.dataset.endpoint === endpoint.url
+                );
+
+                if (existingCard) {
+                    // Update existing card if message or changeCount differs
+                    const existingMessage = existingCard.querySelector('p').textContent;
+                    const existingBadge = existingCard.querySelector('.notification-badge');
+                    const existingChangeCount = existingBadge ? parseInt(existingBadge.textContent) : 0;
+
+                    if (existingMessage !== message || existingChangeCount !== changeCount) {
+                        existingCard.querySelector('p').textContent = message;
+                        if (changeCount > 0) {
+                            if (existingBadge) {
+                                existingBadge.textContent = changeCount;
+                            } else {
+                                const badge = document.createElement('div');
+                                badge.className = 'notification-badge';
+                                badge.textContent = changeCount;
+                                existingCard.appendChild(badge);
+                            }
+                        } else {
+                            existingBadge?.remove();
+                        }
+                    }
+                } else {
+                    // Append new card if none exists
+                    notificationGrid.appendChild(createNotificationCard(endpoint.title, message, changeCount));
+                }
+
                 console.log(`Parsed data for ${endpoint.url}:`, data);
                 console.log(`Message for ${endpoint.title}:`, message);
-                notificationGrid.appendChild(createNotificationCard(endpoint.title, message, changeCount));
             } catch (error) {
                 console.error(`Error fetching ${endpoint.url}:`, error);
-                notificationGrid.appendChild(createNotificationCard(endpoint.title, 'Lỗi khi tải thông báo', 0));
+                // Handle error by updating or appending
+                const existingCard = Array.from(notificationGrid.children).find(
+                    card => card.dataset.endpoint === endpoint.url
+                );
+                const errorMessage = 'Lỗi khi tải thông báo';
+                if (existingCard) {
+                    const existingMessage = existingCard.querySelector('p').textContent;
+                    if (existingMessage !== errorMessage) {
+                        existingCard.querySelector('p').textContent = errorMessage;
+                        existingCard.querySelector('.notification-badge')?.remove();
+                    }
+                } else {
+                    notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
+                }
             }
         }
+    };
+
+    // Initial call and polling setup
+    document.addEventListener('DOMContentLoaded', () => {
+        updateNotifications();
+        // Poll every 3 seconds
+        setInterval(updateNotifications, 3000);
     });
 </script>
 </body>
