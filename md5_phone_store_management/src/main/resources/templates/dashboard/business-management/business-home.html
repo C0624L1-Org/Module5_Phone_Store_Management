@@ -260,35 +260,64 @@
             opacity: 1;
         }
 
-        /* Màu cho split-card Tổng số khách hàng (đồng điệu với btn-green) */
-        .split-card.customer .left-side {
+        /* CSS cho thẻ khách hàng với 3 phần */
+        .split-card.customer {
+            background: linear-gradient(135deg, #28a745 0%, #5cd881 100%);
+        }
+
+        .gender-sections {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            z-index: 1;
+        }
+
+        .gender-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: all 0.4s ease;
+        }
+
+        .gender-section.male {
             background: linear-gradient(135deg, #28a745 0%, #34c759 100%);
-            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
         }
 
-        .split-card.customer .right-side {
+        .gender-section.female {
             background: linear-gradient(135deg, #34c759 0%, #5cd881 100%);
-            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
         }
 
-        .split-card.customer .left-side:hover {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        .gender-section.other {
+            background: linear-gradient(135deg, #5cd881 0%, #88e9a3 100%);
         }
 
-        .split-card.customer .left-side:hover ~ .right-side {
-            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+        .split-card.customer:hover .center-text {
+            opacity: 0;
         }
 
-        .split-card.customer .right-side:hover {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        .split-card.customer:not(:hover) .gender-section {
+            opacity: 0.2;
         }
 
-        .split-card.customer .right-side:hover ~ .left-side {
-            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        .split-card.customer:hover .gender-section {
+            opacity: 0.5;
         }
 
-        .split-card.customer .left-side:hover .content,
-        .split-card.customer .right-side:hover .content {
+        .gender-section:hover {
+            opacity: 1 !important;
+            flex: 3;
+        }
+
+        .gender-section .content {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gender-section:hover .content {
             opacity: 1;
         }
 
@@ -461,16 +490,24 @@
                                 <i class="fas fa-users"></i>
                                 <p>500 khách hàng</p>
                             </div>
-                            <div class="left-side">
-                                <div class="content">
-                                    <h5>Khách hàng cũ</h5>
-                                    <p>100</p>
+                            <div class="gender-sections">
+                                <div class="gender-section male">
+                                    <div class="content">
+                                        <h5>Giới tính nam</h5>
+                                        <p>100</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="right-side">
-                                <div class="content">
-                                    <h5>Khách hàng mới</h5>
-                                    <p>250</p>
+                                <div class="gender-section female">
+                                    <div class="content">
+                                        <h5>Giới tính nữ</h5>
+                                        <p>250</p>
+                                    </div>
+                                </div>
+                                <div class="gender-section other">
+                                    <div class="content">
+                                        <h5>Giới tính khác</h5>
+                                        <p>150</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -478,13 +515,13 @@
 
                     <!-- Action Buttons -->
                     <div class="card-grid">
-                        <a href="/dashboard/admin/customers/list" class="btn-custom btn-orange">
+                        <a href="/dashboard/products/listToChoose" class="btn-custom btn-orange">
                             <i class="fas fa-users"></i> Quản lý giá bán lẻ
                         </a>
-                        <a href="/dashboard/products/listToChoose" class="btn-custom btn-blue">
+                        <a href="/dashboard/business/transaction" class="btn-custom btn-blue">
                             <i class="fas fa-tags"></i> Quản lý lịch sử mua bán
                         </a>
-                        <a href="/dashboard/business/transaction" class="btn-custom btn-green">
+                        <a href="/dashboard/admin/customers/list" class="btn-custom btn-green">
                             <i class="fas fa-history"></i> Quản lý khách hàng
                         </a>
                     </div>
