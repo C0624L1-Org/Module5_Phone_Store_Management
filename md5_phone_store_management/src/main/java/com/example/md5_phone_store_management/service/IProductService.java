@@ -1,13 +1,13 @@
 package com.example.md5_phone_store_management.service;
 
-import com.example.md5_phone_store_management.model.Product;
-import com.example.md5_phone_store_management.model.ProductImage;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
-import java.util.List;
+import com.example.md5_phone_store_management.model.Product;
+import com.example.md5_phone_store_management.model.ProductImage;
 
 public interface IProductService {
 
@@ -56,6 +56,13 @@ public interface IProductService {
     void save(Product product); // Thêm phương thức save
 
     Product findById(Integer id);
+    
+    /**
+     * Tìm sản phẩm theo ID - hỗ trợ cho tính năng báo cáo doanh thu
+     * @param productId ID của sản phẩm cần tìm
+     * @return Product sản phẩm tìm thấy hoặc null nếu không tìm thấy
+     */
+    Product findProductById(Integer productId);
 
     Page<Product> searchProductsByKeyword(String keyword, Pageable pageable);
 

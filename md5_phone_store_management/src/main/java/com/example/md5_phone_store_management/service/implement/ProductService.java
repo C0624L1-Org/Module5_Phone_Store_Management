@@ -228,6 +228,16 @@
         public Product findById(Integer id) {
             return productRepository.findByProductID(id);
         }
+        
+        /**
+         * Tìm sản phẩm theo ID - hỗ trợ cho tính năng báo cáo doanh thu
+         * @param productId ID của sản phẩm cần tìm
+         * @return Product sản phẩm tìm thấy hoặc null nếu không tìm thấy
+         */
+        @Override
+        public Product findProductById(Integer productId) {
+            return productRepository.findById(productId).orElse(null);
+        }
 
         @Override public Long countSoldProducts() { return productRepository.countSoldProducts(); }
     

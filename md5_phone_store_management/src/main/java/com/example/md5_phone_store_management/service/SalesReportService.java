@@ -1,15 +1,5 @@
 package com.example.md5_phone_store_management.service;
 
-import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.model.InvoiceDetail;
-import com.example.md5_phone_store_management.model.Product;
-import com.example.md5_phone_store_management.repository.IInvoiceRepository;
-import com.example.md5_phone_store_management.service.implement.ProductService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.md5_phone_store_management.model.Invoice;
+import com.example.md5_phone_store_management.model.InvoiceDetail;
+import com.example.md5_phone_store_management.model.Product;
+import com.example.md5_phone_store_management.repository.IInvoiceRepository;
+import com.example.md5_phone_store_management.service.implement.ProductService;
 
 @Service
 public class SalesReportService {
@@ -28,7 +29,7 @@ public class SalesReportService {
     private IInvoiceRepository invoiceRepository;
 
     @Autowired
-    private ProductService productService; // Thêm ProductService
+    private ProductService productService;
 
     private static final DateTimeFormatter VNPAY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
@@ -138,9 +139,12 @@ public class SalesReportService {
     }
 
     public boolean isProductIdValid(Integer productId) {
-        List<Invoice> allInvoices = invoiceRepository.findAll();
-        return allInvoices.stream()
-                .flatMap(invoice -> invoice.getInvoiceDetailList().stream())
-                .anyMatch(detail -> detail.getProduct() != null && detail.getProduct().getProductID().equals(productId));
+        if (productId == null) return false;
+        return productService.findById(productId) != null;
+    }
+
+    public Product findProductById(Integer productId) {
+        if (productId == null) return null;
+        return productService.findById(productId);
     }
 }
