@@ -34,6 +34,31 @@ public class ChangeLogController {
     @Autowired
     private ChangeLogService changeLogService;
 
+    @GetMapping("/product/notification")
+    public ResponseEntity<ChangeLog> getAllProductChangeLogs() {
+        ChangeLog changeLog = changeLogService.getLatestEntityChanges("product");
+        System.out.println("đã chạy ");
+        return ResponseEntity.ok(changeLog != null ? changeLog : new ChangeLog());
+    }
+
+
+    //    thông báo chỉ lấy cái mới nhất thôi tại ít thời gian quá
+//     cho kinh doanh
+    @GetMapping("/customer/notification")
+    public ResponseEntity<ChangeLog> getAllCustomerChangeLogs() {
+        ChangeLog changeLog = changeLogService.getLatestEntityChanges("customer");
+        return ResponseEntity.ok(changeLog != null ? changeLog : new ChangeLog());
+    }
+
+    @GetMapping("/invoice/notification")
+    public ResponseEntity<ChangeLog> getAllInvoiceChangeLogs() {
+        ChangeLog changeLog = changeLogService.getLatestEntityChanges("invoice");
+        return ResponseEntity.ok(changeLog != null ? changeLog : new ChangeLog());
+    }
+
+
+
+
     @GetMapping("/notification")
     public List<ChangeLog> getAllChangeLogs() {
         return changeLogService.getAllChangeLogs();

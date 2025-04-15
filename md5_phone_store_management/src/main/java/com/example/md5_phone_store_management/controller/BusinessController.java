@@ -1,5 +1,6 @@
 package com.example.md5_phone_store_management.controller;
 
+import com.example.md5_phone_store_management.model.ChangeLog;
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.Product;
 import com.example.md5_phone_store_management.model.dto.ProductDTO;
@@ -7,6 +8,7 @@ import com.example.md5_phone_store_management.service.CloudinaryService;
 import com.example.md5_phone_store_management.service.CustomerService;
 import com.example.md5_phone_store_management.service.ICustomerService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
+import com.example.md5_phone_store_management.service.implement.ChangeLogService;
 import com.example.md5_phone_store_management.service.implement.ProductService;
 import com.example.md5_phone_store_management.service.implement.SupplierService;
 import jakarta.servlet.http.HttpSession;
@@ -44,29 +46,36 @@ public class BusinessController {
     @Autowired
     private ICustomerService iCustomerService;
 
+
+    @Autowired
+    private ChangeLogService changeLogService;
+
+
+
     //    trang chính quản lý
 //    http://localhost:8080/dashboard/business/management
 //    @todo quản lý kinh doanh
     @GetMapping("/dashboard/business/management")
     public String showManagementPage(Model model, HttpSession session) {
+
+         changeLogService.getAllChangeLogs();
+
+        //        thông báo
+//        về bảng product về giá bán lẻ  bán lẻ  sự tháy đổi giá bán lẻ nếu thêm sp mới mà chưa có gias bán lẻ thì hiển thị, hoặc cập nhật
+//        lịch sử mua bán, gồm những cái thanh toán vừa xong
+//        tjhông tin thêm mớúaửa xóa khách ahàng
+
+
         model.addAttribute("countAllProducts",productService.countProducts());
         model.addAttribute("countProductsHaveRetailPrice",productService.countProductsHaveRetailPrice());
         model.addAttribute("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
         model.addAttribute("maleCustomers", iCustomerService.countMaleCustomers() != null ? iCustomerService.countMaleCustomers() : 0);
         model.addAttribute("femaleCustomers", iCustomerService.countFemaleCustomers() != null ? iCustomerService.countFemaleCustomers() : 0);
 
-//        invoicesPage = invoiceService.findAllSuccessInvoices(pageable);
+
         model.addAttribute("countAllSuccessInvoices", invoiceService.countAllSuccessInvoices());
         model.addAttribute("countTodaySuccessInvoices", invoiceService.countTodaySuccessInvoices());
         model.addAttribute("countThisMonthSuccessInvoices", invoiceService.countThisMonthSuccessInvoices());
-
-
-//        thông báo
-//        về bảng product về giá bán lẻ  bán lẻ  sự tháy đổi giá bán lẻ nếu thêm sp mới mà chưa có gias bán lẻ thì hiển thị, hoặc cập nhật
-//        lịch sử mua bán, gồm những cái thanh toán vừa xong
-//        tjhông tin thêm mớúaửa xóa khách ahàng
-
-
         return "dashboard/business-management/business-home";
     }
     @GetMapping("/dashboard/products/listToChoose")
