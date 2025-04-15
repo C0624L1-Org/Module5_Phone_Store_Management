@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/fragments/navbar.css">
     <link rel="stylesheet" href="/css/fragments/sidebar.css">
@@ -15,17 +17,52 @@
     <link rel="stylesheet" href="/css/common/toast.css">
     <link rel="stylesheet" href="/css/common/layout.css">
     <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e9ecef 100%);
+        }
+
         .content-wrapper {
             display: flex;
-            min-height: calc(100vh - 56px); /* Trừ chiều cao navbar */
+            min-height: calc(100vh - 70px);
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+        }
+
+        .content-container {
+            flex-grow: 1;
+            padding: 0;
         }
 
         .management-section {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
-            padding: 2rem;
-            margin: 2rem;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            margin: 2rem 1rem;
+            width: calc(100% - 2rem);
+            transition: transform 0.3s ease;
+        }
+
+        .management-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title i {
+            color: #007bff;
+            margin-right: 0.75rem;
         }
 
         .btn-custom {
@@ -33,76 +70,457 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 500;
             color: white;
             text-decoration: none;
-            transition: all 0.3s;
-            margin-bottom: 1rem;
-        }
-
-        .btn-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            color: white;
-            text-decoration: none;
-        }
-
-        .btn-blue {
-            background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
-        }
-
-        .btn-green {
-            background: linear-gradient(135deg, #1c7430 0%, #28a745 100%);
-        }
-
-        .btn-orange {
-            background: linear-gradient(135deg, #e65c00 0%, #fd7e14 100%);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-custom i {
-            margin-right: 0.5rem;
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            color: white;
+        }
+
+        .btn-blue {
+            background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #28a745 0%, #34c759 100%);
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, #fd7e14 0%, #ff9f43 100%);
+        }
+
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.4s;
+        }
+
+        .btn-custom:hover::before {
+            left: 100%;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Thẻ cắt thẳng chung */
+        .split-card {
+            position: relative;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: 180px;
+            transition: transform 0.3s ease;
+        }
+
+        .split-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .split-card .left-side,
+        .split-card .right-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            will-change: clip-path;
+            transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+
+        .split-card .content {
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out 0.25s;
+        }
+
+        .split-card .center-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            z-index: 2;
+            pointer-events: none;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .split-card .center-text i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .split-card:hover .center-text {
+            opacity: 0;
+        }
+
+        .split-card:not(:hover) .center-text {
+            opacity: 1;
+        }
+
+        /* Màu cho split-card Sản phẩm (đồng điệu với btn-orange) */
+        .split-card.product .left-side {
+            background: linear-gradient(135deg, #fd7e14 0%, #ff9f43 100%);
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+        }
+
+        .split-card.product .right-side {
+            background: linear-gradient(135deg, #ff9f43 0%, #ffc107 100%);
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+
+        .split-card.product .left-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.product .left-side:hover ~ .right-side {
+            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+        }
+
+        .split-card.product .right-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.product .right-side:hover ~ .left-side {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        }
+
+        .split-card.product .left-side:hover .content,
+        .split-card.product .right-side:hover .content {
+            opacity: 1;
+        }
+
+        /* Màu cho split-card Tổng doanh thu (đồng điệu với btn-blue) */
+        .split-card.revenue .left-side {
+            background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+        }
+
+        .split-card.revenue .right-side {
+            background: linear-gradient(135deg, #00aaff 0%, #4dc0ff 100%);
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+
+        .split-card.revenue .left-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.revenue .left-side:hover ~ .right-side {
+            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+        }
+
+        .split-card.revenue .right-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.revenue .right-side:hover ~ .left-side {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        }
+
+        .split-card.revenue .left-side:hover .content,
+        .split-card.revenue .right-side:hover .content {
+            opacity: 1;
+        }
+
+        /* Màu cho split-card Tổng số khách hàng (đồng điệu với btn-green) */
+        .split-card.customer .left-side {
+            background: linear-gradient(135deg, #28a745 0%, #34c759 100%);
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+        }
+
+        .split-card.customer .right-side {
+            background: linear-gradient(135deg, #34c759 0%, #5cd881 100%);
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+
+        .split-card.customer .left-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.customer .left-side:hover ~ .right-side {
+            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+        }
+
+        .split-card.customer .right-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.customer .right-side:hover ~ .left-side {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        }
+
+        .split-card.customer .left-side:hover .content,
+        .split-card.customer .right-side:hover .content {
+            opacity: 1;
+        }
+
+        /* Thông báo mới nhất */
+        .notification-section {
+            margin-top: 2rem;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .notification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .notification-card {
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .notification-card h6 {
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-card p {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .breadcrumb {
+            background: transparent;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb-item a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .management-section {
+                margin: 1rem;
+                padding: 1.5rem;
+                width: calc(100% - 2rem);
+            }
+
+            .card-grid, .stat-card-grid, .notification-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-custom {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .card-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .stat-card-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
     </style>
 </head>
 <body>
-<!-- Hiển thị thông báo -->
+<!-- Toast notification -->
 <div th:replace="~{common/toast}"></div>
+
+<!-- Navbar -->
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
 <div class="content-wrapper">
     <div class="dashboard-container">
+        <!-- Sidebar -->
         <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-        <!-- Main content area -->
+        <!-- Main content -->
         <div class="content-container flex-grow-1">
-            <div class="container py-4">
+            <div class="container-fluid py-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item active" aria-current="page">Quản lí kinh doanh</li>
+                        <li class="breadcrumb-item active" aria-current="page">Quản lý kinh doanh</li>
                     </ol>
                 </nav>
                 <div class="management-section">
-                    <h3 class="mb-4">
-                        <i class="fas fa-cogs me-2"></i> Quản lý kinh doanh
+                    <h3 class="section-title">
+                        <i class="fas fa-cogs"></i> Tổng quan kinh doanh
                     </h3>
-                    <a href="/dashboard/products/listToChoose" class="btn-custom btn-blue">
-                        <i class="fas fa-tags"></i> Quản lý giá bán lẻ
-                    </a>
-                    <a href="/dashboard/business/transaction" class="btn-custom btn-green">
-                        <i class="fas fa-history"></i> Quản lý lịch sử mua bán
-                    </a>
-                    <a href="/dashboard/admin/customers/list" class="btn-custom btn-orange">
-                        <i class="fas fa-users"></i> Quản lý khách hàng
-                    </a>
+
+                    <!-- Stat Cards -->
+                    <div class="stat-card-grid">
+                        <!-- Đơn hàng mới (sửa thành sản phẩm) -->
+                        <div class="split-card product">
+                            <div class="center-text">
+                                <i class="fas fa-boxes"></i>
+                                <p>300 sản phẩm</p>
+                            </div>
+                            <div class="left-side">
+                                <div class="content">
+                                    <h5>Sản phẩm đã có giá bán lẻ</h5>
+                                    <p>50</p>
+                                </div>
+                            </div>
+                            <div class="right-side">
+                                <div class="content">
+                                    <h5>Sản phẩm chưa có giá bán lẻ</h5>
+                                    <p>250</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Doanh thu hôm nay (sửa thành tổng doanh thu) -->
+                        <div class="split-card revenue">
+                            <div class="center-text">
+                                <i class="fas fa-dollar-sign"></i>
+                                <p>Tổng doanh thu</p>
+                            </div>
+                            <div class="left-side">
+                                <div class="content">
+                                    <h5>Doanh thu hôm nay</h5>
+                                    <p>15,000,000 VNĐ</p>
+                                </div>
+                            </div>
+                            <div class="right-side">
+                                <div class="content">
+                                    <h5>Doanh thu tuần này</h5>
+                                    <p>52,000,000 VNĐ</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tổng số khách hàng -->
+                        <div class="split-card customer">
+                            <div class="center-text">
+                                <i class="fas fa-users"></i>
+                                <p>500 khách hàng</p>
+                            </div>
+                            <div class="left-side">
+                                <div class="content">
+                                    <h5>Khách hàng cũ</h5>
+                                    <p>100</p>
+                                </div>
+                            </div>
+                            <div class="right-side">
+                                <div class="content">
+                                    <h5>Khách hàng mới</h5>
+                                    <p>250</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card-grid">
+                        <a href="/dashboard/admin/customers/list" class="btn-custom btn-orange">
+                            <i class="fas fa-users"></i> Quản lý giá bán lẻ
+                        </a>
+                        <a href="/dashboard/products/listToChoose" class="btn-custom btn-blue">
+                            <i class="fas fa-tags"></i> Quản lý lịch sử mua bán
+                        </a>
+                        <a href="/dashboard/business/transaction" class="btn-custom btn-green">
+                            <i class="fas fa-history"></i> Quản lý khách hàng
+                        </a>
+                    </div>
+
+                    <!-- Notification Section -->
+                    <div class="notification-section">
+                        <h5 class="mb-3"><i class="fas fa-bell"></i> Thông báo mới nhất</h5>
+                        <div class="notification-grid">
+                            <div class="notification-card">
+                                <h6>Quản lý giá bán lẻ</h6>
+                                <p>Giá sản phẩm "Áo thun" vừa được cập nhật.</p>
+                                <div class="notification-badge">3</div>
+                            </div>
+                            <div class="notification-card">
+                                <h6>Quản lý lịch sử mua bán</h6>
+                                <p>Giao dịch #1234 cần xác nhận.</p>
+                                <div class="notification-badge">5</div>
+                            </div>
+                            <div class="notification-card">
+                                <h6>Quản lý khách hàng</h6>
+                                <p>Khách hàng mới đăng ký: Nguyễn Văn D.</p>
+                                <div class="notification-badge">2</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
+    <!-- Footer -->
     <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
+
+<!-- Navbar scripts -->
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
