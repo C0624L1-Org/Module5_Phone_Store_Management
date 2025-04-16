@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface IInvoiceRepository extends JpaRepository<Invoice, Long> {
 
+
     @Query("SELECT i FROM Invoice i WHERE i.payDate >= :startDate AND i.payDate <= :endDate")
     List<Invoice> findInvoicesByDateRange(@Param("startDate") String startDate, @Param("endDate") String endDate);
 

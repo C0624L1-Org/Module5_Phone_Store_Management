@@ -19,6 +19,18 @@ import com.example.md5_phone_store_management.model.PaymentMethod;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
+
+    @Query("SELECT COALESCE(SUM(i.amount), 0) FROM Invoice i WHERE i.status = 'SUCCESS'")
+    Long totalRevenue();
+
+    @Query("SELECT COALESCE(SUM(i.amount), 0) FROM Invoice i WHERE DATE(i.createdAt) = :today")
+    Long totalTodayInvoiceRevenue(@Param("today") LocalDate today);
+
+    @Query("SELECT COALESCE(SUM(i.amount), 0) FROM Invoice i WHERE i.createdAt BETWEEN :startDateTime AND :endDateTime")
+    Long totalThisMonthInvoiceRevenue(@Param("startDateTime") LocalDateTime startDateTime, @Param("endDateTime") LocalDateTime endDateTime);
+
+
+
     // Sắp xếp
     @Query("SELECT COUNT(i) FROM Invoice i WHERE i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS")
     Integer countAllSuccessInvoices();

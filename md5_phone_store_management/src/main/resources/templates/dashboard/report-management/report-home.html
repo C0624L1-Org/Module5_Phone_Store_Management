@@ -258,38 +258,6 @@
             opacity: 1;
         }
 
-        /* Màu cho split-card Báo cáo doanh thu (đồng điệu với btn-purple) */
-        .split-card.revenue .left-side {
-            background: linear-gradient(135deg, #6f42c1 0%, #9370db 100%);
-            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
-        }
-
-        .split-card.revenue .right-side {
-            background: linear-gradient(135deg, #9370db 0%, #b19cd9 100%);
-            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
-        }
-
-        .split-card.revenue .left-side:hover {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        }
-
-        .split-card.revenue .left-side:hover ~ .right-side {
-            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
-        }
-
-        .split-card.revenue .right-side:hover {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        }
-
-        .split-card.revenue .right-side:hover ~ .left-side {
-            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
-        }
-
-        .split-card.revenue .left-side:hover .content,
-        .split-card.revenue .right-side:hover .content {
-            opacity: 1;
-        }
-
         /* Card grid for buttons */
         .card-grid {
             display: grid;
@@ -386,11 +354,8 @@
         }
 
         @media (min-width: 1280px) {
-            .card-grid {
+            .card-grid, .stat-card-grid {
                 grid-template-columns: repeat(2, 1fr);
-            }
-            .stat-card-grid {
-                grid-template-columns: repeat(3, 1fr);
             }
         }
     </style>
@@ -422,21 +387,21 @@
                         <div class="split-card sales">
                             <div class="center-text">
                                 <i class="fas fa-chart-line"></i>
-                                <h5>Doanh Số</h5>
-                                <p>125,600,000 VNĐ</p>
+                                <h5>Tổng doanh thu: <span th:text="${#numbers.formatDecimal(totalInvoiceRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></h5>
+                                <p>Tổng số đơn: <span th:text="${countAllSuccessInvoices} + ' đơn'"></span></p>
                             </div>
                             <div class="left-side">
                                 <div class="content">
-                                    <h4>Đơn hàng hôm nay</h4>
-                                    <p>1 đơn</p>
-                                    <p>5,000,000 VNĐ doanh thu</p>
+                                    <h4>Hôm nay (<span th:text="${#dates.format(new java.util.Date(), 'dd/MM/yyyy')}"></span>)</h4>
+                                    <p>Số đơn: <span th:text="${countTodaySuccessInvoices} + ' đơn'"></span></p>
+                                    <p>Doanh thu: <span th:text="${#numbers.formatDecimal(totalTodayInvoiceRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></p>
                                 </div>
                             </div>
                             <div class="right-side">
                                 <div class="content">
-                                    <h4>Đơn hàng tháng này</h4>
-                                    <p>245 đơn</p>
-                                    <p>50,000,000 VNĐ doanh thu</p>
+                                    <h4>Tháng này (<span th:text="${#dates.format(new java.util.Date(), 'MM/yyyy')}"></span>)</h4>
+                                    <p>Số đơn: <span th:text="${countThisMonthSuccessInvoices} + ' đơn'"></span></p>
+                                    <p>Doanh thu: <span th:text="${#numbers.formatDecimal(totalThisMonthInvoiceRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></p>
                                 </div>
                             </div>
                         </div>
@@ -445,23 +410,21 @@
                         <div class="split-card customer">
                             <div class="center-text">
                                 <i class="fas fa-users"></i>
-                                <p>Tổng 500 khách hàng</p>
+                                <p>Tổng khách hàng: <span th:text="${totalCustomers}"></span></p>
                             </div>
                             <div class="left-side">
                                 <div class="content">
                                     <h5>Khách hàng mới</h5>
-                                    <p>68 khách hàng</p>
+                                    <p th:text="${totalNewCustomers}"></p>
                                 </div>
                             </div>
                             <div class="right-side">
                                 <div class="content">
                                     <h5>Khách hàng thân thiết</h5>
-                                    <p>156 khách hàng</p>
+                                    <p th:text="${totalCustomers - totalNewCustomers}"></p>
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
 
                     <!-- Action Buttons -->
@@ -472,24 +435,13 @@
                         <a href="/dashboard/admin/customer/report" class="btn-custom btn-green">
                             <i class="fas fa-users"></i> Báo cáo khách hàng
                         </a>
-
-
                     </div>
 
                     <!-- Notification Section -->
                     <div class="notification-section">
                         <h5 class="mb-3"><i class="fas fa-bell"></i> Thông báo mới nhất</h5>
-                        <div class="notification-grid">
-                            <div class="notification-card">
-                                <h6>Báo cáo bán hàng</h6>
-                                <p>Báo cáo bán hàng tháng 4 đã được cập nhật.</p>
-                                <div class="notification-badge">2</div>
-                            </div>
-                            <div class="notification-card">
-                                <h6>Báo cáo khách hàng</h6>
-                                <p>Phân tích khách hàng mới cần xem xét.</p>
-                                <div class="notification-badge">4</div>
-                            </div>
+                        <div class="notification-grid" id="notification-grid">
+                            <!-- Notifications will be populated dynamically -->
                         </div>
                     </div>
                 </div>
@@ -500,5 +452,157 @@
 </div>
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const updateNotifications = async () => {
+        const notificationGrid = document.getElementById('notification-grid');
+
+        const endpoints = [
+            { url: '/api/changelogs/invoice/notification', title: 'Báo cáo bán hàng' },
+            { url: '/api/changelogs/customer/notification', title: 'Báo cáo khách hàng' }
+        ];
+
+        const createNotificationCard = (title, message, changeCount) => {
+            const card = document.createElement('div');
+            card.className = 'notification-card';
+            card.dataset.endpoint = endpoints.find(e => e.title === title)?.url;
+            card.innerHTML = `
+                <h6>${title}</h6>
+                <p>${message}</p>
+                ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
+            `;
+            return card;
+        };
+
+        for (const endpoint of endpoints) {
+            try {
+                const response = await fetch(`${endpoint.url}?t=${Date.now()}`);
+                console.log(`Response status for ${endpoint.url}:`, response.status);
+                let data = {};
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log(`Raw response for ${endpoint.url}:`, text);
+                    data = text ? JSON.parse(text) : {};
+                } else {
+                    console.error(`HTTP error ${response.status} for ${endpoint.url}`);
+                    const existingCard = Array.from(notificationGrid.children).find(
+                        card => card.dataset.endpoint === endpoint.url
+                    );
+                    const errorMessage = 'Lỗi khi tải thông báo';
+                    if (existingCard) {
+                        const existingMessage = existingCard.querySelector('p').textContent;
+                        if (existingMessage !== errorMessage) {
+                            existingCard.querySelector('p').textContent = errorMessage;
+                            existingCard.querySelector('.notification-badge')?.remove();
+                        }
+                    } else {
+                        notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
+                    }
+                    continue;
+                }
+
+                // Xử lý dữ liệu từ ChangeLog
+                let message = 'Không có cập nhật mới';
+                let changeCount = 0;
+
+                if (data && data.action && data.fieldName) {
+                    if (endpoint.url.includes('invoice')) {
+                        switch (data.action.toUpperCase()) {
+                            case 'INSERT':
+                                if (data.fieldName.toLowerCase() === 'invoice') {
+                                    const formattedValue = new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND'
+                                    }).format(Number(data.newValue));
+                                    message = data.newValue === 'Invoice created'
+                                        ? `Hóa đơn mới được tạo ${formattedValue}`
+                                        : `Hóa đơn mới: ${formattedValue || 'không xác định'}`;
+                                    changeCount = 1;
+                                } else {
+                                    message = 'Không có báo cáo bán hàng mới';
+                                }
+                                break;
+                            default:
+                                message = 'Không có báo cáo bán hàng mới';
+                                break;
+                        }
+                    } else if (endpoint.url.includes('customer')) {
+                        switch (data.action.toUpperCase()) {
+                            case 'INSERT':
+                                message = `Thêm mới khách hàng: ${data.newValue || 'không xác định'}`;
+                                changeCount = 1;
+                                break;
+                            case 'DELETE':
+                                message = `Xóa khách hàng: ${data.newValue || 'không xác định'}`;
+                                changeCount = 1;
+                                break;
+                            case 'UPDATE':
+                                message = `Cập nhật khách hàng: ${data.newValue || 'không xác định'}`;
+                                changeCount = 1;
+                                break;
+                            default:
+                                message = 'Không có cập nhật khách hàng mới';
+                                break;
+                        }
+                    }
+                }
+
+                // Find existing card for this endpoint
+                const existingCard = Array.from(notificationGrid.children).find(
+                    card => card.dataset.endpoint === endpoint.url
+                );
+
+                if (existingCard) {
+                    // Update existing card if message or changeCount differs
+                    const existingMessage = existingCard.querySelector('p').textContent;
+                    const existingBadge = existingCard.querySelector('.notification-badge');
+                    const existingChangeCount = existingBadge ? parseInt(existingBadge.textContent) : 0;
+
+                    if (existingMessage !== message || existingChangeCount !== changeCount) {
+                        existingCard.querySelector('p').textContent = message;
+                        if (changeCount > 0) {
+                            if (existingBadge) {
+                                existingBadge.textContent = changeCount;
+                            } else {
+                                const badge = document.createElement('div');
+                                badge.className = 'notification-badge';
+                                badge.textContent = changeCount;
+                                existingCard.appendChild(badge);
+                            }
+                        } else {
+                            existingBadge?.remove();
+                        }
+                    }
+                } else {
+                    // Append new card if none exists
+                    notificationGrid.appendChild(createNotificationCard(endpoint.title, message, changeCount));
+                }
+
+                console.log(`Parsed data for ${endpoint.url}:`, data);
+                console.log(`Message for ${endpoint.title}:`, message);
+            } catch (error) {
+                console.error(`Error fetching ${endpoint.url}:`, error);
+                const existingCard = Array.from(notificationGrid.children).find(
+                    card => card.dataset.endpoint === endpoint.url
+                );
+                const errorMessage = 'Lỗi khi tải thông báo';
+                if (existingCard) {
+                    const existingMessage = existingCard.querySelector('p').textContent;
+                    if (existingMessage !== errorMessage) {
+                        existingCard.querySelector('p').textContent = errorMessage;
+                        existingCard.querySelector('.notification-badge')?.remove();
+                    }
+                } else {
+                    notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
+                }
+            }
+        }
+    };
+
+    // Initial call and polling setup
+    document.addEventListener('DOMContentLoaded', () => {
+        updateNotifications();
+        setInterval(updateNotifications, 3000);
+    });
+</script>
 </body>
 </html>

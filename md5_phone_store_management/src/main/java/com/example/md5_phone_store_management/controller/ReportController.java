@@ -3,10 +3,11 @@ package com.example.md5_phone_store_management.controller;
 import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Gender;
 import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.service.CustomerService;
-import com.example.md5_phone_store_management.service.IInvoiceService;
-import com.example.md5_phone_store_management.service.SalesReportService;
+import com.example.md5_phone_store_management.service.*;
+import com.example.md5_phone_store_management.service.implement.ChangeLogService;
 import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
+import com.example.md5_phone_store_management.service.implement.ProductService;
+import com.example.md5_phone_store_management.service.implement.SupplierService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,14 @@ public class ReportController {
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     @Autowired
+    private ICustomerService iCustomerService;
+
+
+    @Autowired
+    private ChangeLogService changeLogService;
+
+
+    @Autowired
     private SalesReportService salesReportService;
 
     @Autowired
@@ -49,10 +58,24 @@ public class ReportController {
     @GetMapping("/report-home")
     public String showReportHome(Model model) {
 
+        model.addAttribute("countAllSuccessInvoices", iInvoiceService.countAllSuccessInvoices());
+        model.addAttribute("totalInvoiceRevenue", iInvoiceService.totalRevenue());
 
+        model.addAttribute("countTodaySuccessInvoices", iInvoiceService.countTodaySuccessInvoices());
+        model.addAttribute("countThisMonthSuccessInvoices", iInvoiceService.countThisMonthSuccessInvoices());
 
+        model.addAttribute("totalTodayInvoiceRevenue", iInvoiceService.totalTodayInvoiceRevenue());
+        model.addAttribute("totalThisMonthInvoiceRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
+
+        model.addAttribute("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
+        model.addAttribute("totalNewCustomers", iCustomerService.countNewCustomers() != null ? iCustomerService.countNewCustomers() : 0);
+        //        khách hàng thân thiết thì trừ đi xử lý ở fe
+
+//thông báo gọi api sau
         return "dashboard/report-management/report-home";
     }
+    //        thông báo cho khách hàng là khách hàng nào đã thanh toán thành công(invoice)
+//        báo cáo bán hàng là đơn hàng mới nhất(invoice)
 
     @GetMapping("/dashboard/admin/customer/report")
     public ModelAndView adminCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page) {

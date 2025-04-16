@@ -325,6 +325,28 @@ public class InvoiceServiceImpl implements IInvoiceService {
     private ApplicationEventPublisher eventPublisher;
 
     @Override
+    public Long totalRevenue() {
+        return invoiceRepository.totalRevenue();
+    }
+
+    @Override
+    public Long totalTodayInvoiceRevenue() {
+        LocalDate today = LocalDate.now();
+        return invoiceRepository.totalTodayInvoiceRevenue(today);
+    }
+
+    @Override
+    public Long totalThisMonthInvoiceRevenue() {
+        LocalDate now = LocalDate.now();
+        YearMonth thisMonth = YearMonth.from(now);
+        LocalDate startOfMonth = thisMonth.atDay(1);
+        LocalDateTime startDateTime = startOfMonth.atStartOfDay();
+        LocalDateTime endDateTime = thisMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+        return invoiceRepository.totalThisMonthInvoiceRevenue(startDateTime, endDateTime);
+    }
+
+
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     public Invoice saveInvoice(Invoice invoice) {
         try {
@@ -377,7 +399,6 @@ public class InvoiceServiceImpl implements IInvoiceService {
             throw e;
         }
     }
-
 
 
     /**

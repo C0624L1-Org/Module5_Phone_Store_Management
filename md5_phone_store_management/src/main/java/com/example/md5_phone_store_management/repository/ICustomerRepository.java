@@ -17,6 +17,9 @@ import java.util.List;
 @Repository
 public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
 
+    @Query("SELECT COUNT(c) FROM Customer c WHERE c.purchaseCount = 0")
+    Integer countNewCustomers();
+
     @Query("SELECT COUNT(c) FROM Customer c WHERE c.gender = 'Male'")
     Integer countMaleCustomers();
 

@@ -26,6 +26,8 @@ public class CustomerServiceImpl implements ICustomerService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+//
+
     @Override
     public Page<Customer> findAllCustomers(Pageable pageable) {
         System.out.println("Tìm tất cả khách hàng với pageable: " + pageable);
@@ -56,6 +58,11 @@ public class CustomerServiceImpl implements ICustomerService {
     @Override
     public Integer countTotalCustomers() {
         return customerRepository.countTotalCustomers();
+    }
+
+    @Override
+    public Integer countNewCustomers() {
+        return customerRepository.countNewCustomers();
     }
 
     @Override

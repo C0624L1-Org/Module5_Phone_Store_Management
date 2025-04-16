@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface ICustomerService {
 
+    Integer countNewCustomers();
 
     Integer countMaleCustomers();
 
