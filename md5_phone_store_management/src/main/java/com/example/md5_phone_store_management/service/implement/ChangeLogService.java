@@ -459,10 +459,7 @@
 package com.example.md5_phone_store_management.service.implement;
 
 import com.example.md5_phone_store_management.event.EntityChangeEvent;
-import com.example.md5_phone_store_management.model.ChangeLog;
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Employee;
-import com.example.md5_phone_store_management.model.Invoice;
+import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.repository.ChangeLogRepository;
 import com.example.md5_phone_store_management.repository.IEmployeeRepository;
 import jakarta.persistence.EntityManager;
@@ -589,28 +586,37 @@ public class ChangeLogService {
                 saveChangeLog(entity, "DELETE", "customer", null, deleteValue, employeeId);
                 break;
             case "INSERT":
+//            case "INSERT_PW_NO_PRICE":
+//            case "INSERT_PW_PRICE":
+//                if (!entity.getClass().getSimpleName().equalsIgnoreCase("Product")) {
+//                    System.out.println("Skipping non-product entity for action: " + action);
+//                    break;
+//                }
+//                System.out.println("Processing product insertion: " + action);
+//                for (String fieldName : TRACKED_FIELDS) {
+//                    String nameValue = getFieldValue(entity, fieldName);
+//                    if (nameValue != null) {
+//                        if (action.equals("INSERT_PW_NO_PRICE") && fieldName.equals("retailPrice")) {
+//                            System.out.println("Logging retailPrice: No Retail Price");
+//                            saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
+//                        } else {
+//                            System.out.println("Logging field: " + fieldName + ", value=" + nameValue);
+//                            saveChangeLog(entity, "INSERT", fieldName, null, nameValue, employeeId);
+//                        }
+//                    }
+//                }
+//                if (action.equals("INSERT_PW_NO_PRICE") && !Arrays.asList(TRACKED_FIELDS).contains("retailPrice")) {
+//                    System.out.println("Logging retailPrice: No Retail Price (fallback)");
+//                    saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
+//                }
+//                break;
+
             case "INSERT_PW_NO_PRICE":
             case "INSERT_PW_PRICE":
-                if (!entity.getClass().getSimpleName().equalsIgnoreCase("Product")) {
-                    System.out.println("Skipping non-product entity for action: " + action);
-                    break;
-                }
-                System.out.println("Processing product insertion: " + action);
-                for (String fieldName : TRACKED_FIELDS) {
-                    String nameValue = getFieldValue(entity, fieldName);
-                    if (nameValue != null) {
-                        if (action.equals("INSERT_PW_NO_PRICE") && fieldName.equals("retailPrice")) {
-                            System.out.println("Logging retailPrice: No Retail Price");
-                            saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
-                        } else {
-                            System.out.println("Logging field: " + fieldName + ", value=" + nameValue);
-                            saveChangeLog(entity, "INSERT", fieldName, null, nameValue, employeeId);
-                        }
-                    }
-                }
-                if (action.equals("INSERT_PW_NO_PRICE") && !Arrays.asList(TRACKED_FIELDS).contains("retailPrice")) {
-                    System.out.println("Logging retailPrice: No Retail Price (fallback)");
-                    saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
+                if (entity instanceof Product) {
+                    String newValue = (String) event.getMetadata().getOrDefault("newValue", "productID=unknown, retailPrice=0");
+                    System.out.println("Logging product insertion: " + newValue);
+                    saveChangeLog(entity, "INSERT", "retailPrice", null, newValue, employeeId);
                 }
                 break;
 
@@ -638,25 +644,33 @@ public class ChangeLogService {
                 }
                 break;
 
+//            case "UPDATE_RETAIL_PRICE":
+//                System.out.println("Processing UPDATE_RETAIL_PRICE");
+//                String oldRetailPrice = oldEntity != null ? getFieldValue(oldEntity, "retailPrice") : null;
+//                String newRetailPrice = getFieldValue(entity, "retailPrice");
+//                System.out.println("Logging retailPrice change: old=" + oldRetailPrice + ", new=" + newRetailPrice);
+//                saveChangeLog(entity, "UPDATE", "retailPrice",
+//                        oldRetailPrice != null ? oldRetailPrice : "No Retail Price",
+//                        newRetailPrice != null ? newRetailPrice : "No Retail Price",
+//                        employeeId);
+//                changes = getFieldChanges(oldEntity, entity);
+//                changes.forEach((fieldName, change) -> {
+//                    if (!fieldName.equals("retailPrice")) {
+//                        System.out.println("Logging field change: " + fieldName + ", old=" + change.get("oldValue") + ", new=" + change.get("newValue"));
+//                        saveChangeLog(entity, "UPDATE", fieldName,
+//                                change.get("oldValue"),
+//                                change.get("newValue"),
+//                                employeeId);
+//                    }
+//                });
+//                break;
             case "UPDATE_RETAIL_PRICE":
-                System.out.println("Processing UPDATE_RETAIL_PRICE");
-                String oldRetailPrice = oldEntity != null ? getFieldValue(oldEntity, "retailPrice") : null;
-                String newRetailPrice = getFieldValue(entity, "retailPrice");
-                System.out.println("Logging retailPrice change: old=" + oldRetailPrice + ", new=" + newRetailPrice);
-                saveChangeLog(entity, "UPDATE", "retailPrice",
-                        oldRetailPrice != null ? oldRetailPrice : "No Retail Price",
-                        newRetailPrice != null ? newRetailPrice : "No Retail Price",
-                        employeeId);
-                changes = getFieldChanges(oldEntity, entity);
-                changes.forEach((fieldName, change) -> {
-                    if (!fieldName.equals("retailPrice")) {
-                        System.out.println("Logging field change: " + fieldName + ", old=" + change.get("oldValue") + ", new=" + change.get("newValue"));
-                        saveChangeLog(entity, "UPDATE", fieldName,
-                                change.get("oldValue"),
-                                change.get("newValue"),
-                                employeeId);
-                    }
-                });
+                if (entity instanceof Product) {
+                    String oldValueP = (String) event.getMetadata().getOrDefault("oldValue", "productID=unknown, retailPrice=0");
+                    String newValueP = (String) event.getMetadata().getOrDefault("newValue", "productID=unknown, retailPrice=0");
+                    System.out.println("Logging retailPrice change: old=" + oldValueP + ", new=" + newValueP);
+                    saveChangeLog(entity, "UPDATE", "retailPrice", oldValueP, newValueP, employeeId);
+                }
                 break;
 
             case "UPDATE":

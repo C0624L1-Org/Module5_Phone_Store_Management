@@ -17,7 +17,6 @@
 <!--    <link rel="stylesheet" href="/css/common/toast.css">-->
 <!--    <link rel="stylesheet" href="/css/common/layout.css">-->
 <!--    <style>-->
-<!--        /* [Your existing CSS unchanged] */-->
 <!--        body {-->
 <!--            font-family: 'Poppins', sans-serif;-->
 <!--            background: linear-gradient(135deg, #f0f2f5 0%, #e9ecef 100%);-->
@@ -133,7 +132,6 @@
 <!--            margin-bottom: 2rem;-->
 <!--        }-->
 
-<!--        /* Thẻ cắt thẳng chung */-->
 <!--        .split-card {-->
 <!--            position: relative;-->
 <!--            background: #ffffff;-->
@@ -197,7 +195,6 @@
 <!--            opacity: 1;-->
 <!--        }-->
 
-<!--        /* Màu cho split-card Sản phẩm (đồng điệu với btn-orange) */-->
 <!--        .split-card.product .left-side {-->
 <!--            background: linear-gradient(135deg, #fd7e14 0%, #ff9f43 100%);-->
 <!--            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);-->
@@ -229,7 +226,6 @@
 <!--            opacity: 1;-->
 <!--        }-->
 
-<!--        /* Màu cho split-card Tổng doanh thu (đồng điệu với btn-blue) */-->
 <!--        .split-card.revenue .left-side {-->
 <!--            background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);-->
 <!--            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);-->
@@ -261,7 +257,6 @@
 <!--            opacity: 1;-->
 <!--        }-->
 
-<!--        /* CSS cho thẻ khách hàng với 3 phần */-->
 <!--        .split-card.customer {-->
 <!--            background: linear-gradient(135deg, #28a745 0%, #5cd881 100%);-->
 <!--        }-->
@@ -322,7 +317,6 @@
 <!--            opacity: 1;-->
 <!--        }-->
 
-<!--        /* Thông báo mới nhất */-->
 <!--        .notification-section {-->
 <!--            margin-top: 2rem;-->
 <!--            background: #ffffff;-->
@@ -552,7 +546,6 @@
 <!--&lt;!&ndash; Bootstrap JS &ndash;&gt;-->
 <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
 
-
 <!--<script>-->
 <!--    const updateNotifications = async () => {-->
 <!--        const notificationGrid = document.getElementById('notification-grid');-->
@@ -587,7 +580,7 @@
 <!--                } else {-->
 <!--                    console.error(`HTTP error ${response.status} for ${endpoint.url}`);-->
 <!--                    const existingCard = Array.from(notificationGrid.children).find(-->
-<!--                        card => card.dataset.endpoint === endpoint.url-->
+<!--                        card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title-->
 <!--                    );-->
 <!--                    const errorMessage = 'Lỗi khi tải thông báo';-->
 <!--                    if (existingCard) {-->
@@ -607,68 +600,65 @@
 <!--                let changeCount = 0;-->
 
 <!--                if (data && data.action && data.fieldName) {-->
-<!--                    if (endpoint.url.includes('product')) {-->
-<!--                        // Product notification logic (unchanged)-->
+<!--                    if (endpoint.url.includes('product') && endpoint.title === 'Quản lý giá bán lẻ') {-->
 <!--                        switch (data.action.toUpperCase()) {-->
 <!--                            case 'INSERT':-->
-<!--                                if (data.fieldName.toLowerCase() === 'retailprice') {-->
-<!--                                    message = data.newValue === 'No Retail Price'-->
-<!--                                        ? `Thêm mới sản phẩm ${data.details || 'chưa có giá bán lẻ'}`-->
-<!--                                        : `Sản phẩm với giá bán lẻ: ${-->
-<!--                                            isNaN(parseFloat(data.newValue))-->
-<!--                                                ? 'không xác định'-->
-<!--                                                : new Intl.NumberFormat('vi-VN', {-->
-<!--                                                    style: 'currency',-->
-<!--                                                    currency: 'VND',-->
-<!--                                                    minimumFractionDigits: 0-->
-<!--                                                }).format(parseFloat(data.newValue))-->
-<!--                                        }`;-->
-<!--                                    changeCount = 1;-->
-<!--                                } else {-->
-<!--                                    message = 'Không có cập nhật giá bán lẻ mới';-->
-<!--                                }-->
+<!--                                message = data.newValue || 'Không có dữ liệu';-->
+<!--                                changeCount = 1;-->
 <!--                                break;-->
 <!--                            default:-->
-<!--                                message = 'Không có cập nhật giá bán lẻ mới';-->
+<!--                                message = 'Không có cập nhật giá bán lẻ mới 2' ;-->
 <!--                                break;-->
 <!--                        }-->
-<!--                    } else if (endpoint.url.includes('invoice')) {-->
-
+<!--                    } else if (endpoint.url.includes('invoice') && endpoint.title === 'Quản lý lịch sử mua bán') {-->
 <!--                        switch (data.action.toUpperCase()) {-->
 <!--                            case 'INSERT':-->
 <!--                                if (data.fieldName.toLowerCase() === 'invoice') {-->
-
-<!--                                    // message = data.newValue === 'Invoice created'-->
-<!--                                    //     ? `Hóa đơn mới được tạo ${data.newValue}`-->
-<!--                                    //     : `Hóa đơn mới: ${data.newValue}`;-->
-<!--                                    // changeCount = 1;-->
-
-<!--                                    let amount;-->
+<!--                                    let amount, customerName = 'không xác định', totalQuantity = 0;-->
 <!--                                    if (data.newValue !== 'Invoice created') {-->
-<!--                                        // Parse amount from "amount=55555, customerId=23"-->
 <!--                                        const amountMatch = data.newValue.match(/amount=([\d.]+)/);-->
-<!--                                        amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : 'N/A';-->
+<!--                                        const customerIdMatch = data.newValue.match(/customerId=(\d+)/);-->
+<!--                                        amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN') + ' VNĐ' : 'N/A';-->
+<!--                                        if (customerIdMatch) {-->
+<!--                                            try {-->
+<!--                                                const customerResponse = await fetch(`/api/changelogs/customers/${customerIdMatch[1]}`);-->
+<!--                                                if (customerResponse.ok) {-->
+<!--                                                    const customerData = await customerResponse.json();-->
+<!--                                                    customerName = customerData.name || 'không xác định';-->
+<!--                                                }-->
+<!--                                            } catch (error) {-->
+<!--                                                console.error(`Error fetching customer data for ID ${customerIdMatch[1]}:`, error);-->
+<!--                                            }-->
+<!--                                        }-->
+<!--                                        if (data.entityId) {-->
+<!--                                            try {-->
+<!--                                                const invoiceDetailsResponse = await fetch(`/api/changelogs/invoices/${data.entityId}/details`);-->
+<!--                                                if (invoiceDetailsResponse.ok) {-->
+<!--                                                    const invoiceDetails = await invoiceDetailsResponse.json();-->
+<!--                                                    totalQuantity = invoiceDetails.quantity || 0;-->
+<!--                                                    console.log(`Invoice ID ${data.entityId} has total quantity: ${totalQuantity}`);-->
+<!--                                                } else {-->
+<!--                                                    console.log(`No invoice details found for ID ${data.entityId}, using quantity: 0`);-->
+<!--                                                }-->
+<!--                                            } catch (error) {-->
+<!--                                                console.error(`Error fetching invoice details for ID ${data.entityId}:`, error);-->
+<!--                                                console.log(`Error occurred for Invoice ID ${data.entityId}, using quantity: 0`);-->
+<!--                                            }-->
+<!--                                        }-->
+<!--                                        message = `Khách hàng ${customerName} đã thanh toán hóa đơn ${amount} cho ${totalQuantity} sản phẩm`;-->
 <!--                                    } else {-->
-<!--                                        amount = data.newValue; // Keep original for 'Invoice created' case-->
+<!--                                        message = `Hóa đơn mới được tạo ${data.newValue}`;-->
 <!--                                    }-->
-
-<!--                                    message = data.newValue === 'Invoice created'-->
-<!--                                        ? `Hóa đơn mới được tạo ${data.newValue}`-->
-<!--                                        : `Hóa đơn mới: ${amount}`;-->
 <!--                                    changeCount = 1;-->
-
-
 <!--                                } else {-->
-<!--                                    message = 'Không có hóa đơn mới';-->
+<!--                                    message = 'Không có cập nhật mới';-->
 <!--                                }-->
 <!--                                break;-->
 <!--                            default:-->
-<!--                                message = 'Không có hóa đơn mới';-->
+<!--                                message = 'Không có cập nhật mới';-->
 <!--                                break;-->
 <!--                        }-->
-
-<!--                    } else {-->
-<!--                        // Customer or other entities (fallback, unchanged)-->
+<!--                    } else if (endpoint.url.includes('customer') && endpoint.title === 'Quản lý khách hàng') {-->
 <!--                        switch (data.action.toUpperCase()) {-->
 <!--                            case 'INSERT':-->
 <!--                                message = `Thêm mới khách hàng: ${data.newValue || 'không xác định'}`;-->
@@ -683,15 +673,15 @@
 <!--                                changeCount = 1;-->
 <!--                                break;-->
 <!--                            default:-->
-<!--                                message = 'Không có cập nhật mới';-->
+<!--                                message = 'Không có cập nhật khách hàng mới';-->
 <!--                                break;-->
 <!--                        }-->
 <!--                    }-->
 <!--                }-->
 
-<!--                // Find existing card for this endpoint-->
+<!--                // Find existing card for this endpoint and title-->
 <!--                const existingCard = Array.from(notificationGrid.children).find(-->
-<!--                    card => card.dataset.endpoint === endpoint.url-->
+<!--                    card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title-->
 <!--                );-->
 
 <!--                if (existingCard) {-->
@@ -725,7 +715,7 @@
 <!--            } catch (error) {-->
 <!--                console.error(`Error fetching ${endpoint.url}:`, error);-->
 <!--                const existingCard = Array.from(notificationGrid.children).find(-->
-<!--                    card => card.dataset.endpoint === endpoint.url-->
+<!--                    card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title-->
 <!--                );-->
 <!--                const errorMessage = 'Lỗi khi tải thông báo';-->
 <!--                if (existingCard) {-->
@@ -749,6 +739,7 @@
 <!--</script>-->
 <!--</body>-->
 <!--</html>-->
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -768,7 +759,6 @@
     <link rel="stylesheet" href="/css/common/toast.css">
     <link rel="stylesheet" href="/css/common/layout.css">
     <style>
-        /* [Original CSS unchanged, included for completeness] */
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f0f2f5 0%, #e9ecef 100%);
@@ -884,7 +874,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Thẻ cắt thẳng chung */
         .split-card {
             position: relative;
             background: #ffffff;
@@ -948,7 +937,6 @@
             opacity: 1;
         }
 
-        /* Màu cho split-card Sản phẩm (đồng điệu với btn-orange) */
         .split-card.product .left-side {
             background: linear-gradient(135deg, #fd7e14 0%, #ff9f43 100%);
             clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
@@ -980,7 +968,6 @@
             opacity: 1;
         }
 
-        /* Màu cho split-card Tổng doanh thu (đồng điệu với btn-blue) */
         .split-card.revenue .left-side {
             background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);
             clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
@@ -1012,7 +999,6 @@
             opacity: 1;
         }
 
-        /* CSS cho thẻ khách hàng với 3 phần */
         .split-card.customer {
             background: linear-gradient(135deg, #28a745 0%, #5cd881 100%);
         }
@@ -1073,7 +1059,6 @@
             opacity: 1;
         }
 
-        /* Thông báo mới nhất */
         .notification-section {
             margin-top: 2rem;
             background: #ffffff;
@@ -1304,6 +1289,211 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // const updateNotifications = async () => {
+    //     const notificationGrid = document.getElementById('notification-grid');
+    //
+    //     const endpoints = [
+    //         { url: '/api/changelogs/product/notification', title: 'Quản lý giá bán lẻ' },
+    //         { url: '/api/changelogs/invoice/notification', title: 'Quản lý lịch sử mua bán' },
+    //         { url: '/api/changelogs/customer/notification', title: 'Quản lý khách hàng' }
+    //     ];
+    //
+    //     const createNotificationCard = (title, message, changeCount) => {
+    //         const card = document.createElement('div');
+    //         card.className = 'notification-card';
+    //         card.dataset.endpoint = endpoints.find(e => e.title === title)?.url;
+    //         card.innerHTML = `
+    //             <h6>${title}</h6>
+    //             <p>${message}</p>
+    //             ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
+    //         `;
+    //         return card;
+    //     };
+    //
+    //     for (const endpoint of endpoints) {
+    //         try {
+    //             const response = await fetch(`${endpoint.url}?t=${Date.now()}`);
+    //             console.log(`Response status for ${endpoint.url}:`, response.status);
+    //             let data = {};
+    //             if (response.ok) {
+    //                 const text = await response.text();
+    //                 console.log(`Raw response for ${endpoint.url}:`, text);
+    //                 data = text ? JSON.parse(text) : {};
+    //             } else {
+    //                 console.error(`HTTP error ${response.status} for ${endpoint.url}`);
+    //                 const existingCard = Array.from(notificationGrid.children).find(
+    //                     card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
+    //                 );
+    //                 const errorMessage = 'Lỗi khi tải thông báo';
+    //                 if (existingCard) {
+    //                     const existingMessage = existingCard.querySelector('p').textContent;
+    //                     if (existingMessage !== errorMessage) {
+    //                         existingCard.querySelector('p').textContent = errorMessage;
+    //                         existingCard.querySelector('.notification-badge')?.remove();
+    //                     }
+    //                 } else {
+    //                     notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
+    //                 }
+    //                 continue;
+    //             }
+    //
+    //             // Xử lý dữ liệu từ ChangeLog
+    //             let message = 'Không có cập nhật mới';
+    //             let changeCount = 0;
+    //
+    //             if (data && data.action && data.fieldName) {
+    //                 if (endpoint.url.includes('product') && endpoint.title === 'Quản lý giá bán lẻ') {
+    //                     switch (data.action.toUpperCase()) {
+    //                         case 'INSERT':
+    //                         case 'INSERT_PW_PRICE':
+    //                         case 'UPDATE_RETAIL_PRICE':
+    //                             if (data.newValue) {
+    //                                 const newValueMatch = data.newValue.match(/productID=(\d+), retailPrice=(\d+)/);
+    //                                 if (newValueMatch) {
+    //                                     const productId = newValueMatch[1];
+    //                                     const retailPrice = parseFloat(newValueMatch[2]);
+    //                                     message = retailPrice === 0
+    //                                         ? `Thêm mới sản phẩm ${productId} chưa có giá bán lẻ`
+    //                                         : `Sản phẩm ${productId} đã được cập nhật giá bán lẻ ${retailPrice}`;
+    //                                     changeCount = 1;
+    //                                 } else {
+    //                                     message = 'Dữ liệu giá bán lẻ không hợp lệ';
+    //                                 }
+    //                             } else {
+    //                                 message = 'Không có dữ liệu';
+    //                             }
+    //                             break;
+    //                         default:
+    //                             message = 'Không có cập nhật giá bán lẻ mới';
+    //                             break;
+    //                     }
+    //                 } else if (endpoint.url.includes('invoice') && endpoint.title === 'Quản lý lịch sử mua bán') {
+    //                     switch (data.action.toUpperCase()) {
+    //                         case 'INSERT':
+    //                             if (data.fieldName.toLowerCase() === 'invoice') {
+    //                                 let amount, customerName = 'không xác định', totalQuantity = 0;
+    //                                 if (data.newValue !== 'Invoice created') {
+    //                                     const amountMatch = data.newValue.match(/amount=([\d.]+)/);
+    //                                     const customerIdMatch = data.newValue.match(/customerId=(\d+)/);
+    //                                     amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN') + ' VNĐ' : 'N/A';
+    //                                     if (customerIdMatch) {
+    //                                         try {
+    //                                             const customerResponse = await fetch(`/api/changelogs/customers/${customerIdMatch[1]}`);
+    //                                             if (customerResponse.ok) {
+    //                                                 const customerData = await customerResponse.json();
+    //                                                 customerName = customerData.name || 'không xác định';
+    //                                             }
+    //                                         } catch (error) {
+    //                                             console.error(`Error fetching customer data for ID ${customerIdMatch[1]}:`, error);
+    //                                         }
+    //                                     }
+    //                                     if (data.entityId) {
+    //                                         try {
+    //                                             const invoiceDetailsResponse = await fetch(`/api/changelogs/invoices/${data.entityId}/details`);
+    //                                             if (invoiceDetailsResponse.ok) {
+    //                                                 const invoiceDetails = await invoiceDetailsResponse.json();
+    //                                                 totalQuantity = invoiceDetails.quantity || 0;
+    //                                                 console.log(`Invoice ID ${data.entityId} has total quantity: ${totalQuantity}`);
+    //                                             } else {
+    //                                                 console.log(`No invoice details found for ID ${data.entityId}, using quantity: 0`);
+    //                                             }
+    //                                         } catch (error) {
+    //                                             console.error(`Error fetching invoice details for ID ${data.entityId}:`, error);
+    //                                             console.log(`Error occurred for Invoice ID ${data.entityId}, using quantity: 0`);
+    //                                         }
+    //                                     }
+    //                                     message = `Khách hàng ${customerName} đã thanh toán hóa đơn ${amount} cho ${totalQuantity} sản phẩm`;
+    //                                 } else {
+    //                                     message = `Hóa đơn mới được tạo ${data.newValue}`;
+    //                                 }
+    //                                 changeCount = 1;
+    //                             } else {
+    //                                 message = 'Không có cập nhật mới';
+    //                             }
+    //                             break;
+    //                         default:
+    //                             message = 'Không có cập nhật mới';
+    //                             break;
+    //                     }
+    //                 } else if (endpoint.url.includes('customer') && endpoint.title === 'Quản lý khách hàng') {
+    //                     switch (data.action.toUpperCase()) {
+    //                         case 'INSERT':
+    //                             message = `Thêm mới khách hàng: ${data.newValue || 'không xác định'}`;
+    //                             changeCount = 1;
+    //                             break;
+    //                         case 'DELETE':
+    //                             message = `Xóa khách hàng: ${data.newValue || 'không xác định'}`;
+    //                             changeCount = 1;
+    //                             break;
+    //                         case 'UPDATE':
+    //                             message = `Cập nhật khách hàng: ${data.newValue || 'không xác định'}`;
+    //                             changeCount = 1;
+    //                             break;
+    //                         default:
+    //                             message = 'Không có cập nhật khách hàng mới';
+    //                             break;
+    //                     }
+    //                 }
+    //             }
+    //
+    //             // Find existing card for this endpoint and title
+    //             const existingCard = Array.from(notificationGrid.children).find(
+    //                 card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
+    //             );
+    //
+    //             if (existingCard) {
+    //                 // Update existing card if message or changeCount differs
+    //                 const existingMessage = existingCard.querySelector('p').textContent;
+    //                 const existingBadge = existingCard.querySelector('.notification-badge');
+    //                 const existingChangeCount = existingBadge ? parseInt(existingBadge.textContent) : 0;
+    //
+    //                 if (existingMessage !== message || existingChangeCount !== changeCount) {
+    //                     existingCard.querySelector('p').textContent = message;
+    //                     if (changeCount > 0) {
+    //                         if (existingBadge) {
+    //                             existingBadge.textContent = changeCount;
+    //                         } else {
+    //                             const badge = document.createElement('div');
+    //                             badge.className = 'notification-badge';
+    //                             badge.textContent = changeCount;
+    //                             existingCard.appendChild(badge);
+    //                         }
+    //                     } else {
+    //                         existingBadge?.remove();
+    //                     }
+    //                 }
+    //             } else {
+    //                 // Append new card if none exists
+    //                 notificationGrid.appendChild(createNotificationCard(endpoint.title, message, changeCount));
+    //             }
+    //
+    //             console.log(`Parsed data for ${endpoint.url}:`, data);
+    //             console.log(`Message for ${endpoint.title}:`, message);
+    //         } catch (error) {
+    //             console.error(`Error fetching ${endpoint.url}:`, error);
+    //             const existingCard = Array.from(notificationGrid.children).find(
+    //                 card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
+    //             );
+    //             const errorMessage = 'Lỗi khi tải thông báo';
+    //             if (existingCard) {
+    //                 const existingMessage = existingCard.querySelector('p').textContent;
+    //                 if (existingMessage !== errorMessage) {
+    //                     existingCard.querySelector('p').textContent = errorMessage;
+    //                     existingCard.querySelector('.notification-badge')?.remove();
+    //                 }
+    //             } else {
+    //                 notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
+    //             }
+    //         }
+    //     }
+    // };
+    //
+    // // Initial call and polling setup
+    // document.addEventListener('DOMContentLoaded', () => {
+    //     updateNotifications();
+    //     setInterval(updateNotifications, 3000);
+    // });
+
     const updateNotifications = async () => {
         const notificationGrid = document.getElementById('notification-grid');
 
@@ -1318,10 +1508,10 @@
             card.className = 'notification-card';
             card.dataset.endpoint = endpoints.find(e => e.title === title)?.url;
             card.innerHTML = `
-                <h6>${title}</h6>
-                <p>${message}</p>
-                ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
-            `;
+            <h6>${title}</h6>
+            <p>${message}</p>
+            ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
+        `;
             return card;
         };
 
@@ -1352,30 +1542,43 @@
                     continue;
                 }
 
-                // Xử lý dữ liệu từ ChangeLog
                 let message = 'Không có cập nhật mới';
                 let changeCount = 0;
 
                 if (data && data.action && data.fieldName) {
                     if (endpoint.url.includes('product') && endpoint.title === 'Quản lý giá bán lẻ') {
-                        // Logic for Quản lý giá bán lẻ (unchanged)
                         switch (data.action.toUpperCase()) {
                             case 'INSERT':
-                                if (data.fieldName.toLowerCase() === 'retailprice') {
-                                    message = data.newValue === 'No Retail Price'
-                                        ? `Thêm mới sản phẩm ${data.details || 'chưa có giá bán lẻ'}`
-                                        : `Sản phẩm với giá bán lẻ: ${
-                                            isNaN(parseFloat(data.newValue))
-                                                ? 'không xác định'
-                                                : new Intl.NumberFormat('vi-VN', {
-                                                    style: 'currency',
-                                                    currency: 'VND',
-                                                    minimumFractionDigits: 0
-                                                }).format(parseFloat(data.newValue))
-                                        }`;
-                                    changeCount = 1;
+                            case 'INSERT_PW_PRICE':
+                            case 'UPDATE_RETAIL_PRICE':
+                                if (data.newValue) {
+                                    const newValueMatch = data.newValue.match(/productID=(\d+), retailPrice=(\d+)/);
+                                    if (newValueMatch) {
+                                        const productId = newValueMatch[1];
+                                        const retailPrice = parseFloat(newValueMatch[2]);
+                                        let productName = productId;
+                                        try {
+                                            const productResponse = await fetch(`/api/changelogs/products/${productId}`);
+                                            if (productResponse.ok) {
+                                                const productData = await productResponse.json();
+                                                productName = productData.name || productId;
+                                            }
+                                        } catch (error) {
+                                            console.error(`Error fetching product data for ID ${productId}:`, error);
+                                        }
+                                        message = retailPrice === 0
+                                            ? `Thêm mới sản phẩm ${productName} chưa có giá bán lẻ`
+                                            : `Sản phẩm ${productName} đã được cập nhật giá bán lẻ ${new Intl.NumberFormat('vi-VN', {
+                                                style: 'currency',
+                                                currency: 'VND',
+                                                minimumFractionDigits: 0
+                                            }).format(retailPrice)}`;
+                                        changeCount = 1;
+                                    } else {
+                                        message = 'Dữ liệu giá bán lẻ không hợp lệ';
+                                    }
                                 } else {
-                                    message = 'Không có cập nhật giá bán lẻ mới';
+                                    message = 'Không có dữ liệu';
                                 }
                                 break;
                             default:
@@ -1431,7 +1634,6 @@
                                 break;
                         }
                     } else if (endpoint.url.includes('customer') && endpoint.title === 'Quản lý khách hàng') {
-                        // Logic for Quản lý khách hàng (unchanged)
                         switch (data.action.toUpperCase()) {
                             case 'INSERT':
                                 message = `Thêm mới khách hàng: ${data.newValue || 'không xác định'}`;
@@ -1452,13 +1654,11 @@
                     }
                 }
 
-                // Find existing card for this endpoint and title
                 const existingCard = Array.from(notificationGrid.children).find(
                     card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
                 );
 
                 if (existingCard) {
-                    // Update existing card if message or changeCount differs
                     const existingMessage = existingCard.querySelector('p').textContent;
                     const existingBadge = existingCard.querySelector('.notification-badge');
                     const existingChangeCount = existingBadge ? parseInt(existingBadge.textContent) : 0;
@@ -1479,7 +1679,6 @@
                         }
                     }
                 } else {
-                    // Append new card if none exists
                     notificationGrid.appendChild(createNotificationCard(endpoint.title, message, changeCount));
                 }
 
@@ -1504,11 +1703,11 @@
         }
     };
 
-    // Initial call and polling setup
     document.addEventListener('DOMContentLoaded', () => {
         updateNotifications();
         setInterval(updateNotifications, 3000);
     });
+
 </script>
 </body>
 </html>

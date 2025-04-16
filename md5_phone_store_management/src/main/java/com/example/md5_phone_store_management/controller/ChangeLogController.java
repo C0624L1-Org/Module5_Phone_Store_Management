@@ -1,9 +1,6 @@
 package com.example.md5_phone_store_management.controller;
 
-import com.example.md5_phone_store_management.model.ChangeLog;
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.model.InvoiceDetail;
+import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.repository.InvoiceDetailRepository;
 import com.example.md5_phone_store_management.service.ICustomerService;
 import com.example.md5_phone_store_management.service.IEmployeeService;
@@ -47,6 +44,34 @@ public class ChangeLogController {
 
     @Autowired
     private ChangeLogService changeLogService;
+
+
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<Map<String, Object>> getProductById(@PathVariable Long productId) {
+        try {
+            Optional<Product> productOptional = Optional.ofNullable(iProductService.getProductById(Math.toIntExact(productId)));
+            if (productOptional.isPresent()) {
+                Product product = productOptional.get();
+                Map<String, Object> response = new HashMap<>();
+                response.put("productId", product.getProductID());
+                response.put("name", product.getName() != null ? product.getName() : "không xác định");
+                return ResponseEntity.ok(response);
+            } else {
+                // Return 404 with a fallback name to match frontend expectation
+                Map<String, Object> response = new HashMap<>();
+                response.put("productId", productId);
+                response.put("name", "không xác định");
+                return ResponseEntity.status(404).body(response);
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching product with ID " + productId + ": " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> response = new HashMap<>();
+            response.put("productId", productId);
+            response.put("name", "không xác định");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
 
 
 
