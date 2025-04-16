@@ -1,6 +1,7 @@
 package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.ChangeLog;
+import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.service.ICustomerService;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IProductService;
@@ -10,11 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/changelogs")
@@ -33,6 +38,35 @@ public class ChangeLogController {
 
     @Autowired
     private ChangeLogService changeLogService;
+
+
+        @GetMapping("/customers/{customerId}")
+        public ResponseEntity<Map<String, String>> getCustomerById(@PathVariable Long customerId) {
+            try {
+                Optional<Customer> customerOptional = Optional.ofNullable(iCustomerService.findCustomerById(Math.toIntExact(customerId)));
+                if (customerOptional.isPresent()) {
+                    Customer customer = customerOptional.get();
+                    Map<String, String> response = new HashMap<>();
+                    response.put("name", customer.getFullName() != null ? customer.getFullName() : "không xác định");
+                    return ResponseEntity.ok(response);
+                } else {
+                    // Return 404 with a fallback name to match frontend expectation
+                    Map<String, String> response = new HashMap<>();
+                    response.put("name", "không xác định");
+                    return ResponseEntity.status(404).body(response);
+                }
+            } catch (Exception e) {
+                System.err.println("Error fetching customer with ID " + customerId + ": " + e.getMessage());
+                e.printStackTrace();
+                Map<String, String> response = new HashMap<>();
+                response.put("name", "không xác định");
+                return ResponseEntity.status(500).body(response);
+            }
+        }
+
+
+
+
 
     @GetMapping("/product/notification")
     public ResponseEntity<ChangeLog> getAllProductChangeLogs() {

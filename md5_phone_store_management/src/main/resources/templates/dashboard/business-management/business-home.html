@@ -637,15 +637,27 @@
                         switch (data.action.toUpperCase()) {
                             case 'INSERT':
                                 if (data.fieldName.toLowerCase() === 'invoice') {
-                                    const formattedValue = new Intl.NumberFormat('vi-VN', {
-                                        style: 'currency',
-                                        currency: 'VND'
-                                    }).format(Number(data.newValue));
+
+                                    // message = data.newValue === 'Invoice created'
+                                    //     ? `Hóa đơn mới được tạo ${data.newValue}`
+                                    //     : `Hóa đơn mới: ${data.newValue}`;
+                                    // changeCount = 1;
+
+                                    let amount;
+                                    if (data.newValue !== 'Invoice created') {
+                                        // Parse amount from "amount=55555, customerId=23"
+                                        const amountMatch = data.newValue.match(/amount=([\d.]+)/);
+                                        amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : 'N/A';
+                                    } else {
+                                        amount = data.newValue; // Keep original for 'Invoice created' case
+                                    }
 
                                     message = data.newValue === 'Invoice created'
-                                        ? `Hóa đơn mới được tạo ${formattedValue}`
-                                        : `Hóa đơn mới: ${formattedValue || 'không xác định'}`;
+                                        ? `Hóa đơn mới được tạo ${data.newValue}`
+                                        : `Hóa đơn mới: ${amount}`;
                                     changeCount = 1;
+
+
                                 } else {
                                     message = 'Không có hóa đơn mới';
                                 }

@@ -615,11 +615,13 @@ public class ChangeLogService {
                 break;
 
             case "INSERT_INVOICE":
-                System.out.println("Processing INSERT_INVOICE for invoice");
-                BigDecimal amount = BigDecimal.valueOf(((Invoice) entity).getAmount());
-                String newValue = amount.toString();
-                saveChangeLog(entity, "INSERT", "invoice", null, newValue, employeeId);
-                break;
+            System.out.println("Processing INSERT_INVOICE for invoice");
+            Invoice invoiceEntity = (Invoice) entity;
+            BigDecimal amount = BigDecimal.valueOf(invoiceEntity.getAmount());
+            Long customerId = Long.valueOf(invoiceEntity.getCustomer() != null ? invoiceEntity.getCustomer().getCustomerID() : null);
+            String newValue = String.format("amount=%s, customerId=%s", amount.toString(), customerId != null ? customerId.toString() : "null");
+            saveChangeLog(entity, "INSERT", "invoice", null, newValue, employeeId);
+            break;
 
             case "UPDATE_INVOICE":
                 System.out.println("Processing UPDATE_INVOICE for invoice");
