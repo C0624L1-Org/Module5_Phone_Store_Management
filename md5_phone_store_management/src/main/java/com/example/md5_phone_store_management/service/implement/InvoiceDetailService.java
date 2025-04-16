@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 
 public class InvoiceDetailService implements IInvoiceDetailService {
@@ -18,6 +20,13 @@ public class InvoiceDetailService implements IInvoiceDetailService {
     @Override
     public Page<InvoiceDetail> findAll(Pageable pageable) {
         return invoiceDetailRepository.findAll(pageable);
+    }
+
+
+
+    @Override
+    public List<InvoiceDetail> findInvoiceDetailById(Long invoiceId) {
+        return  invoiceDetailRepository.findInvoiceDetailsByInvoiceId(invoiceId);
     }
 
     @Override

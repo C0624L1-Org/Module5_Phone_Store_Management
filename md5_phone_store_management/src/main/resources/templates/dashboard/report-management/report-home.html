@@ -667,17 +667,29 @@
                         switch (data.action.toUpperCase()) {
                             case 'INSERT':
                                 if (data.fieldName.toLowerCase() === 'invoice') {
-                                    let amount;
+                                    let amount, totalQuantity = 0;
                                     if (data.newValue !== 'Invoice created') {
                                         const amountMatch = data.newValue.match(/amount=([\d.]+)/);
                                         amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN') + ' VNĐ' : 'N/A';
+                                        if (data.entityId) {
+                                            try {
+                                                const invoiceDetailsResponse = await fetch(`/api/changelogs/invoices/${data.entityId}/details`);
+                                                if (invoiceDetailsResponse.ok) {
+                                                    const invoiceDetail = await invoiceDetailsResponse.json();
+                                                    totalQuantity = invoiceDetail.quantity || 0;
+                                                    console.log(`InvoiceDetail ID ${data.entityId} has quantity: ${totalQuantity}`);
+                                                } else {
+                                                    console.log(`No InvoiceDetail found for ID ${data.entityId}, using quantity: 0`);
+                                                }
+                                            } catch (error) {
+                                                console.error(`Error fetching invoice details for ID ${data.entityId}:`, error);
+                                                console.log(`Error occurred for InvoiceDetail ID ${data.entityId}, using quantity: 0`);
+                                            }
+                                        }
+                                        message = `Hóa đơn tạo mới: ${amount} cho ${totalQuantity} sản phẩm`;
                                     } else {
-                                        amount = data.newValue;
+                                        message = `Hóa đơn mới được tạo ${data.newValue}`;
                                     }
-
-                                    message = data.newValue === 'Invoice created'
-                                        ? `Hóa đơn mới được tạo ${data.newValue}`
-                                        : `Hóa đơn mới: ${amount}`;
                                     changeCount = 1;
                                 } else {
                                     message = 'Không có báo cáo bán hàng mới';

@@ -2,11 +2,16 @@ package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.ChangeLog;
 import com.example.md5_phone_store_management.model.Customer;
+import com.example.md5_phone_store_management.model.Invoice;
+import com.example.md5_phone_store_management.model.InvoiceDetail;
+import com.example.md5_phone_store_management.repository.InvoiceDetailRepository;
 import com.example.md5_phone_store_management.service.ICustomerService;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IProductService;
 import com.example.md5_phone_store_management.service.ISupplierService;
 import com.example.md5_phone_store_management.service.implement.ChangeLogService;
+import com.example.md5_phone_store_management.service.implement.InvoiceDetailService;
+import com.example.md5_phone_store_management.service.implement.InvoiceServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +25,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/changelogs")
 public class ChangeLogController {
+    @Autowired
+    private InvoiceDetailService invoiceDetailService;
+
     @Autowired
     private IEmployeeService iEmployeeService;
 
@@ -38,6 +47,33 @@ public class ChangeLogController {
 
     @Autowired
     private ChangeLogService changeLogService;
+
+
+
+    @GetMapping("/invoices/{invoiceId}/details")
+    public ResponseEntity<Object> getInvoiceDetails(@PathVariable Long invoiceId) {
+        try {
+            List<InvoiceDetail> details = invoiceDetailService.findInvoiceDetailById(invoiceId);
+            int totalQuantity = details.stream()
+                    .mapToInt(detail -> detail.getQuantity() != null ? detail.getQuantity() : 0)
+                    .sum();
+            System.out.println("Invoice ID " + invoiceId + " has total quantity: " + totalQuantity);
+            Object response = new Object() {
+                public final Integer quantity = totalQuantity;
+            };
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("Error fetching invoice details for ID " + invoiceId + ": " + e.getMessage());
+            e.printStackTrace();
+            System.out.println("Error occurred for Invoice ID " + invoiceId + ", returning quantity: 0");
+            Object response = new Object() {
+                public final Integer quantity = 0;
+            };
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+
 
 
         @GetMapping("/customers/{customerId}")

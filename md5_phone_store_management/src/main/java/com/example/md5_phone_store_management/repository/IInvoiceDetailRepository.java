@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.md5_phone_store_management.model.Invoice;
@@ -16,6 +17,12 @@ import com.example.md5_phone_store_management.model.InvoiceDetail;
 
 @Repository
 public interface IInvoiceDetailRepository extends JpaRepository<InvoiceDetail, Integer> {
+
+    @Query("SELECT id FROM InvoiceDetail id WHERE id.invoice.id = :invoiceId")
+    List<InvoiceDetail> findInvoiceDetailsByInvoiceId(@Param("invoiceId") Long invoiceId);
+
+    // Or if you want to find a single detail by its own ID
+    InvoiceDetail findInvoiceDetailById(Long id);
 
 
     // Lưu chi tiết hóa đơn
