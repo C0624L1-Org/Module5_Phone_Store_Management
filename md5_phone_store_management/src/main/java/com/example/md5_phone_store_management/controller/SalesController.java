@@ -713,13 +713,12 @@ public String processPayment(@ModelAttribute("invoice") Invoice invoice,
         try {
             Customer customer = invoice.getCustomer();
             if (customer != null) {
-                Customer freshCustomer = iCustomerService.findCustomerById(customer.getCustomerID());
+                Customer freshCustomer = iCustomerService.findCustomerById(invoice.getCustomer().getCustomerID());
                 if (freshCustomer != null) {
                     int newCount = freshCustomer.getPurchaseCount() + 1;
 
                     try {
-                        Integer customerId = freshCustomer.getCustomerID();
-                        iCustomerService.updatePurchaseCount(customerId, newCount);
+                        iCustomerService.updatePurchaseCount(freshCustomer.getCustomerID(), newCount);
                         System.out.println("Đã cập nhật thành công số lượng mua hàng cho khách hàng: " + freshCustomer.getFullName() +
                                 ", số lần mua mới: " + newCount);
                     } catch (Exception e) {

@@ -378,6 +378,8 @@ public class InvoiceServiceImpl implements IInvoiceService {
         }
     }
 
+
+
     /**
      * Kiểm tra hóa đơn trước khi lưu để đảm bảo tính toàn vẹn
      */

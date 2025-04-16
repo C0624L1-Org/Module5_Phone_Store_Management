@@ -460,7 +460,9 @@ package com.example.md5_phone_store_management.service.implement;
 
 import com.example.md5_phone_store_management.event.EntityChangeEvent;
 import com.example.md5_phone_store_management.model.ChangeLog;
+import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Employee;
+import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.repository.ChangeLogRepository;
 import com.example.md5_phone_store_management.repository.IEmployeeRepository;
 import jakarta.persistence.EntityManager;
@@ -477,6 +479,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -489,7 +492,7 @@ public class ChangeLogService {
 
     private static final String[] TRACKED_FIELDS = {
             "name", "fullName", "retailPrice", // Product fields
-            "amount", "status", "paymentMethod", "orderInfo" // Invoice fields
+            "amount" // Invoice fields
     };
 
     private final Set<String> processedEvents = new HashSet<>();
@@ -555,6 +558,36 @@ public class ChangeLogService {
         }
 
         switch (action) {
+            case "INSERT_CUSTOMER":
+                System.out.println("Processing INSERT_CUSTOMER for customer");
+                String insertValue = ((Customer) entity).getFullName() != null ? ((Customer) entity).getFullName() : String.valueOf(((Customer) entity).getCustomerID());
+                saveChangeLog(entity, "INSERT", "customer", null, insertValue, employeeId);
+                break;
+            case "UPDATE_CUSTOMER":
+                System.out.println("Processing UPDATE_CUSTOMER for customer");
+                String newValueCus = ((Customer) entity).getFullName() != null ? ((Customer) entity).getFullName() : String.valueOf(((Customer) entity).getCustomerID());
+                String oldValue = oldEntity != null ?
+                        (((Customer) oldEntity).getFullName() != null ? ((Customer) oldEntity).getFullName() : String.valueOf(((Customer) oldEntity).getCustomerID())) :
+                        null;
+                saveChangeLog(entity, "UPDATE", "customer", oldValue, newValueCus, employeeId);
+                break;
+            case "DELETE_CUSTOMER":
+                System.out.println("Processing DELETE_CUSTOMER for customer");
+                String deleteValue = (String) event.getMetadata().get("newValue"); // Lấy newValue từ metadata
+                if (deleteValue == null) {
+                    // Dự phòng nếu newValue không có
+                    if (entity != null && entity instanceof Customer) {
+                        deleteValue = String.valueOf(((Customer) entity).getCustomerID());
+                    } else {
+                        // Lấy customerId từ metadata nếu entity là null
+                        deleteValue = String.valueOf(event.getMetadata().get("customerId"));
+                        if (deleteValue == null) {
+                            deleteValue = "unknown_customer"; // Giá trị mặc định nếu không có thông tin
+                        }
+                    }
+                }
+                saveChangeLog(entity, "DELETE", "customer", null, deleteValue, employeeId);
+                break;
             case "INSERT":
             case "INSERT_PW_NO_PRICE":
             case "INSERT_PW_PRICE":
@@ -583,7 +616,9 @@ public class ChangeLogService {
 
             case "INSERT_INVOICE":
                 System.out.println("Processing INSERT_INVOICE for invoice");
-                saveChangeLog(entity, "INSERT", "invoice", null, "Invoice created", employeeId);
+                BigDecimal amount = BigDecimal.valueOf(((Invoice) entity).getAmount());
+                String newValue = amount.toString();
+                saveChangeLog(entity, "INSERT", "invoice", null, newValue, employeeId);
                 break;
 
             case "UPDATE_INVOICE":

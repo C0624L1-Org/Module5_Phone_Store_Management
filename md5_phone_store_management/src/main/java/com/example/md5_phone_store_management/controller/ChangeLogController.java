@@ -41,6 +41,14 @@ public class ChangeLogController {
         return ResponseEntity.ok(changeLog != null ? changeLog : new ChangeLog());
     }
 
+    @GetMapping("/invoice/notification")
+    public ResponseEntity<ChangeLog> getAllInvoiceChangeLogs() {
+        ChangeLog changeLog = changeLogService.getLatestEntityChanges("invoice");
+        return ResponseEntity.ok(changeLog != null ? changeLog : new ChangeLog());
+    }
+
+    
+
 
     //    thông báo chỉ lấy cái mới nhất thôi tại ít thời gian quá
 //     cho kinh doanh
@@ -49,14 +57,6 @@ public class ChangeLogController {
         ChangeLog changeLog = changeLogService.getLatestEntityChanges("customer");
         return ResponseEntity.ok(changeLog != null ? changeLog : new ChangeLog());
     }
-
-    @GetMapping("/invoice/notification")
-    public ResponseEntity<ChangeLog> getAllInvoiceChangeLogs() {
-        ChangeLog changeLog = changeLogService.getLatestEntityChanges("invoice");
-        return ResponseEntity.ok(changeLog != null ? changeLog : new ChangeLog());
-    }
-
-
 
 
     @GetMapping("/notification")
