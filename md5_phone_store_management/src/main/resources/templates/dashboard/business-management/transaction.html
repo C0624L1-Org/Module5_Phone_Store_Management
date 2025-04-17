@@ -468,6 +468,9 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                <tr th:if="${invoices.totalElements == 0}">
+                                    <td colspan="6" class="text-center">Không tìm thấy kết quả.</td>
+                                </tr>
                                 <tr th:each="i,l : ${invoices}">
                                     <td th:text="${l.count}"></td>
                                     <td th:text="${i.createdAt != null ? #temporals.format(i.createdAt, 'dd-MM-yyyy') : 'Lỗi'}"></td>
@@ -504,7 +507,7 @@
                                     </li>
                                     <li class="page-item active mx-2">
                                         <span class="page-link">
-                                            <span th:text="${currentPage + 1}"></span> / <span th:text="${invoices.totalPages}"></span>
+                                            <span th:text="${(invoices.totalPages == 0) ? '0' : (currentPage + 1)}"></span> / <span th:text="${invoices.totalPages}"></span>
                                         </span>
                                     </li>
                                     <li class="page-item" th:classappend="${currentPage + 1 >= invoices.totalPages} ? 'disabled'">
@@ -570,4 +573,3 @@
 </script>
 </body>
 </html>
-
