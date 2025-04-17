@@ -228,11 +228,11 @@ public class SalesController {
                 InvoiceDetail detail = new InvoiceDetail();
                 detail.setProduct(product);
                 detail.setQuantity(quantity);
-                detail.setTotalPrice(product.getSellingPrice().multiply(BigDecimal.valueOf(quantity)));
+                detail.setTotalPrice(product.getRetailPrice().multiply(BigDecimal.valueOf(quantity)));
 
                 // Thêm vào danh sách và tính tổng tiền
                 invoiceDetails.add(detail);
-                totalAmount += product.getSellingPrice().multiply(BigDecimal.valueOf(quantity)).longValue();
+                totalAmount += product.getRetailPrice().multiply(BigDecimal.valueOf(quantity)).longValue();
             }
 
             // Kiểm tra xem có chi tiết hóa đơn nào được tạo không

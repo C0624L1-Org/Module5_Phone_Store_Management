@@ -258,7 +258,7 @@
                                 <tr th:each="item, index : ${invoice.invoiceDetailList}">
                                     <td class="text-center" th:text="${index.count}"></td>
                                     <td th:text="${item.product.name}"></td>
-                                    <td class="text-end" th:text="${#numbers.formatDecimal(item.product.sellingPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+                                    <td class="text-end" th:text="${#numbers.formatDecimal(item.product.retailPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
                                     <td class="text-center" th:text="${item.quantity}"></td>
                                     <td class="text-end" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
                                 </tr>

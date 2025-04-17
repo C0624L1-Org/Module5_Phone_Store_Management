@@ -643,7 +643,7 @@
                     // Format giá sản phẩm
                     let productPrice = 0;
                     try {
-                        productPrice = parseFloat(product.sellingPrice) || 0;
+                        productPrice = parseFloat(product.retailPrice) || 0;
                     } catch (e) {
                         console.error('Lỗi khi parse giá sản phẩm:', e);
                     }
