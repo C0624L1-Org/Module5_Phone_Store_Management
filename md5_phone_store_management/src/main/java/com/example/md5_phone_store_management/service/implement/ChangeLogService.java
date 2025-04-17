@@ -586,30 +586,19 @@ public class ChangeLogService {
                 saveChangeLog(entity, "DELETE", "customer", null, deleteValue, employeeId);
                 break;
             case "INSERT":
-//            case "INSERT_PW_NO_PRICE":
-//            case "INSERT_PW_PRICE":
-//                if (!entity.getClass().getSimpleName().equalsIgnoreCase("Product")) {
-//                    System.out.println("Skipping non-product entity for action: " + action);
-//                    break;
-//                }
-//                System.out.println("Processing product insertion: " + action);
-//                for (String fieldName : TRACKED_FIELDS) {
-//                    String nameValue = getFieldValue(entity, fieldName);
-//                    if (nameValue != null) {
-//                        if (action.equals("INSERT_PW_NO_PRICE") && fieldName.equals("retailPrice")) {
-//                            System.out.println("Logging retailPrice: No Retail Price");
-//                            saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
-//                        } else {
-//                            System.out.println("Logging field: " + fieldName + ", value=" + nameValue);
-//                            saveChangeLog(entity, "INSERT", fieldName, null, nameValue, employeeId);
-//                        }
-//                    }
-//                }
-//                if (action.equals("INSERT_PW_NO_PRICE") && !Arrays.asList(TRACKED_FIELDS).contains("retailPrice")) {
-//                    System.out.println("Logging retailPrice: No Retail Price (fallback)");
-//                    saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
-//                }
-//                break;
+                if (!entity.getClass().getSimpleName().equalsIgnoreCase("Product")) {
+                    System.out.println("Skipping non-product entity for action: " + action);
+                    break;
+                }
+                System.out.println("Processing product insertion: " + action);
+                for (String fieldName : TRACKED_FIELDS) {
+                    String nameValue = getFieldValue(entity, fieldName);
+                    if (nameValue != null) {
+                           saveChangeLog(entity, "INSERT", fieldName, null, nameValue, employeeId);
+
+                    }
+                }
+                break;
 
             case "INSERT_PW_NO_PRICE":
             case "INSERT_PW_PRICE":
@@ -644,26 +633,7 @@ public class ChangeLogService {
                 }
                 break;
 
-//            case "UPDATE_RETAIL_PRICE":
-//                System.out.println("Processing UPDATE_RETAIL_PRICE");
-//                String oldRetailPrice = oldEntity != null ? getFieldValue(oldEntity, "retailPrice") : null;
-//                String newRetailPrice = getFieldValue(entity, "retailPrice");
-//                System.out.println("Logging retailPrice change: old=" + oldRetailPrice + ", new=" + newRetailPrice);
-//                saveChangeLog(entity, "UPDATE", "retailPrice",
-//                        oldRetailPrice != null ? oldRetailPrice : "No Retail Price",
-//                        newRetailPrice != null ? newRetailPrice : "No Retail Price",
-//                        employeeId);
-//                changes = getFieldChanges(oldEntity, entity);
-//                changes.forEach((fieldName, change) -> {
-//                    if (!fieldName.equals("retailPrice")) {
-//                        System.out.println("Logging field change: " + fieldName + ", old=" + change.get("oldValue") + ", new=" + change.get("newValue"));
-//                        saveChangeLog(entity, "UPDATE", fieldName,
-//                                change.get("oldValue"),
-//                                change.get("newValue"),
-//                                employeeId);
-//                    }
-//                });
-//                break;
+
             case "UPDATE_RETAIL_PRICE":
                 if (entity instanceof Product) {
                     String oldValueP = (String) event.getMetadata().getOrDefault("oldValue", "productID=unknown, retailPrice=0");
