@@ -46,6 +46,29 @@ public class ChangeLogController {
     private ChangeLogService changeLogService;
 
 
+    @GetMapping("/employee/{employeeId}/name")
+    public ResponseEntity<Map<String, String>> getEmployeeName(@PathVariable Long employeeId) {
+        System.out.println("Received request for employeeId: " + employeeId);
+        Map<String, String> response = new HashMap<>();
+        try {
+            Employee employee = iEmployeeService.getEmployeeById(Math.toIntExact(employeeId));
+            if (employee != null) {
+                response.put("name", employee.getFullName() != null ? employee.getFullName() : "không xác định");
+                return ResponseEntity.ok(response);
+            } else {
+                System.out.println("nhân viên id " + employeeId + " ko tìm thấy.");
+                response.put("name", "không xác định");
+                return ResponseEntity.status(404).body(response);
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching employee with ID " + employeeId + ": " + e.getMessage());
+            e.printStackTrace();
+            response.put("name", "không xác định");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+
     @GetMapping("/products/{productId}")
     public ResponseEntity<Map<String, Object>> getProductById(@PathVariable Long productId) {
         try {

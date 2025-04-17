@@ -1,720 +1,3 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="vi">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Bảng Điều Khiển</title>-->
-
-<!--    &lt;!&ndash; CSS Libraries &ndash;&gt;-->
-<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">-->
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
-
-<!--    &lt;!&ndash; Tailwind CSS &ndash;&gt;-->
-<!--    <script src="https://cdn.tailwindcss.com"></script>-->
-
-<!--    &lt;!&ndash; Custom CSS &ndash;&gt;-->
-<!--    <link rel="stylesheet" href="/css/fragments/navbar.css">-->
-<!--    <link rel="stylesheet" href="/css/fragments/sidebar.css">-->
-<!--    <link rel="stylesheet" href="/css/fragments/footer.css">-->
-<!--    <link rel="stylesheet" href="/css/common/toast.css">-->
-<!--    <link rel="stylesheet" href="/css/common/layout.css">-->
-
-<!--    &lt;!&ndash; Inline CSS &ndash;&gt;-->
-<!--    <style>-->
-<!--        body {-->
-<!--            font-family: Arial, sans-serif;-->
-<!--            background-color: #f4f7fa;-->
-<!--            margin: 0;-->
-<!--            padding: 0;-->
-<!--        }-->
-
-<!--        .content-wrapper {-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            min-height: 100vh;-->
-<!--            padding-top: 90px;-->
-<!--        }-->
-
-<!--        .dashboard-container {-->
-<!--            display: flex;-->
-<!--            flex: 1; /* Chiếm không gian còn lại giữa navbar và footer */-->
-<!--        }-->
-
-<!--        .dash-container {-->
-<!--            max-width: 100%;-->
-<!--            margin: 0 auto;-->
-<!--            padding: 1rem 2rem; /* Khoảng cách trái/phải và trên/dưới */-->
-<!--            flex: 1;-->
-<!--        }-->
-
-<!--        /* Sidebar */-->
-<!--        aside {-->
-<!--            min-width: 250px;-->
-<!--            background-color: #fff;-->
-<!--            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);-->
-<!--        }-->
-
-<!--        /* Dashboard Cards */-->
-<!--        .dash-cards-wrapper {-->
-<!--            display: flex;-->
-<!--            gap: 20px;-->
-<!--            flex-wrap: nowrap;-->
-<!--            margin-bottom: 20px;-->
-<!--            width: 100%;-->
-<!--        }-->
-
-<!--        .dash-card {-->
-<!--            flex: 1;-->
-<!--            min-width: 0;-->
-<!--        }-->
-
-<!--        /* Update and Arrow Text */-->
-<!--        .dash-update-text {-->
-<!--            font-size: 16px;-->
-<!--            opacity: 0.9;-->
-<!--            text-align: center;-->
-<!--        }-->
-
-<!--        .dash-arrow-text {-->
-<!--            font-size: 12px;-->
-<!--            opacity: 0.8;-->
-<!--        }-->
-
-<!--        /* Bottom Section */-->
-<!--        .dash-bottom-section {-->
-<!--            display: flex;-->
-<!--            gap: 20px;-->
-<!--            width: 100%;-->
-<!--            position: relative;-->
-<!--            flex-wrap: wrap;-->
-<!--        }-->
-
-<!--        .dash-sales-analytics, .dash-updates-profile {-->
-<!--            background: white;-->
-<!--            border-radius: 10px;-->
-<!--            padding: 20px;-->
-<!--            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);-->
-<!--            transition: all 0.3s ease;-->
-<!--            overflow: hidden;-->
-<!--            flex: 1;-->
-<!--        }-->
-
-<!--        .dash-sales-analytics {-->
-<!--            flex: 7;-->
-<!--            min-width: 300px;-->
-<!--            max-height: 600px;-->
-<!--            background: white;-->
-<!--            border-radius: 10px;-->
-<!--            padding: 20px;-->
-<!--            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);-->
-<!--            transition: all 0.3s ease;-->
-<!--            overflow: hidden;-->
-<!--        }-->
-
-<!--        .dash-updates-profile {-->
-<!--            flex: 3;-->
-<!--            min-width: 200px;-->
-<!--            max-height: 600px;-->
-<!--        }-->
-
-<!--        .dash-sales-analytics.hidden, .dash-updates-profile.hidden {-->
-<!--            width: 0;-->
-<!--            min-width: 0;-->
-<!--            padding: 0;-->
-<!--            margin: 0;-->
-<!--            opacity: 0;-->
-<!--            flex: 0;-->
-<!--            overflow: hidden;-->
-<!--        }-->
-
-<!--        .dash-sales-analytics.expanded, .dash-updates-profile.expanded {-->
-<!--            position: absolute;-->
-<!--            left: 0;-->
-<!--            right: 0;-->
-<!--            width: calc(100% - 40px);-->
-<!--            z-index: 1;-->
-<!--        }-->
-
-<!--        .dash-sales-analytics h3, .dash-updates-profile h3 {-->
-<!--            margin: 0 0 10px;-->
-<!--            font-size: 18px;-->
-<!--        }-->
-
-<!--        .dash-sales-analytics p {-->
-<!--            margin: 0 0 20px;-->
-<!--            font-size: 12px;-->
-<!--            color: #666;-->
-<!--        }-->
-
-<!--        .dash-chart-controls {-->
-<!--            display: flex;-->
-<!--            justify-content: space-between;-->
-<!--            align-items: center;-->
-<!--            margin-bottom: 20px;-->
-<!--        }-->
-
-<!--        .dash-chart-controls .dash-zoom {-->
-<!--            display: flex;-->
-<!--            gap: 5px;-->
-<!--        }-->
-
-<!--        .dash-chart-controls .dash-zoom button {-->
-<!--            background: #f0f0f0;-->
-<!--            border: none;-->
-<!--            padding: 5px 10px;-->
-<!--            border-radius: 5px;-->
-<!--            cursor: pointer;-->
-<!--        }-->
-
-<!--        .dash-chart-controls .dash-show-all {-->
-<!--            background: #f0f0f0;-->
-<!--            border: none;-->
-<!--            padding: 5px 10px;-->
-<!--            border-radius: 5px;-->
-<!--            cursor: pointer;-->
-<!--        }-->
-
-<!--        .dash-header {-->
-<!--            display: flex;-->
-<!--            justify-content: space-between;-->
-<!--            align-items: center;-->
-<!--            margin-bottom: 10px;-->
-<!--        }-->
-
-<!--        .dash-expand-btn {-->
-<!--            background: none;-->
-<!--            border: none;-->
-<!--            cursor: pointer;-->
-<!--            font-size: 16px;-->
-<!--            color: #666;-->
-<!--        }-->
-
-<!--        #salesChart {-->
-<!--            max-height: 300px;-->
-<!--            width: 100%;-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body class="font-sans bg-gray-100 m-0 p-0"></body>-->
-<!--&lt;!&ndash; Toast &ndash;&gt;-->
-<!--<div th:replace="~{common/toast}"></div>-->
-
-<!--&lt;!&ndash; Navbar &ndash;&gt;-->
-<!--<nav th:replace="~{fragments/navbar :: navbar}"></nav>-->
-
-<!--<div class="content-wrapper flex flex-col min-h-screen pt-[90px]"></div>-->
-
-<!--<div class="dashboard-container">-->
-<!--    &lt;!&ndash; Sidebar &ndash;&gt;-->
-<!--    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>-->
-
-<!--    <div class="dash-container">-->
-
-<!--        <nav aria-label="breadcrumb">-->
-<!--            <ol class="breadcrumb">-->
-<!--                <li class="breadcrumb-item active" aria-current="page">Thống kê Admin</li>-->
-<!--            </ol>-->
-<!--        </nav>-->
-
-<!--        &lt;!&ndash; Top Section: Cards &ndash;&gt;-->
-<!--        <div class="dash-cards-wrapper">-->
-<!--            <div class="dash-card flex-1 min-w-0 bg-orange-400 text-white rounded-lg shadow-lg p-6"-->
-<!--                 onclick="updateChart('revenue')">-->
-<!--                <div class="flex justify-between items-center">-->
-<!--                    <div>-->
-<!--                        <div class="text-4xl font-bold" id="total-revenue">0đ</div>-->
-<!--                        <div class="text-xl">Doanh Thu</div>-->
-<!--                    </div>-->
-<!--                    <div class="text-4xl">-->
-<!--                        <i class="fas fa-chart-bar"></i>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="flex justify-end mb-2">-->
-<!--                    <div class="flex items-center dash-arrow-text">-->
-<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
-<!--                        <span id="revenue-change">0đ</span>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="border-t border-white my-4 flex justify-center">-->
-<!--                    <div class="flex flex-col items-center dash-update-text">-->
-<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="revenue-update-time"></span>-->
-<!--                        </div>-->
-<!--                        <div id="revenue-update-date"></div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            <div class="dash-card flex-1 min-w-0 bg-green-500 text-white rounded-lg shadow-lg p-6"-->
-<!--                 onclick="updateChart('products')">-->
-<!--                <div class="flex justify-between items-center">-->
-<!--                    <div>-->
-<!--                        <div class="text-4xl font-bold" id="total-products">0</div>-->
-<!--                        <div class="text-xl">Sản Phẩm</div>-->
-<!--                    </div>-->
-<!--                    <div class="text-4xl">-->
-<!--                        <i class="fas fa-chart-bar"></i>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="flex justify-end mb-2">-->
-<!--                    <div class="flex items-center dash-arrow-text">-->
-<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
-<!--                        <span id="products-change">0</span>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="border-t border-white my-4 flex justify-center">-->
-<!--                    <div class="flex flex-col items-center dash-update-text">-->
-<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="products-update-time"></span>-->
-<!--                        </div>-->
-<!--                        <div id="products-update-date"></div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            <div class="dash-card flex-1 min-w-0 bg-pink-400 text-white rounded-lg shadow-lg p-6"-->
-<!--                 onclick="updateChart('suppliers')">-->
-<!--                <div class="flex justify-between items-center">-->
-<!--                    <div>-->
-<!--                        <div class="text-4xl font-bold" id="total-suppliers">0</div>-->
-<!--                        <div class="text-xl">Nhà Cung Cấp</div>-->
-<!--                    </div>-->
-<!--                    <div class="text-4xl">-->
-<!--                        <i class="fas fa-chart-bar"></i>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="flex justify-end mb-2">-->
-<!--                    <div class="flex items-center dash-arrow-text">-->
-<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
-<!--                        <span id="suppliers-change">0</span>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="border-t border-white my-4 flex justify-center">-->
-<!--                    <div class="flex flex-col items-center dash-update-text">-->
-<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="suppliers-update-time"></span>-->
-<!--                        </div>-->
-<!--                        <div id="suppliers-update-date"></div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            <div class="dash-card flex-1 min-w-0 bg-cyan-400 text-white rounded-lg shadow-lg p-6"-->
-<!--                 onclick="updateChart('employees')">-->
-<!--                <div class="flex justify-between items-center">-->
-<!--                    <div>-->
-<!--                        <div class="text-4xl font-bold" id="total-employees">0</div>-->
-<!--                        <div class="text-xl">Nhân Viên</div>-->
-<!--                    </div>-->
-<!--                    <div class="text-4xl">-->
-<!--                        <i class="fas fa-chart-bar"></i>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="flex justify-end mb-2">-->
-<!--                    <div class="flex items-center dash-arrow-text">-->
-<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
-<!--                        <span id="employees-change">0</span>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="border-t border-white my-4 flex justify-center">-->
-<!--                    <div class="flex flex-col items-center dash-update-text">-->
-<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="employees-update-time"></span>-->
-<!--                        </div>-->
-<!--                        <div id="employees-update-date"></div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            <div class="dash-card flex-1 min-w-0 bg-purple-500 text-white rounded-lg shadow-lg p-6"-->
-<!--                 onclick="updateChart('customers')">-->
-<!--                <div class="flex justify-between items-center">-->
-<!--                    <div>-->
-<!--                        <div class="text-4xl font-bold" id="total-customers">0</div>-->
-<!--                        <div class="text-xl">Khách Hàng</div>-->
-<!--                    </div>-->
-<!--                    <div class="text-4xl">-->
-<!--                        <i class="fas fa-chart-bar"></i>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="flex justify-end mb-2">-->
-<!--                    <div class="flex items-center dash-arrow-text">-->
-<!--                        <i class="fas fa-arrow-up mr-1"></i>-->
-<!--                        <span id="customers-change">0</span>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="border-t border-white my-4 flex justify-center">-->
-<!--                    <div class="flex flex-col items-center dash-update-text">-->
-<!--                        <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="customers-update-time"></span>-->
-<!--                        </div>-->
-<!--                        <div id="customers-update-date"></div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        &lt;!&ndash; Bottom Section &ndash;&gt;-->
-<!--        <div class="dash-bottom-section">-->
-<!--            <div class="dash-sales-analytics flex-[7] min-w-[300px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden"></div>-->
-<!--            <div class="dash-header">-->
-<!--                <h3 id="chart-title">Biểu Đồ - Doanh Thu</h3>-->
-<!--                <button class="dash-expand-btn" onclick="toggleExpand('sales')">-->
-<!--                    <i class="fas fa-expand"></i>-->
-<!--                </button>-->
-<!--            </div>-->
-<!--            <p>Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>-->
-<!--            <div class="dash-chart-controls">-->
-<!--                <div class="dash-zoom">-->
-<!--                    <button>⟐</button>-->
-<!--                    <button>⟑</button>-->
-<!--                </div>-->
-<!--                <button class="dash-show-all">Hiển thị tất cả</button>-->
-<!--            </div>-->
-<!--            <canvas id="salesChart"></canvas>-->
-<!--        </div>-->
-
-
-<!--        <div class="dash-updates-profile">-->
-<!--            <div class="dash-header">-->
-<!--                <h3>Cập Nhật Mới Nhất</h3>-->
-<!--                <button class="dash-expand-btn" onclick="toggleExpand('updates')">-->
-<!--                    <i class="fas fa-expand"></i>-->
-<!--                </button>-->
-<!--            </div>-->
-<!--            <div id="changeLogsContainer">-->
-
-<!--            </div>-->
-<!--        </div>-->
-
-
-<!--    </div>-->
-<!--</div>-->
-<!--</div>-->
-
-<!--&lt;!&ndash; Footer &ndash;&gt;-->
-<!--<footer th:replace="~{fragments/footer :: footer}"></footer>-->
-<!--</div>-->
-<!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->
-<!--<div th:replace="~{fragments/navbar :: navbar-script}"></div>-->
-<!--<script>-->
-<!--    // Function to format relative time-->
-<!--    function formatRelativeTime(timestamp) {-->
-<!--        if (!timestamp || isNaN(new Date(timestamp))) {-->
-<!--            return "vừa xong";-->
-<!--        }-->
-<!--        const now = new Date();-->
-<!--        const logTime = new Date(timestamp);-->
-<!--        const diffInSeconds = Math.floor((now - logTime) / 1000);-->
-
-<!--        if (diffInSeconds < 60) {-->
-<!--            return "vừa xong";-->
-<!--        } else if (diffInSeconds < 3600) {-->
-<!--            const minutes = Math.floor(diffInSeconds / 60);-->
-<!--            return `${minutes} phút trước`;-->
-<!--        } else if (diffInSeconds < 86400) {-->
-<!--            const hours = Math.floor(diffInSeconds / 3600);-->
-<!--            return `${hours} giờ trước`;-->
-<!--        } else {-->
-<!--            return logTime.toLocaleString('vi-VN', {-->
-<!--                day: '2-digit',-->
-<!--                month: '2-digit',-->
-<!--                year: 'numeric',-->
-<!--                hour: '2-digit',-->
-<!--                minute: '2-digit'-->
-<!--            });-->
-<!--        }-->
-<!--    }-->
-
-<!--    // Function to format date and time from LocalDateTime-->
-<!--    function formatDateTimeFromLocal(timestamp) {-->
-<!--        if (!timestamp || isNaN(new Date(timestamp))) {-->
-<!--            return {time: '&#45;&#45;:&#45;&#45;', date: '&#45;&#45;/&#45;&#45;/&#45;&#45;&#45;&#45;'};-->
-<!--        }-->
-<!--        const dateObj = new Date(timestamp);-->
-<!--        const time = dateObj.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});-->
-<!--        const date = dateObj.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'});-->
-<!--        return {time, date};-->
-<!--    }-->
-
-<!--    // Function to format currency-->
-<!--    function formatCurrency(value) {-->
-<!--        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(value || 0);-->
-<!--    }-->
-
-<!--    // Function to render change logs-->
-<!--    function renderChangeLogs(logs) {-->
-<!--        const container = document.getElementById('changeLogsContainer');-->
-<!--        if (!logs || !Array.isArray(logs) || logs.length === 0) {-->
-<!--            container.innerHTML = `-->
-<!--<div class="update-item">-->
-<!--    <div class="content">-->
-<!--        <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>-->
-<!--    </div>-->
-<!--</div>-->
-<!--`;-->
-<!--            return;-->
-<!--        }-->
-
-<!--        container.innerHTML = logs.map(log => {-->
-<!--            if (!log || !log.timestamp || !log.action) {-->
-<!--                return '';-->
-<!--            }-->
-<!--            return `-->
-<!--<div class="update-item">-->
-<!--    <div class="flex items-center">-->
-<!--        <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>-->
-<!--        <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'}">-->
-<!--            <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'}"></i>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <div class="content">-->
-<!--        <p class="font-semibold">-->
-<!--            ${log.action === 'INSERT' ? `Nhân viên ID ${log.employeeId || 'N/A'} đã thêm ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :-->
-<!--                log.action === 'UPDATE' ? `Nhân viên ID ${log.employeeId || 'N/A'} đã cập nhật ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :-->
-<!--                    `Nhân viên ID ${log.employeeId || 'N/A'} đã xóa ${log.entityName || 'N/A'} tên ${log.oldValue || 'N/A'}`}-->
-<!--        </p>-->
-<!--        <p class="text-sm text-gray-500">-->
-<!--            ${log.action === 'INSERT' ? 'Thêm mới thành công!' :-->
-<!--                log.action === 'UPDATE' ? 'Cập nhật thành công!' :-->
-<!--                    'Xóa thành công!'}-->
-<!--        </p>-->
-<!--    </div>-->
-<!--</div>-->
-<!--`;-->
-<!--        }).join('');-->
-<!--    }-->
-
-<!--    // Function to fetch dashboard data-->
-<!--    let previousData = {-->
-<!--        revenue: 0,-->
-<!--        products: 0,-->
-<!--        suppliers: 0,-->
-<!--        employees: 0,-->
-<!--        customers: 0-->
-<!--    };-->
-
-<!--    async function fetchDashboardData() {-->
-<!--        try {-->
-<!--            const [-->
-<!--                revenueRes,-->
-<!--                productsRes,-->
-<!--                suppliersRes,-->
-<!--                employeesRes,-->
-<!--                customersRes,-->
-<!--                changeLogsRes,-->
-<!--                revenueTimeRes,-->
-<!--                productsTimeRes,-->
-<!--                suppliersTimeRes,-->
-<!--                employeesTimeRes,-->
-<!--                customersTimeRes-->
-<!--            ] = await Promise.all([-->
-<!--                fetch('/api/changelogs/count/all/total-revenue').catch(() => null),-->
-<!--                fetch('/api/changelogs/count/all/products').catch(() => null),-->
-<!--                fetch('/api/changelogs/count/all/suppliers').catch(() => null),-->
-<!--                fetch('/api/changelogs/count/all/employees').catch(() => null),-->
-<!--                fetch('/api/changelogs/count/all/customers').catch(() => null),-->
-<!--                fetch('/api/changelogs/notification').catch(() => null),-->
-<!--                fetch('/api/changelogs/lastUpdate/time/total-revenue').catch(() => null),-->
-<!--                fetch('/api/changelogs/lastUpdate/time/products').catch(() => null),-->
-<!--                fetch('/api/changelogs/lastUpdate/time/suppliers').catch(() => null),-->
-<!--                fetch('/api/changelogs/lastUpdate/time/employees').catch(() => null),-->
-<!--                fetch('/api/changelogs/lastUpdate/time/customers').catch(() => null)-->
-<!--            ]);-->
-
-<!--            const revenue = (await revenueRes?.json()) ?? 0;-->
-<!--            const products = (await productsRes?.json()) ?? 0;-->
-<!--            const suppliers = (await suppliersRes?.json()) ?? 0;-->
-<!--            const employees = (await employeesRes?.json()) ?? 0;-->
-<!--            const customers = (await customersRes?.json()) ?? 0;-->
-<!--            const changeLogs = (await changeLogsRes?.json()) ?? [];-->
-<!--            const revenueTime = (await revenueTimeRes?.json()) ?? null;-->
-<!--            const productsTime = (await productsTimeRes?.json()) ?? null;-->
-<!--            const suppliersTime = (await suppliersTimeRes?.json()) ?? null;-->
-<!--            const employeesTime = (await employeesTimeRes?.json()) ?? null;-->
-<!--            const customersTime = (await customersTimeRes?.json()) ?? null;-->
-
-<!--            const revenueDateTime = formatDateTimeFromLocal(revenueTime);-->
-<!--            const productsDateTime = formatDateTimeFromLocal(productsTime);-->
-<!--            const suppliersDateTime = formatDateTimeFromLocal(suppliersTime);-->
-<!--            const employeesDateTime = formatDateTimeFromLocal(employeesTime);-->
-<!--            const customersDateTime = formatDateTimeFromLocal(customersTime);-->
-
-<!--            document.getElementById('total-revenue').textContent = formatCurrency(revenue);-->
-<!--            document.getElementById('revenue-change').textContent = formatCurrency(revenue - previousData.revenue);-->
-<!--            document.getElementById('revenue-update-time').textContent = revenueDateTime.time;-->
-<!--            document.getElementById('revenue-update-date').textContent = revenueDateTime.date;-->
-
-<!--            document.getElementById('total-products').textContent = products;-->
-<!--            document.getElementById('products-change').textContent = (products - previousData.products).toString();-->
-<!--            document.getElementById('products-update-time').textContent = productsDateTime.time;-->
-<!--            document.getElementById('products-update-date').textContent = productsDateTime.date;-->
-
-<!--            document.getElementById('total-suppliers').textContent = suppliers;-->
-<!--            document.getElementById('suppliers-change').textContent = (suppliers - previousData.suppliers).toString();-->
-<!--            document.getElementById('suppliers-update-time').textContent = suppliersDateTime.time;-->
-<!--            document.getElementById('suppliers-update-date').textContent = suppliersDateTime.date;-->
-
-<!--            document.getElementById('total-employees').textContent = employees;-->
-<!--            document.getElementById('employees-change').textContent = (employees - previousData.employees).toString();-->
-<!--            document.getElementById('employees-update-time').textContent = employeesDateTime.time;-->
-<!--            document.getElementById('employees-update-date').textContent = employeesDateTime.date;-->
-
-<!--            document.getElementById('total-customers').textContent = customers;-->
-<!--            document.getElementById('customers-change').textContent = (customers - previousData.customers).toString();-->
-<!--            document.getElementById('customers-update-time').textContent = customersDateTime.time;-->
-<!--            document.getElementById('customers-update-date').textContent = customersDateTime.date;-->
-
-<!--            previousData = {revenue, products, suppliers, employees, customers};-->
-
-<!--            renderChangeLogs(changeLogs);-->
-
-<!--            updateChartData('revenue', revenue);-->
-<!--        } catch (error) {-->
-<!--            console.error('Error fetching dashboard data:', error);-->
-<!--            document.getElementById('changeLogsContainer').innerHTML = `-->
-<!--<div class="update-item">-->
-<!--    <div class="content">-->
-<!--        <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>-->
-<!--    </div>-->
-<!--</div>-->
-<!--`;-->
-<!--        }-->
-<!--    }-->
-
-<!--    // Chart setup-->
-<!--    let salesChart;-->
-<!--    const chartData = {-->
-<!--        revenue: {labels: [], data: [], label: 'Doanh Thu'},-->
-<!--        products: {labels: [], data: [], label: 'Sản Phẩm'},-->
-<!--        suppliers: {labels: [], data: [], label: 'Nhà Cung Cấp'},-->
-<!--        employees: {labels: [], data: [], label: 'Nhân Viên'},-->
-<!--        customers: {labels: [], data: [], label: 'Khách Hàng'}-->
-<!--    };-->
-
-<!--    function initializeChart() {-->
-<!--        const ctx = document.getElementById('salesChart').getContext('2d');-->
-<!--        salesChart = new Chart(ctx, {-->
-<!--            type: 'line',-->
-<!--            data: {-->
-<!--                labels: chartData.revenue.labels,-->
-<!--                datasets: [{-->
-<!--                    label: chartData.revenue.label,-->
-<!--                    data: chartData.revenue.data,-->
-<!--                    borderColor: '#ff8a65',-->
-<!--                    backgroundColor: '#ff8a65',-->
-<!--                    fill: false,-->
-<!--                    tension: 0.4,-->
-<!--                    pointBackgroundColor: '#ff8a65',-->
-<!--                    pointBorderColor: '#fff',-->
-<!--                    pointRadius: 5,-->
-<!--                    pointHoverRadius: 7-->
-<!--                }]-->
-<!--            },-->
-<!--            options: {-->
-<!--                scales: {-->
-<!--                    y: {beginAtZero: true, ticks: {stepSize: 5000000}},-->
-<!--                    x: {grid: {display: false}}-->
-<!--                },-->
-<!--                plugins: {-->
-<!--                    legend: {-->
-<!--                        display: true,-->
-<!--                        position: 'top',-->
-<!--                        labels: {boxWidth: 0, font: {size: 12}}-->
-<!--                    }-->
-<!--                },-->
-<!--                responsive: true,-->
-<!--                maintainAspectRatio: false-->
-<!--            }-->
-<!--        });-->
-<!--    }-->
-
-<!--    function updateChartData(type, newData) {-->
-<!--        const data = chartData[type];-->
-<!--        const now = new Date();-->
-<!--        const label = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});-->
-
-<!--        data.labels.push(label);-->
-<!--        data.data.push(type === 'revenue' ? (newData || 0) : parseInt(newData || 0, 10));-->
-
-<!--        if (data.labels.length > 10) {-->
-<!--            data.labels.shift();-->
-<!--            data.data.shift();-->
-<!--        }-->
-
-<!--        salesChart.data.labels = data.labels;-->
-<!--        salesChart.data.datasets[0].label = data.label;-->
-<!--        salesChart.data.datasets[0].data = data.data;-->
-<!--        salesChart.update();-->
-
-<!--        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;-->
-<!--    }-->
-
-<!--    function updateChart(type) {-->
-<!--        const data = chartData[type];-->
-<!--        salesChart.data.labels = data.labels;-->
-<!--        salesChart.data.datasets[0].label = data.label;-->
-<!--        salesChart.data.datasets[0].data = data.data;-->
-<!--        salesChart.update();-->
-<!--        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;-->
-<!--    }-->
-
-<!--    function zoomChart(direction) {-->
-<!--        const yAxis = salesChart.options.scales.y;-->
-<!--        if (direction === 'in') {-->
-<!--            yAxis.ticks.stepSize /= 2;-->
-<!--        } else {-->
-<!--            yAxis.ticks.stepSize *= 2;-->
-<!--        }-->
-<!--        salesChart.update();-->
-<!--    }-->
-
-<!--    function resetChart() {-->
-<!--        salesChart.options.scales.y.ticks.stepSize = 5000000;-->
-<!--        salesChart.update();-->
-<!--    }-->
-
-<!--    function toggleExpand(section) {-->
-<!--        const salesAnalytics = document.querySelector('.dash-sales-analytics');-->
-<!--        const updatesProfile = document.querySelector('.dash-updates-profile');-->
-<!--        const salesExpandBtn = salesAnalytics.querySelector('.dash-expand-btn i');-->
-<!--        const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');-->
-
-<!--        if (section === 'sales') {-->
-<!--            if (salesAnalytics.classList.contains('expanded')) {-->
-<!--                salesAnalytics.classList.remove('expanded');-->
-<!--                updatesProfile.classList.remove('hidden');-->
-<!--                salesExpandBtn.classList.remove('fa-compress');-->
-<!--                salesExpandBtn.classList.add('fa-expand');-->
-<!--            } else {-->
-<!--                salesAnalytics.classList.add('expanded');-->
-<!--                updatesProfile.classList.add('hidden');-->
-<!--                salesExpandBtn.classList.remove('fa-expand');-->
-<!--                salesExpandBtn.classList.add('fa-compress');-->
-<!--                setTimeout(() => salesChart.resize(), 300);-->
-<!--            }-->
-<!--        } else if (section === 'updates') {-->
-<!--            if (updatesProfile.classList.contains('expanded')) {-->
-<!--                updatesProfile.classList.remove('expanded');-->
-<!--                salesAnalytics.classList.remove('hidden');-->
-<!--                updatesExpandBtn.classList.remove('fa-compress');-->
-<!--                updatesExpandBtn.classList.add('fa-expand');-->
-<!--            } else {-->
-<!--                updatesProfile.classList.add('expanded');-->
-<!--                salesAnalytics.classList.add('hidden');-->
-<!--                updatesExpandBtn.classList.remove('fa-expand');-->
-<!--                updatesExpandBtn.classList.add('fa-compress');-->
-<!--            }-->
-<!--        }-->
-<!--    }-->
-
-<!--    // Initialize chart and fetch data-->
-<!--    initializeChart();-->
-<!--    fetchDashboardData();-->
-<!--    setInterval(fetchDashboardData, 3000);-->
-
-<!--    // Resize chart on window resize-->
-<!--    window.addEventListener('resize', () => salesChart.resize());-->
-<!--</script>-->
-<!--</body>-->
-<!--</html>-->
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -945,6 +228,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
+
 <script>
     // Function to format relative time
     function formatRelativeTime(timestamp) {
@@ -991,46 +275,102 @@
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value || 0);
     }
 
+
+    async function getEmployeeNameById(employeeId) {
+        if (!employeeId) return 'N/A';
+        const url = `http://localhost:8080/api/changelogs/employee/${employeeId}/name`; // Use absolute URL for testing
+        console.log("Fetching URL:", url);
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                console.log("lỗi 1");
+                console.log("Status:", response.status);
+                console.log("Response:", await response.text());
+                console.log("employeeId:", employeeId);
+                return 'không xác định';
+            }
+            const data = await response.json();
+            return data.name || 'không xác định';
+        } catch (error) {
+            console.error(`Error fetching employee name for ID ${employeeId}:`, error);
+            console.log("lỗi 2");
+            return 'không xác định';
+        }
+    }
+    // Lưu cache tên nhân viên để tránh gọi API nhiều lần cho cùng một ID
+    const employeeNameCache = {};
+
     // Function to render change logs
-    function renderChangeLogs(logs) {
+    async function renderChangeLogs(logs) {
         const container = document.getElementById('changeLogsContainer');
         if (!logs || !Array.isArray(logs) || logs.length === 0) {
             container.innerHTML = `
-                    <div class="update-item">
-                        <div class="content">
-                            <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
-                        </div>
-                    </div>
-                `;
+            <div class="update-item">
+                <div class="content">
+                    <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
+                </div>
+            </div>
+        `;
             return;
         }
 
-        container.innerHTML = logs.map(log => {
+        // Hiển thị loading indicator
+        container.innerHTML = `
+        <div class="update-item">
+            <div class="content">
+                <p class="text-sm text-gray-500">Đang tải...</p>
+            </div>
+        </div>
+    `;
+
+        // Xử lý và tạo danh sách các promise lấy tên nhân viên
+        const employeeNamePromises = logs.map(async (log) => {
+            if (!log || !log.employeeId) return 'không xác định';
+
+            // Kiểm tra cache trước
+            if (employeeNameCache[log.employeeId]) {
+                return employeeNameCache[log.employeeId];
+            }
+
+            // Nếu không có trong cache, gọi API
+            const name = await getEmployeeNameById(log.employeeId);
+            employeeNameCache[log.employeeId] = name;
+            return name;
+        });
+
+        // Chờ tất cả các lời gọi API hoàn thành
+        const employeeNames = await Promise.all(employeeNamePromises);
+
+        // Tạo HTML cho từng mục log
+        container.innerHTML = logs.map((log, index) => {
             if (!log || !log.timestamp || !log.action) {
                 return '';
             }
+
+            const employeeName = employeeNames[index];
+
             return `
-                    <div class="update-item mb-4">
-                        <div class="flex items-center">
-                            <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>
-                            <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'} p-2 rounded-full">
-                                <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white"></i>
-                            </div>
-                        </div>
-                        <div class="content mt-2">
-                            <p class="font-semibold text-sm">
-                                ${log.action === 'INSERT' ? `Nhân viên ID ${log.employeeId || 'N/A'} đã thêm ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :
-                log.action === 'UPDATE' ? `Nhân viên ID ${log.employeeId || 'N/A'} đã cập nhật ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :
-                    `Nhân viên ID ${log.employeeId || 'N/A'} đã xóa ${log.entityName || 'N/A'} tên ${log.oldValue || 'N/A'}`}
-                            </p>
-                            <p class="text-sm text-gray-500">
-                                ${log.action === 'INSERT' ? 'Thêm mới thành công!' :
+            <div class="update-item mb-4">
+                <div class="flex items-center">
+                    <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>
+                    <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'} p-2 rounded-full">
+                        <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white"></i>
+                    </div>
+                </div>
+                <div class="content mt-2">
+                    <p class="font-semibold text-sm">
+                        ${log.action === 'INSERT' ? `Nhân viên <strong>${employeeName}</strong> đã thêm ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :
+                log.action === 'UPDATE' ? `Nhân viên <strong>${employeeName}</strong> đã cập nhật ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :
+                    `Nhân viên <strong>${employeeName}</strong> đã xóa ${log.entityName || 'N/A'} tên ${log.oldValue || 'N/A'}`}
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        ${log.action === 'INSERT' ? 'Thêm mới thành công!' :
                 log.action === 'UPDATE' ? 'Cập nhật thành công!' :
                     'Xóa thành công!'}
-                            </p>
-                        </div>
-                    </div>
-                `;
+                    </p>
+                </div>
+            </div>
+        `;
         }).join('');
     }
 
@@ -1140,7 +480,7 @@
 
             previousData = { revenue, products, suppliers, employees, customers };
 
-            renderChangeLogs(changeLogs);
+            await renderChangeLogs(changeLogs);  // Đã chuyển thành async
 
             updateChartData('revenue', revenue);
         } catch (error) {
