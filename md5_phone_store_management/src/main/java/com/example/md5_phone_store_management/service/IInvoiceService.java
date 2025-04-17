@@ -2,6 +2,7 @@ package com.example.md5_phone_store_management.service;
 
 import java.util.List;
 
+import com.example.md5_phone_store_management.model.PaymentMethod;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -61,5 +62,7 @@ public interface IInvoiceService {
     
     // Phương thức cho biểu đồ theo năm
     List<Object[]> getYearlyInvoiceStats();
-
+    // filter
+    List<Object[]> filterReport(String groupBy, Integer month, Integer year, PaymentMethod paymentMethod,
+                                String productName, String employeeName);
 }

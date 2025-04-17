@@ -3,6 +3,7 @@ package com.example.md5_phone_store_management.service.implement;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.md5_phone_store_management.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -12,10 +13,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.model.InvoiceDetail;
-import com.example.md5_phone_store_management.model.InvoiceStatus;
 import com.example.md5_phone_store_management.repository.InvoiceRepository;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
@@ -25,7 +22,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
 
     @Autowired
     private InvoiceRepository invoiceRepository;
-    
+
     @Autowired
     private IEmployeeService employeeService;
 
@@ -56,12 +53,12 @@ public class InvoiceServiceImpl implements IInvoiceService {
                     }
                 });
             }
-            
+
             // Đảm bảo invoice có thời gian tạo
             if (invoice.getCreatedAt() == null) {
                 invoice.setCreatedAt(LocalDateTime.now());
             }
-            
+
             // Đảm bảo invoice có trạng thái
             if (invoice.getStatus() == null) {
                 invoice.setStatus(InvoiceStatus.PROCESSING);
@@ -95,7 +92,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
         if (invoice.getAmount() == null) {
             System.err.println("Warning: Invoice amount is null");
         }
-        
+
         if (invoice.getPaymentMethod() == null) {
             System.err.println("Warning: Payment method is null");
         }
@@ -113,7 +110,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
             return null;
         }
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<Invoice> findAll() {
@@ -125,7 +122,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
             return null;
         }
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Page<Invoice> findAll(Pageable pageable) {
@@ -137,7 +134,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
             return null;
         }
     }
-    
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     public void deleteInvoice(Long id) {
@@ -318,4 +315,20 @@ public class InvoiceServiceImpl implements IInvoiceService {
         }
     }
 
+    @Override
+    public List<Object[]> filterReport(String groupBy, Integer month, Integer year, PaymentMethod paymentMethod, String productName, String employeeName) {
+        switch (groupBy.toLowerCase()) {
+            case "day":
+                return invoiceRepository.getDailyRevenueReport(month,year,paymentMethod, employeeName, productName);
+            case "month":
+                return invoiceRepository.getMonthlyRevenueReport(year,paymentMethod, employeeName, productName);
+            case "year":
+                return invoiceRepository.getYearlyRevenueReport(paymentMethod, employeeName, productName);
+            default:
+                LocalDateTime today = LocalDateTime.now();
+                month=today.getMonthValue();
+                year=today.getYear();
+                return invoiceRepository.getDailyRevenueReport(month,year,paymentMethod, employeeName, productName);
+        }
+    }
 }
