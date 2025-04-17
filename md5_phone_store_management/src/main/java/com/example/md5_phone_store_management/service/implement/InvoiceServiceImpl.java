@@ -1,10 +1,7 @@
 package com.example.md5_phone_store_management.service.implement;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -258,36 +255,67 @@ public class InvoiceServiceImpl implements IInvoiceService {
         }
     }
 
+    // Triển khai các phương thức biểu đồ theo ngày
     @Override
-    public int getTotalInvoicesYear(int year) {
-        return invoiceRepository.getTotalInvoicesYear(year);
+    @Transactional(readOnly = true)
+    public List<Object[]> getDailyInvoiceStats() {
+        try {
+            return invoiceRepository.getDailyInvoiceStats();
+        } catch (Exception e) {
+            System.err.println("Error getting daily invoice stats: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
-    public Long getTotalMoneyInvoicesYear(int year) {
-        return invoiceRepository.getTotalMoneyInvoicesYear(year);
+    @Transactional(readOnly = true)
+    public List<Object[]> getDailyInvoiceStatsByMonthAndYear(int month, int year) {
+        try {
+            return invoiceRepository.getDailyInvoiceStatsByMonthAndYear(month, year);
+        } catch (Exception e) {
+            System.err.println("Error getting daily invoice stats by month and year: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
-    // biểu đồ theo tháng (Đình Anh)
+
+    // Triển khai các phương thức biểu đồ theo tháng
     @Override
-    public List<Object[]> getMonthlyRevenueByYear(int year){
-        List<Object[]> result = invoiceRepository.getMonthlyReceiptsByYear(year);
-        Map<Integer, Long> revenueMap = new HashMap<>();
-        for (int month = 1; month <= 12; month++) {
-            revenueMap.put(month, 0L);
+    @Transactional(readOnly = true)
+    public List<Object[]> getMonthlyInvoiceStats() {
+        try {
+            return invoiceRepository.getMonthlyInvoiceStats();
+        } catch (Exception e) {
+            System.err.println("Error getting monthly invoice stats: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-        for (Object[] row : result) {
-            Integer month = (Integer) row[0];
-            Long revenue = (Long) row[1];
-            revenueMap.put(month, revenue);
-        }
-        List<Object[]> monthlyRevenueList = new ArrayList<>();
-        for (Map.Entry<Integer, Long> entry : revenueMap.entrySet()) {
-            monthlyRevenueList.add(new Object[]{entry.getKey(), entry.getValue()});
-        }
-        return monthlyRevenueList;
     }
+
     @Override
-    public  List<Object[]> findAllSuccessInvoices(){
-        return invoiceRepository.getDailyRevenue();
+    @Transactional(readOnly = true)
+    public List<Object[]> getMonthlyInvoiceStatsByYear(int year) {
+        try {
+            return invoiceRepository.getMonthlyInvoiceStatsByYear(year);
+        } catch (Exception e) {
+            System.err.println("Error getting monthly invoice stats by year: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
+
+    // Triển khai phương thức biểu đồ theo năm
+    @Override
+    @Transactional(readOnly = true)
+    public List<Object[]> getYearlyInvoiceStats() {
+        try {
+            return invoiceRepository.getYearlyInvoiceStats();
+        } catch (Exception e) {
+            System.err.println("Error getting yearly invoice stats: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

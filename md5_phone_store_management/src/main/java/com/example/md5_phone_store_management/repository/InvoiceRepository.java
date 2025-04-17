@@ -1,21 +1,15 @@
 package com.example.md5_phone_store_management.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Employee;
 import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.model.InvoiceStatus;
-import com.example.md5_phone_store_management.model.PaymentMethod;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
@@ -62,76 +56,45 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     // Tìm tất cả hóa đơn của một khách hàng theo ID với phân trang
     Page<Invoice> findByCustomer_CustomerID(Integer customerID, Pageable pageable);
-    
-    // Tìm tất cả hóa đơn theo trạng thái
-    List<Invoice> findByStatus(InvoiceStatus status);
-    
-    // Tìm tất cả hóa đơn theo trạng thái với phân trang
-    Page<Invoice> findByStatus(InvoiceStatus status, Pageable pageable);
-    
-    // Tìm tất cả hóa đơn theo phương thức thanh toán
-    List<Invoice> findByPaymentMethod(PaymentMethod paymentMethod);
-    
-    // Tìm tất cả hóa đơn theo phương thức thanh toán với phân trang
-    Page<Invoice> findByPaymentMethod(PaymentMethod paymentMethod, Pageable pageable);
-    
-    // Tìm tất cả hóa đơn theo nhân viên thực hiện
-    List<Invoice> findByEmployee(Employee employee);
-    
-    // Tìm tất cả hóa đơn theo nhân viên thực hiện với phân trang
-    Page<Invoice> findByEmployee(Employee employee, Pageable pageable);
-    
-    // Tìm tất cả hóa đơn theo nhân viên thực hiện theo ID
-    List<Invoice> findByEmployee_EmployeeID(Integer employeeID);
-    
-    // Tìm tất cả hóa đơn theo nhân viên thực hiện theo ID với phân trang
-    Page<Invoice> findByEmployee_EmployeeID(Integer employeeID, Pageable pageable);
-    
-    // Tìm hóa đơn theo khoảng thời gian
-    List<Invoice> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
-    
-    // Tìm hóa đơn theo khoảng thời gian với phân trang
-    Page<Invoice> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
-    
-    // Tìm hóa đơn theo trạng thái và phương thức thanh toán
-    List<Invoice> findByStatusAndPaymentMethod(InvoiceStatus status, PaymentMethod paymentMethod);
-    
-    // Tìm hóa đơn theo trạng thái và phương thức thanh toán với phân trang
-    Page<Invoice> findByStatusAndPaymentMethod(InvoiceStatus status, PaymentMethod paymentMethod, Pageable pageable);
-    
-    // Đếm số hóa đơn theo trạng thái
-    Long countByStatus(InvoiceStatus status);
-    
-    // Đếm số hóa đơn theo phương thức thanh toán
-    Long countByPaymentMethod(PaymentMethod paymentMethod);
-    
-    // Tính tổng doanh thu của tất cả hóa đơn thành công
-    @Query("SELECT SUM(i.amount) FROM Invoice i WHERE i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS")
-    Long getTotalRevenue();
-    
-    // Tính tổng doanh thu theo khoảng thời gian
-    @Query("SELECT SUM(i.amount) FROM Invoice i WHERE i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS AND i.createdAt BETWEEN ?1 AND ?2")
-    Long getTotalRevenueBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    // Tính tổng số đơn hàng theo năm
-    @Query("SELECT count(i) FROM Invoice i WHERE FUNCTION('YEAR', i.createdAt) = :year")
-    int getTotalInvoicesYear(@Param("year") int year);
+    // Truy vấn cho biểu đồ theo ngày (trong tháng hiện tại)
+    @Query(value = "SELECT DAY(created_at) as day, COUNT(id) as invoice_count, SUM(amount) as total_amount " +
+           "FROM invoices " +
+           "WHERE status = 'SUCCESS' AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) " +
+           "GROUP BY DAY(created_at) " +
+           "ORDER BY day", nativeQuery = true)
+    List<Object[]> getDailyInvoiceStats();
 
-    // Tính tổng số tiền mua bán theo năm
-    @Query("select sum(i.amount) from Invoice i where FUNCTION('YEAR',i.createdAt) = :year")
-    Long getTotalMoneyInvoicesYear(@Param("year") int year);
-    // biểu đồ theo tháng (Đình Anh)
-    @Query("SELECT MONTH(i.createdAt), SUM(i.amount) " +
-            "FROM Invoice i " +
-            "WHERE i.status = 'SUCCESS' AND YEAR(i.createdAt) = :year " +
-            "GROUP BY MONTH(i.createdAt) ORDER BY MONTH(i.createdAt)")
-    List<Object[]> getMonthlyReceiptsByYear(@Param("year") int year);
-    @Query(value = """
-    SELECT DATE(i.created_at) AS date, SUM(i.amount) AS total_amount
-    FROM invoices i
-    WHERE i.status = 'SUCCESS'
-    GROUP BY DATE(i.created_at)
-    ORDER BY DATE(i.created_at)
-""", nativeQuery = true)
-    List<Object[]> getDailyRevenue();
+    // Truy vấn cho biểu đồ theo ngày trong khoảng thời gian
+    @Query(value = "SELECT DAY(created_at) as day, COUNT(id) as invoice_count, SUM(amount) as total_amount " +
+           "FROM invoices " +
+           "WHERE status = 'SUCCESS' AND MONTH(created_at) = ?1 AND YEAR(created_at) = ?2 " +
+           "GROUP BY DAY(created_at) " +
+           "ORDER BY day", nativeQuery = true)
+    List<Object[]> getDailyInvoiceStatsByMonthAndYear(int month, int year);
+
+    // Truy vấn cho biểu đồ theo tháng (trong năm hiện tại)
+    @Query(value = "SELECT MONTH(created_at) as month, COUNT(id) as invoice_count, SUM(amount) as total_amount " +
+           "FROM invoices " +
+           "WHERE status = 'SUCCESS' AND YEAR(created_at) = YEAR(CURRENT_DATE()) " +
+           "GROUP BY MONTH(created_at) " +
+           "ORDER BY month", nativeQuery = true)
+    List<Object[]> getMonthlyInvoiceStats();
+
+    // Truy vấn cho biểu đồ theo tháng trong một năm cụ thể
+    @Query(value = "SELECT MONTH(created_at) as month, COUNT(id) as invoice_count, SUM(amount) as total_amount " +
+           "FROM invoices " +
+           "WHERE status = 'SUCCESS' AND YEAR(created_at) = ?1 " +
+           "GROUP BY MONTH(created_at) " +
+           "ORDER BY month", nativeQuery = true)
+    List<Object[]> getMonthlyInvoiceStatsByYear(int year);
+
+    // Truy vấn cho biểu đồ theo năm
+    @Query(value = "SELECT YEAR(created_at) as year, COUNT(id) as invoice_count, SUM(amount) as total_amount " +
+           "FROM invoices " +
+           "WHERE status = 'SUCCESS' " +
+           "GROUP BY YEAR(created_at) " +
+           "ORDER BY year", nativeQuery = true)
+    List<Object[]> getYearlyInvoiceStats();
+
 }
