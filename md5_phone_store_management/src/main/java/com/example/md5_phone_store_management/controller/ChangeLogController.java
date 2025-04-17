@@ -2,13 +2,9 @@ package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.repository.InvoiceDetailRepository;
-import com.example.md5_phone_store_management.service.ICustomerService;
-import com.example.md5_phone_store_management.service.IEmployeeService;
-import com.example.md5_phone_store_management.service.IProductService;
-import com.example.md5_phone_store_management.service.ISupplierService;
-import com.example.md5_phone_store_management.service.implement.ChangeLogService;
-import com.example.md5_phone_store_management.service.implement.InvoiceDetailService;
-import com.example.md5_phone_store_management.service.implement.InvoiceServiceImpl;
+import com.example.md5_phone_store_management.service.*;
+import com.example.md5_phone_store_management.service.implement.*;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +41,44 @@ public class ChangeLogController {
     @Autowired
     private ChangeLogService changeLogService;
 
+    @Autowired
+    private IInvoiceService iInvoiceService;
+
+    @Autowired
+    private ProductService productService;
+
+
+
+
+
+    @GetMapping("/business-home-info")
+    public Map<String, Object> getManagementData() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("countAllProducts", productService.countProducts());
+        response.put("countProductsHaveRetailPrice", productService.countProductsHaveRetailPrice());
+        response.put("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
+        response.put("maleCustomers", iCustomerService.countMaleCustomers() != null ? iCustomerService.countMaleCustomers() : 0);
+        response.put("femaleCustomers", iCustomerService.countFemaleCustomers() != null ? iCustomerService.countFemaleCustomers() : 0);
+        response.put("countAllSuccessInvoices", iInvoiceService.countAllSuccessInvoices());
+        response.put("countTodaySuccessInvoices", iInvoiceService.countTodaySuccessInvoices());
+        response.put("countThisMonthSuccessInvoices", iInvoiceService.countThisMonthSuccessInvoices());
+        return response;
+    }
+
+
+    @GetMapping("/report-home-info")
+    public Map<String, Object> getReportHome() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("countAllSuccessInvoices", iInvoiceService.countAllSuccessInvoices());
+        response.put("totalInvoiceRevenue", iInvoiceService.totalRevenue());
+        response.put("countTodaySuccessInvoices", iInvoiceService.countTodaySuccessInvoices());
+        response.put("countThisMonthSuccessInvoices", iInvoiceService.countThisMonthSuccessInvoices());
+        response.put("totalTodayInvoiceRevenue", iInvoiceService.totalTodayInvoiceRevenue());
+        response.put("totalThisMonthInvoiceRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
+        response.put("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
+        response.put("totalNewCustomers", iCustomerService.countNewCustomers() != null ? iCustomerService.countNewCustomers() : 0);
+        return response;
+    }
 
     @GetMapping("/employee/{employeeId}/name")
     public ResponseEntity<Map<String, String>> getEmployeeName(@PathVariable Long employeeId) {

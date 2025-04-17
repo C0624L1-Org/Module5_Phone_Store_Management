@@ -57,14 +57,16 @@ public class ReportController {
 
     @GetMapping("/report-home")
     public String showReportHome(Model model) {
-        model.addAttribute("countAllSuccessInvoices", iInvoiceService.countAllSuccessInvoices());
-        model.addAttribute("totalInvoiceRevenue", iInvoiceService.totalRevenue());
-        model.addAttribute("countTodaySuccessInvoices", iInvoiceService.countTodaySuccessInvoices());
-        model.addAttribute("countThisMonthSuccessInvoices", iInvoiceService.countThisMonthSuccessInvoices());
-        model.addAttribute("totalTodayInvoiceRevenue", iInvoiceService.totalTodayInvoiceRevenue());
-        model.addAttribute("totalThisMonthInvoiceRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
-        model.addAttribute("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
-        model.addAttribute("totalNewCustomers", iCustomerService.countNewCustomers() != null ? iCustomerService.countNewCustomers() : 0);
+//        model.addAttribute("countAllSuccessInvoices", iInvoiceService.countAllSuccessInvoices());
+//        model.addAttribute("totalInvoiceRevenue", iInvoiceService.totalRevenue());
+//        model.addAttribute("countTodaySuccessInvoices", iInvoiceService.countTodaySuccessInvoices());
+//        model.addAttribute("countThisMonthSuccessInvoices", iInvoiceService.countThisMonthSuccessInvoices());
+//        model.addAttribute("totalTodayInvoiceRevenue", iInvoiceService.totalTodayInvoiceRevenue());
+//        model.addAttribute("totalThisMonthInvoiceRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
+//        model.addAttribute("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
+//        model.addAttribute("totalNewCustomers", iCustomerService.countNewCustomers() != null ? iCustomerService.countNewCustomers() : 0);
+
+
         return "dashboard/report-management/report-home";
     }
 

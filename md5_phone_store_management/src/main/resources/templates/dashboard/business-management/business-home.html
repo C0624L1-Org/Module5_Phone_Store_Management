@@ -1,747 +1,5 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Quản lý kinh doanh</title>-->
-<!--    &lt;!&ndash; Bootstrap CSS &ndash;&gt;-->
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
-<!--    &lt;!&ndash; Font Awesome &ndash;&gt;-->
-<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">-->
-<!--    &lt;!&ndash; Google Fonts &ndash;&gt;-->
-<!--    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">-->
-<!--    &lt;!&ndash; Custom CSS &ndash;&gt;-->
-<!--    <link rel="stylesheet" href="/css/fragments/navbar.css">-->
-<!--    <link rel="stylesheet" href="/css/fragments/sidebar.css">-->
-<!--    <link rel="stylesheet" href="/css/fragments/footer.css">-->
-<!--    <link rel="stylesheet" href="/css/common/toast.css">-->
-<!--    <link rel="stylesheet" href="/css/common/layout.css">-->
-<!--    <style>-->
-<!--        body {-->
-<!--            font-family: 'Poppins', sans-serif;-->
-<!--            background: linear-gradient(135deg, #f0f2f5 0%, #e9ecef 100%);-->
-<!--        }-->
-
-<!--        .content-wrapper {-->
-<!--            display: flex;-->
-<!--            min-height: calc(100vh - 70px);-->
-<!--        }-->
-
-<!--        .dashboard-container {-->
-<!--            display: flex;-->
-<!--            width: 100%;-->
-<!--        }-->
-
-<!--        .content-container {-->
-<!--            flex-grow: 1;-->
-<!--            padding: 0;-->
-<!--        }-->
-
-<!--        .management-section {-->
-<!--            background: #ffffff;-->
-<!--            border-radius: 12px;-->
-<!--            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);-->
-<!--            padding: 2.5rem;-->
-<!--            margin: 2rem 1rem;-->
-<!--            width: calc(100% - 2rem);-->
-<!--            transition: transform 0.3s ease;-->
-<!--        }-->
-
-<!--        .management-section:hover {-->
-<!--            transform: translateY(-5px);-->
-<!--        }-->
-
-<!--        .section-title {-->
-<!--            font-size: 1.8rem;-->
-<!--            font-weight: 600;-->
-<!--            color: #1a1a1a;-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--            margin-bottom: 2rem;-->
-<!--        }-->
-
-<!--        .section-title i {-->
-<!--            color: #007bff;-->
-<!--            margin-right: 0.75rem;-->
-<!--        }-->
-
-<!--        .btn-custom {-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--            justify-content: center;-->
-<!--            width: 100%;-->
-<!--            padding: 1rem;-->
-<!--            border-radius: 12px;-->
-<!--            font-weight: 500;-->
-<!--            color: white;-->
-<!--            text-decoration: none;-->
-<!--            transition: all 0.3s ease;-->
-<!--            margin-bottom: 1.5rem;-->
-<!--            position: relative;-->
-<!--            overflow: hidden;-->
-<!--        }-->
-
-<!--        .btn-custom i {-->
-<!--            margin-right: 0.75rem;-->
-<!--            font-size: 1.2rem;-->
-<!--        }-->
-
-<!--        .btn-custom:hover {-->
-<!--            transform: translateY(-3px);-->
-<!--            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);-->
-<!--            color: white;-->
-<!--        }-->
-
-<!--        .btn-blue {-->
-<!--            background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);-->
-<!--        }-->
-
-<!--        .btn-green {-->
-<!--            background: linear-gradient(135deg, #28a745 0%, #34c759 100%);-->
-<!--        }-->
-
-<!--        .btn-orange {-->
-<!--            background: linear-gradient(135deg, #fd7e14 0%, #ff9f43 100%);-->
-<!--        }-->
-
-<!--        .btn-custom::before {-->
-<!--            content: '';-->
-<!--            position: absolute;-->
-<!--            top: 0;-->
-<!--            left: -100%;-->
-<!--            width: 100%;-->
-<!--            height: 100%;-->
-<!--            background: rgba(255, 255, 255, 0.2);-->
-<!--            transition: all 0.4s;-->
-<!--        }-->
-
-<!--        .btn-custom:hover::before {-->
-<!--            left: 100%;-->
-<!--        }-->
-
-<!--        .card-grid {-->
-<!--            display: grid;-->
-<!--            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));-->
-<!--            gap: 1.5rem;-->
-<!--        }-->
-
-<!--        .stat-card-grid {-->
-<!--            display: grid;-->
-<!--            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));-->
-<!--            gap: 1.5rem;-->
-<!--            margin-bottom: 2rem;-->
-<!--        }-->
-
-<!--        .split-card {-->
-<!--            position: relative;-->
-<!--            background: #ffffff;-->
-<!--            border-radius: 12px;-->
-<!--            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);-->
-<!--            overflow: hidden;-->
-<!--            height: 180px;-->
-<!--            transition: transform 0.3s ease;-->
-<!--        }-->
-
-<!--        .split-card:hover {-->
-<!--            transform: translateY(-5px);-->
-<!--        }-->
-
-<!--        .split-card .left-side,-->
-<!--        .split-card .right-side {-->
-<!--            position: absolute;-->
-<!--            width: 100%;-->
-<!--            height: 100%;-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            justify-content: center;-->
-<!--            align-items: center;-->
-<!--            color: white;-->
-<!--            will-change: clip-path;-->
-<!--            transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1);-->
-<!--            z-index: 1;-->
-<!--        }-->
-
-<!--        .split-card .content {-->
-<!--            opacity: 0;-->
-<!--            transition: opacity 0.4s ease-in-out 0.25s;-->
-<!--        }-->
-
-<!--        .split-card .center-text {-->
-<!--            position: absolute;-->
-<!--            width: 100%;-->
-<!--            height: 100%;-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            justify-content: center;-->
-<!--            align-items: center;-->
-<!--            color: #ffffff;-->
-<!--            font-size: 1.2rem;-->
-<!--            font-weight: 600;-->
-<!--            z-index: 2;-->
-<!--            pointer-events: none;-->
-<!--            transition: opacity 0.4s ease-in-out;-->
-<!--        }-->
-
-<!--        .split-card .center-text i {-->
-<!--            font-size: 2rem;-->
-<!--            margin-bottom: 0.5rem;-->
-<!--        }-->
-
-<!--        .split-card:hover .center-text {-->
-<!--            opacity: 0;-->
-<!--        }-->
-
-<!--        .split-card:not(:hover) .center-text {-->
-<!--            opacity: 1;-->
-<!--        }-->
-
-<!--        .split-card.product .left-side {-->
-<!--            background: linear-gradient(135deg, #fd7e14 0%, #ff9f43 100%);-->
-<!--            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);-->
-<!--        }-->
-
-<!--        .split-card.product .right-side {-->
-<!--            background: linear-gradient(135deg, #ff9f43 0%, #ffc107 100%);-->
-<!--            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);-->
-<!--        }-->
-
-<!--        .split-card.product .left-side:hover {-->
-<!--            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);-->
-<!--        }-->
-
-<!--        .split-card.product .left-side:hover ~ .right-side {-->
-<!--            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);-->
-<!--        }-->
-
-<!--        .split-card.product .right-side:hover {-->
-<!--            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);-->
-<!--        }-->
-
-<!--        .split-card.product .right-side:hover ~ .left-side {-->
-<!--            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);-->
-<!--        }-->
-
-<!--        .split-card.product .left-side:hover .content,-->
-<!--        .split-card.product .right-side:hover .content {-->
-<!--            opacity: 1;-->
-<!--        }-->
-
-<!--        .split-card.revenue .left-side {-->
-<!--            background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);-->
-<!--            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);-->
-<!--        }-->
-
-<!--        .split-card.revenue .right-side {-->
-<!--            background: linear-gradient(135deg, #00aaff 0%, #4dc0ff 100%);-->
-<!--            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);-->
-<!--        }-->
-
-<!--        .split-card.revenue .left-side:hover {-->
-<!--            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);-->
-<!--        }-->
-
-<!--        .split-card.revenue .left-side:hover ~ .right-side {-->
-<!--            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);-->
-<!--        }-->
-
-<!--        .split-card.revenue .right-side:hover {-->
-<!--            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);-->
-<!--        }-->
-
-<!--        .split-card.revenue .right-side:hover ~ .left-side {-->
-<!--            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);-->
-<!--        }-->
-
-<!--        .split-card.revenue .left-side:hover .content,-->
-<!--        .split-card.revenue .right-side:hover .content {-->
-<!--            opacity: 1;-->
-<!--        }-->
-
-<!--        .split-card.customer {-->
-<!--            background: linear-gradient(135deg, #28a745 0%, #5cd881 100%);-->
-<!--        }-->
-
-<!--        .gender-sections {-->
-<!--            position: absolute;-->
-<!--            width: 100%;-->
-<!--            height: 100%;-->
-<!--            display: flex;-->
-<!--            z-index: 1;-->
-<!--        }-->
-
-<!--        .gender-section {-->
-<!--            flex: 1;-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            justify-content: center;-->
-<!--            align-items: center;-->
-<!--            color: white;-->
-<!--            transition: all 0.4s ease;-->
-<!--        }-->
-
-<!--        .gender-section.male {-->
-<!--            background: linear-gradient(135deg, #28a745 0%, #34c759 100%);-->
-<!--        }-->
-
-<!--        .gender-section.female {-->
-<!--            background: linear-gradient(135deg, #34c759 0%, #5cd881 100%);-->
-<!--        }-->
-
-<!--        .gender-section.other {-->
-<!--            background: linear-gradient(135deg, #5cd881 0%, #88e9a3 100%);-->
-<!--        }-->
-
-<!--        .split-card.customer:hover .center-text {-->
-<!--            opacity: 0;-->
-<!--        }-->
-
-<!--        .split-card.customer:not(:hover) .gender-section {-->
-<!--            opacity: 0.2;-->
-<!--        }-->
-
-<!--        .split-card.customer:hover .gender-section {-->
-<!--            opacity: 0.5;-->
-<!--        }-->
-
-<!--        .gender-section:hover {-->
-<!--            opacity: 1 !important;-->
-<!--            flex: 3;-->
-<!--        }-->
-
-<!--        .gender-section .content {-->
-<!--            opacity: 0;-->
-<!--            transition: opacity 0.3s ease;-->
-<!--        }-->
-
-<!--        .gender-section:hover .content {-->
-<!--            opacity: 1;-->
-<!--        }-->
-
-<!--        .notification-section {-->
-<!--            margin-top: 2rem;-->
-<!--            background: #ffffff;-->
-<!--            border-radius: 12px;-->
-<!--            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);-->
-<!--            padding: 1.5rem;-->
-<!--        }-->
-
-<!--        .notification-grid {-->
-<!--            display: grid;-->
-<!--            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));-->
-<!--            gap: 1rem;-->
-<!--        }-->
-
-<!--        .notification-card {-->
-<!--            padding: 1rem;-->
-<!--            border-radius: 8px;-->
-<!--            background: #f8f9fa;-->
-<!--            position: relative;-->
-<!--            transition: transform 0.3s ease;-->
-<!--        }-->
-
-<!--        .notification-card:hover {-->
-<!--            transform: translateY(-3px);-->
-<!--        }-->
-
-<!--        .notification-card h6 {-->
-<!--            font-size: 0.95rem;-->
-<!--            color: #1a1a1a;-->
-<!--            margin-bottom: 0.5rem;-->
-<!--        }-->
-
-<!--        .notification-card p {-->
-<!--            font-size: 0.85rem;-->
-<!--            color: #6c757d;-->
-<!--            margin: 0;-->
-<!--        }-->
-
-<!--        .notification-badge {-->
-<!--            position: absolute;-->
-<!--            top: -10px;-->
-<!--            right: -10px;-->
-<!--            background: #dc3545;-->
-<!--            color: white;-->
-<!--            border-radius: 50%;-->
-<!--            width: 24px;-->
-<!--            height: 24px;-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--            justify-content: center;-->
-<!--            font-size: 0.8rem;-->
-<!--            font-weight: 600;-->
-<!--        }-->
-
-<!--        .breadcrumb {-->
-<!--            background: transparent;-->
-<!--            padding: 0.5rem 0;-->
-<!--            font-size: 0.9rem;-->
-<!--        }-->
-
-<!--        .breadcrumb-item a {-->
-<!--            color: #007bff;-->
-<!--            text-decoration: none;-->
-<!--        }-->
-
-<!--        .breadcrumb-item.active {-->
-<!--            color: #1a1a1a;-->
-<!--            font-weight: 500;-->
-<!--        }-->
-
-<!--        @media (max-width: 768px) {-->
-<!--            .management-section {-->
-<!--                margin: 1rem;-->
-<!--                padding: 1.5rem;-->
-<!--                width: calc(100% - 2rem);-->
-<!--            }-->
-
-<!--            .card-grid, .stat-card-grid, .notification-grid {-->
-<!--                grid-template-columns: 1fr;-->
-<!--            }-->
-
-<!--            .btn-custom {-->
-<!--                padding: 0.75rem;-->
-<!--                font-size: 0.9rem;-->
-<!--            }-->
-<!--        }-->
-
-<!--        @media (min-width: 1280px) {-->
-<!--            .card-grid {-->
-<!--                grid-template-columns: repeat(3, 1fr);-->
-<!--            }-->
-
-<!--            .stat-card-grid {-->
-<!--                grid-template-columns: repeat(3, 1fr);-->
-<!--            }-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--&lt;!&ndash; Toast notification &ndash;&gt;-->
-<!--<div th:replace="~{common/toast}"></div>-->
-
-<!--&lt;!&ndash; Navbar &ndash;&gt;-->
-<!--<nav th:replace="~{fragments/navbar :: navbar}"></nav>-->
-
-<!--<div class="content-wrapper">-->
-<!--    <div class="dashboard-container">-->
-<!--        &lt;!&ndash; Sidebar &ndash;&gt;-->
-<!--        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>-->
-
-<!--        &lt;!&ndash; Main content &ndash;&gt;-->
-<!--        <div class="content-container flex-grow-1">-->
-<!--            <div class="container-fluid py-4">-->
-<!--                <nav aria-label="breadcrumb">-->
-<!--                    <ol class="breadcrumb">-->
-<!--                        <li class="breadcrumb-item active" aria-current="page">Quản lý kinh doanh</li>-->
-<!--                    </ol>-->
-<!--                </nav>-->
-<!--                <div class="management-section">-->
-<!--                    <h3 class="section-title">-->
-<!--                        <i class="fas fa-cogs"></i> Tổng quan kinh doanh-->
-<!--                    </h3>-->
-
-<!--                    &lt;!&ndash; Stat Cards &ndash;&gt;-->
-<!--                    <div class="stat-card-grid">-->
-<!--                        &lt;!&ndash; Đơn hàng mới (sửa thành sản phẩm) &ndash;&gt;-->
-<!--                        <div class="split-card product">-->
-<!--                            <div class="center-text">-->
-<!--                                <i class="fas fa-boxes"></i>-->
-<!--                                <p th:text="${countAllProducts != null} ? ${countAllProducts} + ' sản phẩm' : '0 sản phẩm'"></p>-->
-<!--                            </div>-->
-<!--                            <div class="left-side">-->
-<!--                                <div class="content">-->
-<!--                                    <h5>Sản phẩm đã có giá bán lẻ</h5>-->
-<!--                                    <p th:text="${countProductsHaveRetailPrice != null} ? ${countProductsHaveRetailPrice} : 0"></p>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="right-side">-->
-<!--                                <div class="content">-->
-<!--                                    <h5>Sản phẩm chưa có giá bán lẻ</h5>-->
-<!--                                    <p th:text="${countAllProducts != null and countProductsHaveRetailPrice != null} ? ${countAllProducts - countProductsHaveRetailPrice} : 0"></p>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-
-<!--                        <div class="split-card revenue">-->
-<!--                            <div class="center-text">-->
-<!--                                <i class="fas fa-shopping-cart"></i>-->
-<!--                                <p th:text="${countAllSuccessInvoices != null} ? ${countAllSuccessInvoices} + ' đơn hàng' : '0 đơn hàng'"></p>-->
-<!--                            </div>-->
-<!--                            <div class="left-side">-->
-<!--                                <div class="content">-->
-<!--                                    <h5>Hôm nay (<span-->
-<!--                                            th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}"></span>)</h5>-->
-<!--                                    <p th:text="${countTodaySuccessInvoices != null} ? ${countTodaySuccessInvoices} + ' đơn' : '0 đơn'"></p>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="right-side">-->
-<!--                                <div class="content">-->
-<!--                                    <h5>Tháng này (<span-->
-<!--                                            th:text="${#dates.format(#dates.createNow(), 'MM/yyyy')}"></span>)</h5>-->
-<!--                                    <p th:text="${countThisMonthSuccessInvoices != null} ? ${countThisMonthSuccessInvoices} + ' đơn' : '0 đơn'"></p>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-
-<!--                        &lt;!&ndash; Tổng số khách hàng &ndash;&gt;-->
-<!--                        <div class="split-card customer">-->
-<!--                            <div class="center-text">-->
-<!--                                <i class="fas fa-users"></i>-->
-<!--                                <p th:text="${totalCustomers != null} ? ${totalCustomers} + ' khách hàng' : '0 khách hàng'"></p>-->
-<!--                            </div>-->
-<!--                            <div class="gender-sections">-->
-<!--                                <div class="gender-section male">-->
-<!--                                    <div class="content">-->
-<!--                                        <h5>Giới tính nam</h5>-->
-<!--                                        <p th:text="${maleCustomers != null} ? ${maleCustomers} : 0"></p>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                                <div class="gender-section female">-->
-<!--                                    <div class="content">-->
-<!--                                        <h5>Giới tính nữ</h5>-->
-<!--                                        <p th:text="${femaleCustomers != null} ? ${femaleCustomers} : 0"></p>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                                <div class="gender-section other">-->
-<!--                                    <div class="content">-->
-<!--                                        <h5>Giới tính khác</h5>-->
-<!--                                        <p th:text="${totalCustomers != null and maleCustomers != null and femaleCustomers != null} ? ${totalCustomers - maleCustomers - femaleCustomers} : 0"></p>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    &lt;!&ndash; Action Buttons &ndash;&gt;-->
-<!--                    <div class="card-grid">-->
-<!--                        <a href="/dashboard/products/listToChoose" class="btn-custom btn-orange">-->
-<!--                            <i class="fas fa-users"></i> Quản lý giá bán lẻ-->
-<!--                        </a>-->
-<!--                        <a href="/dashboard/business/transaction" class="btn-custom btn-blue">-->
-<!--                            <i class="fas fa-tags"></i> Quản lý lịch sử mua bán-->
-<!--                        </a>-->
-<!--                        <a href="/dashboard/admin/customers/list" class="btn-custom btn-green">-->
-<!--                            <i class="fas fa-history"></i> Quản lý khách hàng-->
-<!--                        </a>-->
-<!--                    </div>-->
-
-<!--                    &lt;!&ndash; Notification Section &ndash;&gt;-->
-<!--                    <div class="notification-section">-->
-<!--                        <h5 class="mb-3"><i class="fas fa-bell"></i> Thông báo mới nhất</h5>-->
-<!--                        <div class="notification-grid" id="notification-grid">-->
-<!--                            &lt;!&ndash; Notifications will be populated dynamically &ndash;&gt;-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    &lt;!&ndash; Footer &ndash;&gt;-->
-<!--    <footer th:replace="~{fragments/footer :: footer}"></footer>-->
-<!--</div>-->
-
-<!--&lt;!&ndash; Navbar scripts &ndash;&gt;-->
-<!--<div th:replace="~{fragments/navbar :: navbar-script}"></div>-->
-
-<!--&lt;!&ndash; Bootstrap JS &ndash;&gt;-->
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
-
-<!--<script>-->
-<!--    const updateNotifications = async () => {-->
-<!--        const notificationGrid = document.getElementById('notification-grid');-->
-
-<!--        const endpoints = [-->
-<!--            { url: '/api/changelogs/product/notification', title: 'Quản lý giá bán lẻ' },-->
-<!--            { url: '/api/changelogs/invoice/notification', title: 'Quản lý lịch sử mua bán' },-->
-<!--            { url: '/api/changelogs/customer/notification', title: 'Quản lý khách hàng' }-->
-<!--        ];-->
-
-<!--        const createNotificationCard = (title, message, changeCount) => {-->
-<!--            const card = document.createElement('div');-->
-<!--            card.className = 'notification-card';-->
-<!--            card.dataset.endpoint = endpoints.find(e => e.title === title)?.url;-->
-<!--            card.innerHTML = `-->
-<!--                <h6>${title}</h6>-->
-<!--                <p>${message}</p>-->
-<!--                ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}-->
-<!--            `;-->
-<!--            return card;-->
-<!--        };-->
-
-<!--        for (const endpoint of endpoints) {-->
-<!--            try {-->
-<!--                const response = await fetch(`${endpoint.url}?t=${Date.now()}`);-->
-<!--                console.log(`Response status for ${endpoint.url}:`, response.status);-->
-<!--                let data = {};-->
-<!--                if (response.ok) {-->
-<!--                    const text = await response.text();-->
-<!--                    console.log(`Raw response for ${endpoint.url}:`, text);-->
-<!--                    data = text ? JSON.parse(text) : {};-->
-<!--                } else {-->
-<!--                    console.error(`HTTP error ${response.status} for ${endpoint.url}`);-->
-<!--                    const existingCard = Array.from(notificationGrid.children).find(-->
-<!--                        card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title-->
-<!--                    );-->
-<!--                    const errorMessage = 'Lỗi khi tải thông báo';-->
-<!--                    if (existingCard) {-->
-<!--                        const existingMessage = existingCard.querySelector('p').textContent;-->
-<!--                        if (existingMessage !== errorMessage) {-->
-<!--                            existingCard.querySelector('p').textContent = errorMessage;-->
-<!--                            existingCard.querySelector('.notification-badge')?.remove();-->
-<!--                        }-->
-<!--                    } else {-->
-<!--                        notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));-->
-<!--                    }-->
-<!--                    continue;-->
-<!--                }-->
-
-<!--                // Xử lý dữ liệu từ ChangeLog-->
-<!--                let message = 'Không có cập nhật mới';-->
-<!--                let changeCount = 0;-->
-
-<!--                if (data && data.action && data.fieldName) {-->
-<!--                    if (endpoint.url.includes('product') && endpoint.title === 'Quản lý giá bán lẻ') {-->
-<!--                        switch (data.action.toUpperCase()) {-->
-<!--                            case 'INSERT':-->
-<!--                                message = data.newValue || 'Không có dữ liệu';-->
-<!--                                changeCount = 1;-->
-<!--                                break;-->
-<!--                            default:-->
-<!--                                message = 'Không có cập nhật giá bán lẻ mới 2' ;-->
-<!--                                break;-->
-<!--                        }-->
-<!--                    } else if (endpoint.url.includes('invoice') && endpoint.title === 'Quản lý lịch sử mua bán') {-->
-<!--                        switch (data.action.toUpperCase()) {-->
-<!--                            case 'INSERT':-->
-<!--                                if (data.fieldName.toLowerCase() === 'invoice') {-->
-<!--                                    let amount, customerName = 'không xác định', totalQuantity = 0;-->
-<!--                                    if (data.newValue !== 'Invoice created') {-->
-<!--                                        const amountMatch = data.newValue.match(/amount=([\d.]+)/);-->
-<!--                                        const customerIdMatch = data.newValue.match(/customerId=(\d+)/);-->
-<!--                                        amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN') + ' VNĐ' : 'N/A';-->
-<!--                                        if (customerIdMatch) {-->
-<!--                                            try {-->
-<!--                                                const customerResponse = await fetch(`/api/changelogs/customers/${customerIdMatch[1]}`);-->
-<!--                                                if (customerResponse.ok) {-->
-<!--                                                    const customerData = await customerResponse.json();-->
-<!--                                                    customerName = customerData.name || 'không xác định';-->
-<!--                                                }-->
-<!--                                            } catch (error) {-->
-<!--                                                console.error(`Error fetching customer data for ID ${customerIdMatch[1]}:`, error);-->
-<!--                                            }-->
-<!--                                        }-->
-<!--                                        if (data.entityId) {-->
-<!--                                            try {-->
-<!--                                                const invoiceDetailsResponse = await fetch(`/api/changelogs/invoices/${data.entityId}/details`);-->
-<!--                                                if (invoiceDetailsResponse.ok) {-->
-<!--                                                    const invoiceDetails = await invoiceDetailsResponse.json();-->
-<!--                                                    totalQuantity = invoiceDetails.quantity || 0;-->
-<!--                                                    console.log(`Invoice ID ${data.entityId} has total quantity: ${totalQuantity}`);-->
-<!--                                                } else {-->
-<!--                                                    console.log(`No invoice details found for ID ${data.entityId}, using quantity: 0`);-->
-<!--                                                }-->
-<!--                                            } catch (error) {-->
-<!--                                                console.error(`Error fetching invoice details for ID ${data.entityId}:`, error);-->
-<!--                                                console.log(`Error occurred for Invoice ID ${data.entityId}, using quantity: 0`);-->
-<!--                                            }-->
-<!--                                        }-->
-<!--                                        message = `Khách hàng ${customerName} đã thanh toán hóa đơn ${amount} cho ${totalQuantity} sản phẩm`;-->
-<!--                                    } else {-->
-<!--                                        message = `Hóa đơn mới được tạo ${data.newValue}`;-->
-<!--                                    }-->
-<!--                                    changeCount = 1;-->
-<!--                                } else {-->
-<!--                                    message = 'Không có cập nhật mới';-->
-<!--                                }-->
-<!--                                break;-->
-<!--                            default:-->
-<!--                                message = 'Không có cập nhật mới';-->
-<!--                                break;-->
-<!--                        }-->
-<!--                    } else if (endpoint.url.includes('customer') && endpoint.title === 'Quản lý khách hàng') {-->
-<!--                        switch (data.action.toUpperCase()) {-->
-<!--                            case 'INSERT':-->
-<!--                                message = `Thêm mới khách hàng: ${data.newValue || 'không xác định'}`;-->
-<!--                                changeCount = 1;-->
-<!--                                break;-->
-<!--                            case 'DELETE':-->
-<!--                                message = `Xóa khách hàng: ${data.newValue || 'không xác định'}`;-->
-<!--                                changeCount = 1;-->
-<!--                                break;-->
-<!--                            case 'UPDATE':-->
-<!--                                message = `Cập nhật khách hàng: ${data.newValue || 'không xác định'}`;-->
-<!--                                changeCount = 1;-->
-<!--                                break;-->
-<!--                            default:-->
-<!--                                message = 'Không có cập nhật khách hàng mới';-->
-<!--                                break;-->
-<!--                        }-->
-<!--                    }-->
-<!--                }-->
-
-<!--                // Find existing card for this endpoint and title-->
-<!--                const existingCard = Array.from(notificationGrid.children).find(-->
-<!--                    card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title-->
-<!--                );-->
-
-<!--                if (existingCard) {-->
-<!--                    // Update existing card if message or changeCount differs-->
-<!--                    const existingMessage = existingCard.querySelector('p').textContent;-->
-<!--                    const existingBadge = existingCard.querySelector('.notification-badge');-->
-<!--                    const existingChangeCount = existingBadge ? parseInt(existingBadge.textContent) : 0;-->
-
-<!--                    if (existingMessage !== message || existingChangeCount !== changeCount) {-->
-<!--                        existingCard.querySelector('p').textContent = message;-->
-<!--                        if (changeCount > 0) {-->
-<!--                            if (existingBadge) {-->
-<!--                                existingBadge.textContent = changeCount;-->
-<!--                            } else {-->
-<!--                                const badge = document.createElement('div');-->
-<!--                                badge.className = 'notification-badge';-->
-<!--                                badge.textContent = changeCount;-->
-<!--                                existingCard.appendChild(badge);-->
-<!--                            }-->
-<!--                        } else {-->
-<!--                            existingBadge?.remove();-->
-<!--                        }-->
-<!--                    }-->
-<!--                } else {-->
-<!--                    // Append new card if none exists-->
-<!--                    notificationGrid.appendChild(createNotificationCard(endpoint.title, message, changeCount));-->
-<!--                }-->
-
-<!--                console.log(`Parsed data for ${endpoint.url}:`, data);-->
-<!--                console.log(`Message for ${endpoint.title}:`, message);-->
-<!--            } catch (error) {-->
-<!--                console.error(`Error fetching ${endpoint.url}:`, error);-->
-<!--                const existingCard = Array.from(notificationGrid.children).find(-->
-<!--                    card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title-->
-<!--                );-->
-<!--                const errorMessage = 'Lỗi khi tải thông báo';-->
-<!--                if (existingCard) {-->
-<!--                    const existingMessage = existingCard.querySelector('p').textContent;-->
-<!--                    if (existingMessage !== errorMessage) {-->
-<!--                        existingCard.querySelector('p').textContent = errorMessage;-->
-<!--                        existingCard.querySelector('.notification-badge')?.remove();-->
-<!--                    }-->
-<!--                } else {-->
-<!--                    notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));-->
-<!--                }-->
-<!--            }-->
-<!--        }-->
-<!--    };-->
-
-<!--    // Initial call and polling setup-->
-<!--    document.addEventListener('DOMContentLoaded', () => {-->
-<!--        updateNotifications();-->
-<!--        setInterval(updateNotifications, 3000);-->
-<!--    });-->
-<!--</script>-->
-<!--</body>-->
-<!--</html>-->
-
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1158,7 +416,9 @@
     </style>
 </head>
 <body>
-<!-- Toast notification -->
+
+
+
 <div th:replace="~{common/toast}"></div>
 
 <!-- Navbar -->
@@ -1167,7 +427,8 @@
 <div class="content-wrapper">
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+                <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
 
         <!-- Main content -->
         <div class="content-container flex-grow-1">
@@ -1184,70 +445,69 @@
 
                     <!-- Stat Cards -->
                     <div class="stat-card-grid">
-                        <!-- Đơn hàng mới (sửa thành sản phẩm) -->
+                        <!-- Product Card -->
                         <div class="split-card product">
                             <div class="center-text">
                                 <i class="fas fa-boxes"></i>
-                                <p th:text="${countAllProducts != null} ? ${countAllProducts} + ' sản phẩm' : '0 sản phẩm'"></p>
+                                <p id="countAllProducts">0 sản phẩm</p>
                             </div>
                             <div class="left-side">
                                 <div class="content">
                                     <h5>Sản phẩm đã có giá bán lẻ</h5>
-                                    <p th:text="${countProductsHaveRetailPrice != null} ? ${countProductsHaveRetailPrice} : 0"></p>
+                                    <p id="countProductsHaveRetailPrice">0</p>
                                 </div>
                             </div>
                             <div class="right-side">
                                 <div class="content">
                                     <h5>Sản phẩm chưa có giá bán lẻ</h5>
-                                    <p th:text="${countAllProducts != null and countProductsHaveRetailPrice != null} ? ${countAllProducts - countProductsHaveRetailPrice} : 0"></p>
+                                    <p id="countProductsNoRetailPrice">0</p>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Revenue (Invoice) Card -->
                         <div class="split-card revenue">
                             <div class="center-text">
                                 <i class="fas fa-shopping-cart"></i>
-                                <p th:text="${countAllSuccessInvoices != null} ? ${countAllSuccessInvoices} + ' đơn hàng' : '0 đơn hàng'"></p>
+                                <p id="countAllSuccessInvoices">0 đơn hàng</p>
                             </div>
                             <div class="left-side">
                                 <div class="content">
-                                    <h5>Hôm nay (<span
-                                            th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}"></span>)</h5>
-                                    <p th:text="${countTodaySuccessInvoices != null} ? ${countTodaySuccessInvoices} + ' đơn' : '0 đơn'"></p>
+                                    <h5>Hôm nay (<span id="todayDate"></span>)</h5>
+                                    <p id="countTodaySuccessInvoices">0 đơn</p>
                                 </div>
                             </div>
                             <div class="right-side">
                                 <div class="content">
-                                    <h5>Tháng này (<span
-                                            th:text="${#dates.format(#dates.createNow(), 'MM/yyyy')}"></span>)</h5>
-                                    <p th:text="${countThisMonthSuccessInvoices != null} ? ${countThisMonthSuccessInvoices} + ' đơn' : '0 đơn'"></p>
+                                    <h5>Tháng này (<span id="thisMonthDate"></span>)</h5>
+                                    <p id="countThisMonthSuccessInvoices">0 đơn</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Tổng số khách hàng -->
+                        <!-- Customer Card -->
                         <div class="split-card customer">
                             <div class="center-text">
                                 <i class="fas fa-users"></i>
-                                <p th:text="${totalCustomers != null} ? ${totalCustomers} + ' khách hàng' : '0 khách hàng'"></p>
+                                <p id="totalCustomers">0 khách hàng</p>
                             </div>
                             <div class="gender-sections">
                                 <div class="gender-section male">
                                     <div class="content">
                                         <h5>Giới tính nam</h5>
-                                        <p th:text="${maleCustomers != null} ? ${maleCustomers} : 0"></p>
+                                        <p id="maleCustomers">0</p>
                                     </div>
                                 </div>
                                 <div class="gender-section female">
                                     <div class="content">
                                         <h5>Giới tính nữ</h5>
-                                        <p th:text="${femaleCustomers != null} ? ${femaleCustomers} : 0"></p>
+                                        <p id="femaleCustomers">0</p>
                                     </div>
                                 </div>
                                 <div class="gender-section other">
                                     <div class="content">
                                         <h5>Giới tính khác</h5>
-                                        <p th:text="${totalCustomers != null and maleCustomers != null and femaleCustomers != null} ? ${totalCustomers - maleCustomers - femaleCustomers} : 0"></p>
+                                        <p id="otherCustomers">0</p>
                                     </div>
                                 </div>
                             </div>
@@ -1279,221 +539,56 @@
         </div>
     </div>
     <!-- Footer -->
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
-
-<!-- Navbar scripts -->
-<div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // const updateNotifications = async () => {
-    //     const notificationGrid = document.getElementById('notification-grid');
-    //
-    //     const endpoints = [
-    //         { url: '/api/changelogs/product/notification', title: 'Quản lý giá bán lẻ' },
-    //         { url: '/api/changelogs/invoice/notification', title: 'Quản lý lịch sử mua bán' },
-    //         { url: '/api/changelogs/customer/notification', title: 'Quản lý khách hàng' }
-    //     ];
-    //
-    //     const createNotificationCard = (title, message, changeCount) => {
-    //         const card = document.createElement('div');
-    //         card.className = 'notification-card';
-    //         card.dataset.endpoint = endpoints.find(e => e.title === title)?.url;
-    //         card.innerHTML = `
-    //             <h6>${title}</h6>
-    //             <p>${message}</p>
-    //             ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
-    //         `;
-    //         return card;
-    //     };
-    //
-    //     for (const endpoint of endpoints) {
-    //         try {
-    //             const response = await fetch(`${endpoint.url}?t=${Date.now()}`);
-    //             console.log(`Response status for ${endpoint.url}:`, response.status);
-    //             let data = {};
-    //             if (response.ok) {
-    //                 const text = await response.text();
-    //                 console.log(`Raw response for ${endpoint.url}:`, text);
-    //                 data = text ? JSON.parse(text) : {};
-    //             } else {
-    //                 console.error(`HTTP error ${response.status} for ${endpoint.url}`);
-    //                 const existingCard = Array.from(notificationGrid.children).find(
-    //                     card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
-    //                 );
-    //                 const errorMessage = 'Lỗi khi tải thông báo';
-    //                 if (existingCard) {
-    //                     const existingMessage = existingCard.querySelector('p').textContent;
-    //                     if (existingMessage !== errorMessage) {
-    //                         existingCard.querySelector('p').textContent = errorMessage;
-    //                         existingCard.querySelector('.notification-badge')?.remove();
-    //                     }
-    //                 } else {
-    //                     notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
-    //                 }
-    //                 continue;
-    //             }
-    //
-    //             // Xử lý dữ liệu từ ChangeLog
-    //             let message = 'Không có cập nhật mới';
-    //             let changeCount = 0;
-    //
-    //             if (data && data.action && data.fieldName) {
-    //                 if (endpoint.url.includes('product') && endpoint.title === 'Quản lý giá bán lẻ') {
-    //                     switch (data.action.toUpperCase()) {
-    //                         case 'INSERT':
-    //                         case 'INSERT_PW_PRICE':
-    //                         case 'UPDATE_RETAIL_PRICE':
-    //                             if (data.newValue) {
-    //                                 const newValueMatch = data.newValue.match(/productID=(\d+), retailPrice=(\d+)/);
-    //                                 if (newValueMatch) {
-    //                                     const productId = newValueMatch[1];
-    //                                     const retailPrice = parseFloat(newValueMatch[2]);
-    //                                     message = retailPrice === 0
-    //                                         ? `Thêm mới sản phẩm ${productId} chưa có giá bán lẻ`
-    //                                         : `Sản phẩm ${productId} đã được cập nhật giá bán lẻ ${retailPrice}`;
-    //                                     changeCount = 1;
-    //                                 } else {
-    //                                     message = 'Dữ liệu giá bán lẻ không hợp lệ';
-    //                                 }
-    //                             } else {
-    //                                 message = 'Không có dữ liệu';
-    //                             }
-    //                             break;
-    //                         default:
-    //                             message = 'Không có cập nhật giá bán lẻ mới';
-    //                             break;
-    //                     }
-    //                 } else if (endpoint.url.includes('invoice') && endpoint.title === 'Quản lý lịch sử mua bán') {
-    //                     switch (data.action.toUpperCase()) {
-    //                         case 'INSERT':
-    //                             if (data.fieldName.toLowerCase() === 'invoice') {
-    //                                 let amount, customerName = 'không xác định', totalQuantity = 0;
-    //                                 if (data.newValue !== 'Invoice created') {
-    //                                     const amountMatch = data.newValue.match(/amount=([\d.]+)/);
-    //                                     const customerIdMatch = data.newValue.match(/customerId=(\d+)/);
-    //                                     amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN') + ' VNĐ' : 'N/A';
-    //                                     if (customerIdMatch) {
-    //                                         try {
-    //                                             const customerResponse = await fetch(`/api/changelogs/customers/${customerIdMatch[1]}`);
-    //                                             if (customerResponse.ok) {
-    //                                                 const customerData = await customerResponse.json();
-    //                                                 customerName = customerData.name || 'không xác định';
-    //                                             }
-    //                                         } catch (error) {
-    //                                             console.error(`Error fetching customer data for ID ${customerIdMatch[1]}:`, error);
-    //                                         }
-    //                                     }
-    //                                     if (data.entityId) {
-    //                                         try {
-    //                                             const invoiceDetailsResponse = await fetch(`/api/changelogs/invoices/${data.entityId}/details`);
-    //                                             if (invoiceDetailsResponse.ok) {
-    //                                                 const invoiceDetails = await invoiceDetailsResponse.json();
-    //                                                 totalQuantity = invoiceDetails.quantity || 0;
-    //                                                 console.log(`Invoice ID ${data.entityId} has total quantity: ${totalQuantity}`);
-    //                                             } else {
-    //                                                 console.log(`No invoice details found for ID ${data.entityId}, using quantity: 0`);
-    //                                             }
-    //                                         } catch (error) {
-    //                                             console.error(`Error fetching invoice details for ID ${data.entityId}:`, error);
-    //                                             console.log(`Error occurred for Invoice ID ${data.entityId}, using quantity: 0`);
-    //                                         }
-    //                                     }
-    //                                     message = `Khách hàng ${customerName} đã thanh toán hóa đơn ${amount} cho ${totalQuantity} sản phẩm`;
-    //                                 } else {
-    //                                     message = `Hóa đơn mới được tạo ${data.newValue}`;
-    //                                 }
-    //                                 changeCount = 1;
-    //                             } else {
-    //                                 message = 'Không có cập nhật mới';
-    //                             }
-    //                             break;
-    //                         default:
-    //                             message = 'Không có cập nhật mới';
-    //                             break;
-    //                     }
-    //                 } else if (endpoint.url.includes('customer') && endpoint.title === 'Quản lý khách hàng') {
-    //                     switch (data.action.toUpperCase()) {
-    //                         case 'INSERT':
-    //                             message = `Thêm mới khách hàng: ${data.newValue || 'không xác định'}`;
-    //                             changeCount = 1;
-    //                             break;
-    //                         case 'DELETE':
-    //                             message = `Xóa khách hàng: ${data.newValue || 'không xác định'}`;
-    //                             changeCount = 1;
-    //                             break;
-    //                         case 'UPDATE':
-    //                             message = `Cập nhật khách hàng: ${data.newValue || 'không xác định'}`;
-    //                             changeCount = 1;
-    //                             break;
-    //                         default:
-    //                             message = 'Không có cập nhật khách hàng mới';
-    //                             break;
-    //                     }
-    //                 }
-    //             }
-    //
-    //             // Find existing card for this endpoint and title
-    //             const existingCard = Array.from(notificationGrid.children).find(
-    //                 card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
-    //             );
-    //
-    //             if (existingCard) {
-    //                 // Update existing card if message or changeCount differs
-    //                 const existingMessage = existingCard.querySelector('p').textContent;
-    //                 const existingBadge = existingCard.querySelector('.notification-badge');
-    //                 const existingChangeCount = existingBadge ? parseInt(existingBadge.textContent) : 0;
-    //
-    //                 if (existingMessage !== message || existingChangeCount !== changeCount) {
-    //                     existingCard.querySelector('p').textContent = message;
-    //                     if (changeCount > 0) {
-    //                         if (existingBadge) {
-    //                             existingBadge.textContent = changeCount;
-    //                         } else {
-    //                             const badge = document.createElement('div');
-    //                             badge.className = 'notification-badge';
-    //                             badge.textContent = changeCount;
-    //                             existingCard.appendChild(badge);
-    //                         }
-    //                     } else {
-    //                         existingBadge?.remove();
-    //                     }
-    //                 }
-    //             } else {
-    //                 // Append new card if none exists
-    //                 notificationGrid.appendChild(createNotificationCard(endpoint.title, message, changeCount));
-    //             }
-    //
-    //             console.log(`Parsed data for ${endpoint.url}:`, data);
-    //             console.log(`Message for ${endpoint.title}:`, message);
-    //         } catch (error) {
-    //             console.error(`Error fetching ${endpoint.url}:`, error);
-    //             const existingCard = Array.from(notificationGrid.children).find(
-    //                 card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
-    //             );
-    //             const errorMessage = 'Lỗi khi tải thông báo';
-    //             if (existingCard) {
-    //                 const existingMessage = existingCard.querySelector('p').textContent;
-    //                 if (existingMessage !== errorMessage) {
-    //                     existingCard.querySelector('p').textContent = errorMessage;
-    //                     existingCard.querySelector('.notification-badge')?.remove();
-    //                 }
-    //             } else {
-    //                 notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
-    //             }
-    //         }
-    //     }
-    // };
-    //
-    // // Initial call and polling setup
-    // document.addEventListener('DOMContentLoaded', () => {
-    //     updateNotifications();
-    //     setInterval(updateNotifications, 3000);
-    // });
+    // Format date for today
+    const formatTodayDate = () => {
+        return new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
 
+    // Format date for current month
+    const formatThisMonthDate = () => {
+        return new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
+    };
+
+    // Update dashboard data
+    const updateDashboard = async () => {
+        try {
+            const response = await fetch('/api/changelogs/business-home-info?t=' + Date.now());
+            if (!response.ok) {
+                console.error('Error fetching dashboard data:', response.status);
+                return;
+            }
+            const data = await response.json();
+
+            // Update Product Card
+            document.getElementById('countAllProducts').textContent = (data.countAllProducts || 0) + ' sản phẩm';
+            document.getElementById('countProductsHaveRetailPrice').textContent = data.countProductsHaveRetailPrice || 0;
+            document.getElementById('countProductsNoRetailPrice').textContent = (data.countAllProducts - data.countProductsHaveRetailPrice) || 0;
+
+            // Update Revenue (Invoice) Card
+            document.getElementById('countAllSuccessInvoices').textContent = (data.countAllSuccessInvoices || 0) + ' đơn hàng';
+            document.getElementById('countTodaySuccessInvoices').textContent = (data.countTodaySuccessInvoices || 0) + ' đơn';
+            document.getElementById('countThisMonthSuccessInvoices').textContent = (data.countThisMonthSuccessInvoices || 0) + ' đơn';
+            document.getElementById('todayDate').textContent = formatTodayDate();
+            document.getElementById('thisMonthDate').textContent = formatThisMonthDate();
+
+            // Update Customer Card
+            document.getElementById('totalCustomers').textContent = (data.totalCustomers || 0) + ' khách hàng';
+            document.getElementById('maleCustomers').textContent = data.maleCustomers || 0;
+            document.getElementById('femaleCustomers').textContent = data.femaleCustomers || 0;
+            document.getElementById('otherCustomers').textContent = (data.totalCustomers - data.maleCustomers - data.femaleCustomers) || 0;
+        } catch (error) {
+            console.error('Error updating dashboard:', error);
+        }
+    };
+
+    // Update notifications
     const updateNotifications = async () => {
         const notificationGrid = document.getElementById('notification-grid');
 
@@ -1508,10 +603,10 @@
             card.className = 'notification-card';
             card.dataset.endpoint = endpoints.find(e => e.title === title)?.url;
             card.innerHTML = `
-            <h6>${title}</h6>
-            <p>${message}</p>
-            ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
-        `;
+                <h6>${title}</h6>
+                <p>${message}</p>
+                ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
+            `;
             return card;
         };
 
@@ -1703,11 +798,15 @@
         }
     };
 
+    // Initial call and polling setup
     document.addEventListener('DOMContentLoaded', () => {
+        updateDashboard();
         updateNotifications();
-        setInterval(updateNotifications, 3000);
+        setInterval(() => {
+            updateDashboard();
+            updateNotifications();
+        }, 3000);
     });
-
 </script>
 </body>
 </html>

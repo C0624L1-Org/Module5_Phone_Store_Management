@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -362,11 +362,13 @@
 </head>
 <body>
 
+
+
 <div th:replace="~{common/toast}"></div>
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 <div class="content-wrapper">
     <div class="dashboard-container">
-        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+                <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
         <!-- Main content area -->
         <div class="content-container flex-grow-1">
@@ -387,21 +389,21 @@
                         <div class="split-card sales">
                             <div class="center-text">
                                 <i class="fas fa-chart-line"></i>
-                                <h5>Tổng doanh thu: <span th:text="${#numbers.formatDecimal(totalInvoiceRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></h5>
-                                <p>Tổng số đơn: <span th:text="${countAllSuccessInvoices} + ' đơn'"></span></p>
+                                <h5>Tổng doanh thu: <span id="totalInvoiceRevenue">0 VNĐ</span></h5>
+                                <p>Tổng số đơn: <span id="countAllSuccessInvoices">0 đơn</span></p>
                             </div>
                             <div class="left-side">
                                 <div class="content">
-                                    <h4>Hôm nay (<span th:text="${#dates.format(new java.util.Date(), 'dd/MM/yyyy')}"></span>)</h4>
-                                    <p>Số đơn: <span th:text="${countTodaySuccessInvoices} + ' đơn'"></span></p>
-                                    <p>Doanh thu: <span th:text="${#numbers.formatDecimal(totalTodayInvoiceRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></p>
+                                    <h4>Hôm nay (<span id="todayDate"></span>)</h4>
+                                    <p>Số đơn: <span id="countTodaySuccessInvoices">0 đơn</span></p>
+                                    <p>Doanh thu: <span id="totalTodayInvoiceRevenue">0 VNĐ</span></p>
                                 </div>
                             </div>
                             <div class="right-side">
                                 <div class="content">
-                                    <h4>Tháng này (<span th:text="${#dates.format(new java.util.Date(), 'MM/yyyy')}"></span>)</h4>
-                                    <p>Số đơn: <span th:text="${countThisMonthSuccessInvoices} + ' đơn'"></span></p>
-                                    <p>Doanh thu: <span th:text="${#numbers.formatDecimal(totalThisMonthInvoiceRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></p>
+                                    <h4>Tháng này (<span id="thisMonthDate"></span>)</h4>
+                                    <p>Số đơn: <span id="countThisMonthSuccessInvoices">0 đơn</span></p>
+                                    <p>Doanh thu: <span id="totalThisMonthInvoiceRevenue">0 VNĐ</span></p>
                                 </div>
                             </div>
                         </div>
@@ -410,18 +412,18 @@
                         <div class="split-card customer">
                             <div class="center-text">
                                 <i class="fas fa-users"></i>
-                                <p>Tổng khách hàng: <span th:text="${totalCustomers}"></span></p>
+                                <p>Tổng khách hàng: <span id="totalCustomers">0</span></p>
                             </div>
                             <div class="left-side">
                                 <div class="content">
                                     <h5>Khách hàng mới</h5>
-                                    <p th:text="${totalNewCustomers}"></p>
+                                    <p id="totalNewCustomers">0</p>
                                 </div>
                             </div>
                             <div class="right-side">
                                 <div class="content">
                                     <h5>Khách hàng thân thiết</h5>
-                                    <p th:text="${totalCustomers - totalNewCustomers}"></p>
+                                    <p id="loyalCustomers">0</p>
                                 </div>
                             </div>
                         </div>
@@ -448,12 +450,55 @@
             </div>
         </div>
     </div>
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
-<div th:replace="~{fragments/navbar :: navbar-script}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
+    // Format number as Vietnamese currency
+    const formatCurrency = (value) => {
+        return value ? Number(value).toLocaleString('vi-VN') + ' VNĐ' : '0 VNĐ';
+    };
+
+    // Format date for today
+    const formatTodayDate = () => {
+        return new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    // Format date for current month
+    const formatThisMonthDate = () => {
+        return new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
+    };
+
+    // Update dashboard data
+    const updateDashboard = async () => {
+        try {
+            const response = await fetch('/api/changelogs/report-home-info?t=' + Date.now());
+            if (!response.ok) {
+                console.error('Error fetching dashboard data:', response.status);
+                return;
+            }
+            const data = await response.json();
+
+            // Update Sales Card
+            document.getElementById('totalInvoiceRevenue').textContent = formatCurrency(data.totalInvoiceRevenue);
+            document.getElementById('countAllSuccessInvoices').textContent = data.countAllSuccessInvoices + ' đơn';
+            document.getElementById('countTodaySuccessInvoices').textContent = data.countTodaySuccessInvoices + ' đơn';
+            document.getElementById('totalTodayInvoiceRevenue').textContent = formatCurrency(data.totalTodayInvoiceRevenue);
+            document.getElementById('countThisMonthSuccessInvoices').textContent = data.countThisMonthSuccessInvoices + ' đơn';
+            document.getElementById('totalThisMonthInvoiceRevenue').textContent = formatCurrency(data.totalThisMonthInvoiceRevenue);
+            document.getElementById('todayDate').textContent = formatTodayDate();
+            document.getElementById('thisMonthDate').textContent = formatThisMonthDate();
+
+            // Update Customer Card
+            document.getElementById('totalCustomers').textContent = data.totalCustomers || 0;
+            document.getElementById('totalNewCustomers').textContent = data.totalNewCustomers || 0;
+            document.getElementById('loyalCustomers').textContent = (data.totalCustomers - data.totalNewCustomers) || 0;
+        } catch (error) {
+            console.error('Error updating dashboard:', error);
+        }
+    };
+
+    // Update notifications (reusing existing logic with minor adjustments)
     const updateNotifications = async () => {
         const notificationGrid = document.getElementById('notification-grid');
 
@@ -467,10 +512,10 @@
             card.className = 'notification-card';
             card.dataset.endpoint = endpoints.find(e => e.title === title)?.url;
             card.innerHTML = `
-            <h6>${title}</h6>
-            <p>${message}</p>
-            ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
-        `;
+                <h6>${title}</h6>
+                <p>${message}</p>
+                ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
+            `;
             return card;
         };
 
@@ -501,7 +546,7 @@
                     continue;
                 }
 
-                // Xử lý dữ liệu từ ChangeLog
+                // Process ChangeLog data
                 let message = 'Không có cập nhật mới';
                 let changeCount = 0;
 
@@ -632,10 +677,13 @@
 
     // Initial call and polling setup
     document.addEventListener('DOMContentLoaded', () => {
+        updateDashboard();
         updateNotifications();
-        setInterval(updateNotifications, 3000);
+        setInterval(() => {
+            updateDashboard();
+            updateNotifications();
+        }, 3000);
     });
 </script>
-
 </body>
 </html>
