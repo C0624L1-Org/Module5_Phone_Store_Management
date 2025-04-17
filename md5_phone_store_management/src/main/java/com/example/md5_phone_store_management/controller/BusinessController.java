@@ -55,20 +55,19 @@ public class BusinessController {
 
     @GetMapping("/dashboard/business/management")
     public String showManagementPage(Model model, HttpSession session) {
-         changeLogService.getAllChangeLogs();
+//         changeLogService.getAllChangeLogs();
         model.addAttribute("countAllProducts",productService.countProducts());
         model.addAttribute("countProductsHaveRetailPrice",productService.countProductsHaveRetailPrice());
         model.addAttribute("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
         model.addAttribute("maleCustomers", iCustomerService.countMaleCustomers() != null ? iCustomerService.countMaleCustomers() : 0);
         model.addAttribute("femaleCustomers", iCustomerService.countFemaleCustomers() != null ? iCustomerService.countFemaleCustomers() : 0);
-
-
-        
         model.addAttribute("countAllSuccessInvoices", invoiceService.countAllSuccessInvoices());
         model.addAttribute("countTodaySuccessInvoices", invoiceService.countTodaySuccessInvoices());
         model.addAttribute("countThisMonthSuccessInvoices", invoiceService.countThisMonthSuccessInvoices());
         return "dashboard/business-management/business-home";
     }
+
+
     @GetMapping("/dashboard/products/listToChoose")
     public String search1(Model model,
                           @RequestParam(name = "searchProduct", required = false) String searchProduct,

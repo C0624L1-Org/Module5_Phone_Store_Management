@@ -44,35 +44,9 @@ public class InvoiceServiceImpl implements IInvoiceService {
 
     @Override
     public Long totalRevenue() {
-        return iInvoiceDetailRepository.totalRevenue();
+        Long revenue = iInvoiceDetailRepository.totalRevenue();
+        return (revenue == null || revenue == 0) ? 0L : revenue;
     }
-
-//    @Override
-//    public Long totalTodayInvoiceRevenue() {
-//        LocalDate today = LocalDate.now();
-//        LocalDateTime startOfDay = today.atStartOfDay();
-//        LocalDateTime endOfDay = today.atTime(23, 59, 59, 999999999);
-//
-//        // Lấy danh sách ID hóa đơn trong ngày
-//        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startOfDay, endOfDay);
-//
-//        // Tính tổng doanh thu từ chi tiết hóa đơn dựa trên danh sách ID
-//        return iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
-//    }
-//
-//    @Override
-//    public Long totalThisMonthInvoiceRevenue() {
-//        LocalDate now = LocalDate.now();
-//        YearMonth thisMonth = YearMonth.from(now);
-//        LocalDateTime startDateTime = thisMonth.atDay(1).atStartOfDay();
-//        LocalDateTime endDateTime = thisMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
-//
-//        // Lấy danh sách ID hóa đơn trong tháng
-//        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startDateTime, endDateTime);
-//
-//        // Tính tổng doanh thu từ chi tiết hóa đơn dựa trên danh sách ID
-//        return iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
-//    }
 
     @Override
     public Long totalTodayInvoiceRevenue() {

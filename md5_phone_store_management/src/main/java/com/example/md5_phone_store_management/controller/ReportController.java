@@ -57,30 +57,17 @@ public class ReportController {
 
     @GetMapping("/report-home")
     public String showReportHome(Model model) {
-
         model.addAttribute("countAllSuccessInvoices", iInvoiceService.countAllSuccessInvoices());
         model.addAttribute("totalInvoiceRevenue", iInvoiceService.totalRevenue());
-
         model.addAttribute("countTodaySuccessInvoices", iInvoiceService.countTodaySuccessInvoices());
         model.addAttribute("countThisMonthSuccessInvoices", iInvoiceService.countThisMonthSuccessInvoices());
-
-        System.out.println("Doanh thu tháng này " + iInvoiceService.totalThisMonthInvoiceRevenue() + "\n" +" Doanh thu hôm nay " + iInvoiceService.totalTodayInvoiceRevenue()+ " \n " + "Tổng doanh thu " + iInvoiceService.totalRevenue());
-
-
-
-
         model.addAttribute("totalTodayInvoiceRevenue", iInvoiceService.totalTodayInvoiceRevenue());
         model.addAttribute("totalThisMonthInvoiceRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
-
         model.addAttribute("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
         model.addAttribute("totalNewCustomers", iCustomerService.countNewCustomers() != null ? iCustomerService.countNewCustomers() : 0);
-        //        khách hàng thân thiết thì trừ đi xử lý ở fe
-
-//thông báo gọi api sau
         return "dashboard/report-management/report-home";
     }
-    //        thông báo cho khách hàng là khách hàng nào đã thanh toán thành công(invoice)
-//        báo cáo bán hàng là đơn hàng mới nhất(invoice)
+
 
     @GetMapping("/dashboard/admin/customer/report")
     public ModelAndView adminCustomerReport(@RequestParam(name = "page", defaultValue = "0") int page) {
