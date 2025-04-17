@@ -64,6 +64,11 @@ public class ReportController {
         model.addAttribute("countTodaySuccessInvoices", iInvoiceService.countTodaySuccessInvoices());
         model.addAttribute("countThisMonthSuccessInvoices", iInvoiceService.countThisMonthSuccessInvoices());
 
+        System.out.println("Doanh thu tháng này " + iInvoiceService.totalThisMonthInvoiceRevenue() + "\n" +" Doanh thu hôm nay " + iInvoiceService.totalTodayInvoiceRevenue()+ " \n " + "Tổng doanh thu " + iInvoiceService.totalRevenue());
+
+
+
+
         model.addAttribute("totalTodayInvoiceRevenue", iInvoiceService.totalTodayInvoiceRevenue());
         model.addAttribute("totalThisMonthInvoiceRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
 

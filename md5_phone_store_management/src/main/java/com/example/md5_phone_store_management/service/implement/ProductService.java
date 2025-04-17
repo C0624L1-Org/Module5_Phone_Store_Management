@@ -345,6 +345,9 @@ public class ProductService implements IProductService {
         return productRepository.findByProductID(id);
     }
 
+
+
+
     @Override
     public void updateProductWithSellingPrice(Product product) {
         Product existingProduct = productRepository.findByProductID(product.getProductID());
@@ -363,7 +366,7 @@ public class ProductService implements IProductService {
                         product.getStorage(),
                         product.getDetailedDescription());
                 Product updatedProduct = productRepository.findByProductID(product.getProductID());
-                // Kiểm tra nếu có thay đổi liên quan đến retailPrice
+                // Check if retailPrice has changed
                 if ((oldProduct.getRetailPrice() == null && updatedProduct.getRetailPrice() != null) ||
                         (oldProduct.getRetailPrice() != null && updatedProduct.getRetailPrice() == null) ||
                         (oldProduct.getRetailPrice() != null && !oldProduct.getRetailPrice().equals(updatedProduct.getRetailPrice()))) {
@@ -378,7 +381,16 @@ public class ProductService implements IProductService {
                     event.addMetadata("oldValue", oldValue);
                     eventPublisher.publishEvent(event);
                 } else {
+                    // Include product name in metadata for UPDATE action
+                    String newValue = String.format("productID=%d, name=%s",
+                            updatedProduct.getProductID(),
+                            updatedProduct.getName() != null ? updatedProduct.getName() : "Unknown");
+                    String oldValue = String.format("productID=%d, name=%s",
+                            oldProduct.getProductID(),
+                            oldProduct.getName() != null ? oldProduct.getName() : "Unknown");
                     EntityChangeEvent event = new EntityChangeEvent(this, updatedProduct, "UPDATE", oldProduct);
+                    event.addMetadata("newValue", newValue);
+                    event.addMetadata("oldValue", oldValue);
                     eventPublisher.publishEvent(event);
                 }
             } catch (Exception e) {

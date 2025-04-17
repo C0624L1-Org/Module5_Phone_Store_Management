@@ -5,6 +5,7 @@ import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.InvoiceDetail;
 import com.example.md5_phone_store_management.model.InvoiceStatus;
+import com.example.md5_phone_store_management.repository.IInvoiceDetailRepository;
 import com.example.md5_phone_store_management.repository.InvoiceRepository;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -31,87 +33,76 @@ public class InvoiceServiceImpl implements IInvoiceService {
     private InvoiceRepository invoiceRepository;
 
     @Autowired
+    private IInvoiceDetailRepository iInvoiceDetailRepository;
+
+    @Autowired
     private IEmployeeService employeeService;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    //    Long totalRevenue();
+
     @Override
     public Long totalRevenue() {
-        return invoiceRepository.totalRevenue();
+        return iInvoiceDetailRepository.totalRevenue();
     }
+
+//    @Override
+//    public Long totalTodayInvoiceRevenue() {
+//        LocalDate today = LocalDate.now();
+//        LocalDateTime startOfDay = today.atStartOfDay();
+//        LocalDateTime endOfDay = today.atTime(23, 59, 59, 999999999);
+//
+//        // Lấy danh sách ID hóa đơn trong ngày
+//        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startOfDay, endOfDay);
+//
+//        // Tính tổng doanh thu từ chi tiết hóa đơn dựa trên danh sách ID
+//        return iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
+//    }
+//
+//    @Override
+//    public Long totalThisMonthInvoiceRevenue() {
+//        LocalDate now = LocalDate.now();
+//        YearMonth thisMonth = YearMonth.from(now);
+//        LocalDateTime startDateTime = thisMonth.atDay(1).atStartOfDay();
+//        LocalDateTime endDateTime = thisMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+//
+//        // Lấy danh sách ID hóa đơn trong tháng
+//        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startDateTime, endDateTime);
+//
+//        // Tính tổng doanh thu từ chi tiết hóa đơn dựa trên danh sách ID
+//        return iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
+//    }
 
     @Override
     public Long totalTodayInvoiceRevenue() {
-        LocalDate today = LocalDate.now();
-        return invoiceRepository.totalTodayInvoiceRevenue(today);
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        LocalDateTime startOfDay = today.atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
+        LocalDateTime endOfDay = today.atTime(23, 59, 59, 999999999);
+
+        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startOfDay, endOfDay);
+        System.out.println("Invoice IDs for today (size: " + invoiceIds.size() + "): " + invoiceIds);
+
+        Long total = iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
+        System.out.println("Total revenue for today: " + total);
+        return total != null ? total : 0L;
     }
 
     @Override
     public Long totalThisMonthInvoiceRevenue() {
-        LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         YearMonth thisMonth = YearMonth.from(now);
-        LocalDate startOfMonth = thisMonth.atDay(1);
-        LocalDateTime startDateTime = startOfMonth.atStartOfDay();
+        LocalDateTime startDateTime = thisMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
         LocalDateTime endDateTime = thisMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
-        return invoiceRepository.totalThisMonthInvoiceRevenue(startDateTime, endDateTime);
+
+        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startDateTime, endDateTime);
+        System.out.println("Invoice IDs for month (size: " + invoiceIds.size() + "): " + invoiceIds);
+
+        Long total = iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
+        System.out.println("Total revenue for month: " + total);
+        return total != null ? total : 0L;
     }
 
-
-//    @Override
-//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
-//    public Invoice saveInvoice(Invoice invoice) {
-//        try {
-//            if (invoice.getCustomer() == null) {
-//                throw new IllegalArgumentException("Customer cannot be null");
-//            }
-//
-//            System.out.println("Saving invoice: " + invoice);
-//            if (invoice.getInvoiceDetailList() != null) {
-//                System.out.println("Invoice has " + invoice.getInvoiceDetailList().size() + " details");
-//                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
-//                    System.out.println("  - Detail: " + detail);
-//                }
-//            }
-//
-//            if (invoice.getInvoiceDetailList() != null) {
-//                invoice.getInvoiceDetailList().forEach(detail -> {
-//                    if (detail.getInvoice() == null) {
-//                        detail.setInvoice(invoice);
-//                    }
-//                });
-//            }
-//
-//            if (invoice.getCreatedAt() == null) {
-//                invoice.setCreatedAt(LocalDateTime.now());
-//            }
-//
-//            if (invoice.getStatus() == null) {
-//                invoice.setStatus(InvoiceStatus.PROCESSING);
-//            }
-//
-//            validateInvoice(invoice);
-//
-//            Invoice savedInvoice = invoiceRepository.save(invoice);
-//            System.out.println("Invoice saved successfully, ID: " + savedInvoice.getId());
-//
-//            // Generate a unique event ID for debugging
-//            String eventId = java.util.UUID.randomUUID().toString();
-//            System.out.println("Publishing INSERT_INVOICE event for invoice ID: " + savedInvoice.getId() + ", eventId: " + eventId);
-//            eventPublisher.publishEvent(new EntityChangeEvent(this, savedInvoice, "INSERT_INVOICE", null));
-//
-//            return savedInvoice;
-//        } catch (DataIntegrityViolationException e) {
-//            System.err.println("Data integrity violation when saving invoice: " + e.getMessage());
-//            e.printStackTrace();
-//            throw e;
-//        } catch (Exception e) {
-//            System.err.println("Error saving invoice: " + e.getMessage());
-//            e.printStackTrace();
-//            throw e;
-//        }
-//    }
 
 
     @Override

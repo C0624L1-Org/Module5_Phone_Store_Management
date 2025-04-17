@@ -20,15 +20,9 @@ import com.example.md5_phone_store_management.model.PaymentMethod;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
-    @Query("SELECT COALESCE(SUM(i.amount), 0) FROM Invoice i WHERE i.status = 'SUCCESS'")
-    Long totalRevenue();
 
-    @Query("SELECT COALESCE(SUM(i.amount), 0) FROM Invoice i WHERE DATE(i.createdAt) = :today")
-    Long totalTodayInvoiceRevenue(@Param("today") LocalDate today);
-
-    @Query("SELECT COALESCE(SUM(i.amount), 0) FROM Invoice i WHERE i.createdAt BETWEEN :startDateTime AND :endDateTime")
-    Long totalThisMonthInvoiceRevenue(@Param("startDateTime") LocalDateTime startDateTime, @Param("endDateTime") LocalDateTime endDateTime);
-
+    @Query("SELECT DISTINCT i.id FROM Invoice i WHERE i.createdAt BETWEEN :startDate AND :endDate")
+    List<Long> findInvoiceIdsByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 
     // Sắp xếp
@@ -42,31 +36,38 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     Integer countSuccessInvoicesBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 
-
-
     //Theo thoi gian
     @Query(value = "SELECT * FROM invoices WHERE invoices.status = 'SUCCESS' ORDER BY TIME(created_at) ASC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithTimeAsc(Pageable pageable);
+
     @Query(value = "SELECT * FROM invoices WHERE invoices.status = 'SUCCESS' ORDER BY TIME(created_at) DESC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithTimeDesc(Pageable pageable);
+
     //Theo ten khach hang
     @Query(value = "SELECT * FROM invoices LEFT JOIN customer ON invoices.customer_id = customer.customerID WHERE invoices.status = 'SUCCESS' ORDER BY customer.full_name ASC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithCustomerNameAsc(Pageable pageable);
+
     @Query(value = "SELECT * FROM invoices LEFT JOIN customer ON invoices.customer_id = customer.customerID WHERE invoices.status = 'SUCCESS' ORDER BY customer.full_name DESC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithCustomerNameDesc(Pageable pageable);
+
     //Theo tên sản phẩm
     @Query(value = "SELECT * FROM invoices i LEFT JOIN (SELECT id.invoice_id, MIN(p.name) as first_product_name FROM invoicedetail id JOIN product p ON id.product_id = p.productID GROUP BY id.invoice_id) as product_info ON i.id = product_info.invoice_id WHERE i.status = 'SUCCESS' ORDER BY product_info.first_product_name ASC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithProductNameAsc(Pageable pageable);
+
     @Query(value = "SELECT * FROM invoices i LEFT JOIN (SELECT id.invoice_id, MIN(p.name) as first_product_name FROM invoicedetail id JOIN product p ON id.product_id = p.productID GROUP BY id.invoice_id) as product_info ON i.id = product_info.invoice_id WHERE i.status = 'SUCCESS' ORDER BY product_info.first_product_name DESC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithProductNameDesc(Pageable pageable);
+
     //Theo so tien
     @Query(value = "SELECT * FROM invoices WHERE status = 'SUCCESS' ORDER BY amount ASC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithAmountAsc(Pageable pageable);
+
     @Query(value = "SELECT * FROM invoices WHERE status = 'SUCCESS' ORDER BY amount DESC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithAmountDesc(Pageable pageable);
+
     //Theo so luong
     @Query(value = "SELECT i.*, SUM(id.quantity) AS quantity FROM invoices i, invoicedetail id WHERE i.id = id.invoice_id AND i.status = 'SUCCESS' GROUP BY id.invoice_id ORDER BY quantity ASC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithQuantityAsc(Pageable pageable);
+
     @Query(value = "SELECT i.*, SUM(id.quantity) AS quantity FROM invoices i, invoicedetail id WHERE i.id = id.invoice_id AND i.status = 'SUCCESS' GROUP BY id.invoice_id ORDER BY quantity DESC", nativeQuery = true)
     Page<Invoice> findAllSuccessInvoicesWithQuantityDesc(Pageable pageable);
 
@@ -86,53 +87,53 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     // Tìm tất cả hóa đơn của một khách hàng theo ID với phân trang
     Page<Invoice> findByCustomer_CustomerID(Integer customerID, Pageable pageable);
-    
+
     // Tìm tất cả hóa đơn theo trạng thái
     List<Invoice> findByStatus(InvoiceStatus status);
-    
+
     // Tìm tất cả hóa đơn theo trạng thái với phân trang
     Page<Invoice> findByStatus(InvoiceStatus status, Pageable pageable);
-    
+
     // Tìm tất cả hóa đơn theo phương thức thanh toán
     List<Invoice> findByPaymentMethod(PaymentMethod paymentMethod);
-    
+
     // Tìm tất cả hóa đơn theo phương thức thanh toán với phân trang
     Page<Invoice> findByPaymentMethod(PaymentMethod paymentMethod, Pageable pageable);
-    
+
     // Tìm tất cả hóa đơn theo nhân viên thực hiện
     List<Invoice> findByEmployee(Employee employee);
-    
+
     // Tìm tất cả hóa đơn theo nhân viên thực hiện với phân trang
     Page<Invoice> findByEmployee(Employee employee, Pageable pageable);
-    
+
     // Tìm tất cả hóa đơn theo nhân viên thực hiện theo ID
     List<Invoice> findByEmployee_EmployeeID(Integer employeeID);
-    
+
     // Tìm tất cả hóa đơn theo nhân viên thực hiện theo ID với phân trang
     Page<Invoice> findByEmployee_EmployeeID(Integer employeeID, Pageable pageable);
-    
+
     // Tìm hóa đơn theo khoảng thời gian
     List<Invoice> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
-    
+
     // Tìm hóa đơn theo khoảng thời gian với phân trang
     Page<Invoice> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
-    
+
     // Tìm hóa đơn theo trạng thái và phương thức thanh toán
     List<Invoice> findByStatusAndPaymentMethod(InvoiceStatus status, PaymentMethod paymentMethod);
-    
+
     // Tìm hóa đơn theo trạng thái và phương thức thanh toán với phân trang
     Page<Invoice> findByStatusAndPaymentMethod(InvoiceStatus status, PaymentMethod paymentMethod, Pageable pageable);
-    
+
     // Đếm số hóa đơn theo trạng thái
     Long countByStatus(InvoiceStatus status);
-    
+
     // Đếm số hóa đơn theo phương thức thanh toán
     Long countByPaymentMethod(PaymentMethod paymentMethod);
-    
+
     // Tính tổng doanh thu của tất cả hóa đơn thành công
     @Query("SELECT SUM(i.amount) FROM Invoice i WHERE i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS")
     Long getTotalRevenue();
-    
+
     // Tính tổng doanh thu theo khoảng thời gian
     @Query("SELECT SUM(i.amount) FROM Invoice i WHERE i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS AND i.createdAt BETWEEN ?1 AND ?2")
     Long getTotalRevenueBetween(LocalDateTime startDate, LocalDateTime endDate);

@@ -686,14 +686,23 @@ public class ChangeLogService {
             case "UPDATE":
             case "UPDATE_STOCK":
                 System.out.println("Processing update: " + action);
-                changes = getFieldChanges(oldEntity, entity);
-                changes.forEach((fieldName, change) -> {
-                    System.out.println("Logging field change: " + fieldName + ", old=" + change.get("oldValue") + ", new=" + change.get("newValue"));
-                    saveChangeLog(entity, "UPDATE", fieldName,
-                            change.get("oldValue"),
-                            change.get("newValue"),
-                            employeeId);
-                });
+                // Check if metadata contains newValue and oldValue
+                String newValueFromMetadata = (String) event.getMetadata().get("newValue");
+                String oldValueFromMetadata = (String) event.getMetadata().get("oldValue");
+                if (newValueFromMetadata != null && oldValueFromMetadata != null) {
+                    System.out.println("Using metadata for UPDATE: old=" + oldValueFromMetadata + ", new=" + newValueFromMetadata);
+                    saveChangeLog(entity, "UPDATE", "name", oldValueFromMetadata, newValueFromMetadata, employeeId);
+                } else {
+                    // Fallback to field comparison if metadata is not provided
+                    changes = getFieldChanges(oldEntity, entity);
+                    changes.forEach((fieldName, change) -> {
+                        System.out.println("Logging field change: " + fieldName + ", old=" + change.get("oldValue") + ", new=" + change.get("newValue"));
+                        saveChangeLog(entity, "UPDATE", fieldName,
+                                change.get("oldValue"),
+                                change.get("newValue"),
+                                employeeId);
+                    });
+                }
                 break;
 
             case "DELETE_IMAGES":

@@ -61,6 +61,9 @@ public class BusinessController {
         model.addAttribute("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
         model.addAttribute("maleCustomers", iCustomerService.countMaleCustomers() != null ? iCustomerService.countMaleCustomers() : 0);
         model.addAttribute("femaleCustomers", iCustomerService.countFemaleCustomers() != null ? iCustomerService.countFemaleCustomers() : 0);
+
+
+        
         model.addAttribute("countAllSuccessInvoices", invoiceService.countAllSuccessInvoices());
         model.addAttribute("countTodaySuccessInvoices", invoiceService.countTodaySuccessInvoices());
         model.addAttribute("countThisMonthSuccessInvoices", invoiceService.countThisMonthSuccessInvoices());

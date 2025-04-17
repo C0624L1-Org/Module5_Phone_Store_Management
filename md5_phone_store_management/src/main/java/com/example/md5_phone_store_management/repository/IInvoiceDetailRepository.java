@@ -3,6 +3,8 @@ package com.example.md5_phone_store_management.repository;
 import com.example.md5_phone_store_management.model.InvoiceDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -17,6 +19,14 @@ import com.example.md5_phone_store_management.model.InvoiceDetail;
 
 @Repository
 public interface IInvoiceDetailRepository extends JpaRepository<InvoiceDetail, Integer> {
+
+
+    @Query("SELECT COALESCE(SUM(id.totalPrice), 0) FROM InvoiceDetail id WHERE id.invoice.id IN :invoiceIds")
+    Long totalRevenueByInvoiceIds(@Param("invoiceIds") List<Long> invoiceIds);
+
+
+    @Query("SELECT SUM(i.totalPrice) FROM InvoiceDetail i")
+    Long totalRevenue();
 
     @Query("SELECT id FROM InvoiceDetail id WHERE id.invoice.id = :invoiceId")
     List<InvoiceDetail> findInvoiceDetailsByInvoiceId(@Param("invoiceId") Long invoiceId);
