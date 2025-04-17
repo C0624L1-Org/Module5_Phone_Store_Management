@@ -144,4 +144,9 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
 
     @Query("SELECT COALESCE(SUM(id.quantity), 0) FROM InvoiceDetail id")
     Long countSoldProducts();
+
+    // NAVBAR
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Product> searchProductsNameForNavbar(@Param("keyword") String keyword, Pageable pageable);
+
 }

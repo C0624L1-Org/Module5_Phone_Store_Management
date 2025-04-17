@@ -48,7 +48,7 @@
 <!--      </li>-->
 
       <!-- Quản lý nhà cung cấp - Thủ kho, Admin -->
-      <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
+      <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff', 'SalesPerson')">
         <a th:href="@{/dashboard/suppliers}" class="nav-link text-white">
           <i class="fas fa-truck-loading me-2"></i>Quản lý nhà cung cấp
         </a>
@@ -90,7 +90,7 @@
 <!--      </li>-->
 
       <!-- Quản lý báo cáo - Admin & Nhân viên kinh doanh -->
-      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">
+      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">
         <a th:href="@{/report-home}" class="nav-link text-white">
           <i class="fas fa-file-alt me-2"></i>Quản lý báo cáo
         </a>
