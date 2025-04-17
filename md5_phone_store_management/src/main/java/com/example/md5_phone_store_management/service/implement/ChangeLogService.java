@@ -491,6 +491,9 @@ public class ChangeLogService {
             "name", "fullName", "retailPrice", // Product fields
             "amount" // Invoice fields
     };
+    private static final String[] SUPPLIER_FIELDS = {
+            "name" // Supplier fields
+    };
 
     private final Set<String> processedEvents = new HashSet<>();
 
@@ -585,20 +588,57 @@ public class ChangeLogService {
                 }
                 saveChangeLog(entity, "DELETE", "customer", null, deleteValue, employeeId);
                 break;
-            case "INSERT":
-                if (!entity.getClass().getSimpleName().equalsIgnoreCase("Product")) {
-                    System.out.println("Skipping non-product entity for action: " + action);
-                    break;
-                }
-                System.out.println("Processing product insertion: " + action);
-                for (String fieldName : TRACKED_FIELDS) {
-                    String nameValue = getFieldValue(entity, fieldName);
-                    if (nameValue != null) {
-                           saveChangeLog(entity, "INSERT", fieldName, null, nameValue, employeeId);
+//            case "INSERT":
+//            case "INSERT_PW_NO_PRICE":
+//            case "INSERT_PW_PRICE":
+//                if (!entity.getClass().getSimpleName().equalsIgnoreCase("Product")) {
+//                    System.out.println("Skipping non-product entity for action: " + action);
+//                    break;
+//                }
+//                System.out.println("Processing product insertion: " + action);
+//                for (String fieldName : TRACKED_FIELDS) {
+//                    String nameValue = getFieldValue(entity, fieldName);
+//                    if (nameValue != null) {
+//                        if (action.equals("INSERT_PW_NO_PRICE") && fieldName.equals("retailPrice")) {
+//                            System.out.println("Logging retailPrice: No Retail Price");
+//                            saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
+//                        } else {
+//                            System.out.println("Logging field: " + fieldName + ", value=" + nameValue);
+//                            saveChangeLog(entity, "INSERT", fieldName, null, nameValue, employeeId);
+//                        }
+//                    }
+//                }
+//                if (action.equals("INSERT_PW_NO_PRICE") && !Arrays.asList(TRACKED_FIELDS).contains("retailPrice")) {
+//                    System.out.println("Logging retailPrice: No Retail Price (fallback)");
+//                    saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
+//                }
+//                break;
 
+            case "INSERT":
+                String entityType = entity.getClass().getSimpleName();
+                if (entityType.equalsIgnoreCase("Product")) {
+                    System.out.println("Processing product insertion: " + action);
+                    for (String fieldName : TRACKED_FIELDS) {
+                        String nameValue = getFieldValue(entity, fieldName);
+                        if (nameValue != null) {
+                            System.out.println("Logging field: " + fieldName + ", value=" + nameValue);
+                            saveChangeLog(entity, "INSERT", fieldName, null, nameValue, employeeId);
+                        }
                     }
+                } else if (entityType.equalsIgnoreCase("Supplier")) {
+                    System.out.println("Processing supplier insertion: " + action);
+                    for (String fieldName : SUPPLIER_FIELDS) {
+                        String nameValue = getFieldValue(entity, fieldName);
+                        if (nameValue != null) {
+                            System.out.println("Logging field: " + fieldName + ", value=" + nameValue);
+                            saveChangeLog(entity, "INSERT", fieldName, null, nameValue, employeeId);
+                        }
+                    }
+                } else {
+                    System.out.println("Skipping unsupported entity for action: " + action + ", type: " + entityType);
                 }
                 break;
+
 
             case "INSERT_PW_NO_PRICE":
             case "INSERT_PW_PRICE":
