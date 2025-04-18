@@ -558,6 +558,48 @@ public class ChangeLogService {
         }
 
         switch (action) {
+            case "INSERT_EMPLOYEE":
+                System.out.println("Processing INSERT_EMPLOYEE for employee");
+                String insertValueEmp = ((Employee) entity).getFullName() != null ?
+                        ((Employee) entity).getFullName() :
+                        String.valueOf(((Employee) entity).getEmployeeID());
+                saveChangeLog(entity, "INSERT", "employee", null, insertValueEmp, employeeId);
+                break;
+
+
+            case "UPDATE_EMPLOYEE":
+                System.out.println("Processing UPDATE_EMPLOYEE for employee");
+                String newValueEmp = ((Employee) entity).getFullName() != null ?
+                        ((Employee) entity).getFullName() :
+                        String.valueOf(((Employee) entity).getEmployeeID());
+                String oldValueEmp = oldEntity != null ?
+                        (((Employee) oldEntity).getFullName() != null ?
+                                ((Employee) oldEntity).getFullName() :
+                                String.valueOf(((Employee) oldEntity).getEmployeeID())) :
+                        null;
+                // Tạo ChangeLog trực tiếp để đặt entity_name cố định
+                ChangeLog log = new ChangeLog();
+                log.setEntityName("employee"); // Cố định entity_name là "employee"
+                log.setEntityId(getEntityId(entity));
+                log.setFieldName("employee");
+                log.setAction("UPDATE");
+                log.setOldValue(oldValueEmp);
+                log.setNewValue(newValueEmp);
+                log.setEmployeeId(employeeId);
+                log.setTimestamp(LocalDateTime.now());
+                System.out.println("Saving ChangeLog: entityName=" + log.getEntityName() + ", entityId=" + log.getEntityId() +
+                        ", fieldName=employee, action=UPDATE, oldValue=" + oldValueEmp + ", newValue=" + newValueEmp);
+                changeLogRepository.save(log);
+                break;
+
+            case "DELETE_EMPLOYEE":
+                System.out.println("Processing DELETE_EMPLOYEE for employee");
+                String deleteValueEmp = ((Employee) entity).getFullName() != null ?
+                        ((Employee) entity).getFullName() :
+                        String.valueOf(((Employee) entity).getEmployeeID());
+                saveChangeLog(entity, "DELETE", "employee", deleteValueEmp, deleteValueEmp, employeeId);
+                break;
+
             case "INSERT_CUSTOMER":
                 System.out.println("Processing INSERT_CUSTOMER for customer");
                 String insertValue = ((Customer) entity).getFullName() != null ? ((Customer) entity).getFullName() : String.valueOf(((Customer) entity).getCustomerID());
@@ -588,31 +630,6 @@ public class ChangeLogService {
                 }
                 saveChangeLog(entity, "DELETE", "customer", null, deleteValue, employeeId);
                 break;
-//            case "INSERT":
-//            case "INSERT_PW_NO_PRICE":
-//            case "INSERT_PW_PRICE":
-//                if (!entity.getClass().getSimpleName().equalsIgnoreCase("Product")) {
-//                    System.out.println("Skipping non-product entity for action: " + action);
-//                    break;
-//                }
-//                System.out.println("Processing product insertion: " + action);
-//                for (String fieldName : TRACKED_FIELDS) {
-//                    String nameValue = getFieldValue(entity, fieldName);
-//                    if (nameValue != null) {
-//                        if (action.equals("INSERT_PW_NO_PRICE") && fieldName.equals("retailPrice")) {
-//                            System.out.println("Logging retailPrice: No Retail Price");
-//                            saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
-//                        } else {
-//                            System.out.println("Logging field: " + fieldName + ", value=" + nameValue);
-//                            saveChangeLog(entity, "INSERT", fieldName, null, nameValue, employeeId);
-//                        }
-//                    }
-//                }
-//                if (action.equals("INSERT_PW_NO_PRICE") && !Arrays.asList(TRACKED_FIELDS).contains("retailPrice")) {
-//                    System.out.println("Logging retailPrice: No Retail Price (fallback)");
-//                    saveChangeLog(entity, "INSERT", "retailPrice", null, "No Retail Price", employeeId);
-//                }
-//                break;
 
             case "INSERT":
                 String entityType = entity.getClass().getSimpleName();

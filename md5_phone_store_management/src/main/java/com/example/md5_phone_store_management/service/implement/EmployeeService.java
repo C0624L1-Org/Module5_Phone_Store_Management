@@ -270,10 +270,6 @@ public class EmployeeService implements IEmployeeService {
 
     /**
      * Thêm một nhân viên mới vào hệ thống.
-     *
-     * @param employee Đối tượng nhân viên cần thêm.
-     * @throws IllegalArgumentException Nếu thông tin nhân viên không hợp lệ.
-     * @throws RuntimeException Nếu có lỗi khi lưu nhân viên.
      */
     @Override
     @Transactional
@@ -316,7 +312,8 @@ public class EmployeeService implements IEmployeeService {
             }
             logger.info("Đang lưu nhân viên: {}", employee.getFullName());
             Employee savedEmployee = iEmployeeRepository.save(employee);
-            eventPublisher.publishEvent(new EntityChangeEvent(this, savedEmployee, "INSERT", null));
+            // Gửi sự kiện INSERT_EMPLOYEE, không dùng metadata
+            eventPublisher.publishEvent(new EntityChangeEvent(this, savedEmployee, "INSERT_EMPLOYEE", null));
             logger.info("Đã lưu nhân viên thành công: {}", savedEmployee.getFullName());
         } catch (Exception e) {
             logger.error("Lỗi khi thêm nhân viên: {}", e.getMessage());
@@ -324,7 +321,6 @@ public class EmployeeService implements IEmployeeService {
         }
     }
 
-    // Các phương thức giữ nguyên từ mã gốc
     @Override
     public Page<Employee> getAllEmployeesExceptAdmin(Pageable pageable) {
         return iEmployeeRepository.getAllEmployeesExceptAdmin(pageable);
@@ -367,17 +363,6 @@ public class EmployeeService implements IEmployeeService {
 
     /**
      * Cập nhật thông tin nhân viên.
-     *
-     * @param employeeID ID của nhân viên.
-     * @param fullName   Họ và tên.
-     * @param dob        Ngày sinh.
-     * @param address    Địa chỉ.
-     * @param phone      Số điện thoại.
-     * @param role       Vai trò.
-     * @param email      Email.
-     * @return Số bản ghi được cập nhật.
-     * @throws IllegalArgumentException Nếu thông tin không hợp lệ.
-     * @throws EmployeeNotFoundException Nếu không tìm thấy nhân viên.
      */
     @Override
     @Transactional
@@ -409,7 +394,8 @@ public class EmployeeService implements IEmployeeService {
         int updated = iEmployeeRepository.updateEmployee(employeeID, fullName, dob, address, phone, role, email);
         if (updated > 0) {
             Employee updatedEmployee = iEmployeeRepository.getById(employeeID);
-            eventPublisher.publishEvent(new EntityChangeEvent(this, updatedEmployee, "UPDATE", oldEmployee));
+            // Gửi sự kiện UPDATE_EMPLOYEE, không dùng metadata
+            eventPublisher.publishEvent(new EntityChangeEvent(this, updatedEmployee, "UPDATE_EMPLOYEE", oldEmployee));
             logger.info("Cập nhật nhân viên thành công: {}", fullName);
         }
         return updated;
@@ -432,10 +418,6 @@ public class EmployeeService implements IEmployeeService {
 
     /**
      * Xóa danh sách nhân viên theo ID.
-     *
-     * @param employeeIDs Danh sách ID nhân viên.
-     * @throws IllegalArgumentException Nếu danh sách ID không hợp lệ.
-     * @throws EmployeeNotFoundException Nếu không tìm thấy nhân viên.
      */
     @Override
     @Transactional
@@ -452,7 +434,9 @@ public class EmployeeService implements IEmployeeService {
         for (Employee employee : employees) {
             logger.info("Xóa giao dịch của nhân viên ID: {}", employee.getEmployeeID());
             iTransactionOutService.deleteInventoryTransactionByEmployeeID(employee.getEmployeeID());
-            eventPublisher.publishEvent(new EntityChangeEvent(this, employee, "DELETE", employee));
+            // Gửi sự kiện DELETE_EMPLOYEE, không dùng metadata
+            eventPublisher.publishEvent(new EntityChangeEvent(this, employee, "DELETE_EMPLOYEE", null));
+            logger.info("Đã gửi sự kiện DELETE_EMPLOYEE cho nhân viên: {}", employee.getFullName());
         }
         iEmployeeRepository.deleteAllById(employeeIDs);
         logger.info("Đã xóa thành công {} nhân viên", employeeIDs.size());
@@ -460,13 +444,6 @@ public class EmployeeService implements IEmployeeService {
 
     /**
      * Cập nhật ảnh đại diện cho nhân viên.
-     *
-     * @param employeeID ID của nhân viên.
-     * @param file       File ảnh đại diện.
-     * @return Nhân viên đã được cập nhật.
-     * @throws IllegalArgumentException Nếu thông tin không hợp lệ.
-     * @throws EmployeeNotFoundException Nếu không tìm thấy nhân viên.
-     * @throws RuntimeException Nếu có lỗi khi upload ảnh.
      */
     @Override
     @Transactional
@@ -485,11 +462,8 @@ public class EmployeeService implements IEmployeeService {
             Optional<Employee> optional = iEmployeeRepository.findById(employeeID);
             if (optional.isPresent()) {
                 Employee employee = optional.get();
-                Employee oldEmployee = new Employee();
-                org.springframework.beans.BeanUtils.copyProperties(employee, oldEmployee);
                 employee.setAvatar(avatarUrl);
                 Employee updatedEmployee = iEmployeeRepository.save(employee);
-                eventPublisher.publishEvent(new EntityChangeEvent(this, updatedEmployee, "UPDATE", oldEmployee));
                 logger.info("Cập nhật avatar thành công cho nhân viên ID: {}", employeeID);
                 return updatedEmployee;
             } else {
@@ -504,12 +478,6 @@ public class EmployeeService implements IEmployeeService {
 
     /**
      * Đổi mật khẩu của nhân viên.
-     *
-     * @param username    Tên đăng nhập.
-     * @param oldPassword Mật khẩu cũ.
-     * @param newPassword Mật khẩu mới.
-     * @return true nếu đổi mật khẩu thành công, false nếu thất bại.
-     * @throws IllegalArgumentException Nếu thông tin không hợp lệ.
      */
     @Override
     @Transactional
@@ -537,12 +505,9 @@ public class EmployeeService implements IEmployeeService {
             logger.warn("Mật khẩu cũ không khớp cho nhân viên: {}", username);
             return false;
         }
-        Employee oldEmployee = new Employee();
-        org.springframework.beans.BeanUtils.copyProperties(employee, oldEmployee);
         String newEncryptedPassword = encryptPasswordUtils.encryptPasswordUtils(newPassword);
         employee.setPassword(newEncryptedPassword);
-        Employee updatedEmployee = iEmployeeRepository.save(employee);
-        eventPublisher.publishEvent(new EntityChangeEvent(this, updatedEmployee, "UPDATE", oldEmployee));
+        iEmployeeRepository.save(employee);
         logger.info("Đổi mật khẩu thành công cho nhân viên: {}", username);
         return true;
     }
