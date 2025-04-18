@@ -30,7 +30,6 @@ public class SpringSecurity {
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
-        // Chuỗi mã hóa mật khẩu
         return new BCryptPasswordEncoder();
     }
 
@@ -43,7 +42,8 @@ public class SpringSecurity {
                                 "/api/sales/**",
                                 "/dashboard/sales/add",
                                 "/dashboard/products/**",
-                                "/dashboard/admin/transactions/listIn/delete")
+                                "/dashboard/admin/transactions/listIn/delete",
+                                "/api/chatbot/query") // Bỏ qua CSRF cho chatbot
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login",
@@ -58,12 +58,10 @@ public class SpringSecurity {
                                 "/api/vnpay/**",
                                 "/api/payment/**",
                                 "/api/search/**",
-
-//                                chọn sp
+                                "/api/chatbot/query", // Cho phép truy cập chatbot
                                 "/dashboard/products/select-product",
                                 "/dashboard/products/deselect-products",
                                 "/dashboard/products/selected-products",
-
                                 "/dashboard/sales/payment-callback",
                                 "/dashboard/sales/invoice-pdf/**",
                                 "/dashboard/sales/download-invoice-pdf/**").permitAll()
@@ -103,28 +101,8 @@ public class SpringSecurity {
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler)
                 )
-                // Tắt hoàn toàn RequestCache phuc vụ việc redirect về trang cố ý truy cập trước khi đăng nhập
-                .requestCache(RequestCacheConfigurer::disable
-                );
+                .requestCache(RequestCacheConfigurer::disable);
 
         return http.build();
     }
-
-    // tắt tạm thời sercurity
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                // Vô hiệu hóa CSRF
-//                .csrf(csrf -> csrf.disable())
-//                // Cho phép mọi request không cần xác thực
-//                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-//                // Vô hiệu hóa form login
-//                .formLogin(form -> form.disable())
-//                // Vô hiệu hóa logout
-//                .logout(logout -> logout.disable());
-//
-//        return http.build();
-//    }
-
-
 }

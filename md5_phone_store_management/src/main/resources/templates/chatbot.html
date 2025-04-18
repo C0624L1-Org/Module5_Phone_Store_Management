@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot</title>
+  <style>
+    #chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    #chatbot-header {
+      background: #007bff;
+      color: #fff;
+      padding: 10px;
+      border-radius: 10px 10px 0 0;
+      text-align: center;
+      cursor: pointer;
+    }
+    #chatbot-body {
+      height: 300px;
+      overflow-y: auto;
+      padding: 10px;
+      display: none;
+    }
+    #chatbot-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+      display: none;
+    }
+    #chatbot-input input {
+      flex: 1;
+      border: none;
+      padding: 10px;
+      outline: none;
+    }
+    #chatbot-input button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .message {
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 5px;
+    }
+    .user-message {
+      background: #007bff;
+      color: #fff;
+      margin-left: 20%;
+    }
+    .bot-message {
+      background: #f1f1f1;
+      margin-right: 20%;
+    }
+    .bot-message img {
+      max-width: 100px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+<div id="chatbot">
+  <div id="chatbot-header" onclick="toggleChatbot()">Trợ lý AI</div>
+  <div id="chatbot-body"></div>
+  <div id="chatbot-input">
+    <input type="text" id="user-input" placeholder="Nhập yêu cầu...">
+    <button onclick="sendMessage()">Gửi</button>
+  </div>
+</div>
+
+<script>
+  function toggleChatbot() {
+    const body = document.getElementById('chatbot-body');
+    const input = document.getElementById('chatbot-input');
+    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    input.style.display = input.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('user-input');
+    const chatBody = document.getElementById('chatbot-body');
+    const userMessage = input.value.trim();
+
+    if (!userMessage) return;
+
+    // Hiển thị tin nhắn người dùng
+    const userDiv = document.createElement('div');
+    userDiv.className = 'message user-message';
+    userDiv.textContent = userMessage;
+    chatBody.appendChild(userDiv);
+
+    // Gửi yêu cầu tới backend
+    fetch('/api/chatbot/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userMessage)
+    })
+            .then(response => response.text())
+            .then(data => {
+              // Hiển thị phản hồi từ bot
+              const botDiv = document.createElement('div');
+              botDiv.className = 'message bot-message';
+              botDiv.innerHTML = data.replace(/\n/g, '<br>').replace(/\[Ảnh: (.*?)\]/g, '<br><img src="$1" alt="Product Image">');
+              chatBody.appendChild(botDiv);
+              chatBody.scrollTop = chatBody.scrollHeight;
+            })
+            .catch(error => console.error('Error:', error));
+
+    input.value = '';
+  }
+
+  // Gửi tin nhắn khi nhấn Enter
+  document.getElementById('user-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') sendMessage();
+  });
+</script>
+</body>
+</html>
