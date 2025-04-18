@@ -1,3 +1,1388 @@
+<!--&lt;!&ndash;<!DOCTYPE html>&ndash;&gt;-->
+<!--&lt;!&ndash;<html lang="vi">&ndash;&gt;-->
+<!--&lt;!&ndash;<head>&ndash;&gt;-->
+<!--&lt;!&ndash;    <meta charset="UTF-8">&ndash;&gt;-->
+<!--&lt;!&ndash;    <meta name="viewport" content="width=device-width, initial-scale=1.0">&ndash;&gt;-->
+<!--&lt;!&ndash;    <title>Bảng Điều Khiển</title>&ndash;&gt;-->
+
+<!--&lt;!&ndash;    &lt;!&ndash; CSS Libraries &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">&ndash;&gt;-->
+<!--&lt;!&ndash;    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">&ndash;&gt;-->
+
+<!--&lt;!&ndash;    &lt;!&ndash; Tailwind CSS &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;    <script src="https://cdn.tailwindcss.com"></script>&ndash;&gt;-->
+
+<!--&lt;!&ndash;    &lt;!&ndash; Custom CSS &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;    <link rel="stylesheet" href="/css/fragments/navbar.css">&ndash;&gt;-->
+<!--&lt;!&ndash;    <link rel="stylesheet" href="/css/fragments/sidebar.css">&ndash;&gt;-->
+<!--&lt;!&ndash;    <link rel="stylesheet" href="/css/fragments/footer.css">&ndash;&gt;-->
+<!--&lt;!&ndash;    <link rel="stylesheet" href="/css/common/toast.css">&ndash;&gt;-->
+<!--&lt;!&ndash;    <link rel="stylesheet" href="/css/common/layout.css">&ndash;&gt;-->
+
+<!--&lt;!&ndash;    &lt;!&ndash; Inline CSS &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;    <style>&ndash;&gt;-->
+<!--&lt;!&ndash;        .dash-sales-analytics.hidden, .dash-updates-profile.hidden {&ndash;&gt;-->
+<!--&lt;!&ndash;            width: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            min-width: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            padding: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            margin: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            opacity: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            flex: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            overflow: hidden;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        .dash-sales-analytics.expanded, .dash-updates-profile.expanded {&ndash;&gt;-->
+<!--&lt;!&ndash;            position: absolute;&ndash;&gt;-->
+<!--&lt;!&ndash;            left: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            right: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            width: calc(100% - 40px);&ndash;&gt;-->
+<!--&lt;!&ndash;            z-index: 1;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        #salesChart {&ndash;&gt;-->
+<!--&lt;!&ndash;            max-height: 300px;&ndash;&gt;-->
+<!--&lt;!&ndash;            width: 100%;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;    </style>&ndash;&gt;-->
+<!--&lt;!&ndash;</head>&ndash;&gt;-->
+<!--&lt;!&ndash;<body class="font-sans bg-gray-100 m-0 p-0">&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash; Toast &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;<div th:replace="~{common/toast}"></div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;&lt;!&ndash; Navbar &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;<nav th:replace="~{fragments/navbar :: navbar}"></nav>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<div class="content-wrapper flex flex-col min-h-screen pt-[90px]">&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="dashboard-container flex flex-1">&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash; Sidebar &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        <aside th:replace="~{fragments/sidebar :: sidebar}" class="min-w-[250px] bg-white shadow-md"></aside>&ndash;&gt;-->
+
+<!--&lt;!&ndash;        <div class="dash-container flex-1 max-w-full mx-auto p-4 md:p-8">&ndash;&gt;-->
+<!--&lt;!&ndash;            <nav aria-label="breadcrumb">&ndash;&gt;-->
+<!--&lt;!&ndash;                <ol class="breadcrumb">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <li class="breadcrumb-item active" aria-current="page">Thống kê Admin</li>&ndash;&gt;-->
+<!--&lt;!&ndash;                </ol>&ndash;&gt;-->
+<!--&lt;!&ndash;            </nav>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            &lt;!&ndash; Top Section: Cards &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="dash-cards-wrapper flex gap-5 flex-wrap md:flex-nowrap mb-5 w-full">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="dash-card flex-1 min-w-0 bg-orange-400 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('revenue')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-revenue">0đ</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Doanh Thu</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="revenue-change">0đ</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex flex-col items-center text-base opacity-90">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất : <span id="revenue-update-time"></span></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div id="revenue-update-date"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class="dash-card flex-1 min-w-0 bg-green-500 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('products')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-products">0</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Sản Phẩm</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="products-change">0</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex flex-col items-center text-base opacity-90">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất : <span id="products-update-time"></span></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div id="products-update-date"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class="dash-card flex-1 min-w-0 bg-pink-400 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('suppliers')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-suppliers">0</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Nhà Cung Cấp</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="suppliers-change">0</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex flex-col items-center text-base opacity-90">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất : <span id="suppliers-update-time"></span></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div id="suppliers-update-date"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class="dash-card flex-1 min-w-0 bg-cyan-400 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('employees')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-employees">0</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Nhân Viên</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="employees-change">0</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex flex-col items-center text-base opacity-90">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất : <span id="employees-update-time"></span></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div id="employees-update-date"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class="dash-card flex-1 min-w-0 bg-purple-500 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('customers')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-customers">0</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Khách Hàng</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="customers-change">0</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex flex-col items-center text-base opacity-90">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất : <span id="customers-update-time"></span></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div id="customers-update-date"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            &lt;!&ndash; Bottom Section &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="dash-bottom-section flex gap-5 w-full relative flex-wrap">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="dash-sales-analytics flex-[7] min-w-[300px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="dash-header flex justify-between items-center mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer" onclick="toggleExpand('sales')">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-expand"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </button>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="dash-chart-controls flex justify-between items-center mb-5">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="dash-zoom flex gap-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer" onclick="zoomChart('in')">⟐</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer" onclick="zoomChart('out')">⟑</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer" onclick="resetChart()">Hiển thị tất cả</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <canvas id="salesChart"></canvas>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class="dash-updates-profile flex-[3] min-w-[200px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="dash-header flex justify-between items-center mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer" onclick="toggleExpand('updates')">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-expand"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </button>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div id="changeLogsContainer"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;    &lt;!&ndash; Footer &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;    <footer th:replace="~{fragments/footer :: footer}" class="bg-white shadow-md p-4"></footer>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>&ndash;&gt;-->
+<!--&lt;!&ndash;<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>&ndash;&gt;-->
+<!--&lt;!&ndash;<div th:replace="~{fragments/navbar :: navbar-script}"></div>&ndash;&gt;-->
+
+
+<!--&lt;!&ndash;<script>&ndash;&gt;-->
+<!--&lt;!&ndash;    // Function to format relative time&ndash;&gt;-->
+<!--&lt;!&ndash;    function formatRelativeTime(timestamp) {&ndash;&gt;-->
+<!--&lt;!&ndash;        if (!timestamp || isNaN(new Date(timestamp))) {&ndash;&gt;-->
+<!--&lt;!&ndash;            return "vừa xong";&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;        const now = new Date();&ndash;&gt;-->
+<!--&lt;!&ndash;        const logTime = new Date(timestamp);&ndash;&gt;-->
+<!--&lt;!&ndash;        const diffInSeconds = Math.floor((now - logTime) / 1000);&ndash;&gt;-->
+
+<!--&lt;!&ndash;        if (diffInSeconds < 60) {&ndash;&gt;-->
+<!--&lt;!&ndash;            return "vừa xong";&ndash;&gt;-->
+<!--&lt;!&ndash;        } else if (diffInSeconds < 3600) {&ndash;&gt;-->
+<!--&lt;!&ndash;            const minutes = Math.floor(diffInSeconds / 60);&ndash;&gt;-->
+<!--&lt;!&ndash;            return `${minutes} phút trước`;&ndash;&gt;-->
+
+<!--&lt;!&ndash;        } else if (diffInSeconds < 86400) {&ndash;&gt;-->
+<!--&lt;!&ndash;            const hours = Math.floor(diffInSeconds / 3600);&ndash;&gt;-->
+<!--&lt;!&ndash;            return `${hours} giờ trước`;&ndash;&gt;-->
+<!--&lt;!&ndash;        } else {&ndash;&gt;-->
+<!--&lt;!&ndash;            return logTime.toLocaleString('vi-VN', {&ndash;&gt;-->
+<!--&lt;!&ndash;                day: '2-digit',&ndash;&gt;-->
+<!--&lt;!&ndash;                month: '2-digit',&ndash;&gt;-->
+<!--&lt;!&ndash;                year: 'numeric',&ndash;&gt;-->
+<!--&lt;!&ndash;                hour: '2-digit',&ndash;&gt;-->
+<!--&lt;!&ndash;                minute: '2-digit'&ndash;&gt;-->
+<!--&lt;!&ndash;            });&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    // Function to format date and time from LocalDateTime&ndash;&gt;-->
+<!--&lt;!&ndash;    function formatDateTimeFromLocal(timestamp) {&ndash;&gt;-->
+<!--&lt;!&ndash;        if (!timestamp || isNaN(new Date(timestamp))) {&ndash;&gt;-->
+<!--&lt;!&ndash;            return { time: '&#45;&#45;:&#45;&#45;', date: '&#45;&#45;/&#45;&#45;/&#45;&#45;&#45;&#45;' };&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;        const dateObj = new Date(timestamp);&ndash;&gt;-->
+<!--&lt;!&ndash;        const time = dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });&ndash;&gt;-->
+<!--&lt;!&ndash;        const date = dateObj.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });&ndash;&gt;-->
+<!--&lt;!&ndash;        return { time, date };&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    // Function to format currency&ndash;&gt;-->
+<!--&lt;!&ndash;    function formatCurrency(value) {&ndash;&gt;-->
+<!--&lt;!&ndash;        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value || 0);&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+
+<!--&lt;!&ndash;    async function getEmployeeNameById(employeeId) {&ndash;&gt;-->
+<!--&lt;!&ndash;        if (!employeeId) return 'N/A';&ndash;&gt;-->
+<!--&lt;!&ndash;        const url = `http://localhost:8080/api/changelogs/employee/${employeeId}/name`; // Use absolute URL for testing&ndash;&gt;-->
+<!--&lt;!&ndash;        console.log("Fetching URL:", url);&ndash;&gt;-->
+<!--&lt;!&ndash;        try {&ndash;&gt;-->
+<!--&lt;!&ndash;            const response = await fetch(url);&ndash;&gt;-->
+<!--&lt;!&ndash;            if (!response.ok) {&ndash;&gt;-->
+<!--&lt;!&ndash;                console.log("lỗi 1");&ndash;&gt;-->
+<!--&lt;!&ndash;                console.log("Status:", response.status);&ndash;&gt;-->
+<!--&lt;!&ndash;                console.log("Response:", await response.text());&ndash;&gt;-->
+<!--&lt;!&ndash;                console.log("employeeId:", employeeId);&ndash;&gt;-->
+<!--&lt;!&ndash;                return 'không xác định';&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;            const data = await response.json();&ndash;&gt;-->
+<!--&lt;!&ndash;            return data.name || 'không xác định';&ndash;&gt;-->
+<!--&lt;!&ndash;        } catch (error) {&ndash;&gt;-->
+<!--&lt;!&ndash;            console.error(`Error fetching employee name for ID ${employeeId}:`, error);&ndash;&gt;-->
+<!--&lt;!&ndash;            console.log("lỗi 2");&ndash;&gt;-->
+<!--&lt;!&ndash;            return 'không xác định';&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    // Lưu cache tên nhân viên để tránh gọi API nhiều lần cho cùng một ID&ndash;&gt;-->
+<!--&lt;!&ndash;    const employeeNameCache = {};&ndash;&gt;-->
+
+<!--&lt;!&ndash;    // Function to render change logs&ndash;&gt;-->
+<!--&lt;!&ndash;    async function renderChangeLogs(logs) {&ndash;&gt;-->
+<!--&lt;!&ndash;        const container = document.getElementById('changeLogsContainer');&ndash;&gt;-->
+<!--&lt;!&ndash;        if (!logs || !Array.isArray(logs) || logs.length === 0) {&ndash;&gt;-->
+<!--&lt;!&ndash;            container.innerHTML = `&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="update-item">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="content">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        `;&ndash;&gt;-->
+<!--&lt;!&ndash;            return;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        // Hiển thị loading indicator&ndash;&gt;-->
+<!--&lt;!&ndash;        container.innerHTML = `&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="update-item">&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="content">&ndash;&gt;-->
+<!--&lt;!&ndash;                <p class="text-sm text-gray-500">Đang tải...</p>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    `;&ndash;&gt;-->
+
+<!--&lt;!&ndash;        // Xử lý và tạo danh sách các promise lấy tên nhân viên&ndash;&gt;-->
+<!--&lt;!&ndash;        const employeeNamePromises = logs.map(async (log) => {&ndash;&gt;-->
+<!--&lt;!&ndash;            if (!log || !log.employeeId) return 'không xác định';&ndash;&gt;-->
+
+<!--&lt;!&ndash;            // Kiểm tra cache trước&ndash;&gt;-->
+<!--&lt;!&ndash;            if (employeeNameCache[log.employeeId]) {&ndash;&gt;-->
+<!--&lt;!&ndash;                return employeeNameCache[log.employeeId];&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+
+<!--&lt;!&ndash;            // Nếu không có trong cache, gọi API&ndash;&gt;-->
+<!--&lt;!&ndash;            const name = await getEmployeeNameById(log.employeeId);&ndash;&gt;-->
+<!--&lt;!&ndash;            employeeNameCache[log.employeeId] = name;&ndash;&gt;-->
+<!--&lt;!&ndash;            return name;&ndash;&gt;-->
+<!--&lt;!&ndash;        });&ndash;&gt;-->
+
+<!--&lt;!&ndash;        // Chờ tất cả các lời gọi API hoàn thành&ndash;&gt;-->
+<!--&lt;!&ndash;        const employeeNames = await Promise.all(employeeNamePromises);&ndash;&gt;-->
+
+<!--&lt;!&ndash;        // Tạo HTML cho từng mục log&ndash;&gt;-->
+<!--&lt;!&ndash;        container.innerHTML = logs.map((log, index) => {&ndash;&gt;-->
+<!--&lt;!&ndash;            if (!log || !log.timestamp || !log.action) {&ndash;&gt;-->
+<!--&lt;!&ndash;                return '';&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+
+<!--&lt;!&ndash;            const employeeName = employeeNames[index];&ndash;&gt;-->
+
+<!--&lt;!&ndash;            return `&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="update-item mb-4">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="flex items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'} p-2 rounded-full">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="content mt-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <p class="font-semibold text-sm">&ndash;&gt;-->
+<!--&lt;!&ndash;                        ${log.action === 'INSERT' ? `Nhân viên <strong>${employeeName}</strong> đã thêm ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :&ndash;&gt;-->
+<!--&lt;!&ndash;                log.action === 'UPDATE' ? `Nhân viên <strong>${employeeName}</strong> đã cập nhật ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :&ndash;&gt;-->
+<!--&lt;!&ndash;                    `Nhân viên <strong>${employeeName}</strong> đã xóa ${log.entityName || 'N/A'} tên ${log.oldValue || 'N/A'}`}&ndash;&gt;-->
+<!--&lt;!&ndash;                    </p>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <p class="text-sm text-gray-500">&ndash;&gt;-->
+<!--&lt;!&ndash;                        ${log.action === 'INSERT' ? 'Thêm mới thành công!' :&ndash;&gt;-->
+<!--&lt;!&ndash;                log.action === 'UPDATE' ? 'Cập nhật thành công!' :&ndash;&gt;-->
+<!--&lt;!&ndash;                    'Xóa thành công!'}&ndash;&gt;-->
+<!--&lt;!&ndash;                    </p>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        `;&ndash;&gt;-->
+<!--&lt;!&ndash;        }).join('');&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    // Function to fetch dashboard data&ndash;&gt;-->
+<!--&lt;!&ndash;    let previousData = {&ndash;&gt;-->
+<!--&lt;!&ndash;        revenue: 0,&ndash;&gt;-->
+<!--&lt;!&ndash;        products: 0,&ndash;&gt;-->
+<!--&lt;!&ndash;        suppliers: 0,&ndash;&gt;-->
+<!--&lt;!&ndash;        employees: 0,&ndash;&gt;-->
+<!--&lt;!&ndash;        customers: 0&ndash;&gt;-->
+<!--&lt;!&ndash;    };&ndash;&gt;-->
+
+<!--&lt;!&ndash;    async function fetchDashboardData() {&ndash;&gt;-->
+<!--&lt;!&ndash;        try {&ndash;&gt;-->
+<!--&lt;!&ndash;            const [&ndash;&gt;-->
+<!--&lt;!&ndash;                revenueRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                productsRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                suppliersRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                employeesRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                customersRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                changeLogsRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                revenueTimeRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                productsTimeRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                suppliersTimeRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                employeesTimeRes,&ndash;&gt;-->
+<!--&lt;!&ndash;                customersTimeRes&ndash;&gt;-->
+<!--&lt;!&ndash;            ] = await Promise.all([&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/count/all/total-revenue').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/count/all/products').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/count/all/suppliers').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/count/all/employees').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/count/all/customers').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/notification').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/lastUpdate/time/total-revenue').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/lastUpdate/time/products').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/lastUpdate/time/suppliers').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/lastUpdate/time/employees').catch(() => null),&ndash;&gt;-->
+<!--&lt;!&ndash;                fetch('/api/changelogs/lastUpdate/time/customers').catch(() => null)&ndash;&gt;-->
+<!--&lt;!&ndash;            ]);&ndash;&gt;-->
+
+<!--&lt;!&ndash;            // Hàm helper để parse JSON an toàn&ndash;&gt;-->
+<!--&lt;!&ndash;            const parseJson = async (res, endpoint) => {&ndash;&gt;-->
+<!--&lt;!&ndash;                if (!res) {&ndash;&gt;-->
+<!--&lt;!&ndash;                    console.warn(`Request failed for ${endpoint}: No response`);&ndash;&gt;-->
+<!--&lt;!&ndash;                    return null;&ndash;&gt;-->
+<!--&lt;!&ndash;                }&ndash;&gt;-->
+<!--&lt;!&ndash;                if (!res.ok) {&ndash;&gt;-->
+<!--&lt;!&ndash;                    console.warn(`Request failed for ${endpoint}: Status ${res.status}`);&ndash;&gt;-->
+<!--&lt;!&ndash;                    return null;&ndash;&gt;-->
+<!--&lt;!&ndash;                }&ndash;&gt;-->
+<!--&lt;!&ndash;                try {&ndash;&gt;-->
+<!--&lt;!&ndash;                    const text = await res.text();&ndash;&gt;-->
+<!--&lt;!&ndash;                    if (!text) {&ndash;&gt;-->
+<!--&lt;!&ndash;                        console.warn(`Empty response for ${endpoint}`);&ndash;&gt;-->
+<!--&lt;!&ndash;                        return null;&ndash;&gt;-->
+<!--&lt;!&ndash;                    }&ndash;&gt;-->
+<!--&lt;!&ndash;                    return JSON.parse(text);&ndash;&gt;-->
+<!--&lt;!&ndash;                } catch (error) {&ndash;&gt;-->
+<!--&lt;!&ndash;                    console.error(`Failed to parse JSON for ${endpoint}:`, error);&ndash;&gt;-->
+<!--&lt;!&ndash;                    return null;&ndash;&gt;-->
+<!--&lt;!&ndash;                }&ndash;&gt;-->
+<!--&lt;!&ndash;            };&ndash;&gt;-->
+
+<!--&lt;!&ndash;            // Parse từng response&ndash;&gt;-->
+<!--&lt;!&ndash;            const revenue = (await parseJson(revenueRes, '/api/changelogs/count/all/total-revenue')) ?? 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            const products = (await parseJson(productsRes, '/api/changelogs/count/all/products')) ?? 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            const suppliers = (await parseJson(suppliersRes, '/api/changelogs/count/all/suppliers')) ?? 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            const employees = (await parseJson(employeesRes, '/api/changelogs/count/all/employees')) ?? 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            const customers = (await parseJson(customersRes, '/api/changelogs/count/all/customers')) ?? 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            const changeLogs = (await parseJson(changeLogsRes, '/api/changelogs/notification')) ?? [];&ndash;&gt;-->
+<!--&lt;!&ndash;            const revenueTime = (await parseJson(revenueTimeRes, '/api/changelogs/lastUpdate/time/total-revenue')) ?? null;&ndash;&gt;-->
+<!--&lt;!&ndash;            const productsTime = (await parseJson(productsTimeRes, '/api/changelogs/lastUpdate/time/products')) ?? null;&ndash;&gt;-->
+<!--&lt;!&ndash;            const suppliersTime = (await parseJson(suppliersTimeRes, '/api/changelogs/lastUpdate/time/suppliers')) ?? null;&ndash;&gt;-->
+<!--&lt;!&ndash;            const employeesTime = (await parseJson(employeesTimeRes, '/api/changelogs/lastUpdate/time/employees')) ?? null;&ndash;&gt;-->
+<!--&lt;!&ndash;            const customersTime = (await parseJson(customersTimeRes, '/api/changelogs/lastUpdate/time/customers')) ?? null;&ndash;&gt;-->
+
+<!--&lt;!&ndash;            const revenueDateTime = formatDateTimeFromLocal(revenueTime);&ndash;&gt;-->
+<!--&lt;!&ndash;            const productsDateTime = formatDateTimeFromLocal(productsTime);&ndash;&gt;-->
+<!--&lt;!&ndash;            const suppliersDateTime = formatDateTimeFromLocal(suppliersTime);&ndash;&gt;-->
+<!--&lt;!&ndash;            const employeesDateTime = formatDateTimeFromLocal(employeesTime);&ndash;&gt;-->
+<!--&lt;!&ndash;            const customersDateTime = formatDateTimeFromLocal(customersTime);&ndash;&gt;-->
+
+<!--&lt;!&ndash;            document.getElementById('total-revenue').textContent = formatCurrency(revenue);&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('revenue-change').textContent = formatCurrency(revenue - previousData.revenue);&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('revenue-update-time').textContent = revenueDateTime.time;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('revenue-update-date').textContent = revenueDateTime.date;&ndash;&gt;-->
+
+<!--&lt;!&ndash;            document.getElementById('total-products').textContent = products;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('products-change').textContent = (products - previousData.products).toString();&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('products-update-time').textContent = productsDateTime.time;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('products-update-date').textContent = productsDateTime.date;&ndash;&gt;-->
+
+<!--&lt;!&ndash;            document.getElementById('total-suppliers').textContent = suppliers;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('suppliers-change').textContent = (suppliers - previousData.suppliers).toString();&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('suppliers-update-time').textContent = suppliersDateTime.time;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('suppliers-update-date').textContent = suppliersDateTime.date;&ndash;&gt;-->
+
+<!--&lt;!&ndash;            document.getElementById('total-employees').textContent = employees;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('employees-change').textContent = (employees - previousData.employees).toString();&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('employees-update-time').textContent = employeesDateTime.time;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('employees-update-date').textContent = employeesDateTime.date;&ndash;&gt;-->
+
+<!--&lt;!&ndash;            document.getElementById('total-customers').textContent = customers;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('customers-change').textContent = (customers - previousData.customers).toString();&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('customers-update-time').textContent = customersDateTime.time;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('customers-update-date').textContent = customersDateTime.date;&ndash;&gt;-->
+
+<!--&lt;!&ndash;            previousData = { revenue, products, suppliers, employees, customers };&ndash;&gt;-->
+
+<!--&lt;!&ndash;            await renderChangeLogs(changeLogs);  // Đã chuyển thành async&ndash;&gt;-->
+
+<!--&lt;!&ndash;            updateChartData('revenue', revenue);&ndash;&gt;-->
+<!--&lt;!&ndash;        } catch (error) {&ndash;&gt;-->
+<!--&lt;!&ndash;            console.error('Error fetching dashboard data:', error);&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById('changeLogsContainer').innerHTML = `&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="update-item">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="content">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        `;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    // Chart setup&ndash;&gt;-->
+<!--&lt;!&ndash;    let salesChart;&ndash;&gt;-->
+<!--&lt;!&ndash;    const chartData = {&ndash;&gt;-->
+<!--&lt;!&ndash;        revenue: { labels: [], data: [], label: 'Doanh Thu' },&ndash;&gt;-->
+<!--&lt;!&ndash;        products: { labels: [], data: [], label: 'Sản Phẩm' },&ndash;&gt;-->
+<!--&lt;!&ndash;        suppliers: { labels: [], data: [], label: 'Nhà Cung Cấp' },&ndash;&gt;-->
+<!--&lt;!&ndash;        employees: { labels: [], data: [], label: 'Nhân Viên' },&ndash;&gt;-->
+<!--&lt;!&ndash;        customers: { labels: [], data: [], label: 'Khách Hàng' }&ndash;&gt;-->
+<!--&lt;!&ndash;    };&ndash;&gt;-->
+
+<!--&lt;!&ndash;    function initializeChart() {&ndash;&gt;-->
+<!--&lt;!&ndash;        const ctx = document.getElementById('salesChart').getContext('2d');&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart = new Chart(ctx, {&ndash;&gt;-->
+<!--&lt;!&ndash;            type: 'line',&ndash;&gt;-->
+<!--&lt;!&ndash;            data: {&ndash;&gt;-->
+<!--&lt;!&ndash;                labels: chartData.revenue.labels,&ndash;&gt;-->
+<!--&lt;!&ndash;                datasets: [{&ndash;&gt;-->
+<!--&lt;!&ndash;                    label: chartData.revenue.label,&ndash;&gt;-->
+<!--&lt;!&ndash;                    data: chartData.revenue.data,&ndash;&gt;-->
+<!--&lt;!&ndash;                    borderColor: '#ff8a65',&ndash;&gt;-->
+<!--&lt;!&ndash;                    backgroundColor: '#ff8a65',&ndash;&gt;-->
+<!--&lt;!&ndash;                    fill: false,&ndash;&gt;-->
+<!--&lt;!&ndash;                    tension: 0.4,&ndash;&gt;-->
+<!--&lt;!&ndash;                    pointBackgroundColor: '#ff8a65',&ndash;&gt;-->
+<!--&lt;!&ndash;                    pointBorderColor: '#fff',&ndash;&gt;-->
+<!--&lt;!&ndash;                    pointRadius: 5,&ndash;&gt;-->
+<!--&lt;!&ndash;                    pointHoverRadius: 7&ndash;&gt;-->
+<!--&lt;!&ndash;                }]&ndash;&gt;-->
+<!--&lt;!&ndash;            },&ndash;&gt;-->
+<!--&lt;!&ndash;            options: {&ndash;&gt;-->
+<!--&lt;!&ndash;                scales: {&ndash;&gt;-->
+<!--&lt;!&ndash;                    y: { beginAtZero: true, ticks: { stepSize: 5000000 } },&ndash;&gt;-->
+<!--&lt;!&ndash;                    x: { grid: { display: false } }&ndash;&gt;-->
+<!--&lt;!&ndash;                },&ndash;&gt;-->
+<!--&lt;!&ndash;                plugins: {&ndash;&gt;-->
+<!--&lt;!&ndash;                    legend: {&ndash;&gt;-->
+<!--&lt;!&ndash;                        display: true,&ndash;&gt;-->
+<!--&lt;!&ndash;                        position: 'top',&ndash;&gt;-->
+<!--&lt;!&ndash;                        labels: { boxWidth: 0, font: { size: 12 } }&ndash;&gt;-->
+<!--&lt;!&ndash;                    }&ndash;&gt;-->
+<!--&lt;!&ndash;                },&ndash;&gt;-->
+<!--&lt;!&ndash;                responsive: true,&ndash;&gt;-->
+<!--&lt;!&ndash;                maintainAspectRatio: false&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;        });&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    function updateChartData(type, newData) {&ndash;&gt;-->
+<!--&lt;!&ndash;        const data = chartData[type];&ndash;&gt;-->
+<!--&lt;!&ndash;        const now = new Date();&ndash;&gt;-->
+<!--&lt;!&ndash;        const label = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });&ndash;&gt;-->
+
+<!--&lt;!&ndash;        data.labels.push(label);&ndash;&gt;-->
+<!--&lt;!&ndash;        data.data.push(type === 'revenue' ? (newData || 0) : parseInt(newData || 0, 10));&ndash;&gt;-->
+
+<!--&lt;!&ndash;        if (data.labels.length > 10) {&ndash;&gt;-->
+<!--&lt;!&ndash;            data.labels.shift();&ndash;&gt;-->
+<!--&lt;!&ndash;            data.data.shift();&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        salesChart.data.labels = data.labels;&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.data.datasets[0].label = data.label;&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.data.datasets[0].data = data.data;&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.update();&ndash;&gt;-->
+
+<!--&lt;!&ndash;        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    function updateChart(type) {&ndash;&gt;-->
+<!--&lt;!&ndash;        const data = chartData[type];&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.data.labels = data.labels;&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.data.datasets[0].label = data.label;&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.data.datasets[0].data = data.data;&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.update();&ndash;&gt;-->
+<!--&lt;!&ndash;        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    function zoomChart(direction) {&ndash;&gt;-->
+<!--&lt;!&ndash;        const yAxis = salesChart.options.scales.y;&ndash;&gt;-->
+<!--&lt;!&ndash;        if (direction === 'in') {&ndash;&gt;-->
+<!--&lt;!&ndash;            yAxis.ticks.stepSize /= 2;&ndash;&gt;-->
+<!--&lt;!&ndash;        } else {&ndash;&gt;-->
+<!--&lt;!&ndash;            yAxis.ticks.stepSize *= 2;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.update();&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    function resetChart() {&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.options.scales.y.ticks.stepSize = 5000000;&ndash;&gt;-->
+<!--&lt;!&ndash;        salesChart.update();&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    function toggleExpand(section) {&ndash;&gt;-->
+<!--&lt;!&ndash;        const salesAnalytics = document.querySelector('.dash-sales-analytics');&ndash;&gt;-->
+<!--&lt;!&ndash;        const updatesProfile = document.querySelector('.dash-updates-profile');&ndash;&gt;-->
+<!--&lt;!&ndash;        const salesExpandBtn = salesAnalytics.querySelector('.dash-expand-btn i');&ndash;&gt;-->
+<!--&lt;!&ndash;        const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');&ndash;&gt;-->
+
+<!--&lt;!&ndash;        if (section === 'sales') {&ndash;&gt;-->
+<!--&lt;!&ndash;            if (salesAnalytics.classList.contains('expanded')) {&ndash;&gt;-->
+<!--&lt;!&ndash;                salesAnalytics.classList.remove('expanded');&ndash;&gt;-->
+<!--&lt;!&ndash;                updatesProfile.classList.remove('hidden');&ndash;&gt;-->
+<!--&lt;!&ndash;                salesExpandBtn.classList.remove('fa-compress');&ndash;&gt;-->
+<!--&lt;!&ndash;                salesExpandBtn.classList.add('fa-expand');&ndash;&gt;-->
+<!--&lt;!&ndash;            } else {&ndash;&gt;-->
+<!--&lt;!&ndash;                salesAnalytics.classList.add('expanded');&ndash;&gt;-->
+<!--&lt;!&ndash;                updatesProfile.classList.add('hidden');&ndash;&gt;-->
+<!--&lt;!&ndash;                salesExpandBtn.classList.remove('fa-expand');&ndash;&gt;-->
+<!--&lt;!&ndash;                salesExpandBtn.classList.add('fa-compress');&ndash;&gt;-->
+<!--&lt;!&ndash;                setTimeout(() => salesChart.resize(), 300);&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;        } else if (section === 'updates') {&ndash;&gt;-->
+<!--&lt;!&ndash;            if (updatesProfile.classList.contains('expanded')) {&ndash;&gt;-->
+<!--&lt;!&ndash;                updatesProfile.classList.remove('expanded');&ndash;&gt;-->
+<!--&lt;!&ndash;                salesAnalytics.classList.remove('hidden');&ndash;&gt;-->
+<!--&lt;!&ndash;                updatesExpandBtn.classList.remove('fa-compress');&ndash;&gt;-->
+<!--&lt;!&ndash;                updatesExpandBtn.classList.add('fa-expand');&ndash;&gt;-->
+<!--&lt;!&ndash;            } else {&ndash;&gt;-->
+<!--&lt;!&ndash;                updatesProfile.classList.add('expanded');&ndash;&gt;-->
+<!--&lt;!&ndash;                salesAnalytics.classList.add('hidden');&ndash;&gt;-->
+<!--&lt;!&ndash;                updatesExpandBtn.classList.remove('fa-expand');&ndash;&gt;-->
+<!--&lt;!&ndash;                updatesExpandBtn.classList.add('fa-compress');&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--&lt;!&ndash;    // Initialize chart and fetch data&ndash;&gt;-->
+<!--&lt;!&ndash;    initializeChart();&ndash;&gt;-->
+<!--&lt;!&ndash;    fetchDashboardData();&ndash;&gt;-->
+<!--&lt;!&ndash;    setInterval(fetchDashboardData, 3000);&ndash;&gt;-->
+
+<!--&lt;!&ndash;    // Resize chart on window resize&ndash;&gt;-->
+<!--&lt;!&ndash;    window.addEventListener('resize', () => salesChart.resize());&ndash;&gt;-->
+<!--&lt;!&ndash;</script>&ndash;&gt;-->
+<!--&lt;!&ndash;</body>&ndash;&gt;-->
+<!--&lt;!&ndash;</html>&ndash;&gt;-->
+<!--<!DOCTYPE html>-->
+<!--<html lang="vi">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Bảng Điều Khiển</title>-->
+
+<!--    &lt;!&ndash; CSS Libraries &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
+
+<!--    &lt;!&ndash; Tailwind CSS &ndash;&gt;-->
+<!--    <script src="https://cdn.tailwindcss.com"></script>-->
+
+<!--    &lt;!&ndash; Custom CSS &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="/css/fragments/navbar.css">-->
+<!--    <link rel="stylesheet" href="/css/fragments/sidebar.css">-->
+<!--    <link rel="stylesheet" href="/css/fragments/footer.css">-->
+<!--    <link rel="stylesheet" href="/css/common/toast.css">-->
+<!--    <link rel="stylesheet" href="/css/common/layout.css">-->
+
+<!--    &lt;!&ndash; Inline CSS &ndash;&gt;-->
+<!--    <style>-->
+<!--        .dash-sales-analytics.hidden, .dash-updates-profile.hidden {-->
+<!--            width: 0;-->
+<!--            min-width: 0;-->
+<!--            padding: 0;-->
+<!--            margin: 0;-->
+<!--            opacity: 0;-->
+<!--            flex: 0;-->
+<!--            overflow: hidden;-->
+<!--        }-->
+
+<!--        .dash-sales-analytics.expanded, .dash-updates-profile.expanded {-->
+<!--            position: absolute;-->
+<!--            left: 0;-->
+<!--            right: 0;-->
+<!--            width: calc(100% - 40px);-->
+<!--            z-index: 1;-->
+<!--        }-->
+
+<!--        #salesChart {-->
+<!--            max-height: 300px;-->
+<!--            width: 100%;-->
+<!--        }-->
+
+<!--        /* Style cho thời gian cập nhật */-->
+<!--        .update-time {-->
+<!--            font-size: 1.1rem; /* Tăng kích thước font để dễ nhìn */-->
+<!--            opacity: 0.9;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body class="font-sans bg-gray-100 m-0 p-0">-->
+<!--&lt;!&ndash; Toast &ndash;&gt;-->
+<!--<div th:replace="~{common/toast}"></div>-->
+
+<!--&lt;!&ndash; Navbar &ndash;&gt;-->
+<!--<nav th:replace="~{fragments/navbar :: navbar}"></nav>-->
+
+<!--<div class="content-wrapper flex flex-col min-h-screen pt-[90px]">-->
+<!--    <div class="dashboard-container flex flex-1">-->
+<!--        &lt;!&ndash; Sidebar &ndash;&gt;-->
+<!--        <aside th:replace="~{fragments/sidebar :: sidebar}" class="min-w-[250px] bg-white shadow-md"></aside>-->
+
+<!--        <div class="dash-container flex-1 max-w-full mx-auto p-4 md:p-8">-->
+<!--            <nav aria-label="breadcrumb">-->
+<!--                <ol class="breadcrumb">-->
+<!--                    <li class="breadcrumb-item active" aria-current="page">Thống kê Admin</li>-->
+<!--                </ol>-->
+<!--            </nav>-->
+
+<!--            &lt;!&ndash; Top Section: Cards &ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="dash-cards-wrapper flex gap-5 flex-wrap md:flex-nowrap mb-5 w-full">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="dash-card flex-1 min-w-0 bg-orange-400 text-white rounded-lg shadow-lg p-6 cursor-pointer"&ndash;&gt;-->
+<!--&lt;!&ndash;                     onclick="updateChart('revenue')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-revenue">0đ</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Doanh Thu</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="revenue-change">0đ</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="update-time flex flex-col items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span class="text-[22px]"><span id="revenue-update-time"></span> - <span id="revenue-update-date"></span></span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class="dash-card flex-1 min-w-0 bg-green-500 text-white rounded-lg shadow-lg p-6 cursor-pointer"&ndash;&gt;-->
+<!--&lt;!&ndash;                     onclick="updateChart('products')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-products">0</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Sản Phẩm</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="products-change">0</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="update-time flex flex-col items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span><span id="products-update-time"></span> - <span&ndash;&gt;-->
+<!--&lt;!&ndash;                                    id="products-update-date"></span></span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class="dash-card flex-1 min-w-0 bg-pink-400 text-white rounded-lg shadow-lg p-6 cursor-pointer"&ndash;&gt;-->
+<!--&lt;!&ndash;                     onclick="updateChart('suppliers')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-suppliers">0</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Nhà Cung Cấp</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="suppliers-change">0</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="update-time flex flex-col items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span><span id="suppliers-update-time"></span> - <span&ndash;&gt;-->
+<!--&lt;!&ndash;                                    id="suppliers-update-date"></span></span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class="dash-card flex-1 min-w-0 bg-cyan-400 text-white rounded-lg shadow-lg p-6 cursor-pointer"&ndash;&gt;-->
+<!--&lt;!&ndash;                     onclick="updateChart('employees')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-employees">0</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Nhân Viên</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="employees-change">0</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="update-time flex flex-col items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span><span id="employees-update-time"></span> - <span&ndash;&gt;-->
+<!--&lt;!&ndash;                                    id="employees-update-date"></span></span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class="SpikeCard flex-1 min-w-0 bg-purple-500 text-white rounded-lg shadow-lg p-6 cursor-pointer"&ndash;&gt;-->
+<!--&lt;!&ndash;                     onclick="updateChart('customers')">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-between items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-4xl font-bold" id="total-customers">0</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="text-xl">Khách Hàng</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="text-4xl">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-chart-bar"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="flex justify-end mb-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="flex items-center text-sm opacity-80">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-arrow-up mr-1"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span id="customers-change">0</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="border-t border-white my-4 flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="update-time flex flex-col items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <span><span id="customers-update-time"></span> - <span&ndash;&gt;-->
+<!--&lt;!&ndash;                                    id="customers-update-date"></span></span>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--            <div class="dash-cards-wrapper flex gap-5 flex-wrap md:flex-nowrap mb-5 w-full">-->
+<!--                &lt;!&ndash; Revenue Card &ndash;&gt;-->
+<!--                <div class="dash-card flex-1 min-w-0 bg-orange-400 text-white rounded-lg shadow-lg p-6 cursor-pointer"-->
+<!--                     onclick="updateChart('revenue')">-->
+<!--                    <div class="flex justify-center items-center mb-4">-->
+<!--                        <div class="flex items-center">-->
+<!--                            <div class="text-2xl font-bold">Doanh Thu</div>-->
+<!--                            <i class="fas fa-money-bill-wave ml-2 text-2xl"></i>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="text-4xl font-bold text-center" id="total-revenue">0đ</div>-->
+<!--                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">-->
+<!--                        <div class="update-time flex flex-col items-center">-->
+<!--                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>-->
+<!--                            <span class="text-[22px]"><span id="revenue-update-time"></span> - <span id="revenue-update-date"></span></span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Products Card &ndash;&gt;-->
+<!--                <div class="dash-card flex-1 min-w-0 bg-green-500 text-white rounded-lg shadow-lg p-6 cursor-pointer"-->
+<!--                     onclick="updateChart('products')">-->
+<!--                    <div class="flex justify-center items-center mb-4">-->
+<!--                        <div class="flex items-center">-->
+<!--                            <div class="text-2xl font-bold">Sản Phẩm</div>-->
+<!--                            <i class="fas fa-box ml-2 text-2xl"></i>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="text-4xl font-bold text-center" id="total-products">0</div>-->
+<!--                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">-->
+<!--                        <div class="update-time flex flex-col items-center">-->
+<!--                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>-->
+<!--                            <span class="text-[22px]"><span id="products-update-time"></span> - <span id="products-update-date"></span></span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Suppliers Card &ndash;&gt;-->
+<!--                <div class="dash-card flex-1 min-w-0 bg-pink-400 text-white rounded-lg shadow-lg p-6 cursor-pointer"-->
+<!--                     onclick="updateChart('suppliers')">-->
+<!--                    <div class="flex justify-center items-center mb-4">-->
+<!--                        <div class="flex items-center">-->
+<!--                            <div class="text-2xl font-bold">Nhà Cung Cấp</div>-->
+<!--                            <i class="fas fa-truck ml-2 text-2xl"></i>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="text-4xl font-bold text-center" id="total-suppliers">0</div>-->
+<!--                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">-->
+<!--                        <div class="update-time flex flex-col items-center">-->
+<!--                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>-->
+<!--                            <span class="text-[22px]"><span id="suppliers-update-time"></span> - <span id="suppliers-update-date"></span></span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Employees Card &ndash;&gt;-->
+<!--                <div class="dash-card flex-1 min-w-0 bg-cyan-400 text-white rounded-lg shadow-lg p-6 cursor-pointer"-->
+<!--                     onclick="updateChart('employees')">-->
+<!--                    <div class="flex justify-center items-center mb-4">-->
+<!--                        <div class="flex items-center">-->
+<!--                            <div class="text-2xl font-bold">Nhân Viên</div>-->
+<!--                            <i class="fas fa-users ml-2 text-2xl"></i>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="text-4xl font-bold text-center" id="total-employees">0</div>-->
+<!--                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">-->
+<!--                        <div class="update-time flex flex-col items-center">-->
+<!--                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>-->
+<!--                            <span class="text-[22px]"><span id="employees-update-time"></span> - <span id="employees-update-date"></span></span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Customers Card &ndash;&gt;-->
+<!--                <div class="SpikeCard flex-1 min-w-0 bg-purple-500 text-white rounded-lg shadow-lg p-6 cursor-pointer"-->
+<!--                     onclick="updateChart('customers')">-->
+<!--                    <div class="flex justify-center items-center mb-4">-->
+<!--                        <div class="flex items-center">-->
+<!--                            <div class="text-2xl font-bold">Khách Hàng</div>-->
+<!--                            <i class="fas fa-user-friends ml-2 text-2xl"></i>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="text-4xl font-bold text-center" id="total-customers">0</div>-->
+<!--                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">-->
+<!--                        <div class="update-time flex flex-col items-center">-->
+<!--                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>-->
+<!--                            <span class="text-[22px]"><span id="customers-update-time"></span> - <span id="customers-update-date"></span></span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+
+
+<!--            &lt;!&ndash; Bottom Section &ndash;&gt;-->
+<!--            <div class="dash-bottom-section flex gap-5 w-full relative flex-wrap">-->
+<!--                <div class="dash-sales-analytics flex-[7] min-w-[300px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">-->
+<!--                    <div class="dash-header flex justify-between items-center mb-2">-->
+<!--                        <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>-->
+<!--                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"-->
+<!--                                onclick="toggleExpand('sales')">-->
+<!--                            <i class="fas fa-expand"></i>-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy-->
+<!--                        phép amCharts.</p>-->
+<!--                    <div class="dash-chart-controls flex justify-between items-center mb-5">-->
+<!--                        <div class="dash-zoom flex gap-2">-->
+<!--                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"-->
+<!--                                    onclick="zoomChart('in')">⟐-->
+<!--                            </button>-->
+<!--                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"-->
+<!--                                    onclick="zoomChart('out')">⟑-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                        <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"-->
+<!--                                onclick="resetChart()">Hiển thị tất cả-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <canvas id="salesChart"></canvas>-->
+<!--                </div>-->
+
+<!--                <div class="dash-updates-profile flex-[3] min-w-[200px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">-->
+<!--                    <div class="dash-header flex justify-between items-center mb-2">-->
+<!--                        <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>-->
+<!--                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"-->
+<!--                                onclick="toggleExpand('updates')">-->
+<!--                            <i class="fas fa-expand"></i>-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <div id="changeLogsContainer"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Footer &ndash;&gt;-->
+<!--    <footer th:replace="~{fragments/footer :: footer}" class="bg-white shadow-md p-4"></footer>-->
+<!--</div>-->
+
+<!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<div th:replace="~{fragments/navbar :: navbar-script}"></div>-->
+
+<!--<script>-->
+<!--    // Function to format relative time-->
+<!--    function formatRelativeTime(timestamp) {-->
+<!--        if (!timestamp || isNaN(new Date(timestamp))) {-->
+<!--            return "vừa xong";-->
+<!--        }-->
+<!--        const now = new Date();-->
+<!--        const logTime = new Date(timestamp);-->
+<!--        const diffInSeconds = Math.floor((now - logTime) / 1000);-->
+
+<!--        if (diffInSeconds < 60) {-->
+<!--            return "vừa xong";-->
+<!--        } else if (diffInSeconds < 3600) {-->
+<!--            const minutes = Math.floor(diffInSeconds / 60);-->
+<!--            return `${minutes} phút trước`;-->
+
+<!--        } else if (diffInSeconds < 86400) {-->
+<!--            const hours = Math.floor(diffInSeconds / 3600);-->
+<!--            return `${hours} giờ trước`;-->
+<!--        } else {-->
+<!--            return logTime.toLocaleString('vi-VN', {-->
+<!--                day: '2-digit',-->
+<!--                month: '2-digit',-->
+<!--                year: 'numeric',-->
+<!--                hour: '2-digit',-->
+<!--                minute: '2-digit'-->
+<!--            });-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Function to format date and time from LocalDateTime-->
+<!--    function formatDateTimeFromLocal(timestamp) {-->
+<!--        if (!timestamp || isNaN(new Date(timestamp))) {-->
+<!--            return {time: '&#45;&#45;:&#45;&#45;', date: '&#45;&#45;/&#45;&#45;/&#45;&#45;&#45;&#45;'};-->
+<!--        }-->
+<!--        const dateObj = new Date(timestamp);-->
+<!--        const time = dateObj.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});-->
+<!--        const date = dateObj.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'});-->
+<!--        return {time, date};-->
+<!--    }-->
+
+<!--    // Function to format currency-->
+<!--    function formatCurrency(value) {-->
+<!--        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(value || 0);-->
+<!--    }-->
+
+<!--    async function getEmployeeNameById(employeeId) {-->
+<!--        if (!employeeId) return 'N/A';-->
+<!--        const url = `http://localhost:8080/api/changelogs/employee/${employeeId}/name`; // Use absolute URL for testing-->
+<!--        console.log("Fetching URL:", url);-->
+<!--        try {-->
+<!--            const response = await fetch(url);-->
+<!--            if (!response.ok) {-->
+<!--                console.log("lỗi 1");-->
+<!--                console.log("Status:", response.status);-->
+<!--                console.log("Response:", await response.text());-->
+<!--                console.log("employeeId:", employeeId);-->
+<!--                return 'không xác định';-->
+<!--            }-->
+<!--            const data = await response.json();-->
+<!--            return data.name || 'không xác định';-->
+<!--        } catch (error) {-->
+<!--            console.error(`Error fetching employee name for ID ${employeeId}:`, error);-->
+<!--            console.log("lỗi 2");-->
+<!--            return 'không xác định';-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Lưu cache tên nhân viên để tránh gọi API nhiều lần cho cùng một ID-->
+<!--    const employeeNameCache = {};-->
+
+<!--    // Function to render change logs-->
+<!--    async function renderChangeLogs(logs) {-->
+<!--        const container = document.getElementById('changeLogsContainer');-->
+<!--        if (!logs || !Array.isArray(logs) || logs.length === 0) {-->
+<!--            container.innerHTML = `-->
+<!--            <div class="update-item">-->
+<!--                <div class="content">-->
+<!--                    <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        `;-->
+<!--            return;-->
+<!--        }-->
+
+<!--        // Hiển thị loading indicator-->
+<!--        container.innerHTML = `-->
+<!--        <div class="update-item">-->
+<!--            <div class="content">-->
+<!--                <p class="text-sm text-gray-500">Đang tải...</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    `;-->
+
+<!--        // Xử lý và tạo danh sách các promise lấy tên nhân viên-->
+<!--        const employeeNamePromises = logs.map(async (log) => {-->
+<!--            if (!log || !log.employeeId) return 'không xác định';-->
+
+<!--            // Kiểm tra cache trước-->
+<!--            if (employeeNameCache[log.employeeId]) {-->
+<!--                return employeeNameCache[log.employeeId];-->
+<!--            }-->
+
+<!--            // Nếu không có trong cache, gọi API-->
+<!--            const name = await getEmployeeNameById(log.employeeId);-->
+<!--            employeeNameCache[log.employeeId] = name;-->
+<!--            return name;-->
+<!--        });-->
+
+<!--        // Chờ tất cả các lời gọi API hoàn thành-->
+<!--        const employeeNames = await Promise.all(employeeNamePromises);-->
+
+<!--        // Tạo HTML cho từng mục log-->
+<!--        container.innerHTML = logs.map((log, index) => {-->
+<!--            if (!log || !log.timestamp || !log.action) {-->
+<!--                return '';-->
+<!--            }-->
+
+<!--            const employeeName = employeeNames[index];-->
+
+<!--            return `-->
+<!--            <div class="update-item mb-4">-->
+<!--                <div class="flex items-center">-->
+<!--                    <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>-->
+<!--                    <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'} p-2 rounded-full">-->
+<!--                        <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white"></i>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="content mt-2">-->
+<!--                    <p class="font-semibold text-sm">-->
+<!--                        ${log.action === 'INSERT' ? `Nhân viên <strong>${employeeName}</strong> đã thêm ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :-->
+<!--                log.action === 'UPDATE' ? `Nhân viên <strong>${employeeName}</strong> đã cập nhật ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :-->
+<!--                    `Nhân viên <strong>${employeeName}</strong> đã xóa ${log.entityName || 'N/A'} tên ${log.oldValue || 'N/A'}`}-->
+<!--                    </p>-->
+<!--                    <p class="text-sm text-gray-500">-->
+<!--                        ${log.action === 'INSERT' ? 'Thêm mới thành công!' :-->
+<!--                log.action === 'UPDATE' ? 'Cập nhật thành công!' :-->
+<!--                    'Xóa thành công!'}-->
+<!--                    </p>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        `;-->
+<!--        }).join('');-->
+<!--    }-->
+
+<!--    // Function to fetch dashboard data-->
+<!--    let previousData = {-->
+<!--        revenue: 0,-->
+<!--        products: 0,-->
+<!--        suppliers: 0,-->
+<!--        employees: 0,-->
+<!--        customers: 0-->
+<!--    };-->
+
+<!--    async function fetchDashboardData() {-->
+<!--        try {-->
+<!--            const [-->
+<!--                revenueRes,-->
+<!--                productsRes,-->
+<!--                suppliersRes,-->
+<!--                employeesRes,-->
+<!--                customersRes,-->
+<!--                changeLogsRes,-->
+<!--                revenueTimeRes,-->
+<!--                productsTimeRes,-->
+<!--                suppliersTimeRes,-->
+<!--                employeesTimeRes,-->
+<!--                customersTimeRes-->
+<!--            ] = await Promise.all([-->
+<!--                fetch('/api/changelogs/count/all/total-revenue').catch(() => null),-->
+<!--                fetch('/api/changelogs/count/all/products').catch(() => null),-->
+<!--                fetch('/api/changelogs/count/all/suppliers').catch(() => null),-->
+<!--                fetch('/api/changelogs/count/all/employees').catch(() => null),-->
+<!--                fetch('/api/changelogs/count/all/customers').catch(() => null),-->
+<!--                fetch('/api/changelogs/notification').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/total-revenue').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/products').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/suppliers').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/employees').catch(() => null),-->
+<!--                fetch('/api/changelogs/lastUpdate/time/customers').catch(() => null)-->
+<!--            ]);-->
+
+<!--            // Hàm helper để parse JSON an toàn-->
+<!--            const parseJson = async (res, endpoint) => {-->
+<!--                if (!res) {-->
+<!--                    console.warn(`Request failed for ${endpoint}: No response`);-->
+<!--                    return null;-->
+<!--                }-->
+<!--                if (!res.ok) {-->
+<!--                    console.warn(`Request failed for ${endpoint}: Status ${res.status}`);-->
+<!--                    return null;-->
+<!--                }-->
+<!--                try {-->
+<!--                    const text = await res.text();-->
+<!--                    if (!text) {-->
+<!--                        console.warn(`Empty response for ${endpoint}`);-->
+<!--                        return null;-->
+<!--                    }-->
+<!--                    return JSON.parse(text);-->
+<!--                } catch (error) {-->
+<!--                    console.error(`Failed to parse JSON for ${endpoint}:`, error);-->
+<!--                    return null;-->
+<!--                }-->
+<!--            };-->
+
+<!--            // Parse từng response-->
+<!--            const revenue = (await parseJson(revenueRes, '/api/changelogs/count/all/total-revenue')) ?? 0;-->
+<!--            const products = (await parseJson(productsRes, '/api/changelogs/count/all/products')) ?? 0;-->
+<!--            const suppliers = (await parseJson(suppliersRes, '/api/changelogs/count/all/suppliers')) ?? 0;-->
+<!--            const employees = (await parseJson(employeesRes, '/api/changelogs/count/all/employees')) ?? 0;-->
+<!--            const customers = (await parseJson(customersRes, '/api/changelogs/count/all/customers')) ?? 0;-->
+<!--            const changeLogs = (await parseJson(changeLogsRes, '/api/changelogs/notification')) ?? [];-->
+<!--            const revenueTime = (await parseJson(revenueTimeRes, '/api/changelogs/lastUpdate/time/total-revenue')) ?? null;-->
+<!--            const productsTime = (await parseJson(productsTimeRes, '/api/changelogs/lastUpdate/time/products')) ?? null;-->
+<!--            const suppliersTime = (await parseJson(suppliersTimeRes, '/api/changelogs/lastUpdate/time/suppliers')) ?? null;-->
+<!--            const employeesTime = (await parseJson(employeesTimeRes, '/api/changelogs/lastUpdate/time/employees')) ?? null;-->
+<!--            const customersTime = (await parseJson(customersTimeRes, '/api/changelogs/lastUpdate/time/customers')) ?? null;-->
+
+<!--            const revenueDateTime = formatDateTimeFromLocal(revenueTime);-->
+<!--            const productsDateTime = formatDateTimeFromLocal(productsTime);-->
+<!--            const suppliersDateTime = formatDateTimeFromLocal(suppliersTime);-->
+<!--            const employeesDateTime = formatDateTimeFromLocal(employeesTime);-->
+<!--            const customersDateTime = formatDateTimeFromLocal(customersTime);-->
+
+<!--            document.getElementById('total-revenue').textContent = formatCurrency(revenue);-->
+<!--            document.getElementById('revenue-change').textContent = formatCurrency(revenue - previousData.revenue);-->
+<!--            document.getElementById('revenue-update-time').textContent = revenueDateTime.time;-->
+<!--            document.getElementById('revenue-update-date').textContent = revenueDateTime.date;-->
+
+<!--            document.getElementById('total-products').textContent = products;-->
+<!--            document.getElementById('products-change').textContent = (products - previousData.products).toString();-->
+<!--            document.getElementById('products-update-time').textContent = productsDateTime.time;-->
+<!--            document.getElementById('products-update-date').textContent = productsDateTime.date;-->
+
+<!--            document.getElementById('total-suppliers').textContent = suppliers;-->
+<!--            document.getElementById('suppliers-change').textContent = (suppliers - previousData.suppliers).toString();-->
+<!--            document.getElementById('suppliers-update-time').textContent = suppliersDateTime.time;-->
+<!--            document.getElementById('suppliers-update-date').textContent = suppliersDateTime.date;-->
+
+<!--            document.getElementById('total-employees').textContent = employees;-->
+<!--            document.getElementById('employees-change').textContent = (employees - previousData.employees).toString();-->
+<!--            document.getElementById('employees-update-time').textContent = employeesDateTime.time;-->
+<!--            document.getElementById('employees-update-date').textContent = employeesDateTime.date;-->
+
+<!--            document.getElementById('total-customers').textContent = customers;-->
+<!--            document.getElementById('customers-change').textContent = (customers - previousData.customers).toString();-->
+<!--            document.getElementById('customers-update-time').textContent = customersDateTime.time;-->
+<!--            document.getElementById('customers-update-date').textContent = customersDateTime.date;-->
+
+<!--            previousData = {revenue, products, suppliers, employees, customers};-->
+
+<!--            await renderChangeLogs(changeLogs);  // Đã chuyển thành async-->
+
+<!--            updateChartData('revenue', revenue);-->
+<!--        } catch (error) {-->
+<!--            console.error('Error fetching dashboard data:', error);-->
+<!--            document.getElementById('changeLogsContainer').innerHTML = `-->
+<!--            <div class="update-item">-->
+<!--                <div class="content">-->
+<!--                    <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        `;-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Chart setup-->
+<!--    let salesChart;-->
+<!--    const chartData = {-->
+<!--        revenue: {labels: [], data: [], label: 'Doanh Thu'},-->
+<!--        products: {labels: [], data: [], label: 'Sản Phẩm'},-->
+<!--        suppliers: {labels: [], data: [], label: 'Nhà Cung Cấp'},-->
+<!--        employees: {labels: [], data: [], label: 'Nhân Viên'},-->
+<!--        customers: {labels: [], data: [], label: 'Khách Hàng'}-->
+<!--    };-->
+
+<!--    function initializeChart() {-->
+<!--        const ctx = document.getElementById('salesChart').getContext('2d');-->
+<!--        salesChart = new Chart(ctx, {-->
+<!--            type: 'line',-->
+<!--            data: {-->
+<!--                labels: chartData.revenue.labels,-->
+<!--                datasets: [{-->
+<!--                    label: chartData.revenue.label,-->
+<!--                    data: chartData.revenue.data,-->
+<!--                    borderColor: '#ff8a65',-->
+<!--                    backgroundColor: '#ff8a65',-->
+<!--                    fill: false,-->
+<!--                    tension: 0.4,-->
+<!--                    pointBackgroundColor: '#ff8a65',-->
+<!--                    pointBorderColor: '#fff',-->
+<!--                    pointRadius: 5,-->
+<!--                    pointHoverRadius: 7-->
+<!--                }]-->
+<!--            },-->
+<!--            options: {-->
+<!--                scales: {-->
+<!--                    y: {beginAtZero: true, ticks: {stepSize: 5000000}},-->
+<!--                    x: {grid: {display: false}}-->
+<!--                },-->
+<!--                plugins: {-->
+<!--                    legend: {-->
+<!--                        display: true,-->
+<!--                        position: 'top',-->
+<!--                        labels: {boxWidth: 0, font: {size: 12}}-->
+<!--                    }-->
+<!--                },-->
+<!--                responsive: true,-->
+<!--                maintainAspectRatio: false-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+
+<!--    function updateChartData(type, newData) {-->
+<!--        const data = chartData[type];-->
+<!--        const now = new Date();-->
+<!--        const label = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});-->
+
+<!--        data.labels.push(label);-->
+<!--        data.data.push(type === 'revenue' ? (newData || 0) : parseInt(newData || 0, 10));-->
+
+<!--        if (data.labels.length > 10) {-->
+<!--            data.labels.shift();-->
+<!--            data.data.shift();-->
+<!--        }-->
+
+<!--        salesChart.data.labels = data.labels;-->
+<!--        salesChart.data.datasets[0].label = data.label;-->
+<!--        salesChart.data.datasets[0].data = data.data;-->
+<!--        salesChart.update();-->
+
+<!--        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;-->
+<!--    }-->
+
+<!--    function updateChart(type) {-->
+<!--        const data = chartData[type];-->
+<!--        salesChart.data.labels = data.labels;-->
+<!--        salesChart.data.datasets[0].label = data.label;-->
+<!--        salesChart.data.datasets[0].data = data.data;-->
+<!--        salesChart.update();-->
+<!--        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;-->
+<!--    }-->
+
+<!--    function zoomChart(direction) {-->
+<!--        const yAxis = salesChart.options.scales.y;-->
+<!--        if (direction === 'in') {-->
+<!--            yAxis.ticks.stepSize /= 2;-->
+<!--        } else {-->
+<!--            yAxis.ticks.stepSize *= 2;-->
+<!--        }-->
+<!--        salesChart.update();-->
+<!--    }-->
+
+<!--    function resetChart() {-->
+<!--        salesChart.options.scales.y.ticks.stepSize = 5000000;-->
+<!--        salesChart.update();-->
+<!--    }-->
+
+<!--    function toggleExpand(section) {-->
+<!--        const salesAnalytics = document.querySelector('.dash-sales-analytics');-->
+<!--        const updatesProfile = document.querySelector('.dash-updates-profile');-->
+<!--        const salesExpandBtn = salesAnalytics.querySelector('.dash-expand-btn i');-->
+<!--        const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');-->
+
+<!--        if (section === 'sales') {-->
+<!--            if (salesAnalytics.classList.contains('expanded')) {-->
+<!--                salesAnalytics.classList.remove('expanded');-->
+<!--                updatesProfile.classList.remove('hidden');-->
+<!--                salesExpandBtn.classList.remove('fa-compress');-->
+<!--                salesExpandBtn.classList.add('fa-expand');-->
+<!--            } else {-->
+<!--                salesAnalytics.classList.add('expanded');-->
+<!--                updatesProfile.classList.add('hidden');-->
+<!--                salesExpandBtn.classList.remove('fa-expand');-->
+<!--                salesExpandBtn.classList.add('fa-compress');-->
+<!--                setTimeout(() => salesChart.resize(), 300);-->
+<!--            }-->
+<!--        } else if (section === 'updates') {-->
+<!--            if (updatesProfile.classList.contains('expanded')) {-->
+<!--                updatesProfile.classList.remove('expanded');-->
+<!--                salesAnalytics.classList.remove('hidden');-->
+<!--                updatesExpandBtn.classList.remove('fa-compress');-->
+<!--                updatesExpandBtn.classList.add('fa-expand');-->
+<!--            } else {-->
+<!--                updatesProfile.classList.add('expanded');-->
+<!--                salesAnalytics.classList.add('hidden');-->
+<!--                updatesExpandBtn.classList.remove('fa-expand');-->
+<!--                updatesExpandBtn.classList.add('fa-compress');-->
+<!--            }-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Initialize chart and fetch data-->
+<!--    initializeChart();-->
+<!--    fetchDashboardData();-->
+<!--    setInterval(fetchDashboardData, 3000);-->
+
+<!--    // Resize chart on window resize-->
+<!--    window.addEventListener('resize', () => salesChart.resize());-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -43,6 +1428,12 @@
             max-height: 300px;
             width: 100%;
         }
+
+        /* Style cho thời gian cập nhật */
+        .update-time {
+            font-size: 1.1rem; /* Tăng kích thước font để dễ nhìn */
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body class="font-sans bg-gray-100 m-0 p-0">
@@ -66,122 +1457,92 @@
 
             <!-- Top Section: Cards -->
             <div class="dash-cards-wrapper flex gap-5 flex-wrap md:flex-nowrap mb-5 w-full">
-                <div class="dash-card flex-1 min-w-0 bg-orange-400 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('revenue')">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="text-4xl font-bold" id="total-revenue">0đ</div>
-                            <div class="text-xl">Doanh Thu</div>
-                        </div>
-                        <div class="text-4xl">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                    </div>
-                    <div class="flex justify-end mb-2">
-                        <div class="flex items-center text-sm opacity-80">
-                            <i class="fas fa-arrow-up mr-1"></i>
-                            <span id="revenue-change">0đ</span>
+                <!-- Revenue Card -->
+                <div class="dash-card flex-1 min-w-0 bg-orange-400 text-white rounded-lg shadow-lg p-6 cursor-pointer"
+                     onclick="updateChart('revenue')">
+                    <div class="flex justify-center items-center mb-4">
+                        <div class="flex items-center">
+                            <div class="text-2xl font-bold">Doanh Thu</div>
+                            <i class="fas fa-money-bill-wave ml-2 text-2xl"></i>
                         </div>
                     </div>
-                    <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center text-base opacity-90">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="revenue-update-time"></span></div>
-                            <div id="revenue-update-date"></div>
+                    <div class="text-4xl font-bold text-center" id="total-revenue">0đ</div>
+                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">
+                        <div class="update-time flex flex-col items-center">
+                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>
+                            <span class="text-[22px]"><span id="revenue-update-time"></span> - <span id="revenue-update-date"></span></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="dash-card flex-1 min-w-0 bg-green-500 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('products')">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="text-4xl font-bold" id="total-products">0</div>
-                            <div class="text-xl">Sản Phẩm</div>
-                        </div>
-                        <div class="text-4xl">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                    </div>
-                    <div class="flex justify-end mb-2">
-                        <div class="flex items-center text-sm opacity-80">
-                            <i class="fas fa-arrow-up mr-1"></i>
-                            <span id="products-change">0</span>
+                <!-- Products Card -->
+                <div class="dash-card flex-1 min-w-0 bg-green-500 text-white rounded-lg shadow-lg p-6 cursor-pointer"
+                     onclick="updateChart('products')">
+                    <div class="flex justify-center items-center mb-4">
+                        <div class="flex items-center">
+                            <div class="text-2xl font-bold">Sản Phẩm</div>
+                            <i class="fas fa-box ml-2 text-2xl"></i>
                         </div>
                     </div>
-                    <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center text-base opacity-90">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="products-update-time"></span></div>
-                            <div id="products-update-date"></div>
+                    <div class="text-4xl font-bold text-center" id="total-products">0</div>
+                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">
+                        <div class="update-time flex flex-col items-center">
+                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>
+                            <span class="text-[22px]"><span id="products-update-time"></span> - <span id="products-update-date"></span></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="dash-card flex-1 min-w-0 bg-pink-400 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('suppliers')">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="text-4xl font-bold" id="total-suppliers">0</div>
-                            <div class="text-xl">Nhà Cung Cấp</div>
-                        </div>
-                        <div class="text-4xl">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                    </div>
-                    <div class="flex justify-end mb-2">
-                        <div class="flex items-center text-sm opacity-80">
-                            <i class="fas fa-arrow-up mr-1"></i>
-                            <span id="suppliers-change">0</span>
+                <!-- Suppliers Card -->
+                <div class="dash-card flex-1 min-w-0 bg-pink-400 text-white rounded-lg shadow-lg p-6 cursor-pointer"
+                     onclick="updateChart('suppliers')">
+                    <div class="flex justify-center items-center mb-4">
+                        <div class="flex items-center">
+                            <div class="text-2xl font-bold">Nhà Cung Cấp</div>
+                            <i class="fas fa-truck ml-2 text-2xl"></i>
                         </div>
                     </div>
-                    <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center text-base opacity-90">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="suppliers-update-time"></span></div>
-                            <div id="suppliers-update-date"></div>
+                    <div class="text-4xl font-bold text-center" id="total-suppliers">0</div>
+                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">
+                        <div class="update-time flex flex-col items-center">
+                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>
+                            <span class="text-[22px]"><span id="suppliers-update-time"></span> - <span id="suppliers-update-date"></span></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="dash-card flex-1 min-w-0 bg-cyan-400 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('employees')">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="text-4xl font-bold" id="total-employees">0</div>
-                            <div class="text-xl">Nhân Viên</div>
-                        </div>
-                        <div class="text-4xl">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                    </div>
-                    <div class="flex justify-end mb-2">
-                        <div class="flex items-center text-sm opacity-80">
-                            <i class="fas fa-arrow-up mr-1"></i>
-                            <span id="employees-change">0</span>
+                <!-- Employees Card -->
+                <div class="dash-card flex-1 min-w-0 bg-cyan-400 text-white rounded-lg shadow-lg p-6 cursor-pointer"
+                     onclick="updateChart('employees')">
+                    <div class="flex justify-center items-center mb-4">
+                        <div class="flex items-center">
+                            <div class="text-2xl font-bold">Nhân Viên</div>
+                            <i class="fas fa-users ml-2 text-2xl"></i>
                         </div>
                     </div>
-                    <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center text-base opacity-90">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="employees-update-time"></span></div>
-                            <div id="employees-update-date"></div>
+                    <div class="text-4xl font-bold text-center" id="total-employees">0</div>
+                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">
+                        <div class="update-time flex flex-col items-center">
+                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>
+                            <span class="text-[22px]"><span id="employees-update-time"></span> - <span id="employees-update-date"></span></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="dash-card flex-1 min-w-0 bg-purple-500 text-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="updateChart('customers')">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="text-4xl font-bold" id="total-customers">0</div>
-                            <div class="text-xl">Khách Hàng</div>
-                        </div>
-                        <div class="text-4xl">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                    </div>
-                    <div class="flex justify-end mb-2">
-                        <div class="flex items-center text-sm opacity-80">
-                            <i class="fas fa-arrow-up mr-1"></i>
-                            <span id="customers-change">0</span>
+                <!-- Customers Card -->
+                <div class="dash-card flex-1 min-w-0 bg-purple-500 text-white rounded-lg shadow-lg p-6 cursor-pointer"
+                     onclick="updateChart('customers')">
+                    <div class="flex justify-center items-center mb-4">
+                        <div class="flex items-center">
+                            <div class="text-2xl font-bold">Khách Hàng</div>
+                            <i class="fas fa-user-friends ml-2 text-2xl"></i>
                         </div>
                     </div>
-                    <div class="border-t border-white my-4 flex justify-center">
-                        <div class="flex flex-col items-center text-base opacity-90">
-                            <div><i class="fas fa-clock mr-1 inline"></i> Cập nhật: <span id="customers-update-time"></span></div>
-                            <div id="customers-update-date"></div>
+                    <div class="text-4xl font-bold text-center" id="total-customers">0</div>
+                    <div class="border-t border-white my-4 flex justify-center pt-[15px]">
+                        <div class="update-time flex flex-col items-center">
+                            <span><i class="fas fa-clock mr-1 inline"></i> Cập nhật mới nhất:</span>
+                            <span class="text-[22px]"><span id="customers-update-time"></span> - <span id="customers-update-date"></span></span>
                         </div>
                     </div>
                 </div>
@@ -192,17 +1553,25 @@
                 <div class="dash-sales-analytics flex-[7] min-w-[300px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
                     <div class="dash-header flex justify-between items-center mb-2">
                         <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>
-                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer" onclick="toggleExpand('sales')">
+                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
+                                onclick="toggleExpand('sales')">
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
-                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
+                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy
+                        phép amCharts.</p>
                     <div class="dash-chart-controls flex justify-between items-center mb-5">
                         <div class="dash-zoom flex gap-2">
-                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer" onclick="zoomChart('in')">⟐</button>
-                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer" onclick="zoomChart('out')">⟑</button>
+                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
+                                    onclick="zoomChart('in')">⟐
+                            </button>
+                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
+                                    onclick="zoomChart('out')">⟑
+                            </button>
                         </div>
-                        <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer" onclick="resetChart()">Hiển thị tất cả</button>
+                        <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
+                                onclick="resetChart()">Hiển thị tất cả
+                        </button>
                     </div>
                     <canvas id="salesChart"></canvas>
                 </div>
@@ -210,7 +1579,8 @@
                 <div class="dash-updates-profile flex-[3] min-w-[200px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
                     <div class="dash-header flex justify-between items-center mb-2">
                         <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>
-                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer" onclick="toggleExpand('updates')">
+                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
+                                onclick="toggleExpand('updates')">
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
@@ -228,7 +1598,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-
 <script>
     // Function to format relative time
     function formatRelativeTime(timestamp) {
@@ -244,7 +1613,6 @@
         } else if (diffInSeconds < 3600) {
             const minutes = Math.floor(diffInSeconds / 60);
             return `${minutes} phút trước`;
-
         } else if (diffInSeconds < 86400) {
             const hours = Math.floor(diffInSeconds / 3600);
             return `${hours} giờ trước`;
@@ -275,29 +1643,25 @@
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value || 0);
     }
 
-
     async function getEmployeeNameById(employeeId) {
         if (!employeeId) return 'N/A';
-        const url = `http://localhost:8080/api/changelogs/employee/${employeeId}/name`; // Use absolute URL for testing
-        console.log("Fetching URL:", url);
+        const url = `http://localhost:8080/api/changelogs/employee/${employeeId}/name`;
+        console.log("Fetching employee name from URL:", url);
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                console.log("lỗi 1");
-                console.log("Status:", response.status);
-                console.log("Response:", await response.text());
-                console.log("employeeId:", employeeId);
+                console.error(`Error fetching employee name for ID ${employeeId}: Status ${response.status}, Response: ${await response.text()}`);
                 return 'không xác định';
             }
             const data = await response.json();
             return data.name || 'không xác định';
         } catch (error) {
             console.error(`Error fetching employee name for ID ${employeeId}:`, error);
-            console.log("lỗi 2");
             return 'không xác định';
         }
     }
-    // Lưu cache tên nhân viên để tránh gọi API nhiều lần cho cùng một ID
+
+    // Cache employee names
     const employeeNameCache = {};
 
     // Function to render change logs
@@ -305,72 +1669,62 @@
         const container = document.getElementById('changeLogsContainer');
         if (!logs || !Array.isArray(logs) || logs.length === 0) {
             container.innerHTML = `
-            <div class="update-item">
-                <div class="content">
-                    <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
+                <div class="update-item">
+                    <div class="content">
+                        <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
             return;
         }
 
-        // Hiển thị loading indicator
         container.innerHTML = `
-        <div class="update-item">
-            <div class="content">
-                <p class="text-sm text-gray-500">Đang tải...</p>
+            <div class="update-item">
+                <div class="content">
+                    <p class="text-sm text-gray-500">Đang tải...</p>
+                </div>
             </div>
-        </div>
-    `;
+        `;
 
-        // Xử lý và tạo danh sách các promise lấy tên nhân viên
         const employeeNamePromises = logs.map(async (log) => {
             if (!log || !log.employeeId) return 'không xác định';
-
-            // Kiểm tra cache trước
             if (employeeNameCache[log.employeeId]) {
                 return employeeNameCache[log.employeeId];
             }
-
-            // Nếu không có trong cache, gọi API
             const name = await getEmployeeNameById(log.employeeId);
             employeeNameCache[log.employeeId] = name;
             return name;
         });
 
-        // Chờ tất cả các lời gọi API hoàn thành
         const employeeNames = await Promise.all(employeeNamePromises);
 
-        // Tạo HTML cho từng mục log
         container.innerHTML = logs.map((log, index) => {
             if (!log || !log.timestamp || !log.action) {
                 return '';
             }
-
             const employeeName = employeeNames[index];
-
             return `
-            <div class="update-item mb-4">
-                <div class="flex items-center">
-                    <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>
-                    <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'} p-2 rounded-full">
-                        <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white"></i>
+                <div class="update-item mb-4">
+                    <div class="flex items-center">
+                        <p class="text-sm text-gray-600 mr-4">${formatRelativeTime(log.timestamp)}</p>
+                        <div class="icon ${log.action === 'INSERT' ? 'bg-green-500' : log.action === 'UPDATE' ? 'bg-blue-500' : 'bg-red-500'} p-2 rounded-full">
+                            <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white"></i>
+                        </div>
                     </div>
-                </div>
-                <div class="content mt-2">
-                    <p class="font-semibold text-sm">
-                        ${log.action === 'INSERT' ? `Nhân viên <strong>${employeeName}</strong> đã thêm ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :
+                    <div class="content mt-2">
+                        <p class="font-semibold text-sm">
+                            ${log.action === 'INSERT' ? `Nhân viên <strong>${employeeName}</strong> đã thêm ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :
                 log.action === 'UPDATE' ? `Nhân viên <strong>${employeeName}</strong> đã cập nhật ${log.entityName || 'N/A'} tên ${log.newValue || 'N/A'}` :
                     `Nhân viên <strong>${employeeName}</strong> đã xóa ${log.entityName || 'N/A'} tên ${log.oldValue || 'N/A'}`}
-                    </p>
-                    <p class="text-sm text-gray-500">
-                        ${log.action === 'INSERT' ? 'Thêm mới thành công!' :
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            ${log.action === 'INSERT' ? 'Thêm mới thành công!' :
                 log.action === 'UPDATE' ? 'Cập nhật thành công!' :
                     'Xóa thành công!'}
-                    </p>
+                        </p>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
         }).join('');
     }
 
@@ -385,6 +1739,7 @@
 
     async function fetchDashboardData() {
         try {
+            console.log("Fetching dashboard data...");
             const [
                 revenueRes,
                 productsRes,
@@ -398,27 +1753,26 @@
                 employeesTimeRes,
                 customersTimeRes
             ] = await Promise.all([
-                fetch('/api/changelogs/count/all/total-revenue').catch(() => null),
-                fetch('/api/changelogs/count/all/products').catch(() => null),
-                fetch('/api/changelogs/count/all/suppliers').catch(() => null),
-                fetch('/api/changelogs/count/all/employees').catch(() => null),
-                fetch('/api/changelogs/count/all/customers').catch(() => null),
-                fetch('/api/changelogs/notification').catch(() => null),
-                fetch('/api/changelogs/lastUpdate/time/total-revenue').catch(() => null),
-                fetch('/api/changelogs/lastUpdate/time/products').catch(() => null),
-                fetch('/api/changelogs/lastUpdate/time/suppliers').catch(() => null),
-                fetch('/api/changelogs/lastUpdate/time/employees').catch(() => null),
-                fetch('/api/changelogs/lastUpdate/time/customers').catch(() => null)
+                fetch('/api/changelogs/count/all/total-revenue').catch((e) => { console.error("Revenue fetch failed:", e); return null; }),
+                fetch('/api/changelogs/count/all/products').catch((e) => { console.error("Products fetch failed:", e); return null; }),
+                fetch('/api/changelogs/count/all/suppliers').catch((e) => { console.error("Suppliers fetch failed:", e); return null; }),
+                fetch('/api/changelogs/count/all/employees').catch((e) => { console.error("Employees fetch failed:", e); return null; }),
+                fetch('/api/changelogs/count/all/customers').catch((e) => { console.error("Customers fetch failed:", e); return null; }),
+                fetch('/api/changelogs/notification').catch((e) => { console.error("Change logs fetch failed:", e); return null; }),
+                fetch('/api/changelogs/lastUpdate/time/total-revenue').catch((e) => { console.error("Revenue time fetch failed:", e); return null; }),
+                fetch('/api/changelogs/lastUpdate/time/products').catch((e) => { console.error("Products time fetch failed:", e); return null; }),
+                fetch('/api/changelogs/lastUpdate/time/suppliers').catch((e) => { console.error("Suppliers time fetch failed:", e); return null; }),
+                fetch('/api/changelogs/lastUpdate/time/employees').catch((e) => { console.error("Employees time fetch failed:", e); return null; }),
+                fetch('/api/changelogs/lastUpdate/time/customers').catch((e) => { console.error("Customers time fetch failed:", e); return null; })
             ]);
 
-            // Hàm helper để parse JSON an toàn
             const parseJson = async (res, endpoint) => {
                 if (!res) {
                     console.warn(`Request failed for ${endpoint}: No response`);
                     return null;
                 }
                 if (!res.ok) {
-                    console.warn(`Request failed for ${endpoint}: Status ${res.status}`);
+                    console.warn(`Request failed for ${endpoint}: Status ${res.status}, Response: ${await res.text()}`);
                     return null;
                 }
                 try {
@@ -434,7 +1788,6 @@
                 }
             };
 
-            // Parse từng response
             const revenue = (await parseJson(revenueRes, '/api/changelogs/count/all/total-revenue')) ?? 0;
             const products = (await parseJson(productsRes, '/api/changelogs/count/all/products')) ?? 0;
             const suppliers = (await parseJson(suppliersRes, '/api/changelogs/count/all/suppliers')) ?? 0;
@@ -447,6 +1800,8 @@
             const employeesTime = (await parseJson(employeesTimeRes, '/api/changelogs/lastUpdate/time/employees')) ?? null;
             const customersTime = (await parseJson(customersTimeRes, '/api/changelogs/lastUpdate/time/customers')) ?? null;
 
+            console.log("Fetched data:", { revenue, products, suppliers, employees, customers, changeLogs, revenueTime, productsTime, suppliersTime, employeesTime, customersTime });
+
             const revenueDateTime = formatDateTimeFromLocal(revenueTime);
             const productsDateTime = formatDateTimeFromLocal(productsTime);
             const suppliersDateTime = formatDateTimeFromLocal(suppliersTime);
@@ -454,44 +1809,39 @@
             const customersDateTime = formatDateTimeFromLocal(customersTime);
 
             document.getElementById('total-revenue').textContent = formatCurrency(revenue);
-            document.getElementById('revenue-change').textContent = formatCurrency(revenue - previousData.revenue);
             document.getElementById('revenue-update-time').textContent = revenueDateTime.time;
             document.getElementById('revenue-update-date').textContent = revenueDateTime.date;
 
             document.getElementById('total-products').textContent = products;
-            document.getElementById('products-change').textContent = (products - previousData.products).toString();
             document.getElementById('products-update-time').textContent = productsDateTime.time;
             document.getElementById('products-update-date').textContent = productsDateTime.date;
 
             document.getElementById('total-suppliers').textContent = suppliers;
-            document.getElementById('suppliers-change').textContent = (suppliers - previousData.suppliers).toString();
             document.getElementById('suppliers-update-time').textContent = suppliersDateTime.time;
             document.getElementById('suppliers-update-date').textContent = suppliersDateTime.date;
 
             document.getElementById('total-employees').textContent = employees;
-            document.getElementById('employees-change').textContent = (employees - previousData.employees).toString();
             document.getElementById('employees-update-time').textContent = employeesDateTime.time;
             document.getElementById('employees-update-date').textContent = employeesDateTime.date;
 
             document.getElementById('total-customers').textContent = customers;
-            document.getElementById('customers-change').textContent = (customers - previousData.customers).toString();
             document.getElementById('customers-update-time').textContent = customersDateTime.time;
             document.getElementById('customers-update-date').textContent = customersDateTime.date;
 
             previousData = { revenue, products, suppliers, employees, customers };
 
-            await renderChangeLogs(changeLogs);  // Đã chuyển thành async
+            await renderChangeLogs(changeLogs);
 
             updateChartData('revenue', revenue);
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
             document.getElementById('changeLogsContainer').innerHTML = `
-            <div class="update-item">
-                <div class="content">
-                    <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+                <div class="update-item">
+                    <div class="content">
+                        <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
         }
     }
 
