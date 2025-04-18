@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.md5_phone_store_management.model.Product;
@@ -68,4 +70,6 @@ public interface IProductService {
 
     Long countSoldProducts();
 
+    // NAVBAR
+    List<Product> searchProductsNameForNavbar(String keyword, Pageable pageable);
 }
