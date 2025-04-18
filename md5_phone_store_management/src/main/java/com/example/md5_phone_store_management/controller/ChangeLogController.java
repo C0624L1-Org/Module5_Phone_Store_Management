@@ -271,7 +271,9 @@ public class ChangeLogController {
 
     @GetMapping("/lastUpdate/time/total-revenue")
     public LocalDateTime getLastRevenueUpdateTime() {
-        return changeLogService.getLastUpdateTime("invoices");
+        System.out.println("ĐÂY "+changeLogService.getLastUpdateTime("invoice"));
+        return changeLogService.getLastUpdateTime("invoice");
+
     }
 
 
