@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -8,17 +9,20 @@
 <!-- Sidebar Fragment -->
 <aside th:fragment="sidebar" class="sidebar">
   <div class="sidebar-content">
-
-
     <div style="padding: 20px 20px 15px 20px; text-align: center;" class="user-image-back flex justify-center">
-      <a href="http://localhost:8080/common/profile">
-        <img
-                src="/img/dashboard/find_user.png"
-                alt="logo"
-                style="border: 3px solid white; border-radius: 50%; width: 80px; height: 80px; object-fit: cover;"
-        >
-      </a>
+      <div style="position: relative; width: 80px; height: 80px;">
+        <canvas id="radiating-circles" width="120" height="120" style="display: none; position: absolute; top: -20px; left: -20px; z-index: 1;"></canvas>
+        <a href="http://localhost:8080/common/profile" style="position: relative; z-index: 2;">
+          <img
+                  src="/img/dashboard/find_user.png"
+                  alt="logo"
+                  style="border: 3px solid white; border-radius: 50%; width: 80px; height: 80px; object-fit: cover;"
+          >
+        </a>
+      </div>
     </div>
+
+
 
 
     <div class="text-center user-data">
@@ -99,7 +103,59 @@
   <!-- JavaScript for sidebar functionality -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Define menu structure with sub-menus
+      // Lấy current path từ window.location.pathname (chỉ khai báo một lần)
+      const currentPath = window.location.pathname;
+
+      // Radiating Circles Effect
+      const canvas = document.getElementById('radiating-circles');
+      const ctx = canvas.getContext('2d');
+
+      // Log để kiểm tra
+      console.log('Current path:', currentPath);
+      console.log('Canvas element:', canvas);
+
+      // Trung tâm của canvas (khớp với trung tâm ảnh 80x80px)
+      const centerX = canvas.width / 2; // 120 / 2 = 60px
+      const centerY = canvas.height / 2; // 120 / 2 = 60px
+      const layers = 3; // Số lớp vòng tròn
+      const circlesPerLayer = 8; // Số vòng tròn mỗi lớp
+      let time = 0;
+
+      function drawCircles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas
+
+        // Vẽ các vòng tròn bao quanh
+        for (let layer = 1; layer <= layers; layer++) {
+          const baseRadius = 4 + Math.sin(time + layer * 0.8) * 2; // Kích thước vòng tròn nhỏ
+          const distance = 50 + layer * 10; // Khoảng cách từ trung tâm (bắt đầu từ ngoài ảnh)
+
+          for (let i = 0; i < circlesPerLayer; i++) {
+            const angle = (i / circlesPerLayer) * 2 * Math.PI;
+            const x = centerX + Math.cos(angle) * distance;
+            const y = centerY + Math.sin(angle) * distance;
+
+            ctx.beginPath();
+            ctx.arc(x, y, baseRadius, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+          }
+        }
+
+        time += 0.05;
+        requestAnimationFrame(drawCircles);
+      }
+
+      // Kiểm tra đường dẫn để chạy hiệu ứng
+      if (currentPath === '/common/profile') {
+        console.log('Path matched, showing canvas and starting effect');
+        canvas.style.display = 'block'; // Hiển thị canvas
+        drawCircles(); // Chạy hiệu ứng
+      } else {
+        console.log('Path does not match, hiding canvas');
+        canvas.style.display = 'none'; // Ẩn canvas
+      }
+
+      // Sidebar Menu Logic
       const menuItems = [
         {
           id: 'dashboard',
@@ -158,8 +214,6 @@
             { url: '/dashboard/admin/transactions/new/in#', label: 'Thêm mới Nhập Kho' },
             { url: '/dashboard/admin/transactions/In/edit#', label: 'Cập nhật Nhập Kho' },
             { url: '/dashboard/admin/transactions/view#', label: 'Chi tiết Nhập Kho' },
-
-
             { url: '/dashboard/admin/transactions/listOut', label: 'Quản lý Xuất Kho' },
             { url: '/dashboard/admin/transactions/new/out#', label: 'Thêm mới Xuất Kho' },
             { url: '/dashboard/admin/transactions/new/out#', label: 'Thêm mới Xuất Kho' },
@@ -194,9 +248,6 @@
         }
       ];
 
-      // Lấy current path từ window.location.pathname
-      const currentPath = window.location.pathname;
-
       // Lấy tất cả nav links
       const navLinks = document.querySelectorAll('#sidebarMenu .nav-link');
 
@@ -221,17 +272,13 @@
             // Xử lý URL theo quy định # và %
             let baseUrl = subItem.url;
             if (baseUrl.includes('#')) {
-              // Loại bỏ # và phần sau nó
               baseUrl = baseUrl.split('#')[0];
             }
             if (baseUrl.includes('%')) {
-              // Chỉ lấy phần trước %
               baseUrl = baseUrl.split('%')[0];
             }
 
-            // Kiểm tra khớp với currentPath
             if (baseUrl.endsWith('/') && currentPath.startsWith(baseUrl)) {
-              // Xử lý URL động như /dashboard/admin/customers/search/ hoặc /dashboard/products/update-form-retail-price/{số}
               matchedLink = document.querySelector(`#sidebarMenu .nav-link[data-url="${item.url}"]`);
             } else if (currentPath === baseUrl || currentPath.startsWith(baseUrl + '/')) {
               matchedLink = document.querySelector(`#sidebarMenu .nav-link[data-url="${item.url}"]`);

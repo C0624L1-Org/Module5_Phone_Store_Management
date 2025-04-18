@@ -1,5 +1,4 @@
 
-
 .sidebar {
     width: 280px;
     height: calc(100vh - 100px);
@@ -108,4 +107,25 @@
 .sidebar * {
     border: none;
     box-shadow: none;
+}
+
+/* Dự phòng cho Tailwind class khi Tailwind không tải */
+.flex {
+    display: flex;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.flex-column {
+    flex-direction: column;
 }
