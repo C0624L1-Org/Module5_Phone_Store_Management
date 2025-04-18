@@ -1,3 +1,96 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">-->
+<!--<head>-->
+<!--  <title>Sidebar</title>-->
+<!--</head>-->
+
+<!--<body>-->
+<!--&lt;!&ndash; Sidebar Fragment &ndash;&gt;-->
+<!--<aside th:fragment="sidebar" class="sidebar">-->
+<!--  <div class="sidebar-content">-->
+<!--    <div class="text-center user-image-back">-->
+<!--      <img src="/img/dashboard/find_user.png" class="img-fluid rounded-circle avatar-user" alt="logo" width="80">-->
+<!--    </div>-->
+
+<!--    <div class="text-center user-data">-->
+<!--      <h2>Dashboard <span th:text="${loggedEmployee.role.getLabel()}"></span></h2>-->
+<!--    </div>-->
+
+<!--    <ul class="nav flex-column mt-3">-->
+<!--      &lt;!&ndash; Dashboard Riêng của từng Role &ndash;&gt;-->
+<!--      <li class="nav-item">-->
+<!--        <a th:href="@{/dashboard/admin}" class="nav-link text-white" sec:authorize="hasRole('Admin')">-->
+<!--          <i class="fas fa-desktop me-2"></i> Thống kê-->
+<!--        </a>-->
+<!--        <a th:href="@{/dashboard/sales-staff}" class="nav-link text-white" sec:authorize="hasRole('SalesStaff')">-->
+<!--          <i class="fas fa-desktop me-2"></i> Thống kê-->
+<!--        </a>-->
+<!--        <a th:href="@{/dashboard/sales-person}" class="nav-link text-white" sec:authorize="hasRole('SalesPerson')">-->
+<!--          <i class="fas fa-desktop me-2"></i> Thống kê-->
+<!--        </a>-->
+<!--        <a th:href="@{/dashboard/warehouse-staff}" class="nav-link text-white" sec:authorize="hasRole('WarehouseStaff')">-->
+<!--          <i class="fas fa-desktop me-2"></i> Thống kê-->
+<!--        </a>-->
+<!--      </li>-->
+
+<!--      &lt;!&ndash; Quản lý nhân viên - Admin &ndash;&gt;-->
+<!--      <li class="nav-item" sec:authorize="hasRole('Admin')">-->
+<!--        <a th:href="@{/dashboard/admin/employees/list}" class="nav-link text-white">-->
+<!--          <i class="fas fa-users me-2"></i>Quản lý nhân viên-->
+<!--        </a>-->
+<!--      </li>-->
+
+
+<!--      &lt;!&ndash; Quản lý nhà cung cấp - Thủ kho, Admin &ndash;&gt;-->
+<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">-->
+<!--        <a th:href="@{/dashboard/suppliers}" class="nav-link text-white">-->
+<!--          <i class="fas fa-truck-loading me-2"></i>Quản lý nhà cung cấp-->
+<!--        </a>-->
+<!--      </li>-->
+
+<!--      &lt;!&ndash; Quản lý sản phẩm - Nhân viên kinh doanh, Admin &ndash;&gt;-->
+<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff', 'SalesPerson')">-->
+<!--        <a th:href="@{/dashboard/products/list}" class="nav-link text-white">-->
+<!--          <i class="fas fa-chart-line me-2"></i>Quản lý sản phẩm-->
+<!--        </a>-->
+<!--      </li>-->
+
+<!--      &lt;!&ndash; Quản lý bán hàng - Nhân viên bán hàng & Nhân viên kinh doanh &ndash;&gt;-->
+<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">-->
+<!--        <a th:href="@{/dashboard/sales/form}" class="nav-link text-white">-->
+<!--          <i class="fas fa-shopping-cart me-2"></i>Quản lý bán hàng-->
+<!--        </a>-->
+<!--      </li>-->
+
+<!--      &lt;!&ndash; Quản lý xuất nhập kho - Thủ kho, Admin &ndash;&gt;-->
+<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">-->
+<!--        <a th:href="@{/dashboard/warehouse/inventory}" class="nav-link text-white">-->
+<!--          <i class="fas fa-warehouse me-2"></i>Quản lý xuất nhập kho-->
+<!--        </a>-->
+<!--      </li>-->
+
+<!--      &lt;!&ndash; Quản lý kinh doanh - Thủ kho , Nhân viên kinh doanh, Admin &ndash;&gt;-->
+<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">-->
+<!--        <a th:href="@{/dashboard/business/management}" class="nav-link text-white">-->
+<!--          <i class="fas fa-chart-line me-2"></i>Quản lý kinh doanh-->
+<!--        </a>-->
+<!--      </li>-->
+
+
+
+<!--      &lt;!&ndash; Quản lý báo cáo - Admin & Nhân viên kinh doanh &ndash;&gt;-->
+<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">-->
+<!--        <a th:href="@{/report-home}" class="nav-link text-white">-->
+<!--          <i class="fas fa-file-alt me-2"></i>Quản lý báo cáo-->
+<!--        </a>-->
+<!--      </li>-->
+
+
+<!--    </ul>-->
+<!--  </div>-->
+<!--</aside>-->
+<!--</body>-->
+<!--</html>-->
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -16,89 +109,119 @@
       <h2>Dashboard <span th:text="${loggedEmployee.role.getLabel()}"></span></h2>
     </div>
 
-    <ul class="nav flex-column mt-3">
+    <ul class="nav flex-column mt-3" id="sidebarMenu">
       <!-- Dashboard Riêng của từng Role -->
       <li class="nav-item">
-        <a th:href="@{/dashboard/admin}" class="nav-link text-white" sec:authorize="hasRole('Admin')">
+        <a th:href="@{/dashboard/admin}" class="nav-link" sec:authorize="hasRole('Admin')" th:data-url="@{/dashboard/admin}">
           <i class="fas fa-desktop me-2"></i> Thống kê
         </a>
-        <a th:href="@{/dashboard/sales-staff}" class="nav-link text-white" sec:authorize="hasRole('SalesStaff')">
+        <a th:href="@{/dashboard/sales-staff}" class="nav-link" sec:authorize="hasRole('SalesStaff')" th:data-url="@{/dashboard/sales-staff}">
           <i class="fas fa-desktop me-2"></i> Thống kê
         </a>
-        <a th:href="@{/dashboard/sales-person}" class="nav-link text-white" sec:authorize="hasRole('SalesPerson')">
+        <a th:href="@{/dashboard/sales-person}" class="nav-link" sec:authorize="hasRole('SalesPerson')" th:data-url="@{/dashboard/sales-person}">
           <i class="fas fa-desktop me-2"></i> Thống kê
         </a>
-        <a th:href="@{/dashboard/warehouse-staff}" class="nav-link text-white" sec:authorize="hasRole('WarehouseStaff')">
+        <a th:href="@{/dashboard/warehouse-staff}" class="nav-link" sec:authorize="hasRole('WarehouseStaff')" th:data-url="@{/dashboard/warehouse-staff}">
           <i class="fas fa-desktop me-2"></i> Thống kê
         </a>
       </li>
 
       <!-- Quản lý nhân viên - Admin -->
       <li class="nav-item" sec:authorize="hasRole('Admin')">
-        <a th:href="@{/dashboard/admin/employees/list}" class="nav-link text-white">
+        <a th:href="@{/dashboard/admin/employees/list}" class="nav-link" th:data-url="@{/dashboard/admin/employees/list}">
           <i class="fas fa-users me-2"></i>Quản lý nhân viên
         </a>
       </li>
 
-      <!-- Quản lý khách hàng - Nhân viên bán hàng, Admin -->
-<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">-->
-<!--        <a th:href="@{/dashboard/admin/customers/list}" class="nav-link text-white">-->
-<!--          <i class="fas fa-id-card me-2"></i>Quản lý khách hàng-->
-<!--        </a>-->
-<!--      </li>-->
-
       <!-- Quản lý nhà cung cấp - Thủ kho, Admin -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
-        <a th:href="@{/dashboard/suppliers}" class="nav-link text-white">
+        <a th:href="@{/dashboard/suppliers}" class="nav-link" th:data-url="@{/dashboard/suppliers}">
           <i class="fas fa-truck-loading me-2"></i>Quản lý nhà cung cấp
         </a>
       </li>
 
       <!-- Quản lý sản phẩm - Nhân viên kinh doanh, Admin -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff', 'SalesPerson')">
-        <a th:href="@{/dashboard/products/list}" class="nav-link text-white">
+        <a th:href="@{/dashboard/products/list}" class="nav-link" th:data-url="@{/dashboard/products/list}">
           <i class="fas fa-chart-line me-2"></i>Quản lý sản phẩm
         </a>
       </li>
 
       <!-- Quản lý bán hàng - Nhân viên bán hàng & Nhân viên kinh doanh -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">
-        <a th:href="@{/dashboard/sales/form}" class="nav-link text-white">
+        <a th:href="@{/dashboard/sales/form}" class="nav-link" th:data-url="@{/dashboard/sales/form}">
           <i class="fas fa-shopping-cart me-2"></i>Quản lý bán hàng
         </a>
       </li>
 
       <!-- Quản lý xuất nhập kho - Thủ kho, Admin -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
-        <a th:href="@{/dashboard/warehouse/inventory}" class="nav-link text-white">
+        <a th:href="@{/dashboard/warehouse/inventory}" class="nav-link" th:data-url="@{/dashboard/warehouse/inventory}">
           <i class="fas fa-warehouse me-2"></i>Quản lý xuất nhập kho
         </a>
       </li>
 
       <!-- Quản lý kinh doanh - Thủ kho , Nhân viên kinh doanh, Admin -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">
-        <a th:href="@{/dashboard/business/management}" class="nav-link text-white">
+        <a th:href="@{/dashboard/business/management}" class="nav-link" th:data-url="@{/dashboard/business/management}">
           <i class="fas fa-chart-line me-2"></i>Quản lý kinh doanh
         </a>
       </li>
 
-      <!-- Xem thông tin hàng hóa - Nhân viên bán hàng, Admin -->
-<!--      <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">-->
-<!--        <a th:href="@{/dashboard/products/view}" class="nav-link text-white">-->
-<!--          <i class="fas fa-boxes me-2"></i>Xem thông tin hàng hóa-->
-<!--        </a>-->
-<!--      </li>-->
-
       <!-- Quản lý báo cáo - Admin & Nhân viên kinh doanh -->
       <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesStaff')">
-        <a th:href="@{/report-home}" class="nav-link text-white">
+        <a th:href="@{/report-home}" class="nav-link" th:data-url="@{/report-home}">
           <i class="fas fa-file-alt me-2"></i>Quản lý báo cáo
         </a>
       </li>
-
-
     </ul>
   </div>
+
+  <!-- JavaScript for sidebar functionality - with improved active detection -->
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get current path
+      const currentPath = window.location.pathname;
+      console.log("Current path:", currentPath);
+
+      // Get all nav links
+      const navLinks = document.querySelectorAll('#sidebarMenu .nav-link');
+
+      // Remove all active classes first
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+      });
+
+      // Find the single best matching link
+      let bestMatch = null;
+      let bestMatchLength = 0;
+
+      navLinks.forEach(link => {
+        // Get the URL from data-url attribute
+        const linkUrl = link.getAttribute('data-url');
+        if (linkUrl) {
+          // Remove context path if present for proper matching
+          const cleanedUrl = linkUrl.replace(/^\/[^/]+/, '');
+          const cleanedCurrentPath = currentPath.replace(/^\/[^/]+/, '');
+
+          // Check if the current path starts with the link URL (for sub-pages)
+          if (cleanedCurrentPath === cleanedUrl ||
+                  cleanedCurrentPath.startsWith(cleanedUrl + '/')) {
+            // If this match is longer than previous matches, it's more specific
+            if (cleanedUrl.length > bestMatchLength) {
+              bestMatch = link;
+              bestMatchLength = cleanedUrl.length;
+            }
+          }
+        }
+      });
+
+      // Apply active class only to the best match
+      if (bestMatch) {
+        bestMatch.classList.add('active');
+      }
+    });
+  </script>
 </aside>
 </body>
 </html>

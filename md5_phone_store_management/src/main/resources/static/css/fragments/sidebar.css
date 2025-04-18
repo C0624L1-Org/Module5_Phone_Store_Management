@@ -1,3 +1,86 @@
+/*!* === SIDEBAR STYLES === *!*/
+/*.sidebar {*/
+/*    width: 280px;*/
+/*    height: calc(100vh - 100px); !* Viewport height minus navbar height *!*/
+/*    background-color: #333333;*/
+/*    color: white;*/
+/*    position: fixed;*/
+/*    top: 100px; !* Position right below navbar *!*/
+/*    left: 0;*/
+/*    z-index: 100;*/
+/*    box-shadow: 2px 0 5px rgba(0,0,0,0.1);*/
+/*    overflow-y: auto;*/
+/*    flex-shrink: 0;*/
+/*}*/
+
+/*!* In dashboard container *!*/
+/*.dashboard-container .sidebar {*/
+/*    position: static;*/
+/*    height: auto;*/
+/*}*/
+
+/*.sidebar-content {*/
+/*    padding: 1rem;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    height: 100%;*/
+/*}*/
+
+/*!* User info section *!*/
+/*.user-image-back {*/
+/*    padding: 20px 0;*/
+/*    text-align: center;*/
+/*}*/
+
+/*.avatar-user {*/
+/*    border: 3px solid white;*/
+/*    border-radius: 50%;*/
+/*    width: 80px;*/
+/*    height: 80px;*/
+/*    object-fit: cover;*/
+/*}*/
+
+/*.user-data {*/
+/*    margin-bottom: 1.5rem;*/
+/*}*/
+
+/*.user-data h2 {*/
+/*    font-size: 1.2rem;*/
+/*    margin-bottom: 0.5rem;*/
+/*}*/
+
+/*!* Navigation menu *!*/
+/*.sidebar .nav {*/
+/*    margin-top: 1rem;*/
+/*}*/
+
+/*.sidebar .nav-item {*/
+/*    margin-bottom: 0.5rem;*/
+/*}*/
+
+/*.sidebar .nav-link {*/
+/*    color: white;*/
+/*    padding: 0.75rem 1rem;*/
+/*    border-radius: 6px;*/
+/*    transition: background-color 0.2s;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*}*/
+
+/*.sidebar .nav-link:hover {*/
+/*    background-color: rgba(255, 255, 255, 0.1);*/
+/*}*/
+
+/*.sidebar .nav-link.active {*/
+/*    background-color: rgba(255, 255, 255, 0.2);*/
+/*}*/
+
+/*.sidebar .nav-link i {*/
+/*    margin-right: 0.75rem;*/
+/*    width: 20px;*/
+/*    text-align: center;*/
+/*}*/
+
 /* === SIDEBAR STYLES === */
 .sidebar {
     width: 280px;
@@ -24,6 +107,8 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
+    background-color: #333333; /* Match the sidebar background */
 }
 
 /* User info section */
@@ -52,31 +137,97 @@
 /* Navigation menu */
 .sidebar .nav {
     margin-top: 1rem;
+    position: relative;
+    width: 100%;
+    background-color: transparent;
 }
 
 .sidebar .nav-item {
     margin-bottom: 0.5rem;
+    position: relative;
+    width: 100%;
+    background-color: transparent;
 }
 
+/* Base styles for nav links */
 .sidebar .nav-link {
     color: white;
     padding: 0.75rem 1rem;
     border-radius: 6px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
     display: flex;
     align-items: center;
+    position: relative;
+    width: 100%;
+    background-color: transparent;
 }
 
+/* Hover state */
 .sidebar .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.sidebar .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
+/* Keep icons white by default */
 .sidebar .nav-link i {
     margin-right: 0.75rem;
     width: 20px;
     text-align: center;
+    color: white;
+}
+
+/* Active state - white background with black text */
+.sidebar .nav-link.active {
+    background-color: white;
+    color: #333333;
+    font-weight: 500;
+}
+
+/* Make icons black when nav link is active */
+.sidebar .nav-link.active i {
+    color: #333333;
+}
+
+/* Remove any white boxes that might appear in the sidebar */
+.sidebar ul,
+.sidebar li,
+.sidebar div {
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+    list-style: none;
+    background-color: transparent;
+}
+
+/* Override any potential widget styles that might be causing the white boxes */
+#sidebarMenu .nav-item:first-child,
+#sidebarMenu .nav-item:last-child,
+#sidebarMenu .nav-link:first-child,
+#sidebarMenu .nav-link:last-child {
+    background-color: transparent !important;
+}
+
+/* Fix for parent element that might be getting styled */
+.sidebar::before,
+.sidebar::after,
+.sidebar-content::before,
+.sidebar-content::after {
+    display: none !important;
+}
+
+/* Make sure we don't have any default Bootstrap white backgrounds */
+.sidebar .bg-white,
+.sidebar .bg-light,
+.sidebar [class*="bg-"] {
+    background-color: transparent !important;
+}
+
+/* Reset border and other decorations */
+.sidebar * {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Exception for active link */
+.sidebar .nav-link.active {
+    background-color: white !important;
 }
