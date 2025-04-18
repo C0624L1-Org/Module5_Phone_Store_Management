@@ -8,11 +8,18 @@
 <!-- Sidebar Fragment -->
 <aside th:fragment="sidebar" class="sidebar">
   <div class="sidebar-content">
-    <div class="text-center user-image-back">
+
+
+    <div style="padding: 20px 20px 15px 20px; text-align: center;" class="user-image-back flex justify-center">
       <a href="http://localhost:8080/common/profile">
-        <img src="/img/dashboard/find_user.png" class="img-fluid rounded-circle avatar-user" alt="logo" width="80">
+        <img
+                src="/img/dashboard/find_user.png"
+                alt="logo"
+                style="border: 3px solid white; border-radius: 50%; width: 80px; height: 80px; object-fit: cover;"
+        >
       </a>
     </div>
+
 
     <div class="text-center user-data">
       <h2>Xin chào!</h2>

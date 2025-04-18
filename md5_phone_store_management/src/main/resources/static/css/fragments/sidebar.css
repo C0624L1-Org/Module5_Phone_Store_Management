@@ -27,25 +27,6 @@
     background-color: #333333;
 }
 
-/*.user-image-back {*/
-/*    padding: 20px 0;*/
-/*    text-align: center;*/
-/*}*/
-/*sửa lỗi bên tailwind*/
-.user-image-back {
-    padding: 20px 0 !important;
-    text-align: center !important;
-}
-
-
-.avatar-user {
-    border: 3px solid white;
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-}
-
 .user-data {
     margin-bottom: 1.5rem;
 }
