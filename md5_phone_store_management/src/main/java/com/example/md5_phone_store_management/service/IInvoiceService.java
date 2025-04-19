@@ -63,6 +63,6 @@ public interface IInvoiceService {
     // Phương thức cho biểu đồ theo năm
     List<Object[]> getYearlyInvoiceStats();
     // filter
-    List<Object[]> filterReport(String groupBy, Integer month, Integer year, PaymentMethod paymentMethod,
-                                String productName, String employeeName);
+   // List<Object[]> filterReport(String groupBy, Integer month, Integer year, PaymentMethod paymentMethod,
+                               // String productName, String employeeName);
 }

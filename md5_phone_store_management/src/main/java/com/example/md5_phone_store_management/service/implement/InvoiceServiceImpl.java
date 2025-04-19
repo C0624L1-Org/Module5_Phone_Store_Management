@@ -1,9 +1,12 @@
 package com.example.md5_phone_store_management.service.implement;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.YearMonth;
+import java.util.*;
 
 import com.example.md5_phone_store_management.model.*;
+import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -315,20 +318,67 @@ public class InvoiceServiceImpl implements IInvoiceService {
         }
     }
 
-    @Override
-    public List<Object[]> filterReport(String groupBy, Integer month, Integer year, PaymentMethod paymentMethod, String productName, String employeeName) {
-        switch (groupBy.toLowerCase()) {
-            case "day":
-                return invoiceRepository.getDailyRevenueReport(month,year,paymentMethod, employeeName, productName);
-            case "month":
-                return invoiceRepository.getMonthlyRevenueReport(year,paymentMethod, employeeName, productName);
-            case "year":
-                return invoiceRepository.getYearlyRevenueReport(paymentMethod, employeeName, productName);
-            default:
-                LocalDateTime today = LocalDateTime.now();
-                month=today.getMonthValue();
-                year=today.getYear();
-                return invoiceRepository.getDailyRevenueReport(month,year,paymentMethod, employeeName, productName);
+   /* public List<Object[]> filterReport(
+            String groupBy, Integer month, Integer year,
+            PaymentMethod paymentMethod, String productName, String employeeName
+    ) {
+        List<Object[]> rawData;
+        Map<Integer, Object[]> fullDataMap = new LinkedHashMap<>();
+
+        LocalDate now = LocalDate.now();
+        groupBy = (groupBy == null) ? "day" : groupBy.toLowerCase();
+
+        // Xử lý giá trị mặc định
+        if (groupBy.equals("day")) {
+            if (month == null || year == null) {
+                month = now.getMonthValue();
+                year = now.getYear();
+            }
+            rawData = invoiceRepository.getDailyRevenueReport(month, year, paymentMethod, employeeName, productName);
+
+            // Bổ sung đủ các ngày trong tháng
+            int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
+            for (int day = 1; day <= daysInMonth; day++) {
+                fullDataMap.put(day, new Object[]{day, 0L, 0});
+            }
+        } else if (groupBy.equals("month")) {
+            if (year == null) year = now.getYear();
+            rawData = invoiceRepository.getMonthlyRevenueReport(year, paymentMethod, employeeName, productName);
+
+            // Bổ sung đủ 12 tháng
+            for (int m = 1; m <= 12; m++) {
+                fullDataMap.put(m, new Object[]{m, 0L, 0});
+            }
+        } else if (groupBy.equals("year")) {
+            rawData = invoiceRepository.getYearlyRevenueReport(paymentMethod, employeeName, productName);
+
+            // Lấy 3 năm gần nhất
+            int currentYear = now.getYear();
+            for (int y = currentYear - 2; y <= currentYear; y++) {
+                fullDataMap.put(y, new Object[]{y, 0L, 0});
+            }
+        } else {
+            // Mặc định là theo ngày hiện tại
+            month = now.getMonthValue();
+            year = now.getYear();
+            rawData = invoiceRepository.getDailyRevenueReport(month, year, paymentMethod, employeeName, productName);
+            int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
+            for (int day = 1; day <= daysInMonth; day++) {
+                fullDataMap.put(day, new Object[]{day, 0L, 0});
+            }
         }
-    }
+
+        // Ghi đè dữ liệu thực vào bản đồ
+        for (Object[] row : rawData) {
+            Integer key = ((Number) row[0]).intValue();
+            fullDataMap.put(key, new Object[]{
+                    key,
+                    ((Number) row[2]).longValue(),     // totalRevenue
+                    ((Number) row[1]).intValue()       // totalInvoice
+            });
+        }
+
+        // Trả về danh sách theo thứ tự chỉ số
+        return new ArrayList<>(fullDataMap.values());
+    }*/
 }

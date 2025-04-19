@@ -458,33 +458,32 @@
     </style>
 </head>
 <body>
-<!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
 
-<!-- Nhúng navbar -->
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
 <div class="content-wrapper">
     <div class="dashboard-container">
-        <!-- Sidebar -->
         <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-        <!-- Nội dung chính -->
         <div class="content-container">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a th:href="@{/report-home}">Quản lý báo cáo</a></li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/report-home}">Quản lý báo cáo</a>
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page">Báo Cáo Doanh Thu Theo Mã Sản Phẩm</li>
                 </ol>
             </nav>
 
             <div class="card shadow-sm">
                 <div class="card-header">
-                    <h1 class="mb-0"><i class="fas fa-chart-line me-3"></i>Báo Cáo Doanh Thu Theo Mã Sản Phẩm</h1>
+                    <h1 class="mb-0">
+                        <i class="fas fa-chart-line me-3"></i>Báo Cáo Doanh Thu Theo Mã Sản Phẩm
+                    </h1>
                 </div>
                 <div class="card-body">
-                    <!-- Form nhập liệu -->
-                    <form th:action="@{/sales-report}" method="get" class="search-form row g-3">
+                    <form th:action="@{/sales-report-filter}" method="get" class="search-form row g-3">
                         <div class="col-md-3">
                             <label for="paymentMethod" class="form-label">
                                 <i class="fas fa-credit-card me-2"></i>Phương Thức Thanh Toán
@@ -518,16 +517,8 @@
                         </div>
                     </form>
 
-                    <!-- Hiển thị thông báo lỗi -->
-                    <div th:if="${errorMessage}" class="alert alert-danger mt-3" role="alert">
-                        <p th:text="${errorMessage}"></p>
-                    </div>
-
-                    <!-- Hiển thị báo cáo -->
                     <div th:if="${showReport}" class="mt-4">
                         <h2 class="mb-4">Tổng Quan Báo Cáo</h2>
-
-                        <!-- Thông tin tổng quan -->
                         <div class="summary-container">
                             <div class="summary-box">
                                 <i class="fas fa-shopping-cart summary-icon"></i>
@@ -542,22 +533,24 @@
                             <div class="summary-box">
                                 <i class="fas fa-box summary-icon"></i>
                                 <h5>Tổng Số Sản Phẩm Bán Ra</h5>
-                                <p th:text="${totalProductsSold}"></p>
+                                <p th:text="${totalProducts}"></p>
                             </div>
                         </div>
 
-                        <!-- Đồ thị doanh thu theo mã sản phẩm -->
-                        <div class="chart-container" >
+                        <div class="chart-container">
                             <div class="chart-header">
-                                <h3 class="chart-title"><i class="fas fa-chart-bar"></i>Biểu Đồ Doanh Thu Theo Sản Phẩm</h3>
+                                <h3 class="chart-title">
+                                    <i class="fas fa-chart-bar"></i>Biểu Đồ Doanh Thu Theo Sản Phẩm
+                                </h3>
                             </div>
                             <canvas id="revenueChart"></canvas>
                         </div>
 
-                        <!-- Tabs cho các biểu đồ doanh thu khác -->
                         <div class="chart-tabs">
                             <div class="chart-header" style="margin-left: 25px;">
-                                <h3 class="chart-title"><i class="fas fa-chart-bar"></i>Biểu Đồ Doanh Thu Theo Thời Gian</h3>
+                                <h3 class="chart-title">
+                                    <i class="fas fa-chart-bar"></i>Biểu Đồ Doanh Thu Theo Thời Gian
+                                </h3>
                             </div>
                             <ul class="nav nav-tabs" id="revenueChartTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
@@ -572,7 +565,7 @@
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="multi-year-tab" data-bs-toggle="tab" data-bs-target="#multi-year-chart" type="button" role="tab" aria-controls="multi-year-chart" aria-selected="false">
-                                        <i class="fas fa-chart-line me-2"></i>3 Năm Gần Đây
+                                        <i class="fas fa-chart-line me-2"></i>5 Năm Gần Đây
                                     </button>
                                 </li>
                             </ul>
@@ -600,7 +593,6 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <!-- Thẻ hiển thị tổng lợi nhuận trong tháng (theo ngày) -->
                                     <div class="total-revenue-container mb-3">
                                         <div class="card shadow-sm">
                                             <div class="card-body d-flex align-items-center justify-content-between">
@@ -641,7 +633,6 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <!-- Thẻ hiển thị tổng lợi nhuận trong tháng -->
                                     <div class="total-revenue-container mb-3">
                                         <div class="card shadow-sm">
                                             <div class="card-body d-flex align-items-center justify-content-between">
@@ -660,12 +651,12 @@
                                     </div>
                                 </div>
 
-                                <!-- Biểu đồ theo năm -->
-                                <div class="tab-pane fade" id="yearly-chart" role="tabpanel" aria-labelledby="yearly-tab">
+                                <!-- Biểu đồ 3 năm gần đây -->
+                                <div class="tab-pane fade" id="multi-year-chart" role="tabpanel" aria-labelledby="multi-year-tab">
                                     <div class="chart-navigation">
-                                        <h5 id="yearLabel" class="d-flex align-items-center">
-                                            <i class="far fa-calendar-alt me-2"></i>
-                                            Năm YYYY
+                                        <h5 class="d-flex align-items-center">
+                                            <i class="fas fa-chart-line me-2"></i>
+                                            Doanh Thu 3 Năm Gần Đây
                                         </h5>
                                         <div class="nav-button-group">
                                             <button class="btn btn-nav btn-nav-outline" id="prevYear">
@@ -682,34 +673,6 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <!-- Thẻ hiển thị tổng lợi nhuận trong năm -->
-                                    <div class="total-revenue-container mb-3">
-                                        <div class="card shadow-sm">
-                                            <div class="card-body d-flex align-items-center justify-content-between">
-                                                <div>
-                                                    <i class="fas fa-chart-line me-2 text-warning" style="font-size: 1.5rem;"></i>
-                                                    <span class="fw-bold">Lợi nhuận trong năm:</span>
-                                                </div>
-                                                <div>
-                                                    <span id="yearlyTotalRevenue" class="fs-5 fw-bold text-warning">0 VNĐ</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="chart-wrapper">
-                                        <canvas id="yearlyRevenueChart"></canvas>
-                                    </div>
-                                </div>
-
-                                <!-- Biểu đồ 3 năm gần đây -->
-                                <div class="tab-pane fade" id="multi-year-chart" role="tabpanel" aria-labelledby="multi-year-tab">
-                                    <div class="chart-navigation">
-                                        <h5 class="d-flex align-items-center">
-                                            <i class="fas fa-chart-line me-2"></i>
-                                            Doanh Thu 3 Năm Gần Đây
-                                        </h5>
-                                    </div>
-                                    <!-- Thẻ hiển thị tổng lợi nhuận trong 3 năm gần đây -->
                                     <div class="total-revenue-container mb-3">
                                         <div class="card shadow-sm">
                                             <div class="card-body d-flex align-items-center justify-content-between">
@@ -728,33 +691,44 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> <!-- end chart-tabs -->
 
-                        <!-- Danh sách doanh thu theo mã sản phẩm -->
                         <div class="row mt-4">
                             <div class="col-md-12">
-                                <h3><i class="fas fa-list"></i>Chi Tiết Doanh Thu Theo Mã Sản Phẩm</h3>
+                                <h3>
+                                    <i class="fas fa-list"></i>Chi Tiết Doanh Thu Theo Mã Sản Phẩm
+                                </h3>
                                 <div class="product-report-container">
                                     <div class="product-details-list">
-                                        <th:block th:each="product : ${productDetails}">
+                                        <th:block th:each="entry : ${revenueByProduct}">
                                             <details class="product-detail-item">
                                                 <summary>
                                                     <div class="summary-content">
                                                         <div>
-                                                            <i class="fas fa-tag me-2"></i>Mã SP:
-                                                            <span class="product-id" th:text="${product.productID}"></span>
+                                                            <i class="fas fa-tag me-2"></i>Tên Sản Phẩm:
+                                                            <span class="product-id" th:text="${entry[0]}"></span>
                                                         </div>
                                                         <div>
                                                             <i class="fas fa-coins me-2"></i>Doanh Thu:
-                                                            <span class="revenue-value" th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                                                            <span class="revenue-value"
+                                                                  th:text="${#numbers.formatDecimal(entry[1], 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
                                                         </div>
                                                     </div>
                                                 </summary>
                                                 <div class="details-content">
                                                     <th:block th:with="product=${productDetails[entry.key]}">
-                                                        <p><strong>Tên sản phẩm:</strong> <span th:text="${product?.name ?: 'Không tìm thấy'}"></span></p>
-                                                        <p><strong>Giá nhập:</strong> <span th:text="${product?.purchasePrice != null ? #numbers.formatDecimal(product.purchasePrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : 'N/A'}"></span></p>
-                                                        <p><strong>Giá bán:</strong> <span th:text="${product?.sellingPrice != null ? #numbers.formatDecimal(product.sellingPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : 'N/A'}"></span></p>
+                                                        <p>
+                                                            <strong>Tên sản phẩm:</strong>
+                                                            <span th:text="${product?.name != null ? product.name : 'Không tìm thấy'}"></span>
+                                                        </p>
+                                                        <p>
+                                                            <strong>Giá nhập:</strong>
+                                                            <span th:text="${product?.purchasePrice != null ? #numbers.formatDecimal(product.purchasePrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : 'N/A'}"></span>
+                                                        </p>
+                                                        <p>
+                                                            <strong>Giá bán:</strong>
+                                                            <span th:text="${product?.sellingPrice != null ? #numbers.formatDecimal(product.sellingPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : 'N/A'}"></span>
+                                                        </p>
                                                     </th:block>
                                                 </div>
                                             </details>
@@ -763,134 +737,91 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                    </div> <!-- end showReport -->
+                </div> <!-- end card-body -->
+            </div> <!-- end card -->
+        </div> <!-- end content-container -->
+    </div> <!-- end dashboard-container -->
+</div> <!-- end content-wrapper -->
 
-    <!-- Footer -->
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
-</div>
-
-<!-- Nhúng script navbar -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-<!-- Bootstrap JS -->
+<!-- Import Bootstrap Bundle và Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Script cho đồ thị doanh thu theo sản phẩm -->
+<!-- Script cho biểu đồ -->
 <script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-        /*[# th:if="${showReport}"]*/
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        const productIds = /*[[${revenueByProduct != null ? revenueByProduct.keySet() : #lists.emptyList()}]]*/ [];
-        const revenues = /*[[${revenueByProduct != null ? revenueByProduct.values() : #lists.emptyList()}]]*/ [];
-        const isSingleProduct = /*[[${productId != null and productId != ''}]]*/ false;
 
-        console.log('Product IDs:', productIds);
-        console.log('Revenues:', revenues);
-        console.log('Is Single Product:', isSingleProduct);
-
-        // Tạo màu gradient cho cột
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(37, 99, 235, 0.8)');
-        gradient.addColorStop(1, 'rgba(37, 99, 235, 0.2)');
-
-        // Hàm format số tiền VND
-        function formatVND(value) {
-            return new Intl.NumberFormat('vi-VN', {
-                style: 'decimal',
-                maximumFractionDigits: 0
-            }).format(value) + ' VND';
-        }
-
-        // Tạo và cấu hình biểu đồ
+    /* <![CDATA[ */
+    const revenueByProduct = /*[[${revenueByProduct}]]*/ [];
+    const revenueByDaily = /*[[${revenueByDaily}]]*/ [];
+    const revenueByMonthly = /*[[${revenueByMonthly}]]*/ [];
+    const revenueByYear = /*[[${revenueByYear}]]*/ [];
+    function drawChart(canvasId, labels, data, labelName, additionalData = null) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: productIds,
+                labels: labels,
                 datasets: [{
-                    label: 'Doanh Thu (VNĐ)',
-                    data: revenues,
-                    backgroundColor: gradient,
-                    borderColor: 'rgba(37, 99, 235, 1)',
-                    borderWidth: 1,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                    barPercentage: isSingleProduct ? 0.4 : 0.6,
-                    categoryPercentage: isSingleProduct ? 0.5 : 0.7,
-                    hoverBackgroundColor: 'rgba(29, 78, 216, 0.9)'
+                    label: labelName,
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
-                layout: {
-                    padding: { top: 10, right: 20, bottom: 10, left: 20 }
-                },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(226, 232, 240, 0.8)', drawBorder: false },
-                        border: { display: false },
                         ticks: {
-                            callback: function(value) { return formatVND(value); },
-                            font: { size: 12, weight: '500' },
-                            color: '#64748b',
-                            padding: 10
-                        }
-                    },
-                    x: {
-                        grid: { display: false },
-                        border: { display: false },
-                        ticks: {
-                            font: { size: 12, weight: '500' },
-                            color: '#64748b',
-                            padding: 10,
-                            maxRotation: 0,
-                            minRotation: 0,
-                            align: 'center',
-                            autoSkip: true,
-                            maxTicksLimit: 10
+                            callback: function(value) {
+                                return value.toLocaleString("vi-VN") + ' VNĐ';
+                            }
                         }
                     }
                 },
+                // Nếu có thêm dữ liệu, có thể hiển thị ở tooltips
                 plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        align: 'end',
-                        labels: {
-                            boxWidth: 15,
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            padding: 20,
-                            font: { size: 14, weight: '600' }
-                        }
-                    },
                     tooltip: {
-                        backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                        titleFont: { size: 16, weight: 'bold' },
-                        bodyFont: { size: 15 },
-                        padding: 15,
-                        cornerRadius: 8,
-                        displayColors: false,
                         callbacks: {
-                            label: function(context) { return 'Doanh thu: ' + formatVND(context.raw); },
-                            title: function(context) { return 'Mã sản phẩm: ' + context[0].label; }
+                            footer: function(tooltipItems) {
+                                if (additionalData) {
+                                    let totalOrders = additionalData[tooltipItems[0].dataIndex];
+                                    return 'Tổng Số Đơn Hàng: ' + totalOrders;
+                                }
+                                return '';
+                            }
                         }
                     }
-                },
-                animation: { duration: 1000, easing: 'easeOutQuart' },
-                interaction: { mode: 'index', intersect: false }
+                }
             }
         });
-        /*[/]*/
-    });
-</script>
+    }
+    const productLabels = revenueByProduct.map(r => r[0]);
+    const productRevenue = revenueByProduct.map(r => r[1]);
+    drawChart('revenueChart', productLabels, productRevenue, 'Doanh Thu (VNĐ)');
+    const dailyLabels = revenueByDaily.map(r => r[0]); // ngày
+    const dailyRevenue = revenueByDaily.map(r => r[1]); // doanh thu
+    const dailyOrders = revenueByDaily.map(r => r[2]); // số đơn hàng
+    drawChart('dayRevenueChart', dailyLabels, dailyRevenue, 'Doanh Thu Theo Ngày', dailyOrders);
 
-<!-- Script cho các biểu đồ doanh thu theo thời gian -->
-<script th:inline="javascript" th:src="@{/js/dashboard/chart-sales.js}"></script>
+    // Biểu đồ doanh thu theo tháng (trong năm)
+    const monthlyLabels = revenueByMonthly.map(r => 'Tháng ' + r[0]);
+    const monthlyRevenue = revenueByMonthly.map(r => r[1]);
+    const monthlyOrders = revenueByMonthly.map(r => r[2]);
+    drawChart('monthlyRevenueChart', monthlyLabels, monthlyRevenue, 'Doanh Thu Theo Tháng', monthlyOrders);
+
+    // Biểu đồ doanh thu theo năm
+    const yearLabels = revenueByYear.map(r => r[0]);
+    const yearRevenue = revenueByYear.map(r => r[1]);
+    const yearOrders = revenueByYear.map(r => r[2]);
+    drawChart('yearRevenueChart', yearLabels, yearRevenue, 'Doanh Thu Theo Năm', yearOrders);
+    /* ]]> */
+</script>
 </body>
 </html>
