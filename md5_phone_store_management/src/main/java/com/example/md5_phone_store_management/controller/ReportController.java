@@ -116,10 +116,10 @@ public class ReportController {
     }
 
     @GetMapping("/sales-report")
-    public String showSalesReportForm(  @RequestParam(value = "paymentMethod", required = false) PaymentMethod paymentMethod,
-                                        @RequestParam(value = "employeeName", required = false) String employeeName,
-                                        @RequestParam(value = "productName", required = false) String productName,
-            Model model) {
+    public String showSalesReportForm(@RequestParam(value = "paymentMethod", required = false) PaymentMethod paymentMethod,
+                                      @RequestParam(value = "employeeName", required = false) String employeeName,
+                                      @RequestParam(value = "productName", required = false) String productName,
+                                      Model model) {
         model.addAttribute("paymentMethods", PaymentMethod.values());
         model.addAttribute("paymentMethod", paymentMethod);
         model.addAttribute("employeeName", employeeName);
