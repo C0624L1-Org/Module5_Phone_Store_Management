@@ -6,6 +6,7 @@ import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.InvoiceDetail;
 import com.example.md5_phone_store_management.model.InvoiceStatus;
 import com.example.md5_phone_store_management.repository.IInvoiceDetailRepository;
+import com.example.md5_phone_store_management.repository.IInvoiceRepository;
 import com.example.md5_phone_store_management.repository.InvoiceRepository;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
@@ -33,6 +34,9 @@ public class InvoiceServiceImpl implements IInvoiceService {
     private InvoiceRepository invoiceRepository;
 
     @Autowired
+    private IInvoiceRepository iinvoiceRepository;
+
+    @Autowired
     private IInvoiceDetailRepository iInvoiceDetailRepository;
 
     @Autowired
@@ -42,11 +46,30 @@ public class InvoiceServiceImpl implements IInvoiceService {
     private ApplicationEventPublisher eventPublisher;
 
 
+
+    @Override
+    public String getBestSalesStaffName() {
+        Integer employeeId = iInvoiceDetailRepository.getBestSalesStaffEmployeeId();
+        if (employeeId == null) {
+            return "";
+        }
+        return employeeService.getEmployeeById(employeeId).getFullName();
+    }
+
+    @Override
+    public Integer getBestSalesStaffSellingQuantity() {
+        Integer employeeId = iInvoiceDetailRepository.getBestSalesStaffEmployeeId();
+        return iinvoiceRepository.countBestSalesStaffSellingQuantityWithEmployeeId(employeeId);
+    }
+
+
     @Override
     public Long totalRevenue() {
         Long revenue = iInvoiceDetailRepository.totalRevenue();
         return (revenue == null || revenue == 0) ? 0L : revenue;
     }
+
+
 
     @Override
     public Long totalTodayInvoiceRevenue() {
@@ -62,6 +85,9 @@ public class InvoiceServiceImpl implements IInvoiceService {
         return total != null ? total : 0L;
     }
 
+
+
+
     @Override
     public Long totalThisMonthInvoiceRevenue() {
         LocalDate now = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
@@ -76,6 +102,23 @@ public class InvoiceServiceImpl implements IInvoiceService {
         System.out.println("Total revenue for month: " + total);
         return total != null ? total : 0L;
     }
+
+
+    @Override
+    public Long totalLastMonthInvoiceRevenue() {
+        LocalDate now = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        YearMonth lastMonth = YearMonth.from(now).minusMonths(1); // Lấy tháng trước
+        LocalDateTime startDateTime = lastMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
+        LocalDateTime endDateTime = lastMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+
+        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startDateTime, endDateTime);
+        System.out.println("Invoice IDs for last month (size: " + invoiceIds.size() + "): " + invoiceIds);
+
+        Long total = iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
+        System.out.println("Total revenue for last month: " + total);
+        return total != null ? total : 0L;
+    }
+
 
 
 

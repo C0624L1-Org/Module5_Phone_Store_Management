@@ -18,6 +18,9 @@ import java.util.List;
 @Repository
 public interface TransactionOutRepository extends JpaRepository<InventoryTransaction, Integer> {
 
+    @Query("SELECT COALESCE(SUM(it.quantity), 0) FROM InventoryTransaction it WHERE it.transactionType = 'OUT'")
+    Integer countExportProducts();
+
     @Query("SELECT i FROM InventoryTransaction i WHERE i.transactionType = :type")
     Page<InventoryTransaction> getByTransactionType(@Param("type") TransactionType type, Pageable pageable);
 

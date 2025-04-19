@@ -47,6 +47,59 @@ public class ChangeLogController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private TransactionOutService transactionOutService;
+
+    @Autowired
+    private TransactionInService transactionInService;
+    @Autowired
+    private CustomerService customerService;
+
+
+
+    @GetMapping("/admin-dashboard-info")
+    public Map<String, Object> getAdminDashboardData() {
+        Map<String, Object> response = new HashMap<>();
+//        Doanh thu
+        response.put("totalRevenue", iInvoiceService.totalRevenue());
+        response.put("lastMonthRevenue",  iInvoiceService.totalLastMonthInvoiceRevenue());
+        response.put("thisMonthRevenue",  iInvoiceService.totalThisMonthInvoiceRevenue());
+
+//        Sản phẩm
+        response.put("countAllProducts", productService.countProducts());
+        response.put("countExportProducts", transactionOutService.countExportProducts());
+        response.put("countImportProducts", transactionInService.countImportProducts());
+        response.put("topSellingProductName", invoiceDetailService.getTopSellingProductName());
+        response.put("topSellingProductNamePurchaseQuantity", invoiceDetailService.getTopSellingProductNamePurchaseQuantity());
+//
+////        Nhà cung cấp
+        response.put("countSuppliers", iSupplierService.countSuppliers());
+        response.put("regularSupplier",transactionInService.countRegularSupplier());
+        response.put("newSupplier",iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
+        response.put("bestSupplierName",transactionInService.getBestSupplierName());
+        response.put("bestSupplierImportQuantity",transactionInService.getBestSupplierImportQuantity());
+//
+////        nhân viên
+        response.put("countAllEmployees", iEmployeeService.countEmployee());
+        response.put("countWarehouseStaff", iEmployeeService.countWarehouseStaff());
+        response.put("countSalesStaff", iEmployeeService.countSalesStaff());
+        response.put("countSalesPerson", iEmployeeService.countBusinessStaff());
+        response.put("bestSalesStaffName", iInvoiceService.getBestSalesStaffName());
+        response.put("bestSalesStaffSellingQuantity", iInvoiceService.getBestSalesStaffSellingQuantity());
+//
+////        Khách hàng
+        response.put("countAllCustomers", iCustomerService.countTotalCustomers());
+        response.put("countNewCustomers", iCustomerService.countNewCustomers());
+        response.put("countRegularCustomers", iCustomerService.countTotalCustomers() - iCustomerService.countNewCustomers());
+        response.put("topBuyingCustomerName", invoiceDetailService.getTopBuyingCustomerName());
+        response.put("topBuyingCustomerTotalPurchase", invoiceDetailService.getTopBuyingCustomerTotalPurchase());
+        response.put("topBuyingCustomerTotalPurchaseQuantity", invoiceDetailService.getTopBuyingCustomerTotalPurchaseQuantity());
+
+
+        return response;
+    }
+
+
 
 
 
@@ -283,22 +336,6 @@ public class ChangeLogController {
         Long soldProducts = iProductService.countSoldProducts();
         return soldProducts != null ? soldProducts : 0L;
     }
-
-
-//@GetMapping("/count/all/sales-staff")
-//    public Long countSalesStaff() {
-//        return iEmployeeService.countSalesStaff();
-//    }
-//
-//    @GetMapping("/count/all/business-staff")
-//    public Long countBusinessStaff() {
-//        return iEmployeeService.countBusinessStaff();
-//    }
-//
-//    @GetMapping("/count/all/warehouse-staff")
-//    public Long countWarehouseStaff() {
-//        return iEmployeeService.countWarehouseStaff();
-//    }
 
 }
 

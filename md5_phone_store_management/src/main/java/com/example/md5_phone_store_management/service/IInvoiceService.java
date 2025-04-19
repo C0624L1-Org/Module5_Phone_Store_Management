@@ -11,9 +11,17 @@ import com.example.md5_phone_store_management.model.Invoice;
 
 public interface IInvoiceService {
 
+
+//    response.put("bestSalesStaffName", iInvoiceService.getBestSalesStaffName());
+//        response.put("bestSalesStaffSellingQuantity", iInvoiceService.getBestSalesStaffSellingQuantity());
+    String getBestSalesStaffName();
+    Integer getBestSalesStaffSellingQuantity();
+
     Long totalTodayInvoiceRevenue();
 
+
     Long totalThisMonthInvoiceRevenue();
+    Long totalLastMonthInvoiceRevenue();
 
 
     Invoice saveInvoice(Invoice invoice);

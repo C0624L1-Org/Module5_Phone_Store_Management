@@ -23,6 +23,14 @@ public class TransactionOutService implements ITransactionOutService {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+
+    @Override
+    public Integer countExportProducts(){
+        return transactionOutRepository.countExportProducts();
+    }
+
+
+
     @Override
     public Page<InventoryTransaction> searchExportTransactions(String productName, String supplierName, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         LocalDateTime startDateTime = (startDate != null) ? startDate.atStartOfDay() : null;

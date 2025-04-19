@@ -12,6 +12,17 @@ import java.util.List;
 @Repository
 public interface IInvoiceRepository extends JpaRepository<Invoice, Long> {
 
+    @Query("SELECT COALESCE(COUNT(inv), 0) " +
+            "FROM Invoice inv " +
+            "WHERE inv.customer.customerID = :customerId")
+    Integer getTopBuyingCustomerTotalPurchaseQuantity(@Param("customerId") Long customerId);
+
+    @Query("SELECT COALESCE(SUM(id.quantity), 0) " +
+            "FROM Invoice inv " +
+            "JOIN inv.invoiceDetailList id " +
+            "WHERE inv.employee.employeeID = :employeeId")
+    Integer countBestSalesStaffSellingQuantityWithEmployeeId(@Param("employeeId") Integer employeeId);
+
 
     @Query("SELECT i FROM Invoice i WHERE i.payDate >= :startDate AND i.payDate <= :endDate")
     List<Invoice> findInvoicesByDateRange(@Param("startDate") String startDate, @Param("endDate") String endDate);

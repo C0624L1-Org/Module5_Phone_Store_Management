@@ -22,8 +22,11 @@
     <!-- Inline CSS -->
     <style>
         .dash-sales-analytics, .dash-updates-profile {
-            transition: all 0.5s ease-in-out;
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Elastic easing for smooth slide */
             transform-origin: center;
+            will-change: transform, opacity, width, flex, background-color;
+            position: relative;
+            overflow: hidden;
         }
 
         .dash-sales-analytics.hidden, .dash-updates-profile.hidden {
@@ -34,7 +37,7 @@
             opacity: 0;
             flex: 0;
             overflow: hidden;
-            transform: scale(0.8);
+            transform: scale(0.95) translateX(50px); /* Slide out to right */
         }
 
         .dash-sales-analytics.expanded, .dash-updates-profile.expanded {
@@ -42,23 +45,34 @@
             left: 20px;
             right: 20px;
             width: calc(100% - 40px);
-            z-index: 1;
+            z-index: 10;
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) translateX(0); /* Slide in */
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            background-color: white;
+        }
+
+        .dash-content {
+            transition: opacity 0.3s ease-in-out; /* Fade for content */
+            opacity: 1;
+        }
+
+        .dash-content.fading {
+            opacity: 0;
+            background-color: white; /* Fade to white */
         }
 
         #salesChart {
             max-height: 300px;
             width: 100%;
+            transition: height 0.3s ease-in-out;
         }
 
-        /* Style cho thời gian cập nhật */
         .update-time {
             font-size: 1.1rem;
             opacity: 0.9;
         }
 
-        /* Style cho thẻ và hiệu ứng trượt */
         .dash-card {
             position: relative;
             overflow: hidden;
@@ -105,8 +119,9 @@
             bottom: 1rem;
             left: 1rem;
             right: 1rem;
+            padding-top: 0.5rem;
             opacity: 0;
-            transition: opacity 0.4s ease-in-out;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             color: white;
         }
 
@@ -114,7 +129,6 @@
             opacity: 1;
         }
 
-        /* Style cho cột thông báo khi mở rộng */
         .update-columns {
             display: flex;
             gap: 1rem;
@@ -128,6 +142,13 @@
             background: #f9fafb;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0; /* Start transparent */
+        }
+
+        .update-column.visible {
+            opacity: 1; /* Fade in */
+            transform: translateY(0); /* Slide up slightly */
         }
 
         .update-column-header {
@@ -168,41 +189,20 @@
             margin-bottom: 0.5rem;
             border-radius: 6px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
         }
 
         .update-item-expanded:hover {
             transform: translateY(-2px);
+            opacity: 0.95;
         }
-
-
-
 
         .dash-bottom-section {
-            height: 615px; /* Chiều cao cố định cho dash-bottom-section */
-            overflow: hidden; /* Ẩn nội dung vượt quá chiều cao */
+            height: 615px;
+            overflow: hidden;
+            position: relative;
         }
 
-        /* Đảm bảo các phần tử bên trong không làm thay đổi chiều cao của dash-bottom-section */
-        .dash-sales-analytics, .dash-updates-profile {
-            transition: all 0.5s ease-in-out;
-            transform-origin: center;
-        }
-
-        /* Khi mở rộng, các phần tử sẽ không ảnh hưởng đến chiều cao của dash-bottom-section */
-        .dash-sales-analytics.expanded, .dash-updates-profile.expanded {
-            position: absolute;
-            left: 20px;
-            right: 20px;
-            width: calc(100% - 40px);
-            z-index: 10;
-            opacity: 1;
-            transform: scale(1);
-            overflow-y: auto;
-            background: white;
-        }
-
-        /* Đảm bảo chiều cao của các phần tử khi không mở rộng */
         .dash-sales-analytics {
             max-height: 600px;
         }
@@ -246,35 +246,18 @@
                         </div>
                         <div class="dash-card-main">
                             <div class="border-t border-white mb-4"></div>
-                            <div class="text-4xl font-bold text-center" id="total-revenue">0đ</div>
+                            <div class="text-4xl font-bold text-center" id="totalRevenue">0đ</div>
                         </div>
-                        <div class="dash-card-update flex justify-end items-end mt-4 pb-4">
-
-                        <div class="text-xs flex items-center gap-1">
+                        <div class="dash-card-update flex justify-end items-end mt-4">
+                            <div class="text-xs flex items-center gap-1">
                                 <i class="fas fa-clock text-white"></i>
-                                <span id="revenue-update-time"></span> - <span id="revenue-update-date"></span>
+                                <span id="revenue-update-time">--:--</span> - <span id="revenue-update-date">--/--/----</span>
                             </div>
                         </div>
-                        <div class="dash-card-previous ">
-                        <p id="prev" class="text-sm font-semibold">Tháng trước: 50,000,000đ</p>
-                            <p id="current" class="text-sm font-semibold">Tháng này: 100,000,000đ</p>
-                            <p id="change" class="text-xs">
-                                <script>
-                                    function parse(str) {
-                                        return parseInt(str.replace(/[^0-9]/g, ''));
-                                    }
-                                    const prev = parse(document.getElementById("prev").innerText);
-                                    const current = parse(document.getElementById("current").innerText);
-                                    const diff = current - prev;
-                                    const percent = Math.abs((diff / prev) * 100).toFixed(2);
-                                    document.currentScript.parentElement.innerText =
-                                        diff > 0
-                                            ? `Tăng ${diff.toLocaleString('vi-VN')}đ (${percent}%)`
-                                            : diff < 0
-                                                ? `Giảm ${Math.abs(diff).toLocaleString('vi-VN')}đ (${percent}%)`
-                                                : "Không thay đổi";
-                                </script>
-                            </p>
+                        <div class="dash-card-previous">
+                            <div class="text-sm font-semibold">Tháng trước: <span id="lastMonthRevenue">0đ</span></div>
+                            <div class="text-sm font-semibold">Tháng này: <span id="thisMonthRevenue">0đ</span></div>
+                            <div class="text-xs" id="revenue-change"></div>
                         </div>
                     </div>
                 </div>
@@ -292,18 +275,18 @@
                         </div>
                         <div class="dash-card-main">
                             <div class="border-t border-white mb-4"></div>
-                            <div class="text-4xl font-bold text-center" id="total-products">0</div>
+                            <div class="text-4xl font-bold text-center" id="countAllProducts">0</div>
                         </div>
                         <div class="dash-card-update flex justify-end items-end mt-4">
                             <div class="text-xs flex items-center gap-1">
                                 <i class="fas fa-clock text-white"></i>
-                                <span id="products-update-time"></span> - <span id="products-update-date"></span>
+                                <span id="products-update-time">--:--</span> - <span id="products-update-date">--/--/----</span>
                             </div>
                         </div>
                         <div class="dash-card-previous">
-                            <p class="text-sm font-semibold">Nhập : 120</p>
-                            <p class="text-sm font-semibold">Xuất : 50</p>
-                            <p class="text-sm font-semibold">Sản Phẩm Hot : Iphone 13 </p>
+                            <div class="text-sm font-semibold">Sản phẩm nhập: <span id="countImportProducts">0</span></div>
+                            <div class="text-sm font-semibold">Sản phẩm xuất: <span id="countExportProducts">0</span></div>
+                            <div class="text-sm font-semibold">Sản phẩm bán chạy: <span id="topSellingProductName">N/A</span> với <span id="topSellingProductNamePurchaseQuantity">0</span> lượt bán</div>
                         </div>
                     </div>
                 </div>
@@ -321,17 +304,18 @@
                         </div>
                         <div class="dash-card-main">
                             <div class="border-t border-white mb-4"></div>
-                            <div class="text-4xl font-bold text-center" id="total-suppliers">0</div>
+                            <div class="text-4xl font-bold text-center" id="countSuppliers">0</div>
                         </div>
                         <div class="dash-card-update flex justify-end items-end mt-4">
                             <div class="text-xs flex items-center gap-1">
                                 <i class="fas fa-clock text-white"></i>
-                                <span id="suppliers-update-time"></span> - <span id="suppliers-update-date"></span>
+                                <span id="suppliers-update-time">--:--</span> - <span id="suppliers-update-date">--/--/----</span>
                             </div>
                         </div>
                         <div class="dash-card-previous">
-                            <p class="text-sm font-semibold">Nhà cung cấp mới: 5 (lấy ncc chưa nhập bh)</p>
-                            <p class="text-sm font-semibold">Nhà cung cấp thân thiết : 10 (tổng trừ đi )</p>
+                            <div class="text-sm font-semibold">Nhà cung cấp mới: <span id="newSupplier">0</span></div>
+                            <div class="text-sm font-semibold">Nhà cung cấp thân thiết: <span id="regularSupplier">0</span></div>
+                            <div class="text-sm font-semibold">Nhà cung cấp tốt nhất: <span id="bestSupplierName">N/A</span> với <span id="bestSupplierImportQuantity">0</span> lần nhập</div>
                         </div>
                     </div>
                 </div>
@@ -349,20 +333,19 @@
                         </div>
                         <div class="dash-card-main">
                             <div class="border-t border-white mb-4"></div>
-                            <div class="text-4xl font-bold text-center" id="total-employees">0</div>
+                            <div class="text-4xl font-bold text-center" id="countAllEmployees">0</div>
                         </div>
                         <div class="dash-card-update flex justify-end items-end mt-4">
                             <div class="text-xs flex items-center gap-1">
                                 <i class="fas fa-clock text-white"></i>
-                                <span id="employees-update-time"></span> - <span id="employees-update-date"></span>
+                                <span id="employees-update-time">--:--</span> - <span id="employees-update-date">--/--/----</span>
                             </div>
                         </div>
                         <div class="dash-card-previous">
-                            <p class="text-sm font-semibold">Nhân Viên Kho : 5</p>
-                            <p class="text-sm font-semibold">Nhân Viên Bán Hàng : 5</p>
-                            <p class="text-sm font-semibold">Nhân Viên Kinh Doanh : 5</p>
-                            <br>
-                            <p class="text-sm font-semibold">Nhân viên bán hàng tốt nhất : 5</p>
+                            <div class="text-sm font-semibold">Nhân viên kho: <span id="countWarehouseStaff">0</span></div>
+                            <div class="text-sm font-semibold">Nhân viên bán hàng: <span id="countSalesStaff">0</span></div>
+                            <div class="text-sm font-semibold">Nhân viên kinh doanh: <span id="countSalesPerson">0</span></div>
+                            <div class="text-sm font-semibold">Nhân viên xuất sắc: <span id="bestSalesStaffName">N/A</span> với <span id="bestSalesStaffSellingQuantity">0</span> đơn</div>
                         </div>
                     </div>
                 </div>
@@ -380,63 +363,64 @@
                         </div>
                         <div class="dash-card-main">
                             <div class="border-t border-white mb-4"></div>
-                            <div class="text-4xl font-bold text-center" id="total-customers">0</div>
+                            <div class="text-4xl font-bold text-center" id="countAllCustomers">0</div>
                         </div>
                         <div class="dash-card-update flex justify-end items-end mt-4">
                             <div class="text-xs flex items-center gap-1">
                                 <i class="fas fa-clock text-white"></i>
-                                <span id="customers-update-time"></span> - <span id="customers-update-date"></span>
+                                <span id="customers-update-time">--:--</span> - <span id="customers-update-date">--/--/----</span>
                             </div>
                         </div>
                         <div class="dash-card-previous">
-                            <p class="text-sm font-semibold">Khách hàng mới: 300</p>
-                            <p class="text-sm font-semibold">Khách hàng thân thiết: 300</p>
-                            <p class="text-sm font-semibold">Khách hàng top 1: 300</p>
+                            <div class="text-sm font-semibold">Khách hàng mới: <span id="countNewCustomers">0</span></div>
+                            <div class="text-sm font-semibold">Khách hàng thân thiết: <span id="countRegularCustomers">0</span></div>
+                            <div class="text-sm font-semibold">Khách hàng ưu tú: <span id="topBuyingCustomerName">N/A</span> với <span id="topBuyingCustomerTotalPurchase">0đ</span> (<span id="topBuyingCustomerTotalPurchaseQuantity">0</span> đơn)</div>
                         </div>
                     </div>
                 </div>
             </div>
-
 
             <div class="dash-bottom-section flex gap-4 w-full relative flex-wrap">
-                <div class="dash-sales-analytics flex-[7] min-w-[300px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
-                    <div class="dash-header flex justify-between items-center mb-2">
-                        <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>
-                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
-                                onclick="toggleExpand('sales')">
-                            <i class="fas fa-expand"></i>
-                        </button>
-                    </div>
-                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
-                    <div class="dash-chart-controls flex justify-between items-center mb-5">
-                        <div class="dash-zoom flex gap-2">
-                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
-                                    onclick="zoomChart('in')">⟐
-                            </button>
-                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
-                                    onclick="zoomChart('out')">⟑
+                <div class="dash-sales-analytics flex-[7] min-w-[300px] bg-white rounded-lg p-5 shadow-md transition-all">
+                    <div class="dash-content">
+                        <div class="dash-header flex justify-between items-center mb-2">
+                            <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>
+                            <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
+                                    onclick="toggleExpand('sales')">
+                                <i class="fas fa-expand"></i>
                             </button>
                         </div>
-                        <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
-                                onclick="resetChart()">Hiển thị tất cả
-                        </button>
+                        <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
+                        <div class="dash-chart-controls flex justify-between items-center mb-5">
+                            <div class="dash-zoom flex gap-2">
+                                <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
+                                        onclick="zoomChart('in')">⟐
+                                </button>
+                                <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
+                                        onclick="zoomChart('out')">⟑
+                                </button>
+                            </div>
+                            <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
+                                    onclick="resetChart()">Hiển thị tất cả
+                            </button>
+                        </div>
+                        <canvas id="salesChart"></canvas>
                     </div>
-                    <canvas id="salesChart"></canvas>
                 </div>
 
-                <div class="dash-updates-profile flex-[3] min-w-[200px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
-                    <div class="dash-header flex justify-between items-center mb-2">
-                        <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>
-                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
-                                onclick="toggleExpand('updates')">
-                            <i class="fas fa-expand"></i>
-                        </button>
+                <div class="dash-updates-profile flex-[3] min-w-[200px] bg-white rounded-lg p-5 shadow-md transition-all">
+                    <div class="dash-content">
+                        <div class="dash-header flex justify-between items-center mb-2">
+                            <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>
+                            <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
+                                    onclick="toggleExpand('updates')">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                        <div id="changeLogsContainer"></div>
                     </div>
-                    <div id="changeLogsContainer"></div>
                 </div>
             </div>
-
-
         </div>
     </div>
 
@@ -449,7 +433,7 @@
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
 <script>
-    // Function to format entity name to Vietnamese
+    // Format entity name to Vietnamese
     function formatEntityName(entityName) {
         const entityMap = {
             'supplier': 'Nhà Cung Cấp',
@@ -461,7 +445,7 @@
         return entityMap[entityName?.toLowerCase()] || 'N/A';
     }
 
-    // Function to format action to Vietnamese
+    // Format action to Vietnamese
     function formatAction(action) {
         const actionMap = {
             'INSERT': 'Thêm mới',
@@ -471,7 +455,7 @@
         return actionMap[action] || 'N/A';
     }
 
-    // Function to format relative time
+    // Format relative time
     function formatRelativeTime(timestamp, isExpanded) {
         if (!timestamp || isNaN(new Date(timestamp))) {
             return "vừa xong";
@@ -512,26 +496,23 @@
         }
     }
 
-    // Function to format date and time from LocalDateTime
-    function formatDateTimeFromLocal(timestamp) {
-        if (!timestamp || isNaN(new Date(timestamp))) {
-            return {time: '--:--', date: '--/--/----'};
-        }
-        const dateObj = new Date(timestamp);
-        const time = dateObj.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
-        const date = dateObj.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'});
+    // Format date and time
+    function formatDateTime() {
+        const now = new Date();
+        const time = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
+        const date = now.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'});
         return {time, date};
     }
 
-    // Function to format currency
+    // Format currency
     function formatCurrency(value) {
         return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(value || 0);
     }
 
+    // Fetch employee name by ID
     async function getEmployeeNameById(employeeId) {
         if (!employeeId) return 'N/A';
-        const url = `http://localhost:8080/api/changelogs/employee/${employeeId}/name`;
-        console.log("Fetching employee name from URL:", url);
+        const url = `/api/changelogs/employee/${employeeId}/name`;
         try {
             const response = await fetch(url);
             if (!response.ok) {
@@ -549,7 +530,7 @@
     // Cache employee names
     const employeeNameCache = {};
 
-    // Function to render change logs
+    // Render change logs
     async function renderChangeLogs(logs) {
         const container = document.getElementById('changeLogsContainer');
         const updatesProfile = document.querySelector('.dash-updates-profile');
@@ -587,7 +568,6 @@
         const employeeNames = await Promise.all(employeeNamePromises);
 
         if (isExpanded) {
-            // Expanded display with columns
             const entities = ['Hóa Đơn', 'Sản Phẩm', 'Nhà Cung Cấp', 'Nhân Viên', 'Khách Hàng'];
             const logsByEntity = entities.reduce((acc, entity) => {
                 acc[entity] = [];
@@ -604,7 +584,7 @@
             container.innerHTML = `
                 <div class="update-columns">
                     ${entities.map(entity => `
-                        <div class="update-column">
+                        <div class="update-column" style="transform: translateY(20px);">
                             <div class="update-column-header">
                                 <h4>${entity}</h4>
                             </div>
@@ -613,30 +593,22 @@
                                     <p class="text-sm text-gray-500">Chưa có cập nhật.</p>
                                 ` : logsByEntity[entity].map(({log, employeeName}) => {
                 const actionText = formatAction(log.action);
-                const entityText = formatEntityName(log.entityName);
                 const valueText = log.action === 'DELETE' ? (log.oldValue || 'N/A') : (log.newValue || 'N/A');
                 return `
                                         <div class="update-item-expanded">
                                             <p class="text-xs text-gray-600 flex items-center gap-1 mb-1 leading-none">
-    <i class="fas fa-clock relative top-[1px]"></i>
-    ${formatRelativeTime(log.timestamp, true)}
-</p>
-
+                                                <i class="fas fa-clock relative top-[1px]"></i>
+                                                ${formatRelativeTime(log.timestamp, true)}
+                                            </p>
                                             <div class="flex items-center gap-2">
-    <!-- Icon -->
-    <div class="${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0">
-        <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
-    </div>
-
-    <!-- Nội dung -->
-<!--    <div class="flex flex-col justify-center">-->
-     <p class="text-sm leading-tight">
-        <span class="font-medium">${employeeName} ${actionText.toLowerCase()}</span><br>
-        <span class="text-gray-700">${valueText}</span>
-        </p>
-<!--    </div>-->
-</div>
-
+                                                <div class="${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
+                                                </div>
+                                                <p class="text-sm leading-tight">
+                                                    <span class="font-medium">${employeeName} ${actionText.toLowerCase()}</span><br>
+                                                    <span class="text-gray-700">${valueText}</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     `;
             }).join('')}
@@ -645,9 +617,20 @@
                     `).join('')}
                 </div>
             `;
+
+            // Fade in columns sequentially
+            setTimeout(() => {
+                const columns = container.querySelectorAll('.update-column');
+                columns.forEach((col, index) => {
+                    setTimeout(() => {
+                        col.classList.add('visible');
+                    }, index * 100); // Staggered fade-in
+                });
+            }, 300); // Delay to sync with panel transition
         } else {
-            // Compact display
-            container.innerHTML = logs.map((log, index) => {
+            // Limit to 6 logs in normal state
+            const limitedLogs = logs.slice(0, 6);
+            container.innerHTML = limitedLogs.map((log, index) => {
                 if (!log || !log.timestamp || !log.action) {
                     return '';
                 }
@@ -674,7 +657,7 @@
         }
     }
 
-    // Function to fetch dashboard data
+    // Fetch dashboard data
     let previousData = {
         revenue: 0,
         products: 0,
@@ -686,61 +669,13 @@
     async function fetchDashboardData() {
         try {
             console.log("Fetching dashboard data...");
-            const [
-                revenueRes,
-                productsRes,
-                suppliersRes,
-                employeesRes,
-                customersRes,
-                changeLogsRes,
-                revenueTimeRes,
-                productsTimeRes,
-                suppliersTimeRes,
-                employeesTimeRes,
-                customersTimeRes
-            ] = await Promise.all([
-                fetch('/api/changelogs/count/all/total-revenue').catch(e => {
-                    console.error("Revenue fetch failed:", e);
-                    return null;
-                }),
-                fetch('/api/changelogs/count/all/products').catch(e => {
-                    console.error("Products fetch failed:", e);
-                    return null;
-                }),
-                fetch('/api/changelogs/count/all/suppliers').catch(e => {
-                    console.error("Suppliers fetch failed:", e);
-                    return null;
-                }),
-                fetch('/api/changelogs/count/all/employees').catch(e => {
-                    console.error("Employees fetch failed:", e);
-                    return null;
-                }),
-                fetch('/api/changelogs/count/all/customers').catch(e => {
-                    console.error("Customers fetch failed:", e);
+            const [adminDashboardRes, changeLogsRes] = await Promise.all([
+                fetch('/api/changelogs/admin-dashboard-info').catch(e => {
+                    console.error("Admin dashboard fetch failed:", e);
                     return null;
                 }),
                 fetch('/api/changelogs/notification').catch(e => {
                     console.error("Change logs fetch failed:", e);
-                    return null;
-                }),
-                fetch('/api/changelogs/lastUpdate/time/total-revenue').catch(e => {
-                    console.error("Revenue time fetch failed:", e);
-                    return null;
-                }),
-                fetch('/api/changelogs/lastUpdate/time/products').catch(e => {
-                    console.error("Products time fetch failed:", e);
-                    return null;
-                }),
-                fetch('/api/changelogs/lastUpdate/time/suppliers').catch(e => {
-                    console.error("Suppliers time fetch failed:", e);
-                    return null;
-                }),
-                fetch('/api/changelogs/lastUpdate/time/employees').catch(e => {
-                    console.error("Employees time fetch failed:", e);
-                    return null;
-                }),
-                fetch('/api/changelogs/lastUpdate/time/customers').catch(e => {
-                    console.error("Customers time fetch failed:", e);
                     return null;
                 })
             ]);
@@ -767,51 +702,87 @@
                 }
             };
 
-            const revenue = (await parseJson(revenueRes, '/api/changelogs/count/all/total-revenue')) ?? 0;
-            const products = (await parseJson(productsRes, '/api/changelogs/count/all/products')) ?? 0;
-            const suppliers = (await parseJson(suppliersRes, '/api/changelogs/count/all/suppliers')) ?? 0;
-            const employees = (await parseJson(employeesRes, '/api/changelogs/count/all/employees')) ?? 0;
-            const customers = (await parseJson(customersRes, '/api/changelogs/count/all/customers')) ?? 0;
+            const adminData = (await parseJson(adminDashboardRes, '/api/changelogs/admin-dashboard-info')) ?? {};
             const changeLogs = (await parseJson(changeLogsRes, '/api/changelogs/notification')) ?? [];
-            const revenueTime = (await parseJson(revenueTimeRes, '/api/changelogs/lastUpdate/time/total-revenue')) ?? null;
-            const productsTime = (await parseJson(productsTimeRes, '/api/changelogs/lastUpdate/time/products')) ?? null;
-            const suppliersTime = (await parseJson(suppliersTimeRes, '/api/changelogs/lastUpdate/time/suppliers')) ?? null;
-            const employeesTime = (await parseJson(employeesTimeRes, '/api/changelogs/lastUpdate/time/employees')) ?? null;
-            const customersTime = (await parseJson(customersTimeRes, '/api/changelogs/lastUpdate/time/customers')) ?? null;
 
-            console.log("Fetched data:", {revenue, products, suppliers, employees, customers, changeLogs});
+            console.log("Fetched admin dashboard data:", adminData);
 
-            const revenueDateTime = formatDateTimeFromLocal(revenueTime);
-            const productsDateTime = formatDateTimeFromLocal(productsTime);
-            const suppliersDateTime = formatDateTimeFromLocal(suppliersTime);
-            const employeesDateTime = formatDateTimeFromLocal(employeesTime);
-            const customersDateTime = formatDateTimeFromLocal(customersTime);
+            // Current timestamp for update times
+            const dateTime = formatDateTime();
 
-            document.getElementById('total-revenue').textContent = formatCurrency(revenue);
-            document.getElementById('revenue-update-time').textContent = revenueDateTime.time;
-            document.getElementById('revenue-update-date').textContent = revenueDateTime.date;
+            // Revenue
+            const thisMonthRevenue = adminData.thisMonthRevenue ?? 0;
+            const lastMonthRevenue = adminData.lastMonthRevenue ?? 0;
+            document.getElementById('totalRevenue').textContent = formatCurrency(adminData.totalRevenue ?? 0);
+            document.getElementById('lastMonthRevenue').textContent = formatCurrency(lastMonthRevenue);
+            document.getElementById('thisMonthRevenue').textContent = formatCurrency(thisMonthRevenue);
+            const diffRevenue = thisMonthRevenue - lastMonthRevenue;
+            if (thisMonthRevenue === 0 || lastMonthRevenue === 0) {
+                document.getElementById('revenue-change').textContent = diffRevenue > 0
+                    ? `Tăng ${formatCurrency(diffRevenue)}`
+                    : diffRevenue < 0
+                        ? `Giảm ${formatCurrency(Math.abs(diffRevenue))}`
+                        : "Không thay đổi";
+            } else {
+                const percentRevenue = Math.abs((diffRevenue / lastMonthRevenue) * 100).toFixed(2);
+                document.getElementById('revenue-change').textContent = diffRevenue > 0
+                    ? `Tăng ${formatCurrency(diffRevenue)} (${percentRevenue}%)`
+                    : diffRevenue < 0
+                        ? `Giảm ${formatCurrency(Math.abs(diffRevenue))} (${percentRevenue}%)`
+                        : "Không thay đổi";
+            }
+            document.getElementById('revenue-update-time').textContent = dateTime.time;
+            document.getElementById('revenue-update-date').textContent = dateTime.date;
 
-            document.getElementById('total-products').textContent = products;
-            document.getElementById('products-update-time').textContent = productsDateTime.time;
-            document.getElementById('products-update-date').textContent = productsDateTime.date;
+            // Products
+            document.getElementById('countAllProducts').textContent = adminData.countAllProducts ?? 0;
+            document.getElementById('countImportProducts').textContent = adminData.countImportProducts ?? 0;
+            document.getElementById('countExportProducts').textContent = adminData.countExportProducts ?? 0;
+            document.getElementById('topSellingProductName').textContent = adminData.topSellingProductName ?? 'N/A';
+            document.getElementById('topSellingProductNamePurchaseQuantity').textContent = adminData.topSellingProductNamePurchaseQuantity ?? 0;
+            document.getElementById('products-update-time').textContent = dateTime.time;
+            document.getElementById('products-update-date').textContent = dateTime.date;
 
-            document.getElementById('total-suppliers').textContent = suppliers;
-            document.getElementById('suppliers-update-time').textContent = suppliersDateTime.time;
-            document.getElementById('suppliers-update-date').textContent = suppliersDateTime.date;
+            // Suppliers
+            document.getElementById('countSuppliers').textContent = adminData.countSuppliers ?? 0;
+            document.getElementById('newSupplier').textContent = adminData.newSupplier ?? 0;
+            document.getElementById('regularSupplier').textContent = adminData.regularSupplier ?? 0;
+            document.getElementById('bestSupplierName').textContent = adminData.bestSupplierName ?? 'N/A';
+            document.getElementById('bestSupplierImportQuantity').textContent = adminData.bestSupplierImportQuantity ?? 0;
+            document.getElementById('suppliers-update-time').textContent = dateTime.time;
+            document.getElementById('suppliers-update-date').textContent = dateTime.date;
 
-            document.getElementById('total-employees').textContent = employees;
-            document.getElementById('employees-update-time').textContent = employeesDateTime.time;
-            document.getElementById('employees-update-date').textContent = employeesDateTime.date;
+            // Employees
+            document.getElementById('countAllEmployees').textContent = adminData.countAllEmployees ?? 0;
+            document.getElementById('countWarehouseStaff').textContent = adminData.countWarehouseStaff ?? 0;
+            document.getElementById('countSalesStaff').textContent = adminData.countSalesStaff ?? 0;
+            document.getElementById('countSalesPerson').textContent = adminData.countSalesPerson ?? 0;
+            document.getElementById('bestSalesStaffName').textContent = adminData.bestSalesStaffName ?? 'N/A';
+            document.getElementById('bestSalesStaffSellingQuantity').textContent = adminData.bestSalesStaffSellingQuantity ?? 0;
+            document.getElementById('employees-update-time').textContent = dateTime.time;
+            document.getElementById('employees-update-date').textContent = dateTime.date;
 
-            document.getElementById('total-customers').textContent = customers;
-            document.getElementById('customers-update-time').textContent = customersDateTime.time;
-            document.getElementById('customers-update-date').textContent = customersDateTime.date;
+            // Customers
+            document.getElementById('countAllCustomers').textContent = adminData.countAllCustomers ?? 0;
+            document.getElementById('countNewCustomers').textContent = adminData.countNewCustomers ?? 0;
+            document.getElementById('countRegularCustomers').textContent = adminData.countRegularCustomers ?? 0;
+            document.getElementById('topBuyingCustomerName').textContent = adminData.topBuyingCustomerName ?? 'N/A';
+            document.getElementById('topBuyingCustomerTotalPurchase').textContent = formatCurrency(adminData.topBuyingCustomerTotalPurchase ?? 0);
+            document.getElementById('topBuyingCustomerTotalPurchaseQuantity').textContent = adminData.topBuyingCustomerTotalPurchaseQuantity ?? 0;
+            document.getElementById('customers-update-time').textContent = dateTime.time;
+            document.getElementById('customers-update-date').textContent = dateTime.date;
 
-            previousData = {revenue, products, suppliers, employees, customers};
+            previousData = {
+                revenue: thisMonthRevenue,
+                products: adminData.countAllProducts ?? 0,
+                suppliers: adminData.countSuppliers ?? 0,
+                employees: adminData.countAllEmployees ?? 0,
+                customers: adminData.countAllCustomers ?? 0
+            };
 
             await renderChangeLogs(changeLogs);
 
-            updateChartData('revenue', revenue);
+            updateChartData('revenue', thisMonthRevenue);
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
             document.getElementById('changeLogsContainer').innerHTML = `
@@ -866,7 +837,11 @@
                     }
                 },
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 600,
+                    easing: 'easeInOutCubic'
+                }
             }
         });
     }
@@ -919,45 +894,74 @@
     function toggleExpand(section) {
         const salesAnalytics = document.querySelector('.dash-sales-analytics');
         const updatesProfile = document.querySelector('.dash-updates-profile');
+        const salesContent = salesAnalytics.querySelector('.dash-content');
+        const updatesContent = updatesProfile.querySelector('.dash-content');
         const salesExpandBtn = salesAnalytics.querySelector('.dash-expand-btn i');
         const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');
 
-        if (section === 'sales') {
-            if (salesAnalytics.classList.contains('expanded')) {
-                salesAnalytics.classList.remove('expanded');
-                salesAnalytics.style.pointerEvents = 'none';
-                setTimeout(() => {
-                    updatesProfile.classList.remove('hidden');
-                    salesAnalytics.style.pointerEvents = 'auto';
-                }, 500);
-                salesExpandBtn.classList.remove('fa-compress');
-                salesExpandBtn.classList.add('fa-expand');
-            } else {
-                salesAnalytics.classList.add('expanded');
-                updatesProfile.classList.add('hidden');
-                salesExpandBtn.classList.remove('fa-expand');
-                salesExpandBtn.classList.add('fa-compress');
-                setTimeout(() => salesChart.resize(), 500);
+        // Disable pointer events during transition
+        salesAnalytics.style.pointerEvents = 'none';
+        updatesProfile.style.pointerEvents = 'none';
+
+        // Fade out current content
+        salesContent.classList.add('fading');
+        updatesContent.classList.add('fading');
+
+        setTimeout(() => {
+            if (section === 'sales') {
+                if (salesAnalytics.classList.contains('expanded')) {
+                    salesAnalytics.classList.remove('expanded');
+                    setTimeout(() => {
+                        updatesProfile.classList.remove('hidden');
+                        salesContent.classList.remove('fading');
+                        updatesContent.classList.remove('fading');
+                        salesAnalytics.style.pointerEvents = 'auto';
+                        updatesProfile.style.pointerEvents = 'auto';
+                        salesChart.resize();
+                    }, 400); // After fade and slide
+                    salesExpandBtn.classList.remove('fa-compress');
+                    salesExpandBtn.classList.add('fa-expand');
+                } else {
+                    salesAnalytics.classList.add('expanded');
+                    updatesProfile.classList.add('hidden');
+                    setTimeout(() => {
+                        salesContent.classList.remove('fading');
+                        updatesContent.classList.remove('fading');
+                        salesAnalytics.style.pointerEvents = 'auto';
+                        updatesProfile.style.pointerEvents = 'auto';
+                        salesChart.resize();
+                    }, 400);
+                    salesExpandBtn.classList.remove('fa-expand');
+                    salesExpandBtn.classList.add('fa-compress');
+                }
+            } else if (section === 'updates') {
+                if (updatesProfile.classList.contains('expanded')) {
+                    updatesProfile.classList.remove('expanded');
+                    setTimeout(() => {
+                        salesAnalytics.classList.remove('hidden');
+                        salesContent.classList.remove('fading');
+                        updatesContent.classList.remove('fading');
+                        salesAnalytics.style.pointerEvents = 'auto';
+                        updatesProfile.style.pointerEvents = 'auto';
+                        fetchDashboardData();
+                    }, 400);
+                    updatesExpandBtn.classList.remove('fa-compress');
+                    updatesExpandBtn.classList.add('fa-expand');
+                } else {
+                    updatesProfile.classList.add('expanded');
+                    salesAnalytics.classList.add('hidden');
+                    setTimeout(() => {
+                        salesContent.classList.remove('fading');
+                        updatesContent.classList.remove('fading');
+                        salesAnalytics.style.pointerEvents = 'auto';
+                        updatesProfile.style.pointerEvents = 'auto';
+                        fetchDashboardData();
+                    }, 400);
+                    updatesExpandBtn.classList.remove('fa-expand');
+                    updatesExpandBtn.classList.add('fa-compress');
+                }
             }
-        } else if (section === 'updates') {
-            if (updatesProfile.classList.contains('expanded')) {
-                updatesProfile.classList.remove('expanded');
-                updatesProfile.style.pointerEvents = 'none';
-                setTimeout(() => {
-                    salesAnalytics.classList.remove('hidden');
-                    updatesProfile.style.pointerEvents = 'auto';
-                }, 500);
-                updatesExpandBtn.classList.remove('fa-compress');
-                updatesExpandBtn.classList.add('fa-expand');
-                setTimeout(() => fetchDashboardData(), 500);
-            } else {
-                updatesProfile.classList.add('expanded');
-                salesAnalytics.classList.add('hidden');
-                updatesExpandBtn.classList.remove('fa-expand');
-                updatesExpandBtn.classList.add('fa-compress');
-                setTimeout(() => fetchDashboardData(), 500);
-            }
-        }
+        }, 300); // Wait for fade-out
     }
 
     // Initialize chart and fetch data

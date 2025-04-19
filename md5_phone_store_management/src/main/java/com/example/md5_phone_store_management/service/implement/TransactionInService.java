@@ -36,6 +36,35 @@ public class TransactionInService implements ITransactionInService {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
+    @Override
+    public Integer countRegularSupplier() {
+        return inventoryTransactionInRepo.countRegularSupplier();
+    }
+
+    @Override
+    public String getBestSupplierName() {
+        Integer bestSupplierId = inventoryTransactionInRepo.getBestSupplierId();
+        if (bestSupplierId == null || bestSupplierId == 0) {
+            throw new IllegalArgumentException("Không có nhà cung cấp nào được tìm thấy (ID không hợp lệ).");
+        }
+        Supplier supplier = supplierRepository.findById(bestSupplierId)
+                .orElseThrow(() -> new IllegalArgumentException("Nhà cung cấp với ID " + bestSupplierId + " không tồn tại."));
+        return supplier.getName();
+    }
+
+    @Override
+    public Integer getBestSupplierImportQuantity() {
+        return inventoryTransactionInRepo.getBestSupplierImportQuantity();
+    }
+
+
+
+
+    @Override
+    public Integer countImportProducts(){
+        return inventoryTransactionInRepo.countImportProducts();
+    }
+
 
     @Override
     public InventoryTransaction save(InventoryTransaction transaction) {
