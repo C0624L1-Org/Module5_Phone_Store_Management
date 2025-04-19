@@ -485,7 +485,7 @@
                 <div class="card-body">
                     <!-- Form nhập liệu -->
                     <div class="filter-container">
-                        <form th:action="@{/sales-report}" method="post" class="search-form row g-3 align-items-end">
+                        <form th:action="@{/sales-report}" method="post" class="search-form row g-3 align-items-end" >
 
                             <div class="col-md-3 col-sm-6">
                                 <label for="paymentMethod" class="form-label">
@@ -494,7 +494,9 @@
                                 <select id="paymentMethod" name="paymentMethod" class="form-control form-select">
                                     <option value="">Tất cả</option>
                                     <option th:each="pm : ${T(com.example.md5_phone_store_management.model.PaymentMethod).values()}"
-                                            th:value="${pm.name()}" th:text="${pm.getLabel()}">Payment</option>
+                                            th:value="${pm.name()}" th:text="${pm.getLabel()}"
+                                            th:selected="${param.paymentMethod != null and param.paymentMethod[0] == pm.name()}">
+                                    </option>
                                 </select>
                             </div>
 
