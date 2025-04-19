@@ -174,6 +174,42 @@
         .update-item-expanded:hover {
             transform: translateY(-2px);
         }
+
+
+
+
+        .dash-bottom-section {
+            height: 615px; /* Chiều cao cố định cho dash-bottom-section */
+            overflow: hidden; /* Ẩn nội dung vượt quá chiều cao */
+        }
+
+        /* Đảm bảo các phần tử bên trong không làm thay đổi chiều cao của dash-bottom-section */
+        .dash-sales-analytics, .dash-updates-profile {
+            transition: all 0.5s ease-in-out;
+            transform-origin: center;
+        }
+
+        /* Khi mở rộng, các phần tử sẽ không ảnh hưởng đến chiều cao của dash-bottom-section */
+        .dash-sales-analytics.expanded, .dash-updates-profile.expanded {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            width: calc(100% - 40px);
+            z-index: 10;
+            opacity: 1;
+            transform: scale(1);
+            overflow-y: auto;
+            background: white;
+        }
+
+        /* Đảm bảo chiều cao của các phần tử khi không mở rộng */
+        .dash-sales-analytics {
+            max-height: 600px;
+        }
+
+        .dash-updates-profile {
+            max-height: 600px;
+        }
     </style>
 </head>
 <body class="font-sans bg-gray-100 m-0 p-0">
@@ -339,8 +375,48 @@
             </div>
 
             <!-- Bottom Section -->
+<!--            <div class="dash-bottom-section flex gap-4 w-full relative flex-wrap">-->
+<!--                <div class="dash-sales-analytics flex-[7] min-w-[300px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">-->
+<!--                    <div class="dash-header flex justify-between items-center mb-2">-->
+<!--                        <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>-->
+<!--                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"-->
+<!--                                onclick="toggleExpand('sales')">-->
+<!--                            <i class="fas fa-expand"></i>-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy-->
+<!--                        phép amCharts.</p>-->
+<!--                    <div class="dash-chart-controls flex justify-between items-center mb-5">-->
+<!--                        <div class="dash-zoom flex gap-2">-->
+<!--                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"-->
+<!--                                    onclick="zoomChart('in')">⟐-->
+<!--                            </button>-->
+<!--                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"-->
+<!--                                    onclick="zoomChart('out')">⟑-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                        <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"-->
+<!--                                onclick="resetChart()">Hiển thị tất cả-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <canvas id="salesChart"></canvas>-->
+<!--                </div>-->
+
+<!--                <div class="dash-updates-profile flex-[3] min-w-[200px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">-->
+<!--                    <div class="dash-header flex justify-between items-center mb-2">-->
+<!--                        <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>-->
+<!--                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"-->
+<!--                                onclick="toggleExpand('updates')">-->
+<!--                            <i class="fas fa-expand"></i>-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <div id="changeLogsContainer"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+
             <div class="dash-bottom-section flex gap-4 w-full relative flex-wrap">
-                <div class="dash-sales-analytics flex-[7] min-w-[300px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
+                <div class="dash-sales-analytics flex-[7] min-w-[300px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
                     <div class="dash-header flex justify-between items-center mb-2">
                         <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>
                         <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
@@ -348,8 +424,7 @@
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
-                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy
-                        phép amCharts.</p>
+                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
                     <div class="dash-chart-controls flex justify-between items-center mb-5">
                         <div class="dash-zoom flex gap-2">
                             <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
@@ -366,7 +441,7 @@
                     <canvas id="salesChart"></canvas>
                 </div>
 
-                <div class="dash-updates-profile flex-[3] min-w-[200px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
+                <div class="dash-updates-profile flex-[3] min-w-[200px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">
                     <div class="dash-header flex justify-between items-center mb-2">
                         <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>
                         <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
@@ -377,6 +452,8 @@
                     <div id="changeLogsContainer"></div>
                 </div>
             </div>
+
+
         </div>
     </div>
 
