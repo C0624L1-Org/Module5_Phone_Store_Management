@@ -240,5 +240,10 @@
         }
 
         @Override public Long countSoldProducts() { return productRepository.countSoldProducts(); }
-    
+
+        @Override
+        public List<Product> searchProductsNameForNavbar(String keyword, Pageable pageable) {
+            return productRepository.searchProductsNameForNavbar(keyword, pageable);
+        }
+
     }

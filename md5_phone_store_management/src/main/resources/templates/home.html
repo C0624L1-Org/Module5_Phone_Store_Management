@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
+  <title>Hệ thống Quản lý Cửa hàng Điện thoại</title>
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,7 +13,6 @@
   <link rel="stylesheet" href="/css/fragments/navbar.css">
   <link rel="stylesheet" href="/css/fragments/footer.css">
   <link rel="stylesheet" href="/css/common/layout.css">
-
 </head>
 <body>
 <!-- Hiển thị thông báo -->
@@ -25,258 +24,122 @@
   <!-- Main content for page without sidebar -->
   <main class="full-width-container">
     <div class="container">
-      <!-- Hero Slider -->
-      <div class="hero-slider">
-        <div class="main-slide">
-          <div class="product-info">
-            <h1 class="product-title">
-              HONOR Magic V3 <span>5G</span>
-            </h1>
-            <p class="product-subtitle">Điện thoại gập siêu mỏng nhẹ</p>
-          </div>
-
-          <div class="product-image">
-            <img >
-            <div class="exclusive-badge">
-              ĐỘC<br>QUYỀN
-            </div>
-          </div>
-
-          <div class="promotion-info">
-            <div class="discount-badge">
-              Giảm ngay
-            </div>
-            <div class="discount-price">
-              2.000.000đ
-            </div>
-            <p class="warranty-text">Bảo hành Premium Care+</p>
-            <a href="#" class="buy-now-button">Mua ngay</a>
-          </div>
-
-          <div class="sparkle sparkle-1">✧</div>
-          <div class="sparkle sparkle-2">✧</div>
+      <!-- Phần giới thiệu hệ thống -->
+      <div class="jumbotron text-center my-4 p-5 bg-light rounded shadow">
+        <h1 class="display-4">Hệ thống Quản lý Cửa hàng Điện thoại</h1>
+        <p class="lead">Giải pháp toàn diện để quản lý hiệu quả hoạt động kinh doanh của cửa hàng điện thoại</p>
+        <hr class="my-4">
+        <div sec:authorize="isAnonymous()">
+          <p>Đăng nhập để sử dụng các tính năng quản lý dành cho nhân viên và quản trị viên</p>
+          <a class="btn btn-primary btn-lg" href="/login" role="button">Đăng nhập</a>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+          <p>Quay trở lại trang quản trị</p>
+          <a class="btn btn-primary btn-lg" th:href="@{/dashboard/admin}" sec:authorize="hasRole('Admin')">Dashboard</a>
+          <a class="btn btn-primary btn-lg" th:href="@{/dashboard/sales-staff}" sec:authorize="hasRole('SalesStaff')">Dashboard</a>
+          <a class="btn btn-primary btn-lg" th:href="@{/dashboard/sales-person}" sec:authorize="hasRole('SalesPerson')">Dashboard</a>
+          <a class="btn btn-primary btn-lg" th:href="@{/dashboard/warehouse-staff}" sec:authorize="hasRole('WarehouseStaff')">Dashboard</a>
         </div>
 
-        <div class="dots-container">
-          <span class="dot active"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </div>
       </div>
 
-      <!-- Banner section -->
-      <div class="banner-container">
-        <div class="banner banner-1">
-          <div class="warranty-badge">BẢO HÀNH TRỌN ĐỜI</div>
-          <h2 class="phone-title">Galaxy S25 Ultra</h2>
-          <p class="phone-subtitle">Galaxy AI 💫</p>
-          <div class="promotion-badge">Tặng 7 Triệu</div>
-        </div>
-
-        <div class="banner banner-2">
-          <h2 class="aircon-text">MÁY LẠNH<br>LẠNH THẦN TỐC</h2>
-          <div class="installment-badge">TRẢ GÓP TỪ 17K/NGÀY</div>
-        </div>
-      </div>
-
-      <!-- Category section -->
-      <div class="category-section">
-        <h2 class="section-title">Danh mục nổi bật</h2>
-        <div class="category-grid">
-          <div class="category-item">
-            <div class="category-icon">📱</div>
-            <div class="category-name">Điện thoại</div>
-          </div>
-          <div class="category-item">
-            <div class="category-icon">💻</div>
-            <div class="category-name">Laptop</div>
-          </div>
-          <div class="category-item">
-            <div class="category-icon">📟</div>
-            <div class="category-name">Máy tính bảng</div>
-          </div>
-          <div class="category-item">
-            <div class="category-icon">🔄</div>
-            <div class="category-name">Xem tất cả</div>
+      <!-- Phần tính năng chính -->
+      <div class="row mb-5">
+        <h2 class="text-center mb-4">Tính năng chính</h2>
+        
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+              <i class="fas fa-mobile-alt fa-3x mb-3 text-primary"></i>
+              <h3 class="card-title">Quản lý Sản phẩm</h3>
+              <p class="card-text">Theo dõi tồn kho, thêm mới, cập nhật sản phẩm và quản lý thông tin chi tiết của từng mặt hàng</p>
+            </div>
           </div>
         </div>
-      </div>
-
-      <!-- Deal section -->
-      <div class="deal-section">
-        <div class="deal-header">
-          <div class="deal-title">
-            <i>🔥</i> DEAL SỐC TRONG NGÀY
+        
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+              <i class="fas fa-shopping-cart fa-3x mb-3 text-success"></i>
+              <h3 class="card-title">Quản lý Bán hàng</h3>
+              <p class="card-text">Xử lý giao dịch bán hàng, tạo hóa đơn, theo dõi lịch sử mua hàng của khách hàng</p>
+            </div>
           </div>
-          <div class="countdown">
-            <span>Kết thúc trong</span>
-            <div class="countdown-item">05</div>
-            <div class="countdown-separator">:</div>
-            <div class="countdown-item">43</div>
-            <div class="countdown-separator">:</div>
-            <div class="countdown-item">21</div>
-          </div>
-          <a href="#" class="view-all">Xem tất cả ></a>
         </div>
-
-        <div class="product-grid">
-          <div class="product-card">
-            <div class="discount-tag">Giảm 28%</div>
-            <div class="product-card-image">
-              <img >
-            </div>
-            <h3 class="product-card-title">iPhone 15 256GB Chính hãng VN/A</h3>
-            <div class="product-card-price">21.990.000₫</div>
-            <div class="product-card-old-price">27.990.000₫</div>
-            <div class="product-card-gift">Quà 1.500.000₫</div>
-            <div class="rating">
-              <div class="stars">★★★★★</div>
-              <div class="count">(124)</div>
+        
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+              <i class="fas fa-users fa-3x mb-3 text-danger"></i>
+              <h3 class="card-title">Quản lý Khách hàng</h3>
+              <p class="card-text">Lưu trữ thông tin khách hàng, lịch sử mua hàng và chăm sóc khách hàng hiệu quả</p>
             </div>
           </div>
-
-          <div class="product-card">
-            <div class="discount-tag">Giảm 20%</div>
-            <div class="product-card-image">
-              <img >
-            </div>
-            <h3 class="product-card-title">Samsung Galaxy S24 8GB/256GB</h3>
-            <div class="product-card-price">19.490.000₫</div>
-            <div class="product-card-old-price">23.990.000₫</div>
-            <div class="product-card-gift">Quà 2.000.000₫</div>
-            <div class="rating">
-              <div class="stars">★★★★☆</div>
-              <div class="count">(98)</div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+              <i class="fas fa-warehouse fa-3x mb-3 text-warning"></i>
+              <h3 class="card-title">Quản lý Kho hàng</h3>
+              <p class="card-text">Kiểm soát xuất nhập kho, quản lý tồn kho và thông báo khi hàng sắp hết</p>
             </div>
           </div>
-
-          <div class="product-card">
-            <div class="discount-tag">Giảm 15%</div>
-            <div class="product-card-image">
-              <img >
-            </div>
-            <h3 class="product-card-title">MacBook Air M3 13" 8GB/256GB</h3>
-            <div class="product-card-price">27.990.000₫</div>
-            <div class="product-card-old-price">32.990.000₫</div>
-            <div class="product-card-gift">Quà 1.000.000₫</div>
-            <div class="rating">
-              <div class="stars">★★★★★</div>
-              <div class="count">(85)</div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+              <i class="fas fa-user-tie fa-3x mb-3 text-info"></i>
+              <h3 class="card-title">Quản lý Nhân viên</h3>
+              <p class="card-text">Phân quyền, theo dõi hoạt động và quản lý thông tin của nhân viên</p>
             </div>
           </div>
-
-          <div class="product-card">
-            <div class="discount-tag">Giảm 30%</div>
-            <div class="product-card-image">
-              <img >
-            </div>
-            <h3 class="product-card-title">Xiaomi Redmi Note 13 Pro 5G</h3>
-            <div class="product-card-price">8.490.000₫</div>
-            <div class="product-card-old-price">12.490.000₫</div>
-            <div class="product-card-gift">Quà 800.000₫</div>
-            <div class="rating">
-              <div class="stars">★★★★☆</div>
-              <div class="count">(76)</div>
-            </div>
-          </div>
-
-          <div class="product-card">
-            <div class="discount-tag">Giảm 25%</div>
-            <div class="product-card-image">
-              <img >
-            </div>
-            <h3 class="product-card-title">iPad Gen 10 WiFi 64GB Chính hãng</h3>
-            <div class="product-card-price">9.990.000₫</div>
-            <div class="product-card-old-price">12.990.000₫</div>
-            <div class="product-card-gift">Quà 1.200.000₫</div>
-            <div class="rating">
-              <div class="stars">★★★★★</div>
-              <div class="count">(67)</div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+              <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+              <h3 class="card-title">Báo cáo & Thống kê</h3>
+              <p class="card-text">Tạo báo cáo doanh số, lợi nhuận và phân tích xu hướng kinh doanh</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Second Deal section -->
-      <div class="deal-section">
-        <div class="deal-header">
-          <div class="deal-title">
-            ĐIỆN THOẠI NỔI BẬT
-          </div>
-          <a href="#" class="view-all">Xem tất cả ></a>
+      <!-- Phần thống kê tổng quan -->
+
+      <!-- Phần hướng dẫn sử dụng -->
+      <div class="card mb-5 shadow-sm">
+        <div class="card-header bg-light">
+          <h2 class="mb-0">Hướng dẫn sử dụng</h2>
         </div>
-
-        <div class="product-grid">
-          <div class="product-card">
-            <div class="product-card-image">
-              <img >
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h4><i class="fas fa-user me-2 text-primary"></i>Dành cho Quản trị viên</h4>
+              <ul class="list-group list-group-flush mb-4">
+                <li class="list-group-item">Quản lý và phân quyền người dùng hệ thống</li>
+                <li class="list-group-item">Xem báo cáo tổng quan về tình hình kinh doanh</li>
+                <li class="list-group-item">Cấu hình hệ thống và thiết lập các thông số</li>
+                <li class="list-group-item">Quản lý thông tin nhà cung cấp</li>
+              </ul>
             </div>
-            <h3 class="product-card-title">Samsung Galaxy Z Flip6 5G</h3>
-            <div class="product-card-price">22.990.000₫</div>
-            <div class="product-card-gift">Trả góp 0%</div>
-            <div class="rating">
-              <div class="stars">★★★★★</div>
-              <div class="count">(53)</div>
-            </div>
-          </div>
-
-          <div class="product-card">
-            <div class="product-card-image">
-              <img >
-            </div>
-            <h3 class="product-card-title">OPPO Reno11 F 5G 8GB/256GB</h3>
-            <div class="product-card-price">8.990.000₫</div>
-            <div class="product-card-gift">Quà 700.000₫</div>
-            <div class="rating">
-              <div class="stars">★★★★☆</div>
-              <div class="count">(42)</div>
-            </div>
-          </div>
-
-          <div class="product-card">
-            <div class="discount-tag">Giảm 18%</div>
-            <div class="product-card-image">
-              <img >
-            </div>
-            <h3 class="product-card-title">vivo V30 5G 12GB/512GB</h3>
-            <div class="product-card-price">12.490.000₫</div>
-            <div class="product-card-old-price">14.990.000₫</div>
-            <div class="product-card-gift">Quà 1.200.000₫</div>
-            <div class="rating">
-              <div class="stars">★★★★☆</div>
-              <div class="count">(38)</div>
-            </div>
-          </div>
-
-          <div class="product-card">
-            <div class="product-card-image">
-              <img >
-            </div>
-            <h3 class="product-card-title">iPhone 16 Pro Max 256GB</h3>
-            <div class="product-card-price">34.990.000₫</div>
-            <div class="product-card-gift">Trả góp 0%</div>
-            <div class="rating">
-              <div class="stars">★★★★★</div>
-              <div class="count">(45)</div>
-            </div>
-          </div>
-
-          <div class="product-card">
-            <div class="product-card-image">
-              <img >
-            </div>
-            <h3 class="product-card-title">Xiaomi 14 Ultra 5G 12GB/512GB</h3>
-            <div class="product-card-price">24.990.000₫</div>
-            <div class="product-card-gift">Quà 2.000.000₫</div>
-            <div class="rating">
-              <div class="stars">★★★★☆</div>
-              <div class="count">(37)</div>
+            
+            <div class="col-md-6">
+              <h4><i class="fas fa-users me-2 text-success"></i>Dành cho Nhân viên</h4>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">Nhân viên bán hàng: Quản lý việc bán hàng tại cửa hàng và thu thập thông tin khách hàng</li>
+                <li class="list-group-item">Nhân viên kho: Quản lý xuất nhập hàng, cập nhật thông tin hàng hóa</li>
+                <li class="list-group-item">Nhân viên kinh doanh: Quản lý nhà cung cấp và lập các báo cáo</li>
+              </ul>
             </div>
           </div>
         </div>
       </div>
+    </div>
   </main>
-
 
   <!-- Nhúng footer -->
   <footer th:replace="~{fragments/footer :: footer}"></footer>
@@ -291,257 +154,3 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-<!--<!DOCTYPE html>-->
-<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Home</title>-->
-
-<!--    &lt;!&ndash; Bootstrap CSS &ndash;&gt;-->
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
-<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">-->
-<!--    &lt;!&ndash;Custom&ndash;&gt;-->
-<!--    <link rel="stylesheet" href="/css/home.css">-->
-<!--    <link rel="stylesheet" href="/css/fragments/navbar.css">-->
-<!--    <link rel="stylesheet" href="/css/fragments/footer.css">-->
-<!--    <link rel="stylesheet" href="/css/common/layout.css">-->
-<!--</head>-->
-<!--<body>-->
-<!--&lt;!&ndash; Hiển thị thông báo &ndash;&gt;-->
-<!--<div th:replace="~{common/toast}"></div>-->
-<!--&lt;!&ndash; Nhúng navbar &ndash;&gt;-->
-<!--<nav th:replace="~{fragments/navbar :: navbar}"></nav>-->
-
-<!--<div class="content-wrapper">-->
-<!--    &lt;!&ndash; Main content for page without sidebar &ndash;&gt;-->
-<!--    <main class="full-width-container">-->
-<!--        <div class="container">-->
-<!--            &lt;!&ndash; Hero Slider &ndash;&gt;-->
-<!--            <div class="hero-slider">-->
-<!--                <div class="main-slide">-->
-<!--                    <div class="product-info">-->
-<!--                        <h1 class="product-title">-->
-<!--                            HONOR Magic V3 <span>5G</span>-->
-<!--                        </h1>-->
-<!--                        <p class="product-subtitle">Điện thoại gập siêu mỏng nhẹ</p>-->
-<!--                    </div>-->
-
-<!--                    <div class="product-image">-->
-<!--                        <img>-->
-<!--                        <div class="exclusive-badge">-->
-<!--                            ĐỘC<br>QUYỀN-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    <div class="promotion-info">-->
-<!--                        <div class="discount-badge">-->
-<!--                            Giảm ngay-->
-<!--                        </div>-->
-<!--                        <div class="discount-price">-->
-<!--                            2.000.000đ-->
-<!--                        </div>-->
-<!--                        <p class="warranty-text">Bảo hành Premium Care+</p>-->
-<!--                        <a href="#" class="buy-now-button">Mua ngay</a>-->
-<!--                    </div>-->
-
-<!--                    <div class="sparkle sparkle-1">✧</div>-->
-<!--                    <div class="sparkle sparkle-2">✧</div>-->
-<!--                </div>-->
-
-<!--                <div class="dots-container">-->
-<!--                    <span class="dot active"></span>-->
-<!--                    <span class="dot"></span>-->
-<!--                    <span class="dot"></span>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            &lt;!&ndash; Banner section &ndash;&gt;-->
-<!--            <div class="banner-container">-->
-<!--                <div class="banner banner-1">-->
-<!--                    <div class="warranty-badge">BẢO HÀNH TRỌN ĐỜI</div>-->
-<!--                    <h2 class="phone-title">Galaxy S25 Ultra</h2>-->
-<!--                    <p class="phone-subtitle">Galaxy AI 💫</p>-->
-<!--                    <div class="promotion-badge">Tặng 7 Triệu</div>-->
-<!--                </div>-->
-
-<!--                <div class="banner banner-2">-->
-<!--                    <h2 class="aircon-text">MÁY LẠNH<br>LẠNH THẦN TỐC</h2>-->
-<!--                    <div class="installment-badge">TRẢ GÓP TỪ 17K/NGÀY</div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            &lt;!&ndash; Category section &ndash;&gt;-->
-<!--            <div class="category-section">-->
-<!--                <h2 class="section-title">Danh mục nổi bật</h2>-->
-<!--                <div class="category-grid">-->
-<!--                    <div class="category-item">-->
-<!--                        <div class="category-icon">📱</div>-->
-<!--                        <div class="category-name">Điện thoại</div>-->
-<!--                    </div>-->
-<!--                    <div class="category-item">-->
-<!--                        <div class="category-icon">💻</div>-->
-<!--                        <div class="category-name">Laptop</div>-->
-<!--                    </div>-->
-<!--                    <div class="category-item">-->
-<!--                        <div class="category-icon">📟</div>-->
-<!--                        <div class="category-name">Máy tính bảng</div>-->
-<!--                    </div>-->
-<!--                    <div class="category-item">-->
-<!--                        <div class="category-icon">🔄</div>-->
-<!--                        <div class="category-name">Xem tất cả</div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-
-<!--            &lt;!&ndash; Deal section &ndash;&gt;-->
-<!--            &lt;!&ndash; Deal section &ndash;&gt;-->
-<!--            <div class="deal-section">-->
-<!--                <div class="deal-header">-->
-<!--                    <div class="deal-title">-->
-<!--                        <i>🔥</i> DEAL SỐC TRONG NGÀY-->
-<!--                    </div>-->
-<!--                    <div class="countdown">-->
-<!--                        <span>Kết thúc trong</span>-->
-<!--                        <div class="countdown-item">05</div>-->
-<!--                        <div class="countdown-separator">:</div>-->
-<!--                        <div class="countdown-item">43</div>-->
-<!--                        <div class="countdown-separator">:</div>-->
-<!--                        <div class="countdown-item">21</div>-->
-<!--                    </div>-->
-<!--                    <a href="#" class="view-all">Xem tất cả ></a>-->
-<!--                </div>-->
-
-<!--                <div class="product-grid">-->
-<!--                    &lt;!&ndash; Sử dụng th:each để lặp qua danh sách sản phẩm từ productService &ndash;&gt;-->
-<!--                    <div class="product-card" th:each="prod : ${product}">-->
-<!--                        &lt;!&ndash; Tính toán phần trăm giảm giá nếu retailPrice tồn tại và lớn hơn sellingPrice &ndash;&gt;-->
-<!--                        <div class="discount-tag"-->
-<!--                             th:text="'Giảm ' + ${#numbers.formatInteger(((prod.retailPrice - prod.sellingPrice) / prod.retailPrice * 100), 0, 'POINT')} + '%'"-->
-<!--                             th:if="${prod.retailPrice != null and prod.retailPrice > prod.sellingPrice}">-->
-<!--                            Giảm 28%-->
-<!--                        </div>-->
-<!--                        <div class="product-card-image" style="width: 100%; height: 200px; overflow: hidden;">-->
-<!--                            &lt;!&ndash; Giới hạn ảnh trong khung với object-fit &ndash;&gt;-->
-<!--                            <img th:src="${prod.images != null and !prod.images.isEmpty() ? prod.images[0].imageUrl : '/images/default.jpg'}"-->
-<!--                                 th:alt="'Hình ảnh ' + ${prod.name}"-->
-<!--                                 style="width: 100%; height: 100%; object-fit: contain;">-->
-<!--                        </div>-->
-<!--                        <h3 class="product-card-title" th:text="${prod.name}">iPhone 15 256GB Chính hãng VN/A</h3>-->
-<!--                        <div class="product-card-price"-->
-<!--                             th:text="${#numbers.formatDecimal(prod.sellingPrice, 0, 'POINT', 0, 'POINT')} + '₫'">-->
-<!--                            21.990.000₫-->
-<!--                        </div>-->
-<!--                        <div class="product-card-old-price"-->
-<!--                             th:text="${#numbers.formatDecimal(prod.retailPrice, 0, 'POINT', 0, 'POINT')} + '₫'"-->
-<!--                             th:if="${prod.retailPrice != null and prod.retailPrice > prod.sellingPrice}">-->
-<!--                            27.990.000₫-->
-<!--                        </div>-->
-<!--                        &lt;!&ndash; Không có giftValue trong model, giữ nguyên tĩnh &ndash;&gt;-->
-<!--                        <div class="product-card-gift">Quà 1.500.000₫</div>-->
-<!--                        &lt;!&ndash; Không có ratingStars và reviewCount, giữ nguyên tĩnh &ndash;&gt;-->
-<!--                        <div class="rating">-->
-<!--                            <div class="stars">★★★★★</div>-->
-<!--                            <div class="count">(124)</div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            &lt;!&ndash; Second Deal section (giữ nguyên tĩnh hoặc có thể áp dụng tương tự) &ndash;&gt;-->
-<!--            <div class="deal-section">-->
-<!--                <div class="deal-header">-->
-<!--                    <div class="deal-title">-->
-<!--                        ĐIỆN THOẠI NỔI BẬT-->
-<!--                    </div>-->
-<!--                    <a href="#" class="view-all">Xem tất cả ></a>-->
-<!--                </div>-->
-
-<!--                <div class="product-grid">-->
-<!--                    <div class="product-card">-->
-<!--                        <div class="product-card-image">-->
-<!--                            <img>-->
-<!--                        </div>-->
-<!--                        <h3 class="product-card-title">Samsung Galaxy Z Flip6 5G</h3>-->
-<!--                        <div class="product-card-price">22.990.000₫</div>-->
-<!--                        <div class="product-card-gift">Trả góp 0%</div>-->
-<!--                        <div class="rating">-->
-<!--                            <div class="stars">★★★★★</div>-->
-<!--                            <div class="count">(53)</div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    <div class="product-card">-->
-<!--                        <div class="product-card-image">-->
-<!--                            <img>-->
-<!--                        </div>-->
-<!--                        <h3 class="product-card-title">OPPO Reno11 F 5G 8GB/256GB</h3>-->
-<!--                        <div class="product-card-price">8.990.000₫</div>-->
-<!--                        <div class="product-card-gift">Quà 700.000₫</div>-->
-<!--                        <div class="rating">-->
-<!--                            <div class="stars">★★★★☆</div>-->
-<!--                            <div class="count">(42)</div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    <div class="product-card">-->
-<!--                        <div class="discount-tag">Giảm 18%</div>-->
-<!--                        <div class="product-card-image">-->
-<!--                            <img>-->
-<!--                        </div>-->
-<!--                        <h3 class="product-card-title">vivo V30 5G 12GB/512GB</h3>-->
-<!--                        <div class="product-card-price">12.490.000₫</div>-->
-<!--                        <div class="product-card-old-price">14.990.000₫</div>-->
-<!--                        <div class="product-card-gift">Quà 1.200.000₫</div>-->
-<!--                        <div class="rating">-->
-<!--                            <div class="stars">★★★★☆</div>-->
-<!--                            <div class="count">(38)</div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    <div class="product-card">-->
-<!--                        <div class="product-card-image">-->
-<!--                            <img>-->
-<!--                        </div>-->
-<!--                        <h3 class="product-card-title">iPhone 16 Pro Max 256GB</h3>-->
-<!--                        <div class="product-card-price">34.990.000₫</div>-->
-<!--                        <div class="product-card-gift">Trả góp 0%</div>-->
-<!--                        <div class="rating">-->
-<!--                            <div class="stars">★★★★★</div>-->
-<!--                            <div class="count">(45)</div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    <div class="product-card">-->
-<!--                        <div class="product-card-image">-->
-<!--                            <img>-->
-<!--                        </div>-->
-<!--                        <h3 class="product-card-title">Xiaomi 14 Ultra 5G 12GB/512GB</h3>-->
-<!--                        <div class="product-card-price">24.990.000₫</div>-->
-<!--                        <div class="product-card-gift">Quà 2.000.000₫</div>-->
-<!--                        <div class="rating">-->
-<!--                            <div class="stars">★★★★☆</div>-->
-<!--                            <div class="count">(37)</div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </main>-->
-
-<!--    &lt;!&ndash; Nhúng footer &ndash;&gt;-->
-<!--    <footer th:replace="~{fragments/footer :: footer}"></footer>-->
-<!--</div>-->
-
-<!--<div class="overlay"></div>-->
-
-<!--&lt;!&ndash; Nhúng script navbar &ndash;&gt;-->
-<!--<div th:replace="~{fragments/navbar :: navbar-script}"></div>-->
-
-<!--&lt;!&ndash; Các script khác &ndash;&gt;-->
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->
-<!--</body>-->
-<!--</html>-->

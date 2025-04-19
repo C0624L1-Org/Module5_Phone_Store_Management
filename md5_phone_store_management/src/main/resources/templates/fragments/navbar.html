@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Navbar</title>
+    <link rel="stylesheet" th:href="@{/css/fragments/navbar.css}">
 </head>
 <body>
 <!-- Navbar Fragment -->
@@ -28,8 +29,14 @@
             </div>
 
             <div class="search-container">
-                <input type="text" placeholder="Nhập tên điện thoại, máy tính, phụ kiện... cần tìm">
-                <button>🔍</button>
+                <!-- Không dùng form hoặc dùng form với onsubmit="return false;" -->
+                <div class="search-inner">
+                    <input type="text" id="search-input" autocomplete="off" placeholder="Nhập tên điện thoại cần tìm...">
+                    <button type="button" id="search-button"><i class="fas fa-search"></i></button>
+                    <div id="search-results" class="search-results">
+                        <!-- Kết quả tìm kiếm sẽ hiển thị ở đây -->
+                    </div>
+                </div>
             </div>
 
             <div class="user-actions">
@@ -94,6 +101,10 @@
         const menuButton = document.querySelector('.menu-button');
         const dropdownMenu = document.querySelector('.dropdown-menu');
         const overlay = document.querySelector('.overlay');
+        // Thực hiện ngay sau khi DOM load
+        forceClearSearch();
+
+        // Loại bỏ setInterval và chỉ gọi forceClearSearch khi cần thiết
 
         menuButton.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -131,7 +142,51 @@
             });
         }
     });
+
+    // Bắt sự kiện nhập
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            if (!this.value.trim()) {
+                forceClearSearch(true);
+            }
+        });
+    }
+
+    // Bắt sự kiện click bất kỳ
+    document.addEventListener('click', function(e) {
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+        const searchButton = document.getElementById('search-button');
+
+        if (searchInput && searchResults && searchButton) {
+            if (!searchInput.contains(e.target) &&
+                !searchResults.contains(e.target) &&
+                !searchButton.contains(e.target)) {
+                forceClearSearch(true);
+            }
+        }
+    });
+
+    // Hàm đảm bảo ẩn kết quả
+    function forceClearSearch(force) {
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+
+        if (searchResults) {
+            if (force || !searchInput || !searchInput.value.trim()) {
+                searchResults.classList.add('force-hide');
+            } else {
+                searchResults.classList.remove('force-hide');
+            }
+        }
+    }
 </script>
+
+<!-- Navbar Search -->
+<div th:fragment="navbar-script">
+    <script th:src="@{/js/common/navbar.js}"></script>
+</div>
 
 </body>
 </html>
