@@ -1,6 +1,6 @@
 package com.example.md5_phone_store_management.service.implement;
 
-import com.cloudinary.utils.StringUtils;
+
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.InvoiceDetail;
 import com.example.md5_phone_store_management.model.PaymentMethod;
@@ -15,21 +15,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 @Service
 public class SaleReportServiceImpl implements ISaleReportService {
+    private final SaleReportRepository saleReportRepository;
+    private final ProductService productService;
     @Autowired
-    SaleReportRepository saleReportRepository;
-    @Autowired
-    ProductService productService;
+    public SaleReportServiceImpl(SaleReportRepository saleReportRepository, ProductService productService) {
+        this.saleReportRepository = saleReportRepository;
+        this.productService = productService;
+    }
     // Khai báo Logger
     private static final Logger logger = LoggerFactory.getLogger(SaleReportServiceImpl.class);
 
@@ -62,11 +65,6 @@ public class SaleReportServiceImpl implements ISaleReportService {
     }
 
     public SaleReportData generateSalesReport(PaymentMethod paymentMethod, String employeeName, String productName) {
-        if (paymentMethod == null && StringUtils.isBlank(employeeName) && StringUtils.isBlank(productName)) {
-            List<Invoice> invoices = saleReportRepository.findAll();
-        } else {
-            List<Invoice> invoices = getFilteredInvoices(paymentMethod, employeeName, productName);
-        }
         List<Invoice> invoices = getFilteredInvoices(paymentMethod, employeeName, productName);
         long totalOrders = invoices.size();
         long totalCustomers = invoices.stream().map(invoice -> invoice.getCustomer().getCustomerID()).distinct().count();
@@ -125,30 +123,14 @@ public class SaleReportServiceImpl implements ISaleReportService {
                 .filter(invoice -> invoice.getCreatedAt() != null &&
                         invoice.getCreatedAt().getYear() == year &&
                         invoice.getCreatedAt().getMonthValue() == month)
-                .collect(Collectors.toList());
+                .toList();
 
         // Nhóm hóa đơn theo ngày
         Map<Integer, List<Invoice>> invoicesGroupedByDay = filteredInvoices.stream()
                 .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getDayOfMonth()));
 
         // Tính tổng doanh thu mỗi ngày từ chi tiết hóa đơn
-        Map<Integer, Long> dailyRevenues = invoicesGroupedByDay.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().stream()
-                                .flatMap(invoice -> invoice.getInvoiceDetailList() != null
-                                        ? invoice.getInvoiceDetailList().stream()
-                                        : Stream.empty())
-                                .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
-                                .mapToLong(detail -> {
-                                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
-                                    BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
-                                    return sellingPrice.subtract(purchasePrice)
-                                            .multiply(BigDecimal.valueOf(detail.getQuantity()))
-                                            .longValue();
-                                })
-                                .sum()
-                ));
+        Map<Integer, Long> dailyRevenues = calculateGroupedProfit(invoicesGroupedByDay);
 
         // Đếm số hóa đơn mỗi ngày
         Map<Integer, Long> dailyCounts = invoicesGroupedByDay.entrySet().stream()
@@ -189,23 +171,7 @@ public class SaleReportServiceImpl implements ISaleReportService {
                 .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getMonthValue()));
 
 
-        Map<Integer, Long> monthlyRevenues = invoicesGroupedByMonth.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, // key là tháng (Integer)
-                        entry -> entry.getValue().stream()
-                                // Tính tổng doanh thu từ các chi tiết hóa đơn (lợi nhuận gộp)
-                                .flatMap(invoice -> invoice.getInvoiceDetailList() != null ? invoice.getInvoiceDetailList().stream() : Stream.empty())
-                                .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
-                                .mapToLong(detail -> {
-                                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
-                                    BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
-                                    // Tính lợi nhuận gộp cho mỗi mặt hàng (giá bán - giá mua) * số lượng
-                                    return sellingPrice.subtract(purchasePrice)
-                                            .multiply(BigDecimal.valueOf(detail.getQuantity()))
-                                            .longValue();
-                                })
-                                .sum()
-                ));
+        Map<Integer, Long> monthlyRevenues = calculateGroupedProfit(invoicesGroupedByMonth);
 
 
         Map<Integer, Long> monthlyCounts = invoicesGroupedByMonth.entrySet().stream()
@@ -256,12 +222,7 @@ public class SaleReportServiceImpl implements ISaleReportService {
                 ));
 
         // Đếm số lượng hóa đơn theo năm
-        Map<Integer, Long> countByYear = invoicesGroupedByYear.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> (long) entry.getValue().size()
-                ));
-
+        Map<Integer, Long> countByYear = calculateGroupedProfit(invoicesGroupedByYear);
         // Gom dữ liệu ra list kết quả
         List<Object[]> result = new ArrayList<>();
         Set<Integer> years = new TreeSet<>(revenueByYear.keySet()); // Sắp xếp theo năm tăng dần
@@ -323,8 +284,8 @@ public class SaleReportServiceImpl implements ISaleReportService {
 
         Map<Integer, Product> productDetails = revenueByProduct.keySet().stream()
                 .collect(Collectors.toMap(
-                        id -> id,
-                        id -> productService.findById(id)
+                        Function.identity(),            // thay cho id -> id
+                        productService::findById       // method reference
                 ));
 
         Map<String, Object> report = new HashMap<>();
@@ -335,6 +296,28 @@ public class SaleReportServiceImpl implements ISaleReportService {
         report.put("productDetails", productDetails);
 
         return report;
+    }
+    private long calculateProfit(List<Invoice> invoices) {
+        return invoices.stream()
+                .flatMap(invoice -> invoice.getInvoiceDetailList() != null
+                        ? invoice.getInvoiceDetailList().stream()
+                        : Stream.empty())
+                .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
+                .mapToLong(detail -> {
+                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                    BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
+                    return sellingPrice.subtract(purchasePrice)
+                            .multiply(BigDecimal.valueOf(detail.getQuantity()))
+                            .longValue();
+                })
+                .sum();
+    }
+    private <K> Map<K, Long> calculateGroupedProfit(Map<K, List<Invoice>> groupedInvoices) {
+        return groupedInvoices.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> calculateProfit(entry.getValue())
+                ));
     }
 }
 
