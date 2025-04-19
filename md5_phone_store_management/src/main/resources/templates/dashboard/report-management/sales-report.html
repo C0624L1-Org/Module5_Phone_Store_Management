@@ -484,7 +484,7 @@
                 </div>
                 <div class="card-body">
                     <!-- Form nhập liệu -->
-                    <form th:action="@{/sales-report}" method="get" class="search-form row g-3">
+                    <form th:action="@{/sales-report}" method="post" class="search-form row g-3">
                         <div class="col-md-3">
                             <label for="paymentMethod" class="form-label">
                                 <i class="fas fa-credit-card me-2"></i>Phương Thức Thanh Toán
@@ -492,9 +492,10 @@
                             <select id="paymentMethod" name="paymentMethod" class="form-control">
                                 <option value="">Tất cả</option>
                                 <option th:each="pm : ${T(com.example.md5_phone_store_management.model.PaymentMethod).values()}"
-                                        th:value="${pm}" th:text="${pm}">Payment</option>
+                                        th:value="${pm.name()}" th:text="${pm.getLabel()}">Payment</option>
                             </select>
                         </div>
+
                         <div class="col-md-4">
                             <label for="employeeName" class="form-label">
                                 <i class="fas fa-user me-2"></i>Tên Nhân Viên
@@ -736,13 +737,13 @@
                                 <h3><i class="fas fa-list"></i>Chi Tiết Doanh Thu Theo Mã Sản Phẩm</h3>
                                 <div class="product-report-container">
                                     <div class="product-details-list">
-                                        <th:block th:each="product : ${productDetails}">
+                                        <th:block th:each="entry : ${revenueByProduct}">
                                             <details class="product-detail-item">
                                                 <summary>
                                                     <div class="summary-content">
                                                         <div>
                                                             <i class="fas fa-tag me-2"></i>Mã SP:
-                                                            <span class="product-id" th:text="${product.productID}"></span>
+                                                            <span class="product-id" th:text="${entry.key}"></span>
                                                         </div>
                                                         <div>
                                                             <i class="fas fa-coins me-2"></i>Doanh Thu:

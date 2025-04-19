@@ -9,6 +9,8 @@ import com.example.md5_phone_store_management.model.dto.SaleReportData;
 import com.example.md5_phone_store_management.repository.SaleReportRepository;
 import com.example.md5_phone_store_management.service.ISaleReportService;
 
+import com.itextpdf.text.log.Logger;
+import com.itextpdf.text.log.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +20,17 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 
 @Service
 public class SaleReportServiceImpl implements ISaleReportService {
     @Autowired
     SaleReportRepository saleReportRepository;
+    @Autowired
+    ProductService productService;
+    // Khai báo Logger
+    private static final Logger logger = LoggerFactory.getLogger(SaleReportServiceImpl.class);
 
     public List<Invoice> getFilteredInvoices(PaymentMethod paymentMethod, String employeeName, String productName) {
         return saleReportRepository.filterInvoices(paymentMethod, employeeName, productName);
@@ -47,13 +55,15 @@ public class SaleReportServiceImpl implements ISaleReportService {
     public List<Object[]> getRevenueByTime(LocalDateTime startDate, LocalDateTime endDate) {
         return saleReportRepository.sumAmountByDate(startDate, endDate);
     }
-    public List<Product> getListProduct(PaymentMethod paymentMethod, String employeeName, String productName){
-        return saleReportRepository.findPaidProductsWithFilters(paymentMethod,employeeName,productName);
+
+    public List<Product> getListProduct(PaymentMethod paymentMethod, String employeeName, String productName) {
+        return saleReportRepository.findPaidProductsWithFilters(paymentMethod, employeeName, productName);
     }
+
     public SaleReportData generateSalesReport(PaymentMethod paymentMethod, String employeeName, String productName) {
-        if (paymentMethod==null&& StringUtils.isBlank(employeeName)&&StringUtils.isBlank(productName)) {
-            List<Invoice> invoices =saleReportRepository.findAll();
-        }else {
+        if (paymentMethod == null && StringUtils.isBlank(employeeName) && StringUtils.isBlank(productName)) {
+            List<Invoice> invoices = saleReportRepository.findAll();
+        } else {
             List<Invoice> invoices = getFilteredInvoices(paymentMethod, employeeName, productName);
         }
         List<Invoice> invoices = getFilteredInvoices(paymentMethod, employeeName, productName);
@@ -96,6 +106,7 @@ public class SaleReportServiceImpl implements ISaleReportService {
         reportData.setProducts(products);
         return reportData;
     }
+
     public List<Object[]> getTotalRevenueAndInvoiceCountByMonthAndYear(List<Invoice> invoices, int year, int month) {
         // Tạo danh sách các ngày trong tháng năm đã cho
         List<LocalDate> daysInMonth = getDaysInMonth(year, month);
@@ -128,6 +139,7 @@ public class SaleReportServiceImpl implements ISaleReportService {
         }
         return days;
     }
+
     public List<Object[]> getTotalRevenueAndInvoiceCountByMonth(List<Invoice> invoices, int year) {
         // Tạo một danh sách các tháng trong năm
         Set<String> allMonthsInYear = getMonthsInYear(year);
@@ -157,6 +169,7 @@ public class SaleReportServiceImpl implements ISaleReportService {
         }
         return months;
     }
+
     public List<Object[]> getTotalRevenueAndInvoiceCountByYear(List<Invoice> invoices) {
         Map<Integer, Long> revenueByYear = invoices.stream()
                 .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getYear(),
@@ -172,6 +185,68 @@ public class SaleReportServiceImpl implements ISaleReportService {
             result.add(new Object[]{year, totalRevenue, count});
         }
         return result;
+    }
+
+    public Map<String, Object> generateSalesReport(List<Invoice> invoices) {
+        if (invoices == null || invoices.isEmpty()) {
+            logger.warn("No invoices provided.");
+            return null;
+        }
+
+        logger.info("Initial invoices count: " + invoices.size());
+
+        long totalOrders = invoices.size();
+
+        long totalRevenue = invoices.stream()
+                .flatMap(invoice -> {
+                    List<InvoiceDetail> details = invoice.getInvoiceDetailList();
+                    return (details == null || details.isEmpty()) ? Stream.empty() : details.stream();
+                })
+                .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
+                .mapToLong(detail -> {
+                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                    BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
+                    return sellingPrice.subtract(purchasePrice).multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                })
+                .sum();
+
+        long totalProductsSold = invoices.stream()
+                .flatMap(invoice -> invoice.getInvoiceDetailList() != null
+                        ? invoice.getInvoiceDetailList().stream()
+                        : Stream.empty())
+                .filter(detail -> detail.getQuantity() != null)
+                .mapToLong(InvoiceDetail::getQuantity)
+                .sum();
+
+        Map<Integer, Long> revenueByProduct = invoices.stream()
+                .flatMap(invoice -> {
+                    List<InvoiceDetail> details = invoice.getInvoiceDetailList();
+                    return (details == null || details.isEmpty()) ? Stream.empty() : details.stream();
+                })
+                .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
+                .collect(Collectors.groupingBy(
+                        detail -> detail.getProduct().getProductID(),
+                        Collectors.mapping(detail -> {
+                            BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                            BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
+                            return sellingPrice.subtract(purchasePrice).multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                        }, Collectors.summingLong(Long::longValue))
+                ));
+
+        Map<Integer, Product> productDetails = revenueByProduct.keySet().stream()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        id -> productService.findById(id)
+                ));
+
+        Map<String, Object> report = new HashMap<>();
+        report.put("totalOrders", totalOrders);
+        report.put("totalRevenue", totalRevenue);
+        report.put("totalProductsSold", totalProductsSold);
+        report.put("revenueByProduct", revenueByProduct);
+        report.put("productDetails", productDetails);
+
+        return report;
     }
 }
 

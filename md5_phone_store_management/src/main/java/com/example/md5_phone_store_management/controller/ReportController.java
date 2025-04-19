@@ -132,12 +132,6 @@ public class ReportController {
             @RequestParam(value = "paymentMethod", required = false) PaymentMethod paymentMethod,
             @RequestParam(value = "employeeName", required = false) String employeeName,
             @RequestParam(value = "productName", required = false) String productName,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            @RequestParam(required = false) String productId,
-            @RequestParam(defaultValue = "false") boolean compareEnabled,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate compareStartDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate compareEndDate,
             @RequestParam(defaultValue = "0") int page, // Thêm tham số page
             Model model) {
         SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
@@ -148,28 +142,9 @@ public class ReportController {
         model.addAttribute("employeeName", employeeName);
         model.addAttribute("productName", productName);
         model.addAttribute("products", products);
-        model.addAttribute("startDate", startDate != null ? startDate.format(DATE_INPUT_FORMATTER) : "");
-        model.addAttribute("endDate", endDate != null ? endDate.format(DATE_INPUT_FORMATTER) : "");
-
-        model.addAttribute("compareEnabled", compareEnabled);
-        model.addAttribute("compareStartDate", compareStartDate != null ? compareStartDate.format(DATE_INPUT_FORMATTER) : "");
-        model.addAttribute("compareEndDate", compareEndDate != null ? compareEndDate.format(DATE_INPUT_FORMATTER) : "");
-
         try {
 
-            LocalDateTime startDateTime = startDate.atStartOfDay();
-            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-
-            Integer parsedProductId = null;
-            if (productId != null && !productId.trim().isEmpty()) {
-                parsedProductId = Integer.parseInt(productId);
-                if (!salesReportService.isProductIdValid(parsedProductId)) {
-                    model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại.");
-                    return "dashboard/report-management/sales-report";
-                }
-            }
-
-            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, parsedProductId);
+            Map<String, Object> report = saleReportServiceImpl.generateSalesReport(reportData.getFilteredInvoices());
             if (report == null) {
                 model.addAttribute("messageType", "error");
                 model.addAttribute("message", "Không có dữ liệu trong khoảng thời gian này hoặc mã sản phẩm không hợp lệ.");
@@ -177,13 +152,13 @@ public class ReportController {
             }
 
             // Nếu có mã sản phẩm, lấy thông tin sản phẩm và gán cho biểu đồ
-            if (parsedProductId != null) {
+        /*    if (parsedProductId != null) {
                  productName = getProductNameFromReport(parsedProductId, report);
                 if (productName != null) {
                     model.addAttribute("chartProductName", productName);
                     model.addAttribute("chartProductId", parsedProductId);
                 }
-            }
+            }*/
 
             // Lấy revenueByProduct và phân trang
             Map<Integer, Long> revenueByProduct = (Map<Integer, Long>) report.get("revenueByProduct");
@@ -201,10 +176,10 @@ public class ReportController {
             Map<Integer, Long> paginatedRevenueByProduct = paginatedRevenueList.stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-            model.addAttribute("totalOrders", reportData.getTotalOrders());
-            model.addAttribute("totalRevenue", reportData.getTotalRevenue());
-            model.addAttribute("totalProductsSold", reportData.getTotalProductsSold());
-            model.addAttribute("revenueByProduct", reportData.getRevenueByProduct()); // Giữ nguyên để biểu đồ sử dụng
+            model.addAttribute("totalOrders", report.get("totalOrders"));
+            model.addAttribute("totalRevenue", report.get("totalRevenue"));
+            model.addAttribute("totalProductsSold", report.get("totalProductsSold"));
+            model.addAttribute("revenueByProduct", revenueByProduct); // Giữ nguyên để biểu đồ sử dụng
             model.addAttribute("paginatedRevenueByProduct", paginatedRevenueByProduct); // Danh sách phân trang
             model.addAttribute("productDetails", report.get("productDetails"));
             model.addAttribute("showReport", true);
@@ -223,29 +198,6 @@ public class ReportController {
 
         return "dashboard/report-management/sales-report";
     }
-
-    // Thêm phương thức lấy tên sản phẩm
-    private String getProductNameFromReport(Integer productId, Map<String, Object> report) {
-        if (productId == null) {
-            return null;
-        }
-
-        try {
-            // Lấy thông tin từ productDetails nếu có
-            if (report != null && report.containsKey("productDetails")) {
-                Map<Integer, String> productDetails = (Map<Integer, String>) report.get("productDetails");
-                if (productDetails.containsKey(productId)) {
-                    return productDetails.get(productId);
-                }
-            }
-            return "Sản phẩm #" + productId;
-        } catch (Exception e) {
-            System.err.println("Error getting product name: " + e.getMessage());
-            e.printStackTrace();
-            return "Sản phẩm #" + productId;
-        }
-    }
-
     // API cho biểu đồ doanh thu theo ngày trong tháng
     @GetMapping("/api/chart/day")
     public ResponseEntity<?> getDailyRevenueChart(
@@ -395,54 +347,4 @@ public class ReportController {
 
         return ResponseEntity.ok(response);
     }
-    //Dinh Anh
-    @GetMapping("/sales-report-filter")
-    public String getSalesReport(
-            @RequestParam(value = "paymentMethod", required = false) PaymentMethod paymentMethod,
-            @RequestParam(value = "employeeName", required = false) String employeeName,
-            @RequestParam(value = "productName", required = false) String productName,
-            @RequestParam(value = "month", required = false) Integer month,
-            @RequestParam(value = "year", required = false) Integer year,
-            Model model) {
-
-        // Gán tháng/năm hiện tại nếu null
-        LocalDate now = LocalDate.now();
-        int reportMonth = (month != null) ? month : now.getMonthValue(); // tháng hiện tại
-        int reportYear = (year != null) ? year : now.getYear();          // năm hiện tại
-
-        // Gọi service để lấy dữ liệu báo cáo tổng hợp
-        SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
-
-        // Lấy dữ liệu doanh thu theo ngày, tháng, năm
-        List<Object[]> dataDaily = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
-                reportData.getFilteredInvoices(), reportYear,reportMonth);
-        List<Object[]> dataMonthly = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonth(
-                reportData.getFilteredInvoices(), reportYear);
-        List<Object[]> dataYear = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByYear(
-                reportData.getFilteredInvoices());
-
-        // Đưa dữ liệu lên giao diện
-        model.addAttribute("showReport", true);
-        model.addAttribute("totalOrders", reportData.getTotalOrders());
-        model.addAttribute("totalRevenue", reportData.getTotalRevenue());
-        model.addAttribute("totalCustomers", reportData.getTotalCustomers());
-        model.addAttribute("totalProducts", reportData.getTotalProductsSold());
-
-        model.addAttribute("revenueByProduct", reportData.getRevenueByProduct());
-        model.addAttribute("revenueByDaily", dataDaily);
-        model.addAttribute("revenueByMonthly", dataMonthly);
-        model.addAttribute("revenueByYear", dataYear);
-
-        model.addAttribute("paymentMethods", PaymentMethod.values());
-        model.addAttribute("paymentMethod", paymentMethod);
-        model.addAttribute("employeeName", employeeName);
-        model.addAttribute("productName", productName);
-
-        // Truyền tháng/năm đã xử lý lên giao diện (để giữ lại input người dùng)
-        model.addAttribute("selectedMonth", reportMonth);
-        model.addAttribute("selectedYear", reportYear);
-
-        return "/dashboard/report-management/filter-sales-report";
-    }
-
 }
