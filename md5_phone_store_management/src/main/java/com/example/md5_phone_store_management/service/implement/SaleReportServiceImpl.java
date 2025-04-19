@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -107,67 +108,103 @@ public class SaleReportServiceImpl implements ISaleReportService {
         return reportData;
     }
 
-    public List<Object[]> getTotalRevenueAndInvoiceCountByMonthAndYear(List<Invoice> invoices, int year, int month) {
-        // Tạo danh sách các ngày trong tháng năm đã cho
-        List<LocalDate> daysInMonth = getDaysInMonth(year, month);
+    public List<Object[]> getTotalRevenueAndInvoiceCountByMonthAndYear(List<Invoice> invoices, int month, int year) {
+        List<Object[]> dailyStats = new ArrayList<>();
 
-        // Nhóm các hóa đơn theo ngày trong tháng và năm
-        Map<LocalDate, Long> revenueByDay = invoices.stream()
-                .filter(invoice -> invoice.getCreatedAt().getYear() == year && invoice.getCreatedAt().getMonthValue() == month)
-                .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().toLocalDate(),
-                        Collectors.summingLong(Invoice::getAmount)));
-
-        // Kết quả cuối cùng
-        List<Object[]> result = new ArrayList<>();
-
-        // Duyệt qua tất cả các ngày trong tháng
-        for (LocalDate date : daysInMonth) {
-            long totalRevenue = revenueByDay.getOrDefault(date, 0L); // Lấy doanh thu, nếu không có thì trả về 0
-            long count = revenueByDay.containsKey(date) ? 1 : 0; // Nếu có hóa đơn thì có 1 hóa đơn, nếu không có thì 0
-            result.add(new Object[]{date, totalRevenue, count});
+        if (invoices == null || invoices.isEmpty()) {
+            return dailyStats;
         }
-        return result;
+
+        List<Invoice> filteredInvoices = invoices.stream()
+                .filter(invoice -> invoice.getCreatedAt() != null &&
+                        invoice.getCreatedAt().getYear() == year &&
+                        invoice.getCreatedAt().getMonthValue() == month)
+                .collect(Collectors.toList());
+
+        Map<Integer, List<Invoice>> invoicesGroupedByDay = filteredInvoices.stream()
+                .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getDayOfMonth()));
+
+
+        Map<Integer, Long> dailyCounts = invoicesGroupedByDay.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, // key là ngày (Integer)
+                        entry -> (long) entry.getValue().size() // value là số lượng hóa đơn (Long)
+                ));
+
+        Map<Integer, Long> dailyRevenues = invoicesGroupedByDay.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, // key là ngày (Integer)
+                        entry -> entry.getValue().stream()
+                                .mapToLong(inv -> inv.getAmount() != null ? inv.getAmount() : 0L) // Lấy amount, coi null là 0
+                                .sum() // Tính tổng amount cho ngày đó
+                ));
+
+        YearMonth yearMonth = YearMonth.of(year, month);
+        int daysInMonth = yearMonth.lengthOfMonth();
+
+        for (int day = 1; day <= daysInMonth; day++) {
+            long count = dailyCounts.getOrDefault(day, 0L); // Lấy số lượng, mặc định là 0 nếu không có
+            long revenue = dailyRevenues.getOrDefault(day, 0L); // Lấy doanh thu, mặc định là 0 nếu không có
+
+            dailyStats.add(new Object[]{day, count, revenue});
+        }
+
+        return dailyStats;
     }
 
-    // Helper method để lấy tất cả các ngày trong tháng và năm
-    private List<LocalDate> getDaysInMonth(int year, int month) {
-        List<LocalDate> days = new ArrayList<>();
-        LocalDate firstDayOfMonth = LocalDate.of(year, month, 1);
-        int lengthOfMonth = firstDayOfMonth.lengthOfMonth();  // Lấy số ngày trong tháng
-        for (int day = 1; day <= lengthOfMonth; day++) {
-            days.add(firstDayOfMonth.withDayOfMonth(day));
-        }
-        return days;
-    }
 
     public List<Object[]> getTotalRevenueAndInvoiceCountByMonth(List<Invoice> invoices, int year) {
-        // Tạo một danh sách các tháng trong năm
-        Set<String> allMonthsInYear = getMonthsInYear(year);
+        List<Object[]> monthlyStats = new ArrayList<>();
 
-        // Nhóm các hóa đơn theo tháng
-        Map<String, Long> revenueByMonth = invoices.stream()
-                .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getYear() + "-" + invoice.getCreatedAt().getMonthValue(),
-                        Collectors.summingLong(Invoice::getAmount)));
+        if (invoices == null || invoices.isEmpty()) {
 
-        // Kết quả cuối cùng
-        List<Object[]> result = new ArrayList<>();
-
-        // Duyệt qua tất cả các tháng trong năm
-        for (String month : allMonthsInYear) {
-            long totalRevenue = revenueByMonth.getOrDefault(month, 0L); // Lấy doanh thu, nếu không có thì trả về 0
-            long count = revenueByMonth.containsKey(month) ? 1 : 0; // Nếu có hóa đơn thì có 1 hóa đơn, nếu không có thì 0
-            result.add(new Object[]{month, totalRevenue, count});
+            for (int month = 1; month <= 12; month++) {
+                monthlyStats.add(new Object[]{month, 0L, 0L});
+            }
+            return monthlyStats;
         }
-        return result;
-    }
 
-    // Helper method để lấy tất cả các tháng trong năm
-    private Set<String> getMonthsInYear(int year) {
-        Set<String> months = new HashSet<>();
-        for (int i = 1; i <= 12; i++) {
-            months.add(year + "-" + i);
+        Map<Integer, List<Invoice>> invoicesGroupedByMonth = invoices.stream()
+                .filter(invoice -> invoice.getCreatedAt() != null &&
+                        invoice.getCreatedAt().getYear() == year)
+                .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getMonthValue()));
+
+
+        Map<Integer, Long> monthlyRevenues = invoicesGroupedByMonth.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, // key là tháng (Integer)
+                        entry -> entry.getValue().stream()
+                                // Tính tổng doanh thu từ các chi tiết hóa đơn (lợi nhuận gộp)
+                                .flatMap(invoice -> invoice.getInvoiceDetailList() != null ? invoice.getInvoiceDetailList().stream() : Stream.empty())
+                                .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
+                                .mapToLong(detail -> {
+                                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                                    BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
+                                    // Tính lợi nhuận gộp cho mỗi mặt hàng (giá bán - giá mua) * số lượng
+                                    return sellingPrice.subtract(purchasePrice)
+                                            .multiply(BigDecimal.valueOf(detail.getQuantity()))
+                                            .longValue();
+                                })
+                                .sum()
+                ));
+
+
+        Map<Integer, Long> monthlyCounts = invoicesGroupedByMonth.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, // key là tháng (Integer)
+                        entry -> (long) entry.getValue().size() // value là số lượng hóa đơn (Long)
+                ));
+
+        for (int month = 1; month <= 12; month++) {
+            long revenue = monthlyRevenues.getOrDefault(month, 0L); // Lấy doanh thu tháng, mặc định 0 nếu không có
+            long count = monthlyCounts.getOrDefault(month, 0L); // Lấy số lượng hóa đơn, mặc định 0 nếu không có
+
+
+            monthlyStats.add(new Object[]{month,count,revenue }); // <-- Tháng là Integer
         }
-        return months;
+
+
+        return monthlyStats;
     }
 
     public List<Object[]> getTotalRevenueAndInvoiceCountByYear(List<Invoice> invoices) {
@@ -175,15 +212,19 @@ public class SaleReportServiceImpl implements ISaleReportService {
                 .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getYear(),
                         Collectors.summingLong(Invoice::getAmount)));
 
+        Map<Integer, Long> countByYear = invoices.stream()
+                .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getYear(),
+                        Collectors.counting()));
+
         List<Object[]> result = new ArrayList<>();
+        Set<Integer> years = new TreeSet<>(revenueByYear.keySet());
 
-
-        Set<Integer> years = revenueByYear.keySet();
-        for (int year : years) {
+        for (Integer year : years) {
             long totalRevenue = revenueByYear.getOrDefault(year, 0L);
-            long count = revenueByYear.containsKey(year) ? 1 : 0;
-            result.add(new Object[]{year, totalRevenue, count});
+            long count = countByYear.getOrDefault(year, 0L);
+            result.add(new Object[]{year, count, totalRevenue});
         }
+
         return result;
     }
 

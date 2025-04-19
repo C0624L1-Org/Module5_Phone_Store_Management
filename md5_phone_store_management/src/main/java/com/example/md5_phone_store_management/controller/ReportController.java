@@ -208,19 +208,26 @@ public class ReportController {
             @RequestParam(value = "productName", required = false) String productName) {
 
 
-        List<Object[]> data;
+        List<Object[]> data =new ArrayList<>();
         SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
+        List<Invoice> invoices =reportData.getFilteredInvoices();
+        List<Object[]> result = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(invoices, month,year);
 
+        System.out.println("Thống kê hóa đơn hàng ngày cho tháng " + month + "/" + year + ":");
+        System.out.println("Ngày | Số lượng | Doanh thu");
+        System.out.println("-----|----------|----------");
+        for (Object[] dayData : result) {
+            System.out.printf("%-4d | %-8d | %d%n", dayData[0], dayData[1], dayData[2]);
+        }
         if (month != null && year != null) {
-
             data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
-                    reportData.getFilteredInvoices(), year,month);
+                    invoices, month,year);
         } else {
             LocalDate now = LocalDate.now();
             int reportMonth = now.getMonthValue(); // tháng hiện tại
             int reportYear = now.getYear();
             data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
-                    reportData.getFilteredInvoices(), reportYear,reportMonth);
+                    invoices, reportYear,reportMonth);
         }
 
         if (data == null || data.isEmpty()) {
@@ -242,10 +249,6 @@ public class ReportController {
         response.put("invoiceCounts", invoiceCounts);
         response.put("revenueSums", revenueSums);
 
-        // Thêm thông tin sản phẩm nếu có
-        if (reportData.getRevenueByProduct() != null) {
-            response.put("productName", reportData.getProducts());
-        }
 
         return ResponseEntity.ok(response);
     }
@@ -260,15 +263,15 @@ public class ReportController {
 
         List<Object[]> data;
         SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
-
+        List<Invoice> invoices =reportData.getFilteredInvoices();
         if (year != null) {
            data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonth(
-                   reportData.getFilteredInvoices(), year);
+                  invoices, year);
         } else {
             // Lấy dữ liệu mặc định
             int currentYear = Year.now().getValue(); // Lấy năm hiện tại an toàn
             data = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonth(
-                    reportData.getFilteredInvoices(), currentYear);
+                    invoices, currentYear);
         }
 
         if (data == null || data.isEmpty()) {
@@ -289,11 +292,6 @@ public class ReportController {
         response.put("months", months);
         response.put("invoiceCounts", invoiceCounts);
         response.put("revenueSums", revenueSums);
-
-        // Thêm thông tin sản phẩm nếu có
-        if (reportData.getRevenueByProduct() != null) {
-            response.put("productName", reportData.getProducts());
-        }
 
         return ResponseEntity.ok(response);
     }
@@ -337,13 +335,6 @@ public class ReportController {
         response.put("years", years);
         response.put("invoiceCounts", invoiceCounts);
         response.put("revenueSums", revenueSums);
-
-        // Thêm thông tin sản phẩm nếu có
-        if (reportData.getRevenueByProduct() != null) {
-
-                response.put("productName", reportData.getProducts());
-
-        }
 
         return ResponseEntity.ok(response);
     }
