@@ -21,27 +21,19 @@ document.addEventListener('DOMContentLoaded', function() {
     initMonthlyChart();
     initMultiYearChart(); // Changed from yearlyChart
 
-    // Gắn sự kiện cho các nút điều hướng
+
     setupNavigationButtons();
 
-    // Có thể thêm sự kiện cho nút "Tạo báo cáo" của form chính
-    // Nếu bạn muốn biểu đồ cập nhật ngay khi người dùng bấm nút "Tạo báo cáo"
-    // mà không load lại trang (cần ngăn chặn submit mặc định của form)
+
     const reportForm = document.querySelector('.search-form');
     if (reportForm) {
         reportForm.addEventListener('submit', function(event) {
-            // Ngăn chặn form submit theo cách truyền thống (load lại trang)
-            event.preventDefault();
+            //event.preventDefault();
 
-            // Cập nhật lại các biểu đồ với bộ lọc mới từ form
-            // Các hàm loadChartData sẽ tự đọc bộ lọc mới nhất từ form
             loadDayChartData(currentMonth, currentYear); // Load lại biểu đồ ngày với tháng/năm hiện tại và bộ lọc mới
             loadMonthlyChartData(currentYear);         // Load lại biểu đồ tháng với năm hiện tại và bộ lọc mới
             loadMultiYearChartData();                 // Load lại biểu đồ năm với bộ lọc mới
 
-            // Nếu bạn có logic hiển thị báo cáo dạng bảng ở phần khác của trang,
-            // bạn cũng cần kích hoạt nó ở đây thông qua AJAX POST hoặc GET tùy cách bạn xử lý.
-            // Đoạn code này chỉ tập trung vào việc cập nhật biểu đồ.
         });
     }
 });
@@ -481,12 +473,6 @@ function setupNavigationButtons() {
         loadMonthlyChartData(currentYear);
     });
 
-    // Các nút reset bộ lọc sản phẩm (nếu có) đã được xử lý ngầm khi form submit
-    // Nếu bạn muốn nút reset filter chỉ ảnh hưởng đến biểu đồ mà không load lại trang,
-    // bạn cần thêm logic vào đây để xóa giá trị trong các input filter,
-    // sau đó gọi lại các hàm loadChartData.
-    // Hiện tại, nút "Xóa báo cáo" trong form làm việc này bằng cách load lại trang /sales-report
-    // mà không có params, dẫn đến filter rỗng.
     const resetButtons = document.querySelectorAll('.reset-product-filter'); // ID/Class này không thấy trong HTML bạn cung cấp
     if (resetButtons && resetButtons.length > 0) {
         resetButtons.forEach(button => {
@@ -496,8 +482,6 @@ function setupNavigationButtons() {
                 document.getElementById('employeeName').value = ''; // Clear input
                 document.getElementById('productName').value = ''; // Clear input
 
-                // Sau khi reset form, load lại dữ liệu biểu đồ
-                // Các hàm loadChartData sẽ tự đọc giá trị rỗng vừa reset
                 loadDayChartData(currentMonth, currentYear);
                 loadMonthlyChartData(currentYear);
                 loadMultiYearChartData();
