@@ -248,15 +248,33 @@
                             <div class="border-t border-white mb-4"></div>
                             <div class="text-4xl font-bold text-center" id="total-revenue">0đ</div>
                         </div>
-                        <div class="dash-card-update flex justify-end items-end mt-4">
-                            <div class="text-xs flex items-center gap-1">
+                        <div class="dash-card-update flex justify-end items-end mt-4 pb-4">
+
+                        <div class="text-xs flex items-center gap-1">
                                 <i class="fas fa-clock text-white"></i>
                                 <span id="revenue-update-time"></span> - <span id="revenue-update-date"></span>
                             </div>
                         </div>
-                        <div class="dash-card-previous">
-                            <p class="text-sm font-semibold">Doanh thu tháng trước: 50,000,000đ</p>
-                            <p class="text-xs">Tăng 10% so với tháng trước đó</p>
+                        <div class="dash-card-previous ">
+                        <p id="prev" class="text-sm font-semibold">Tháng trước: 50,000,000đ</p>
+                            <p id="current" class="text-sm font-semibold">Tháng này: 100,000,000đ</p>
+                            <p id="change" class="text-xs">
+                                <script>
+                                    function parse(str) {
+                                        return parseInt(str.replace(/[^0-9]/g, ''));
+                                    }
+                                    const prev = parse(document.getElementById("prev").innerText);
+                                    const current = parse(document.getElementById("current").innerText);
+                                    const diff = current - prev;
+                                    const percent = Math.abs((diff / prev) * 100).toFixed(2);
+                                    document.currentScript.parentElement.innerText =
+                                        diff > 0
+                                            ? `Tăng ${diff.toLocaleString('vi-VN')}đ (${percent}%)`
+                                            : diff < 0
+                                                ? `Giảm ${Math.abs(diff).toLocaleString('vi-VN')}đ (${percent}%)`
+                                                : "Không thay đổi";
+                                </script>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -283,8 +301,9 @@
                             </div>
                         </div>
                         <div class="dash-card-previous">
-                            <p class="text-sm font-semibold">Sản phẩm tháng trước: 120</p>
-                            <p class="text-xs">Giảm 5% so với tháng trước đó</p>
+                            <p class="text-sm font-semibold">Nhập : 120</p>
+                            <p class="text-sm font-semibold">Xuất : 50</p>
+                            <p class="text-sm font-semibold">Sản Phẩm Hot : Iphone 13 </p>
                         </div>
                     </div>
                 </div>
@@ -311,8 +330,8 @@
                             </div>
                         </div>
                         <div class="dash-card-previous">
-                            <p class="text-sm font-semibold">Nhà cung cấp tháng trước: 15</p>
-                            <p class="text-xs">Tăng 3% so với tháng trước đó</p>
+                            <p class="text-sm font-semibold">Nhà cung cấp mới: 5 (lấy ncc chưa nhập bh)</p>
+                            <p class="text-sm font-semibold">Nhà cung cấp thân thiết : 10 (tổng trừ đi )</p>
                         </div>
                     </div>
                 </div>
@@ -339,8 +358,11 @@
                             </div>
                         </div>
                         <div class="dash-card-previous">
-                            <p class="text-sm font-semibold">Nhân viên tháng trước: 25</p>
-                            <p class="text-xs">Không đổi so với tháng trước đó</p>
+                            <p class="text-sm font-semibold">Nhân Viên Kho : 5</p>
+                            <p class="text-sm font-semibold">Nhân Viên Bán Hàng : 5</p>
+                            <p class="text-sm font-semibold">Nhân Viên Kinh Doanh : 5</p>
+                            <br>
+                            <p class="text-sm font-semibold">Nhân viên bán hàng tốt nhất : 5</p>
                         </div>
                     </div>
                 </div>
@@ -367,52 +389,13 @@
                             </div>
                         </div>
                         <div class="dash-card-previous">
-                            <p class="text-sm font-semibold">Khách hàng tháng trước: 300</p>
-                            <p class="text-xs">Tăng 8% so với tháng trước đó</p>
+                            <p class="text-sm font-semibold">Khách hàng mới: 300</p>
+                            <p class="text-sm font-semibold">Khách hàng thân thiết: 300</p>
+                            <p class="text-sm font-semibold">Khách hàng top 1: 300</p>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Bottom Section -->
-<!--            <div class="dash-bottom-section flex gap-4 w-full relative flex-wrap">-->
-<!--                <div class="dash-sales-analytics flex-[7] min-w-[300px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">-->
-<!--                    <div class="dash-header flex justify-between items-center mb-2">-->
-<!--                        <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>-->
-<!--                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"-->
-<!--                                onclick="toggleExpand('sales')">-->
-<!--                            <i class="fas fa-expand"></i>-->
-<!--                        </button>-->
-<!--                    </div>-->
-<!--                    <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy-->
-<!--                        phép amCharts.</p>-->
-<!--                    <div class="dash-chart-controls flex justify-between items-center mb-5">-->
-<!--                        <div class="dash-zoom flex gap-2">-->
-<!--                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"-->
-<!--                                    onclick="zoomChart('in')">⟐-->
-<!--                            </button>-->
-<!--                            <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"-->
-<!--                                    onclick="zoomChart('out')">⟑-->
-<!--                            </button>-->
-<!--                        </div>-->
-<!--                        <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"-->
-<!--                                onclick="resetChart()">Hiển thị tất cả-->
-<!--                        </button>-->
-<!--                    </div>-->
-<!--                    <canvas id="salesChart"></canvas>-->
-<!--                </div>-->
-
-<!--                <div class="dash-updates-profile flex-[3] min-w-[200px] max-h-[600px] bg-white rounded-lg p-5 shadow-md transition-all duration-300 overflow-hidden">-->
-<!--                    <div class="dash-header flex justify-between items-center mb-2">-->
-<!--                        <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>-->
-<!--                        <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"-->
-<!--                                onclick="toggleExpand('updates')">-->
-<!--                            <i class="fas fa-expand"></i>-->
-<!--                        </button>-->
-<!--                    </div>-->
-<!--                    <div id="changeLogsContainer"></div>-->
-<!--                </div>-->
-<!--            </div>-->
 
 
             <div class="dash-bottom-section flex gap-4 w-full relative flex-wrap">
