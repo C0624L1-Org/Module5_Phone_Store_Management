@@ -112,39 +112,58 @@ public class SaleReportServiceImpl implements ISaleReportService {
         List<Object[]> dailyStats = new ArrayList<>();
 
         if (invoices == null || invoices.isEmpty()) {
+            YearMonth yearMonth = YearMonth.of(year, month);
+            int daysInMonth = yearMonth.lengthOfMonth();
+            for (int day = 1; day <= daysInMonth; day++) {
+                dailyStats.add(new Object[]{day, 0L, 0L});
+            }
             return dailyStats;
         }
 
+        // Lọc hóa đơn theo tháng và năm
         List<Invoice> filteredInvoices = invoices.stream()
                 .filter(invoice -> invoice.getCreatedAt() != null &&
                         invoice.getCreatedAt().getYear() == year &&
                         invoice.getCreatedAt().getMonthValue() == month)
                 .collect(Collectors.toList());
 
+        // Nhóm hóa đơn theo ngày
         Map<Integer, List<Invoice>> invoicesGroupedByDay = filteredInvoices.stream()
                 .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getDayOfMonth()));
 
-
-        Map<Integer, Long> dailyCounts = invoicesGroupedByDay.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, // key là ngày (Integer)
-                        entry -> (long) entry.getValue().size() // value là số lượng hóa đơn (Long)
-                ));
-
+        // Tính tổng doanh thu mỗi ngày từ chi tiết hóa đơn
         Map<Integer, Long> dailyRevenues = invoicesGroupedByDay.entrySet().stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey, // key là ngày (Integer)
+                        Map.Entry::getKey,
                         entry -> entry.getValue().stream()
-                                .mapToLong(inv -> inv.getAmount() != null ? inv.getAmount() : 0L) // Lấy amount, coi null là 0
-                                .sum() // Tính tổng amount cho ngày đó
+                                .flatMap(invoice -> invoice.getInvoiceDetailList() != null
+                                        ? invoice.getInvoiceDetailList().stream()
+                                        : Stream.empty())
+                                .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
+                                .mapToLong(detail -> {
+                                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                                    BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
+                                    return sellingPrice.subtract(purchasePrice)
+                                            .multiply(BigDecimal.valueOf(detail.getQuantity()))
+                                            .longValue();
+                                })
+                                .sum()
                 ));
 
+        // Đếm số hóa đơn mỗi ngày
+        Map<Integer, Long> dailyCounts = invoicesGroupedByDay.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> (long) entry.getValue().size()
+                ));
+
+        // Tạo kết quả trả về, bao gồm những ngày không có dữ liệu
         YearMonth yearMonth = YearMonth.of(year, month);
         int daysInMonth = yearMonth.lengthOfMonth();
 
         for (int day = 1; day <= daysInMonth; day++) {
-            long count = dailyCounts.getOrDefault(day, 0L); // Lấy số lượng, mặc định là 0 nếu không có
-            long revenue = dailyRevenues.getOrDefault(day, 0L); // Lấy doanh thu, mặc định là 0 nếu không có
+            long revenue = dailyRevenues.getOrDefault(day, 0L);
+            long count = dailyCounts.getOrDefault(day, 0L);
 
             dailyStats.add(new Object[]{day, count, revenue});
         }
@@ -208,16 +227,44 @@ public class SaleReportServiceImpl implements ISaleReportService {
     }
 
     public List<Object[]> getTotalRevenueAndInvoiceCountByYear(List<Invoice> invoices) {
-        Map<Integer, Long> revenueByYear = invoices.stream()
-                .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getYear(),
-                        Collectors.summingLong(Invoice::getAmount)));
+        if (invoices == null || invoices.isEmpty()) {
+            return new ArrayList<>();
+        }
 
-        Map<Integer, Long> countByYear = invoices.stream()
-                .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getYear(),
-                        Collectors.counting()));
+        // Nhóm hóa đơn theo năm
+        Map<Integer, List<Invoice>> invoicesGroupedByYear = invoices.stream()
+                .filter(invoice -> invoice.getCreatedAt() != null)
+                .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getYear()));
 
+        // Tính lợi nhuận gộp (doanh thu thực) theo năm
+        Map<Integer, Long> revenueByYear = invoicesGroupedByYear.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().stream()
+                                .flatMap(invoice -> invoice.getInvoiceDetailList() != null
+                                        ? invoice.getInvoiceDetailList().stream()
+                                        : Stream.empty())
+                                .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
+                                .mapToLong(detail -> {
+                                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                                    BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
+                                    return sellingPrice.subtract(purchasePrice)
+                                            .multiply(BigDecimal.valueOf(detail.getQuantity()))
+                                            .longValue();
+                                })
+                                .sum()
+                ));
+
+        // Đếm số lượng hóa đơn theo năm
+        Map<Integer, Long> countByYear = invoicesGroupedByYear.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> (long) entry.getValue().size()
+                ));
+
+        // Gom dữ liệu ra list kết quả
         List<Object[]> result = new ArrayList<>();
-        Set<Integer> years = new TreeSet<>(revenueByYear.keySet());
+        Set<Integer> years = new TreeSet<>(revenueByYear.keySet()); // Sắp xếp theo năm tăng dần
 
         for (Integer year : years) {
             long totalRevenue = revenueByYear.getOrDefault(year, 0L);
