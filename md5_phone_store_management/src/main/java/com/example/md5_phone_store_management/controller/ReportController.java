@@ -17,7 +17,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.Year;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,14 +36,11 @@ public class ReportController {
     @Autowired
     private SaleReportServiceImpl saleReportServiceImpl;
 
-    private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter VNPAY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-
     @Autowired
     private CustomerService customerService;
 
     @GetMapping("/report-home")
-    public String showReportHome(Model model) {
+    public String showReportHome() {
         return "dashboard/report-management/report-home";
     }
 
@@ -201,17 +197,10 @@ public class ReportController {
             @RequestParam(value = "productName", required = false) String productName) {
 
 
-        List<Object[]> data =new ArrayList<>();
+        List<Object[]> data ;
         SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
         List<Invoice> invoices =reportData.getFilteredInvoices();
-        List<Object[]> result = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(invoices, month,year);
 
-        System.out.println("Thống kê hóa đơn hàng ngày cho tháng " + month + "/" + year + ":");
-        System.out.println("Ngày | Số lượng | Doanh thu");
-        System.out.println("-----|----------|----------");
-        for (Object[] dayData : result) {
-            System.out.printf("%-4d | %-8d | %d%n", dayData[0], dayData[1], dayData[2]);
-        }
         if (month != null && year != null) {
             data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
                     invoices, month,year);
