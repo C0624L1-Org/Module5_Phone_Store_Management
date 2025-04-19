@@ -4,14 +4,11 @@ import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.model.dto.SaleReportData;
 import com.example.md5_phone_store_management.service.CustomerService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
-import com.example.md5_phone_store_management.service.IProductService;
-import com.example.md5_phone_store_management.service.SalesReportService;
 import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
 import com.example.md5_phone_store_management.service.implement.SaleReportServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -31,9 +27,6 @@ import java.util.stream.Collectors;
 public class ReportController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
-
-    @Autowired
-    private SalesReportService salesReportService;
 
     @Autowired
     private CustomerServiceImpl customerServiceImpl;
