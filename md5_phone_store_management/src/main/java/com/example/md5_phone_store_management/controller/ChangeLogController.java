@@ -54,6 +54,82 @@ public class ChangeLogController {
     private TransactionInService transactionInService;
 
 
+    @GetMapping("/sales-staff-home-info")
+    public Map<String, Object> getSaleStaffDashboardData() {
+        Map<String, Object> response = new HashMap<>();
+//
+//        Tổng số đơn đã bán
+//        Tổng doanh thu đã bán
+//        Số đơn hôm nay
+//        Doanh thu hôm nay
+//        Số đơn tháng này
+//        Doanh thu tháng này
+//
+//        dựa vào id khách hàng hiển thị cá nhân
+
+
+        response.put("totalRevenue", iInvoiceService.totalRevenue());
+        response.put("countAllProducts", productService.countProducts());
+        response.put("topSellingProductName", invoiceDetailService.getTopSellingProductName());
+
+
+//
+        return response;
+    }
+
+
+    @GetMapping("/customers/{customerId}")
+    public ResponseEntity<Map<String, String>> getCustomerById(@PathVariable Long customerId) {
+        try {
+            Optional<Customer> customerOptional = Optional.ofNullable(iCustomerService.findCustomerById(Math.toIntExact(customerId)));
+            if (customerOptional.isPresent()) {
+                Customer customer = customerOptional.get();
+                Map<String, String> response = new HashMap<>();
+                response.put("name", customer.getFullName() != null ? customer.getFullName() : "không xác định");
+                return ResponseEntity.ok(response);
+            } else {
+                // Return 404 with a fallback name to match frontend expectation
+                Map<String, String> response = new HashMap<>();
+                response.put("name", "không xác định");
+                return ResponseEntity.status(404).body(response);
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching customer with ID " + customerId + ": " + e.getMessage());
+            e.printStackTrace();
+            Map<String, String> response = new HashMap<>();
+            response.put("name", "không xác định");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<Map<String, Object>> getProductById(@PathVariable Long productId) {
+        try {
+            Optional<Product> productOptional = Optional.ofNullable(iProductService.getProductById(Math.toIntExact(productId)));
+            if (productOptional.isPresent()) {
+                Product product = productOptional.get();
+                Map<String, Object> response = new HashMap<>();
+                response.put("productId", product.getProductID());
+                response.put("name", product.getName() != null ? product.getName() : "không xác định");
+                return ResponseEntity.ok(response);
+            } else {
+                // Return 404 with a fallback name to match frontend expectation
+                Map<String, Object> response = new HashMap<>();
+                response.put("productId", productId);
+                response.put("name", "không xác định");
+                return ResponseEntity.status(404).body(response);
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching product with ID " + productId + ": " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> response = new HashMap<>();
+            response.put("productId", productId);
+            response.put("name", "không xác định");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+
 
     @GetMapping("/lastUpdate/time/transactionin")
     public LocalDateTime getLastTransactionInUpdateTime() {
@@ -131,6 +207,7 @@ public class ChangeLogController {
 
 
 
+
     @GetMapping("/admin-dashboard-info")
     public Map<String, Object> getAdminDashboardData() {
         Map<String, Object> response = new HashMap<>();
@@ -141,9 +218,9 @@ public class ChangeLogController {
 
 //        Sản phẩm
         response.put("countAllProducts", productService.countProducts());
+        response.put("topSellingProductName", invoiceDetailService.getTopSellingProductName());
         response.put("countExportProducts", transactionOutService.countExportProducts());
         response.put("countImportProducts", transactionInService.countImportProducts());
-        response.put("topSellingProductName", invoiceDetailService.getTopSellingProductName());
         response.put("topSellingProductNamePurchaseQuantity", invoiceDetailService.getTopSellingProductNamePurchaseQuantity());
 //
 ////        Nhà cung cấp
@@ -230,32 +307,9 @@ public class ChangeLogController {
     }
 
 
-    @GetMapping("/products/{productId}")
-    public ResponseEntity<Map<String, Object>> getProductById(@PathVariable Long productId) {
-        try {
-            Optional<Product> productOptional = Optional.ofNullable(iProductService.getProductById(Math.toIntExact(productId)));
-            if (productOptional.isPresent()) {
-                Product product = productOptional.get();
-                Map<String, Object> response = new HashMap<>();
-                response.put("productId", product.getProductID());
-                response.put("name", product.getName() != null ? product.getName() : "không xác định");
-                return ResponseEntity.ok(response);
-            } else {
-                // Return 404 with a fallback name to match frontend expectation
-                Map<String, Object> response = new HashMap<>();
-                response.put("productId", productId);
-                response.put("name", "không xác định");
-                return ResponseEntity.status(404).body(response);
-            }
-        } catch (Exception e) {
-            System.err.println("Error fetching product with ID " + productId + ": " + e.getMessage());
-            e.printStackTrace();
-            Map<String, Object> response = new HashMap<>();
-            response.put("productId", productId);
-            response.put("name", "không xác định");
-            return ResponseEntity.status(500).body(response);
-        }
-    }
+
+
+
 
 
 
@@ -285,29 +339,7 @@ public class ChangeLogController {
 
 
 
-        @GetMapping("/customers/{customerId}")
-        public ResponseEntity<Map<String, String>> getCustomerById(@PathVariable Long customerId) {
-            try {
-                Optional<Customer> customerOptional = Optional.ofNullable(iCustomerService.findCustomerById(Math.toIntExact(customerId)));
-                if (customerOptional.isPresent()) {
-                    Customer customer = customerOptional.get();
-                    Map<String, String> response = new HashMap<>();
-                    response.put("name", customer.getFullName() != null ? customer.getFullName() : "không xác định");
-                    return ResponseEntity.ok(response);
-                } else {
-                    // Return 404 with a fallback name to match frontend expectation
-                    Map<String, String> response = new HashMap<>();
-                    response.put("name", "không xác định");
-                    return ResponseEntity.status(404).body(response);
-                }
-            } catch (Exception e) {
-                System.err.println("Error fetching customer with ID " + customerId + ": " + e.getMessage());
-                e.printStackTrace();
-                Map<String, String> response = new HashMap<>();
-                response.put("name", "không xác định");
-                return ResponseEntity.status(500).body(response);
-            }
-        }
+
 
 
 
