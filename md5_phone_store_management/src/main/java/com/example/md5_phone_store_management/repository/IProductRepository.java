@@ -17,6 +17,9 @@ import com.example.md5_phone_store_management.model.Product;
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Integer> {
 
+    @Query("SELECT p FROM Product p WHERE p.stockQuantity < 11")
+    List<Product> findAllProductsHaveStockQuantityUnderEleven();
+
 
     @Query("SELECT COUNT(p) FROM Product p WHERE p.retailPrice IS NOT NULL")
     Integer countProductsHaveRetailPrice();

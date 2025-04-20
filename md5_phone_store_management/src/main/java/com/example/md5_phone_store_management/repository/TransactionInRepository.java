@@ -17,6 +17,36 @@ import java.util.List;
 @Repository
 public interface TransactionInRepository extends JpaRepository<InventoryTransaction, Integer> {
 
+
+    // Count total number of IN transactions
+    @Query("SELECT COUNT(t) FROM InventoryTransaction t WHERE t.transactionType = 'IN'")
+    Integer countImportQuantity();
+
+    // Count IN transactions in the current month
+    @Query("SELECT COUNT(t) FROM InventoryTransaction t WHERE t.transactionType = 'IN' " +
+            "AND YEAR(t.transactionDate) = YEAR(CURRENT_DATE) " +
+            "AND MONTH(t.transactionDate) = MONTH(CURRENT_DATE)")
+    Integer countThisMonthImportQuantityProducts();
+
+    // Get supplierID from the most recent IN transaction
+    @Query("SELECT t.supplier.supplierID FROM InventoryTransaction t WHERE t.transactionType = 'IN' " +
+            "ORDER BY t.transactionDate DESC LIMIT 1")
+    Integer getLastestImportSupplierId();
+
+    // Get productID from the most recent IN transaction
+    @Query("SELECT t.product.productID FROM InventoryTransaction t WHERE t.transactionType = 'IN' " +
+            "ORDER BY t.transactionDate DESC LIMIT 1")
+    Integer getLastestImportProductId();
+
+
+
+
+
+
+
+
+
+
     // Đếm số lượng nhà cung cấp không trùng lặp (các giao dịch nhập kho)
     @Query("SELECT COALESCE(COUNT(DISTINCT it.supplier.supplierID), 0) " +
             "FROM InventoryTransaction it " +

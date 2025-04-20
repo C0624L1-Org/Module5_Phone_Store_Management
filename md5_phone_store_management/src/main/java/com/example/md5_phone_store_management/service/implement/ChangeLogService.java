@@ -529,6 +529,12 @@ public class ChangeLogService {
         return changeLogRepository.findAll(Sort.by(Sort.Direction.DESC, "timestamp"));
     }
 
+    public List<ChangeLog> getAllChangeLogForWarehouse() {
+        return changeLogRepository.getAllChangeLogForWarehouse(Sort.by(Sort.Direction.DESC, "timestamp"));
+    }
+
+
+
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleEntityChange(EntityChangeEvent event) {
         Object entity = event.getEntity();

@@ -37,6 +37,43 @@ public class TransactionInService implements ITransactionInService {
 
 
     @Override
+    public Integer countImportQuantity() {
+        return inventoryTransactionInRepo.countImportQuantity();
+    }
+
+    @Override
+    public Integer countThisMonthImportQuantityProducts() {
+        return inventoryTransactionInRepo.countThisMonthImportQuantityProducts();
+    }
+
+    @Override
+    public String getRecentImportSupplierName() {
+        Integer SupplierID = inventoryTransactionInRepo.getLastestImportSupplierId();
+        if (SupplierID == null || SupplierID == 0) {
+            throw new IllegalArgumentException("Không có nhà cung cấp nào được tìm thấy (ID không hợp lệ).");
+        }
+        Supplier supplier = supplierRepository.findById(SupplierID)
+                .orElseThrow(() -> new IllegalArgumentException("Nhà cung cấp với ID " + SupplierID + " không tồn tại."));
+        return supplier.getName();
+    }
+
+    @Override
+    public String getRecentImportProductName() {
+        Integer productID = inventoryTransactionInRepo.getLastestImportProductId();
+        if (productID == null || productID == 0) {
+            throw new IllegalArgumentException("Không có sản phẩm nào được tìm thấy (ID không hợp lệ).");
+        }
+        Product product = productRepository.findByProductID(productID);
+        return product.getName();
+    }
+
+
+
+
+
+
+
+    @Override
     public Integer countRegularSupplier() {
         return inventoryTransactionInRepo.countRegularSupplier();
     }

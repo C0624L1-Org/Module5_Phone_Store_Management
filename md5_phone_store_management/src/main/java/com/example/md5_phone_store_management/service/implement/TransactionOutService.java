@@ -1,7 +1,11 @@
 package com.example.md5_phone_store_management.service.implement;
 
 import com.example.md5_phone_store_management.model.InventoryTransaction;
+import com.example.md5_phone_store_management.model.Product;
+import com.example.md5_phone_store_management.model.Supplier;
 import com.example.md5_phone_store_management.model.TransactionType;
+import com.example.md5_phone_store_management.repository.IProductRepository;
+import com.example.md5_phone_store_management.repository.ISupplierRepository;
 import com.example.md5_phone_store_management.repository.TransactionOutRepository;
 import com.example.md5_phone_store_management.service.ITransactionOutService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +23,53 @@ import java.util.Optional;
 public class TransactionOutService implements ITransactionOutService {
 
     @Autowired
+    private IProductRepository productRepository;
+
+    @Autowired
+    private ISupplierRepository supplierRepository;
+
+    @Autowired
     private TransactionOutRepository transactionOutRepository;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+
+    @Override
+    public Integer countExportQuantity() {
+        return transactionOutRepository.countExportQuantity();
+    }
+
+    @Override
+    public Integer countThisMonthExportQuantityProducts() {
+        return transactionOutRepository.countThisMonthExportQuantityProducts();
+    }
+
+    @Override
+    public String getRecentExportSupplierName() {
+        Integer SupplierID = transactionOutRepository.getLastestExportSupplierId();
+        if (SupplierID == null || SupplierID == 0) {
+            throw new IllegalArgumentException("Không có nhà cung cấp nào được tìm thấy (ID không hợp lệ).");
+        }
+        Supplier supplier = supplierRepository.findById(SupplierID)
+                .orElseThrow(() -> new IllegalArgumentException("Nhà cung cấp với ID " + SupplierID + " không tồn tại."));
+        return supplier.getName();
+    }
+
+    @Override
+    public String getRecentExportProductName() {
+                Integer productID = transactionOutRepository.getLastestExportProductId();
+        if (productID == null || productID == 0) {
+            throw new IllegalArgumentException("Không có sản phẩm nào được tìm thấy (ID không hợp lệ).");
+        }
+        Product product = productRepository.findByProductID(productID);
+        return product.getName();
+    }
+
+
+
+
+
+
 
 
     @Override

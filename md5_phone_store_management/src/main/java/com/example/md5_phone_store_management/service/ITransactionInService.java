@@ -12,6 +12,11 @@ import java.util.List;
 public interface ITransactionInService {
 
 
+    Integer countImportQuantity();
+    Integer countThisMonthImportQuantityProducts();
+    String getRecentImportSupplierName();
+    String getRecentImportProductName();
+
 
     Integer countRegularSupplier();
     String getBestSupplierName();

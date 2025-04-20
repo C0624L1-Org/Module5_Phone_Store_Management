@@ -9,6 +9,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ITransactionOutService {
+
+
+    Integer countExportQuantity();
+    Integer countThisMonthExportQuantityProducts();
+    String getRecentExportSupplierName();
+    String getRecentExportProductName();
+
+
     Integer countExportProducts();
 
     List<InventoryTransaction> getAllOutTransactions();

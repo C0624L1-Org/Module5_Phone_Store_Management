@@ -56,23 +56,51 @@ public class ChangeLogController {
     private CustomerService customerService;
 
 
+    @GetMapping("/warehouse-staff-home/out-of-stock-warning")
+    public List<Map<String, Object>> getOutOfStockWarningForWareHouseStaffNotication() {
+        List<Product> products = productService.findAllProductsHaveStockQuantityUnderEleven();
+        return products.stream().map(product -> {
+            Map<String, Object> productMap = new HashMap<>();
+            productMap.put("productID", product.getProductID());
+            productMap.put("name", product.getName());
+            productMap.put("stockQuantity", product.getStockQuantity());
+            productMap.put("generalInfo", String.format(
+                    "CPU: %s, Storage: %s, Screen: %s, Camera: %s, Selfie: %s",
+                    product.getCPU() != null ? product.getCPU() : "N/A",
+                    product.getStorage() != null ? product.getStorage() : "N/A",
+                    product.getScreenSize() != null ? product.getScreenSize() : "N/A",
+                    product.getCamera() != null ? product.getCamera() : "N/A",
+                    product.getSelfie() != null ? product.getSelfie() : "N/A"
+            ));
+            productMap.put("supplierName", product.getSupplier() != null ? product.getSupplier().getName() : "N/A");
+            return productMap;
+        }).collect(Collectors.toList());
+    }
+
+
+    @GetMapping("/warehouse-staff-home/notification")
+    public List<ChangeLog> getAllChangeLogsForWareHouseStaffNotication() {
+        return changeLogService.getAllChangeLogForWarehouse();
+    }
+
+//    cập nhạt tg mới nhất chưa đúng cho xuuát nhập
+
     @GetMapping("/warehouse-staff-dashboard-info")
     public Map<String, Object> getWarehouseStaffDashboardData() {
         Map<String, Object> response = new HashMap<>();
 
+        response.put("allImportQuantity", transactionInService.countImportQuantity());
+        response.put("countAllImportProductQuantity", transactionInService.countImportProducts());
+        response.put("thisMonthImportQuantity", transactionInService.countThisMonthImportQuantityProducts());
+        response.put("recentImportSupplierName", transactionInService.getRecentImportSupplierName());
+        response.put("recentImportProductName", transactionInService.getRecentImportProductName());
 
-//        response.put("allImportQuantity", transactionInService.countImportQuantity());
-//        response.put("countAllImportProductQuantity", transactionInService.countImportProducts());
-//        response.put("thisMonthImportQuantity", productService.countProducts());
-//        response.put("recentImportSupplierName", transactionInService.getRecentImportSupplierName());
-//        response.put("recentImportProductName", transactionInService.getRecentImportProductName());
-//
-//
-//        response.put("allExportQuantity", transactionInService.countImportQuantity());
-//        response.put("countAllExportProductQuantity", transactionInService.countImportProducts());
-//        response.put("thisMonthExportQuantity", productService.countProducts());
-//        response.put("recentExportSupplierName", transactionInService.getRecentImportSupplierName());
-//        response.put("recentExportProductName", transactionInService.getRecentImportProductName());
+
+        response.put("allExportQuantity", transactionOutService.countExportQuantity());
+        response.put("countAllExportProductQuantity", transactionOutService.countExportProducts());
+        response.put("thisMonthExportQuantity", transactionOutService.countThisMonthExportQuantityProducts());
+        response.put("recentExportSupplierName", transactionOutService.getRecentExportSupplierName());
+        response.put("recentExportProductName", transactionOutService.getRecentExportProductName());
         
 ////        Nhà cung cấp
         response.put("countSuppliers", iSupplierService.countSuppliers());
@@ -85,11 +113,6 @@ public class ChangeLogController {
     }
 
 
-    @GetMapping("/warehouse-staff-home/notification")
-    public List<ChangeLog> getAllChangeLogsForWareHouseStaffNotication() {
-        System.out.println("đã vào");
-        return changeLogService.getAllChangeLogs();
-    }
 
     @GetMapping("/admin-dashboard-info")
     public Map<String, Object> getAdminDashboardData() {

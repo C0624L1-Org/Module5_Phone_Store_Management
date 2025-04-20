@@ -18,6 +18,28 @@ import java.util.List;
 @Repository
 public interface TransactionOutRepository extends JpaRepository<InventoryTransaction, Integer> {
 
+
+    @Query("SELECT COUNT(t) FROM InventoryTransaction t WHERE t.transactionType = 'OUT'")
+    Integer countExportQuantity();
+
+    // Count OUT transactions in the current month
+    @Query("SELECT COUNT(t) FROM InventoryTransaction t WHERE t.transactionType = 'OUT' " +
+            "AND YEAR(t.transactionDate) = YEAR(CURRENT_DATE) " +
+            "AND MONTH(t.transactionDate) = MONTH(CURRENT_DATE)")
+    Integer countThisMonthExportQuantityProducts();
+
+    // Get supplierID from the most recent OUT transaction
+    @Query("SELECT t.supplier.supplierID FROM InventoryTransaction t WHERE t.transactionType = 'OUT' " +
+            "ORDER BY t.transactionDate DESC LIMIT 1")
+    Integer getLastestExportSupplierId();
+
+    // Get productID from the most recent OUT transaction
+    @Query("SELECT t.product.productID FROM InventoryTransaction t WHERE t.transactionType = 'OUT' " +
+            "ORDER BY t.transactionDate DESC LIMIT 1")
+    Integer getLastestExportProductId();
+
+
+
     @Query("SELECT COALESCE(SUM(it.quantity), 0) FROM InventoryTransaction it WHERE it.transactionType = 'OUT'")
     Integer countExportProducts();
 

@@ -260,6 +260,11 @@ public class ProductService implements IProductService {
     private ApplicationEventPublisher eventPublisher;
 
     @Override
+    public List<Product> findAllProductsHaveStockQuantityUnderEleven() {
+        return productRepository.findAllProductsHaveStockQuantityUnderEleven();
+    }
+
+    @Override
     public Page<Product> searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(
             String name, String supplierName, Integer purchasePrice, boolean noRetailPrice, Pageable pageable) {
         if (noRetailPrice) {
@@ -453,6 +458,8 @@ public class ProductService implements IProductService {
     public long countProducts() {
         return productRepository.count();
     }
+
+
 
     @Override
     public Integer countProductsHaveRetailPrice() {
