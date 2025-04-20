@@ -118,7 +118,7 @@
         const menuButton = document.querySelector('.menu-button');
         const dropdownMenu = document.querySelector('.dropdown-menu');
         const overlay = document.querySelector('.overlay');
-        
+
         // Thực hiện ngay sau khi DOM load
         forceClearSearch();
 
@@ -133,7 +133,7 @@
             if (!e.target.closest('.menu-container')) {
                 dropdownMenu.classList.remove('show');
                 overlay.classList.remove('show');
-                
+
                 // Đóng tất cả submenu khi click ra ngoài
                 document.querySelectorAll('.submenu').forEach(sub => {
                     sub.classList.remove('active');

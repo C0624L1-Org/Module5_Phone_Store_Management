@@ -1,40 +1,25 @@
 package com.example.md5_phone_store_management.controller;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.example.md5_phone_store_management.model.*;
+import com.example.md5_phone_store_management.model.dto.SaleReportData;
+import com.example.md5_phone_store_management.service.CustomerService;
+import com.example.md5_phone_store_management.service.IInvoiceService;
+import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
+import com.example.md5_phone_store_management.service.implement.SaleReportServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Gender;
-import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.service.CustomerService;
-import com.example.md5_phone_store_management.service.IInvoiceService;
-import com.example.md5_phone_store_management.service.SalesReportService;
-import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("")
@@ -43,23 +28,19 @@ public class ReportController {
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     @Autowired
-    private SalesReportService salesReportService;
-
-    @Autowired
     private CustomerServiceImpl customerServiceImpl;
 
     @Autowired
     private IInvoiceService iInvoiceService;
 
-
-    private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter VNPAY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    @Autowired
+    private SaleReportServiceImpl saleReportServiceImpl;
 
     @Autowired
     private CustomerService customerService;
 
     @GetMapping("/report-home")
-    public String showReportHome(Model model) {
+    public String showReportHome() {
         return "dashboard/report-management/report-home";
     }
 
@@ -124,52 +105,35 @@ public class ReportController {
     }
 
     @GetMapping("/sales-report")
-    public String showSalesReportForm(Model model) {
-        model.addAttribute("startDate", "1970-01-01");
-        model.addAttribute("endDate", LocalDate.now().format(DATE_INPUT_FORMATTER));
+    public String showSalesReportForm(@RequestParam(value = "paymentMethod", required = false) PaymentMethod paymentMethod,
+                                      @RequestParam(value = "employeeName", required = false) String employeeName,
+                                      @RequestParam(value = "productName", required = false) String productName,
+                                      Model model) {
+        model.addAttribute("paymentMethods", PaymentMethod.values());
+        model.addAttribute("paymentMethod", paymentMethod);
+        model.addAttribute("employeeName", employeeName);
+        model.addAttribute("productName", productName);
         return "dashboard/report-management/sales-report";
     }
 
     @PostMapping("/sales-report")
     public String generateSalesReport(
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            @RequestParam(required = false) String productId,
-            @RequestParam(defaultValue = "false") boolean compareEnabled,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate compareStartDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate compareEndDate,
+            @RequestParam(value = "paymentMethod", required = false) PaymentMethod paymentMethod,
+            @RequestParam(value = "employeeName", required = false) String employeeName,
+            @RequestParam(value = "productName", required = false) String productName,
             @RequestParam(defaultValue = "0") int page, // Thêm tham số page
             Model model) {
-
-        final int PAGE_SIZE = 3; // 3 sản phẩm mỗi trang
-
-        model.addAttribute("startDate", startDate != null ? startDate.format(DATE_INPUT_FORMATTER) : "");
-        model.addAttribute("endDate", endDate != null ? endDate.format(DATE_INPUT_FORMATTER) : "");
-        model.addAttribute("productId", productId);
-        model.addAttribute("compareEnabled", compareEnabled);
-        model.addAttribute("compareStartDate", compareStartDate != null ? compareStartDate.format(DATE_INPUT_FORMATTER) : "");
-        model.addAttribute("compareEndDate", compareEndDate != null ? compareEndDate.format(DATE_INPUT_FORMATTER) : "");
-
-        if (startDate == null || endDate == null) {
-            model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.");
-            return "dashboard/report-management/sales-report";
-        }
-
+        SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
+        List<Product> products =reportData.getProducts();
+        final int PAGE_SIZE = 3;// 3 sản phẩm mỗi trang
+        model.addAttribute("paymentMethods", PaymentMethod.values());
+        model.addAttribute("paymentMethod", paymentMethod);
+        model.addAttribute("employeeName", employeeName);
+        model.addAttribute("productName", productName);
+        model.addAttribute("products", products);
         try {
 
-            LocalDateTime startDateTime = startDate.atStartOfDay();
-            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-
-            Integer parsedProductId = null;
-            if (productId != null && !productId.trim().isEmpty()) {
-                parsedProductId = Integer.parseInt(productId);
-                if (!salesReportService.isProductIdValid(parsedProductId)) {
-                    model.addAttribute("errorMessage", "Mã sản phẩm không tồn tại.");
-                    return "dashboard/report-management/sales-report";
-                }
-            }
-
-            Map<String, Object> report = salesReportService.generateSalesReport(startDateTime, endDateTime, parsedProductId);
+            Map<String, Object> report = saleReportServiceImpl.generateSalesReport(reportData.getFilteredInvoices());
             if (report == null) {
                 model.addAttribute("messageType", "error");
                 model.addAttribute("message", "Không có dữ liệu trong khoảng thời gian này hoặc mã sản phẩm không hợp lệ.");
@@ -177,13 +141,13 @@ public class ReportController {
             }
 
             // Nếu có mã sản phẩm, lấy thông tin sản phẩm và gán cho biểu đồ
-            if (parsedProductId != null) {
-                String productName = getProductNameFromReport(parsedProductId, report);
+        /*    if (parsedProductId != null) {
+                 productName = getProductNameFromReport(parsedProductId, report);
                 if (productName != null) {
                     model.addAttribute("chartProductName", productName);
                     model.addAttribute("chartProductId", parsedProductId);
                 }
-            }
+            }*/
 
             // Lấy revenueByProduct và phân trang
             Map<Integer, Long> revenueByProduct = (Map<Integer, Long>) report.get("revenueByProduct");
@@ -223,49 +187,29 @@ public class ReportController {
 
         return "dashboard/report-management/sales-report";
     }
-
-    // Thêm phương thức lấy tên sản phẩm
-    private String getProductNameFromReport(Integer productId, Map<String, Object> report) {
-        if (productId == null) {
-            return null;
-        }
-
-        try {
-            // Lấy thông tin từ productDetails nếu có
-            if (report != null && report.containsKey("productDetails")) {
-                Map<Integer, String> productDetails = (Map<Integer, String>) report.get("productDetails");
-                if (productDetails.containsKey(productId)) {
-                    return productDetails.get(productId);
-                }
-            }
-            return "Sản phẩm #" + productId;
-        } catch (Exception e) {
-            System.err.println("Error getting product name: " + e.getMessage());
-            e.printStackTrace();
-            return "Sản phẩm #" + productId;
-        }
-    }
-
     // API cho biểu đồ doanh thu theo ngày trong tháng
     @GetMapping("/api/chart/day")
     public ResponseEntity<?> getDailyRevenueChart(
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer productId) {
+            @RequestParam(value = "paymentMethod", required = false) PaymentMethod paymentMethod,
+            @RequestParam(value = "employeeName", required = false) String employeeName,
+            @RequestParam(value = "productName", required = false) String productName) {
 
-        List<Object[]> data;
+
+        List<Object[]> data ;
+        SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
+        List<Invoice> invoices =reportData.getFilteredInvoices();
 
         if (month != null && year != null) {
-            if (productId != null) {
-                // Lấy dữ liệu theo ngày trong tháng và sản phẩm
-                data = iInvoiceService.getDailyInvoiceStatsByMonthAndYear(month, year);
-            } else {
-                // Lấy dữ liệu theo ngày trong tháng
-                data = iInvoiceService.getDailyInvoiceStatsByMonthAndYear(month, year);
-            }
+            data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
+                    invoices, month,year);
         } else {
-            // Lấy dữ liệu mặc định
-            data = iInvoiceService.getDailyInvoiceStats();
+            LocalDate now = LocalDate.now();
+            int reportMonth = now.getMonthValue(); // tháng hiện tại
+            int reportYear = now.getYear();
+            data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
+                    invoices, reportYear,reportMonth);
         }
 
         if (data == null || data.isEmpty()) {
@@ -287,10 +231,6 @@ public class ReportController {
         response.put("invoiceCounts", invoiceCounts);
         response.put("revenueSums", revenueSums);
 
-        // Thêm thông tin sản phẩm nếu có
-        if (productId != null) {
-            response.put("productId", productId);
-        }
 
         return ResponseEntity.ok(response);
     }
@@ -299,21 +239,21 @@ public class ReportController {
     @GetMapping("/api/revenue/monthly")
     public ResponseEntity<?> getMonthlyRevenueChart(
             @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer productId) {
+            @RequestParam(value = "paymentMethod", required = false) PaymentMethod paymentMethod,
+            @RequestParam(value = "employeeName", required = false) String employeeName,
+            @RequestParam(value = "productName", required = false) String productName) {
 
         List<Object[]> data;
-
+        SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
+        List<Invoice> invoices =reportData.getFilteredInvoices();
         if (year != null) {
-            if (productId != null) {
-                // Lấy dữ liệu theo tháng trong năm và sản phẩm
-                data = iInvoiceService.getMonthlyInvoiceStatsByYear(year);
-            } else {
-                // Lấy dữ liệu theo tháng trong năm
-                data = iInvoiceService.getMonthlyInvoiceStatsByYear(year);
-            }
+           data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonth(
+                  invoices, year);
         } else {
             // Lấy dữ liệu mặc định
-            data = iInvoiceService.getMonthlyInvoiceStats();
+            int currentYear = Year.now().getValue(); // Lấy năm hiện tại an toàn
+            data = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonth(
+                    invoices, currentYear);
         }
 
         if (data == null || data.isEmpty()) {
@@ -335,28 +275,20 @@ public class ReportController {
         response.put("invoiceCounts", invoiceCounts);
         response.put("revenueSums", revenueSums);
 
-        // Thêm thông tin sản phẩm nếu có
-        if (productId != null) {
-            response.put("productId", productId);
-        }
-
         return ResponseEntity.ok(response);
     }
 
     // API cho biểu đồ doanh thu theo 3 năm gần nhất
     @GetMapping("/api/revenue/yearly")
     public ResponseEntity<?> getYearlyRevenueChart(
-            @RequestParam(required = false) Integer productId) {
+            @RequestParam(value = "paymentMethod", required = false) PaymentMethod paymentMethod,
+            @RequestParam(value = "employeeName", required = false) String employeeName,
+            @RequestParam(value = "productName", required = false) String productName) {
 
         List<Object[]> allYearlyData;
-
-        if (productId != null) {
-            // Lấy dữ liệu theo năm và sản phẩm
-            allYearlyData = iInvoiceService.getYearlyInvoiceStats();
-        } else {
-            // Lấy dữ liệu theo năm
-            allYearlyData = iInvoiceService.getYearlyInvoiceStats();
-        }
+        SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
+        allYearlyData=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByYear(
+                reportData.getFilteredInvoices());
 
         if (allYearlyData == null || allYearlyData.isEmpty()) {
             return ResponseEntity.ok(Collections.emptyMap());
@@ -385,11 +317,6 @@ public class ReportController {
         response.put("years", years);
         response.put("invoiceCounts", invoiceCounts);
         response.put("revenueSums", revenueSums);
-
-        // Thêm thông tin sản phẩm nếu có
-        if (productId != null) {
-            response.put("productId", productId);
-        }
 
         return ResponseEntity.ok(response);
     }

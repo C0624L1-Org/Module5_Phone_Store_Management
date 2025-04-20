@@ -2,10 +2,12 @@ package com.example.md5_phone_store_management.repository;
 
 import java.util.List;
 
+import com.example.md5_phone_store_management.model.PaymentMethod;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.md5_phone_store_management.model.Customer;
@@ -96,5 +98,82 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
            "GROUP BY YEAR(created_at) " +
            "ORDER BY year", nativeQuery = true)
     List<Object[]> getYearlyInvoiceStats();
+    // Filter
+    // Truy vấn doanh thu theo ngày trong tháng
+    @Query("""
+        SELECT 
+            FUNCTION('DATE', i.createdAt) AS date,
+            COUNT(DISTINCT i.id) AS totalInvoice,
+            SUM(i.amount) AS totalRevenue
+        FROM Invoice i
+        JOIN i.invoiceDetailList d
+        JOIN d.product p
+        LEFT JOIN i.employee e
+        WHERE 
+            i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS
+            AND (:paymentMethod IS NULL OR i.paymentMethod = :paymentMethod)
+            AND (:employeeName IS NULL OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :employeeName, '%')))
+            AND (:productName IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%')))
+            AND FUNCTION('MONTH', i.createdAt) = :month
+            AND FUNCTION('YEAR', i.createdAt) = :year
+        GROUP BY FUNCTION('DATE', i.createdAt)
+        ORDER BY FUNCTION('DATE', i.createdAt)
+    """)
+    List<Object[]> getDailyRevenueReport(
+            @Param("month") int month,
+            @Param("year") int year,
+            @Param("paymentMethod") PaymentMethod paymentMethod,
+            @Param("employeeName") String employeeName,
+            @Param("productName") String productName
+    );
 
+    // Truy vấn doanh thu theo tháng trong năm
+    @Query("""
+        SELECT 
+            FUNCTION('MONTH', i.createdAt) AS month,
+            COUNT(DISTINCT i.id) AS totalInvoice,
+            SUM(i.amount) AS totalRevenue
+        FROM Invoice i
+        JOIN i.invoiceDetailList d
+        JOIN d.product p
+        LEFT JOIN i.employee e
+        WHERE 
+            i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS
+            AND FUNCTION('YEAR', i.createdAt) = :year
+            AND (:paymentMethod IS NULL OR i.paymentMethod = :paymentMethod)
+            AND (:employeeName IS NULL OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :employeeName, '%')))
+            AND (:productName IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%')))
+        GROUP BY FUNCTION('MONTH', i.createdAt)
+        ORDER BY FUNCTION('MONTH', i.createdAt)
+    """)
+    List<Object[]> getMonthlyRevenueReport(
+            @Param("year") int year,
+            @Param("paymentMethod") PaymentMethod paymentMethod,
+            @Param("employeeName") String employeeName,
+            @Param("productName") String productName
+    );
+
+    // Truy vấn doanh thu theo các năm
+    @Query("""
+        SELECT 
+            FUNCTION('YEAR', i.createdAt) AS year,
+            COUNT(DISTINCT i.id) AS totalInvoice,
+            SUM(i.amount) AS totalRevenue
+        FROM Invoice i
+        JOIN i.invoiceDetailList d
+        JOIN d.product p
+        LEFT JOIN i.employee e
+        WHERE 
+            i.status = com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS
+            AND (:paymentMethod IS NULL OR i.paymentMethod = :paymentMethod)
+            AND (:employeeName IS NULL OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :employeeName, '%')))
+            AND (:productName IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%')))
+        GROUP BY FUNCTION('YEAR', i.createdAt)
+        ORDER BY FUNCTION('YEAR', i.createdAt)
+    """)
+    List<Object[]> getYearlyRevenueReport(
+            @Param("paymentMethod") PaymentMethod paymentMethod,
+            @Param("employeeName") String employeeName,
+            @Param("productName") String productName
+    );
 }
