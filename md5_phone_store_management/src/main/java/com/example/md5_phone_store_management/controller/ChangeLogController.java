@@ -53,14 +53,17 @@ public class ChangeLogController {
     @Autowired
     private TransactionInService transactionInService;
 
+
+
     @GetMapping("/lastUpdate/time/transactionin")
     public LocalDateTime getLastTransactionInUpdateTime() {
-        return changeLogService.getLastUpdateTime("transactionin");
+        return changeLogService.getLastUpdateTimeWithEntityNameAndFieldName("inventorytransaction", "transactionin");
+
     }
 
     @GetMapping("/lastUpdate/time/transactionout")
     public LocalDateTime getLastTransactionOutUpdateTime() {
-        return changeLogService.getLastUpdateTime("transactionout");
+        return changeLogService.getLastUpdateTimeWithEntityNameAndFieldName("inventorytransaction", "transactionout");
     }
 
     @GetMapping("/lastUpdate/time/suppliers")

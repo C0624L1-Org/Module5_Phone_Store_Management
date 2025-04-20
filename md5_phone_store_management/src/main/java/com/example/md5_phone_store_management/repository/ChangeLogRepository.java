@@ -11,7 +11,9 @@ import java.util.List;
 @Repository
 public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
 
-    @Query("SELECT c FROM ChangeLog c WHERE LOWER(c.entityName) IN ('transactionout', 'transactionin', 'supplier')")
+    List<ChangeLog> findTopByEntityNameAndFieldNameOrderByTimestampDesc(String entityName, String fieldName);
+
+    @Query("SELECT c FROM ChangeLog c WHERE LOWER(c.entityName) IN ( 'inventorytransaction', 'supplier')")
     List<ChangeLog> getAllChangeLogForWarehouse(Sort sort);
 
     List<ChangeLog> findTopByEntityNameOrderByTimestampDesc(String entityName);

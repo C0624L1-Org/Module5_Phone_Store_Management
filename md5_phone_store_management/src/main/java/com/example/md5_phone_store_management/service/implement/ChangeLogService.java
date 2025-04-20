@@ -509,6 +509,14 @@ public class ChangeLogService {
         this.entityManager = entityManager;
     }
 
+    public LocalDateTime getLastUpdateTimeWithEntityNameAndFieldName(String entityName, String field_name) {
+        List<ChangeLog> changeLogs = changeLogRepository.findTopByEntityNameAndFieldNameOrderByTimestampDesc(entityName, field_name);
+        if (changeLogs != null && !changeLogs.isEmpty()) {
+            return changeLogs.get(0).getTimestamp();
+        }
+        return null;
+    }
+
     public LocalDateTime getLastUpdateTime(String entityName) {
         List<ChangeLog> changeLogs = changeLogRepository.findTopByEntityNameOrderByTimestampDesc(entityName);
         if (changeLogs != null && !changeLogs.isEmpty()) {
@@ -564,6 +572,66 @@ public class ChangeLogService {
         }
 
         switch (action) {
+
+            case "INSERT_TRANSACTIONOUT":
+                System.out.println("Processing INSERT_TRANSACTIONOUT for transactionout");
+                String insertValueTransOut = ((InventoryTransaction) entity).getProduct() != null ?
+                        ((InventoryTransaction) entity).getProduct().getName() :
+                        String.valueOf(((InventoryTransaction) entity).getTransactionID());
+                saveChangeLog(entity, "INSERT", "transactionout", "transactionout", insertValueTransOut, employeeId);
+                break;
+
+            case "UPDATE_TRANSACTIONOUT":
+                System.out.println("Processing UPDATE_TRANSACTIONOUT for transactionout");
+                String newValueTransOut = ((InventoryTransaction) entity).getProduct() != null ?
+                        ((InventoryTransaction) entity).getProduct().getName() :
+                        String.valueOf(((InventoryTransaction) entity).getTransactionID());
+                String oldValueTransOut = oldEntity != null ?
+                        (((InventoryTransaction) oldEntity).getProduct() != null ?
+                                ((InventoryTransaction) oldEntity).getProduct().getName() :
+                                String.valueOf(((InventoryTransaction) oldEntity).getTransactionID())) :
+                        null;
+                saveChangeLog(entity, "UPDATE", "transactionout", "transactionout", oldValueTransOut, employeeId);
+                break;
+
+            case "DELETE_TRANSACTIONOUT":
+                System.out.println("Processing DELETE_TRANSACTIONOUT for transactionout");
+                String deleteValueTransOut = ((InventoryTransaction) entity).getProduct() != null ?
+                        ((InventoryTransaction) entity).getProduct().getName() :
+                        String.valueOf(((InventoryTransaction) entity).getTransactionID());
+                saveChangeLog(entity, "DELETE", "transactionout", "transactionout", deleteValueTransOut, employeeId);
+                break;
+
+
+            case "INSERT_TRANSACTIONIN":
+                System.out.println("Processing INSERT_TRANSACTIONIN for transactionin");
+                String insertValueTrans = ((InventoryTransaction) entity).getProduct() != null ?
+                        ((InventoryTransaction) entity).getProduct().getName() :
+                        String.valueOf(((InventoryTransaction) entity).getTransactionID());
+                saveChangeLog(entity, "INSERT", "transactionin", null, insertValueTrans, employeeId);
+                break;
+
+            case "UPDATE_TRANSACTIONIN":
+                System.out.println("Processing UPDATE_TRANSACTIONIN for transactionin");
+                String newValueTrans = ((InventoryTransaction) entity).getProduct() != null ?
+                        ((InventoryTransaction) entity).getProduct().getName() :
+                        String.valueOf(((InventoryTransaction) entity).getTransactionID());
+                String oldValueTrans = oldEntity != null ?
+                        (((InventoryTransaction) oldEntity).getProduct() != null ?
+                                ((InventoryTransaction) oldEntity).getProduct().getName() :
+                                String.valueOf(((InventoryTransaction) oldEntity).getTransactionID())) :
+                        null;
+                saveChangeLog(entity, "UPDATE", "transactionin", oldValueTrans, newValueTrans, employeeId);
+                break;
+
+            case "DELETE_TRANSACTIONIN":
+                System.out.println("Processing DELETE_TRANSACTIONIN for transactionin");
+                String deleteValueTrans = ((InventoryTransaction) entity).getProduct() != null ?
+                        ((InventoryTransaction) entity).getProduct().getName() :
+                        String.valueOf(((InventoryTransaction) entity).getTransactionID());
+                saveChangeLog(entity, "DELETE", "transactionin", deleteValueTrans, deleteValueTrans, employeeId);
+                break;
+
             case "INSERT_EMPLOYEE":
                 System.out.println("Processing INSERT_EMPLOYEE for employee");
                 String insertValueEmp = ((Employee) entity).getFullName() != null ?
