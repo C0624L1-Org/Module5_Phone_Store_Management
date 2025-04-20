@@ -52,8 +52,22 @@ public class ChangeLogController {
 
     @Autowired
     private TransactionInService transactionInService;
-    @Autowired
-    private CustomerService customerService;
+
+    @GetMapping("/lastUpdate/time/transactionin")
+    public LocalDateTime getLastTransactionInUpdateTime() {
+        return changeLogService.getLastUpdateTime("transactionin");
+    }
+
+    @GetMapping("/lastUpdate/time/transactionout")
+    public LocalDateTime getLastTransactionOutUpdateTime() {
+        return changeLogService.getLastUpdateTime("transactionout");
+    }
+
+    @GetMapping("/lastUpdate/time/suppliers")
+    public LocalDateTime getLastSupplierUpdateTime() {
+        return changeLogService.getLastUpdateTime("supplier");
+    }
+
 
 
     @GetMapping("/warehouse-staff-home/out-of-stock-warning")
@@ -369,10 +383,6 @@ public class ChangeLogController {
         return changeLogService.getLastUpdateTime("customer");
     }
 
-    @GetMapping("/lastUpdate/time/suppliers")
-    public LocalDateTime getLastSupplierUpdateTime() {
-        return changeLogService.getLastUpdateTime("supplier");
-    }
 
     @GetMapping("/lastUpdate/time/products")
     public LocalDateTime getLastProductUpdateTime() {
