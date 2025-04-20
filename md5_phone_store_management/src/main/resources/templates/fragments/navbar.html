@@ -14,22 +14,39 @@
                     <img src="/img/fpt_logo.png" alt="Shop Logo">
                 </a>
                 <div class="menu-container">
-                    <div class="menu-button">
-                        <i>☰</i>
-                        <span>Danh mục</span>
-                    </div>
                     <!-- Dropdown Menu -->
-                    <div class="dropdown-menu">
-                        <div class="menu-item">Danh mục 1</div>
-                        <div class="menu-item">Danh mục 2</div>
-                        <div class="menu-item">Danh mục 3</div>
-                        <div class="menu-item">Danh mục 4</div>
+                    <div class="menu-container">
+                        <div class="menu-button">
+                            <i>☰</i>
+                            <span>Nhà Cung Cấp</span>
+                        </div>
+                        <!-- Dropdown Menu -->
+                        <div class="dropdown-menu">
+                            <!-- Menu cấp 1: Danh sách nhà cung cấp -->
+                            <div th:each="supplier : ${suppliers}" class="menu-item-parent">
+                                <div class="menu-item-supplier">
+                                    <span th:text="${supplier.name}"></span>
+                                    <i class="fas fa-angle-right submenu-icon"></i>
+                                </div>
+                                <!-- Menu cấp 2: Sản phẩm của nhà cung cấp -->
+                                <div class="submenu">
+                                    <div th:each="product : ${supplierProducts.get(supplier.supplierID)}" class="submenu-item">
+                                        <a th:href="@{/dashboard/products/detail/{id}(id=${product.productID})}" th:text="${product.name}"></a>
+                                    </div>
+                                    <div th:if="${supplierProducts.get(supplier.supplierID).empty}" class="submenu-item">
+                                        <span class="text-muted">Không có sản phẩm</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:if="${suppliers.empty}" class="menu-item">
+                                <span class="text-muted">Không có nhà cung cấp</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="search-container">
-                <!-- Không dùng form hoặc dùng form với onsubmit="return false;" -->
                 <div class="search-inner">
                     <input type="text" id="search-input" autocomplete="off" placeholder="Nhập tên điện thoại cần tìm...">
                     <button type="button" id="search-button"><i class="fas fa-search"></i></button>
@@ -101,11 +118,11 @@
         const menuButton = document.querySelector('.menu-button');
         const dropdownMenu = document.querySelector('.dropdown-menu');
         const overlay = document.querySelector('.overlay');
+        
         // Thực hiện ngay sau khi DOM load
         forceClearSearch();
 
-        // Loại bỏ setInterval và chỉ gọi forceClearSearch khi cần thiết
-
+        // Xử lý sự kiện cho menu chính
         menuButton.addEventListener('click', function(e) {
             e.stopPropagation();
             dropdownMenu.classList.toggle('show');
@@ -116,6 +133,11 @@
             if (!e.target.closest('.menu-container')) {
                 dropdownMenu.classList.remove('show');
                 overlay.classList.remove('show');
+                
+                // Đóng tất cả submenu khi click ra ngoài
+                document.querySelectorAll('.submenu').forEach(sub => {
+                    sub.classList.remove('active');
+                });
             }
         });
 
