@@ -56,6 +56,40 @@ public class ChangeLogController {
     private CustomerService customerService;
 
 
+    @GetMapping("/warehouse-staff-dashboard-info")
+    public Map<String, Object> getWarehouseStaffDashboardData() {
+        Map<String, Object> response = new HashMap<>();
+
+
+//        response.put("allImportQuantity", transactionInService.countImportQuantity());
+//        response.put("countAllImportProductQuantity", transactionInService.countImportProducts());
+//        response.put("thisMonthImportQuantity", productService.countProducts());
+//        response.put("recentImportSupplierName", transactionInService.getRecentImportSupplierName());
+//        response.put("recentImportProductName", transactionInService.getRecentImportProductName());
+//
+//
+//        response.put("allExportQuantity", transactionInService.countImportQuantity());
+//        response.put("countAllExportProductQuantity", transactionInService.countImportProducts());
+//        response.put("thisMonthExportQuantity", productService.countProducts());
+//        response.put("recentExportSupplierName", transactionInService.getRecentImportSupplierName());
+//        response.put("recentExportProductName", transactionInService.getRecentImportProductName());
+        
+////        Nhà cung cấp
+        response.put("countSuppliers", iSupplierService.countSuppliers());
+        response.put("regularSupplier",transactionInService.countRegularSupplier());
+        response.put("newSupplier",iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
+        response.put("bestSupplierName",transactionInService.getBestSupplierName());
+        response.put("bestSupplierImportQuantity",transactionInService.getBestSupplierImportQuantity());
+//
+        return response;
+    }
+
+
+    @GetMapping("/warehouse-staff-home/notification")
+    public List<ChangeLog> getAllChangeLogsForWareHouseStaffNotication() {
+        System.out.println("đã vào");
+        return changeLogService.getAllChangeLogs();
+    }
 
     @GetMapping("/admin-dashboard-info")
     public Map<String, Object> getAdminDashboardData() {
