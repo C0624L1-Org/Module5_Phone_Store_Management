@@ -216,7 +216,16 @@ public class TransactionOutService implements ITransactionOutService {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
+
+
+
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+
+    public List<InventoryTransaction> getAllOutTransactionsByEmployee(Integer employeeID) {
+        return transactionOutRepository.findByEmployeeEmployeeIDAndTransactionType(employeeID, TransactionType.OUT);
+    }
+
 
     @Override
     public Integer countExportQuantity() {
