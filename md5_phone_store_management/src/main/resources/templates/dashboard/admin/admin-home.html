@@ -414,17 +414,7 @@
                         </div>
                         <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
                         <div class="dash-chart-controls flex justify-between items-center mb-5">
-                            <div class="dash-zoom flex gap-2">
-                                <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
-                                        onclick="zoomChart('in')">⟐
-                                </button>
-                                <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
-                                        onclick="zoomChart('out')">⟑
-                                </button>
-                            </div>
-                            <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
-                                    onclick="resetChart()">Hiển thị tất cả
-                            </button>
+                            <!-- Removed zoom and reset buttons as per previous request -->
                         </div>
                         <canvas id="salesChart"></canvas>
                     </div>
@@ -536,9 +526,20 @@
         return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(value || 0);
     }
 
+    // Parse value string into object
+    function parseValueString(value) {
+        const result = {};
+        if (!value || typeof value !== 'string') return result;
+        const pairs = value.split(',').map(pair => pair.trim().split('='));
+        pairs.forEach(([key, val]) => {
+            if (key && val) result[key.trim()] = val.trim();
+        });
+        return result;
+    }
+
     // Fetch employee name by ID
     async function getEmployeeNameById(employeeId) {
-        if (!employeeId) return 'N/A';
+        if (!employeeId) return 'không xác định';
         const url = `/api/changelogs/employee/${employeeId}/name`;
         try {
             const response = await fetch(url);
@@ -554,8 +555,89 @@
         }
     }
 
-    // Cache employee names
+    // Fetch customer name by ID
+    async function getCustomerNameById(customerId) {
+        if (!customerId) return 'không xác định';
+        if (customerNameCache[customerId]) {
+            return customerNameCache[customerId];
+        }
+        const url = `/api/changelogs/customers/${customerId}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                console.error(`Error fetching customer name for ID ${customerId}: Status ${response.status}`);
+                return 'không xác định';
+            }
+            const data = await response.json();
+            const name = data.name || 'không xác định';
+            customerNameCache[customerId] = name;
+            return name;
+        } catch (error) {
+            console.error(`Error fetching customer name for ID ${customerId}:`, error);
+            return 'không xác định';
+        }
+    }
+
+    // Fetch product name by ID
+    async function getProductNameById(productId) {
+        if (!productId) return 'không xác định';
+        if (productNameCache[productId]) {
+            return productNameCache[productId];
+        }
+        const url = `/api/changelogs/products/${productId}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                console.error(`Error fetching product name for ID ${productId}: Status ${response.status}`);
+                return 'không xác định';
+            }
+            const data = await response.json();
+            const name = data.name || 'không xác định';
+            productNameCache[productId] = name;
+            return name;
+        } catch (error) {
+            console.error(`Error fetching product name for ID ${productId}:`, error);
+            return 'không xác định';
+        }
+    }
+    // Cache for names
     const employeeNameCache = {};
+    const customerNameCache = {};
+    const productNameCache = {};
+
+    // Format notification text
+    async function formatNotificationText(log, isExpanded) {
+        const entity = log.entityName?.toLowerCase();
+        const value = log.action === 'DELETE' ? log.oldValue : log.newValue;
+        const parsed = parseValueString(value);
+
+        if (entity === 'invoice') {
+            const amount = parsed.amount ? parseFloat(parsed.amount) : 0;
+            const customerId = parsed.customerId || 'N/A';
+            const customerName = await getCustomerNameById(customerId);
+            if (isExpanded) {
+                return `Khách Hàng: ${customerName}, thanh toán hóa đơn: ${formatCurrency(amount)}`;
+            } else {
+                return `Hóa đơn mới của ${customerName} tổng tiền: ${formatCurrency(amount)}`;
+            }
+        } else if (entity === 'product') {
+            const productId = parsed.productID || 'N/A';
+            const productName = await getProductNameById(productId);
+            return isExpanded ? `Sản phẩm ${productName}` : `Sản Phẩm tên: ${productName}`;
+        } else if (entity === 'customer') {
+            const customerId = parsed.customerId || 'N/A';
+            const customerName = await getCustomerNameById(customerId);
+            return isExpanded ? `Khách Hàng: ${customerName}` : `Khách Hàng tên: ${customerName}`;
+        } else if (entity === 'employee') {
+            const employeeId = parsed.employeeId || 'N/A';
+            const employeeName = await getEmployeeNameById(employeeId);
+            return isExpanded ? `Nhân Viên: ${employeeName}` : `Nhân Viên tên: ${employeeName}`;
+        } else if (entity === 'supplier') {
+            const supplierName = parsed.supplierName || value || 'không xác định';
+            return isExpanded ? `Nhà Cung Cấp: ${supplierName}` : `Nhà Cung Cấp tên: ${supplierName}`;
+        }
+        return value || 'không xác định';
+    }
 
     // State for change logs
     let cachedChangeLogs = [];
@@ -570,22 +652,22 @@
 
         if (!logs || !Array.isArray(logs) || logs.length === 0) {
             container.innerHTML = `
-                <div class="update-item">
-                    <div class="content">
-                        <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
+                    <div class="update-item">
+                        <div class="content">
+                            <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
             return;
         }
 
         container.innerHTML = `
-            <div class="update-item">
-                <div class="content">
-                    <p class="text-sm text-gray-500">Đang tải...</p>
+                <div class="update-item">
+                    <div class="content">
+                        <p class="text-sm text-gray-500">Đang tải...</p>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
 
         const employeeNamePromises = logs.map(async (log) => {
             if (!log || !log.employeeId) return 'không xác định';
@@ -613,42 +695,59 @@
                 }
             });
 
-            container.innerHTML = `
-                <div class="update-columns">
-                    ${entities.map(entity => `
+            const entityNotifications = await Promise.all(entities.map(async (entity) => {
+                if (logsByEntity[entity].length === 0) {
+                    return `
+                            <div class="update-column" style="transform: translateY(20px);">
+                                <div class="update-column-header">
+                                    <h4>${entity}</h4>
+                                </div>
+                                <div class="update-column-content">
+                                    <p class="text-sm text-gray-500">Chưa có cập nhật.</p>
+                                </div>
+                            </div>
+                        `;
+                }
+
+                const items = await Promise.all(logsByEntity[entity].map(async ({log, employeeName}) => {
+                    const actionText = formatAction(log.action);
+                    const valueText = await formatNotificationText(log, true);
+                    return `
+                            <div class="update-item-expanded">
+                                <p class="text-xs text-gray-600 flex items-center gap-1 mb-1 leading-none">
+                                    <i class="fas fa-clock relative top-[1px]"></i>
+                                    ${formatRelativeTime(log.timestamp, true)}
+                                </p>
+                                <div class="flex items-center gap-2">
+                                    <div class="${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
+                                    </div>
+                                    <p class="text-sm leading-tight">
+                                        <span class="font-medium">${employeeName} ${actionText.toLowerCase()}</span><br>
+                                        <span class="text-gray-700">${valueText}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                }));
+
+                return `
                         <div class="update-column" style="transform: translateY(20px);">
                             <div class="update-column-header">
                                 <h4>${entity}</h4>
                             </div>
                             <div class="update-column-content">
-                                ${logsByEntity[entity].length === 0 ? `
-                                    <p class="text-sm text-gray-500">Chưa có cập nhật.</p>
-                                ` : logsByEntity[entity].map(({log, employeeName}) => {
-                const actionText = formatAction(log.action);
-                const valueText = log.action === 'DELETE' ? (log.oldValue || 'N/A') : (log.newValue || 'N/A');
-                return `
-                                        <div class="update-item-expanded">
-                                            <p class="text-xs text-gray-600 flex items-center gap-1 mb-1 leading-none">
-                                                <i class="fas fa-clock relative top-[1px]"></i>
-                                                ${formatRelativeTime(log.timestamp, true)}
-                                            </p>
-                                            <div class="flex items-center gap-2">
-                                                <div class="${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0">
-                                                    <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
-                                                </div>
-                                                <p class="text-sm leading-tight">
-                                                    <span class="font-medium">${employeeName} ${actionText.toLowerCase()}</span><br>
-                                                    <span class="text-gray-700">${valueText}</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    `;
-            }).join('')}
+                                ${items.join('')}
                             </div>
                         </div>
-                    `).join('')}
-                </div>
-            `;
+                    `;
+            }));
+
+            container.innerHTML = `
+                    <div class="update-columns">
+                        ${entityNotifications.join('')}
+                    </div>
+                `;
 
             setTimeout(() => {
                 const columns = container.querySelectorAll('.update-column');
@@ -660,30 +759,32 @@
             }, 300);
         } else {
             const limitedLogs = logs.slice(0, 6);
-            container.innerHTML = limitedLogs.map((log, index) => {
+            const items = await Promise.all(limitedLogs.map(async (log, index) => {
                 if (!log || !log.timestamp || !log.action) {
                     return '';
                 }
                 const employeeName = employeeNames[index];
                 const actionText = formatAction(log.action);
                 const entityText = formatEntityName(log.entityName);
-                const valueText = log.action === 'DELETE' ? (log.oldValue || 'N/A') : (log.newValue || 'N/A');
+                const valueText = await formatNotificationText(log, false);
 
                 return `
-                    <div class="update-item mb-4 flex items-start gap-2">
-                        <div class="icon ${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                            <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between w-full">
-                                <strong class="text-sm">${actionText}</strong>
-                                <span class="text-xs text-gray-600">${formatRelativeTime(log.timestamp, false)}</span>
+                        <div class="update-item mb-4 flex items-start gap-2">
+                            <div class="icon ${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
                             </div>
-                            <p class="text-sm mt-1">${entityText} tên ${valueText}</p>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between w-full">
+                                    <strong class="text-sm">${actionText}</strong>
+                                    <span class="text-xs text-gray-600">${formatRelativeTime(log.timestamp, false)}</span>
+                                </div>
+                                <p class="text-sm mt-1">${valueText}</p>
+                            </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+            }));
+
+            container.innerHTML = items.join('');
         }
     }
 
@@ -834,12 +935,12 @@
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
             document.getElementById('changeLogsContainer').innerHTML = `
-                <div class="update-item">
-                    <div class="content">
-                        <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+                    <div class="update-item">
+                        <div class="content">
+                            <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
         }
     }
 
