@@ -1,10 +1,14 @@
 package com.example.md5_phone_store_management.controller;
 
+import com.example.md5_phone_store_management.model.ChangeLog;
 import com.example.md5_phone_store_management.model.Invoice;
 import com.example.md5_phone_store_management.model.Product;
 import com.example.md5_phone_store_management.model.dto.ProductDTO;
 import com.example.md5_phone_store_management.service.CloudinaryService;
+import com.example.md5_phone_store_management.service.CustomerService;
+import com.example.md5_phone_store_management.service.ICustomerService;
 import com.example.md5_phone_store_management.service.IInvoiceService;
+import com.example.md5_phone_store_management.service.implement.ChangeLogService;
 import com.example.md5_phone_store_management.service.implement.ProductService;
 import com.example.md5_phone_store_management.service.implement.SupplierService;
 import jakarta.servlet.http.HttpSession;
@@ -37,14 +41,33 @@ public class BusinessController {
     CloudinaryService cloudinaryService;
     @Autowired
     private IInvoiceService invoiceService;
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private ICustomerService iCustomerService;
 
 
-    //    trang chính quản lý
-//    http://localhost:8080/dashboard/business/management
+    @Autowired
+    private ChangeLogService changeLogService;
+
+
+
+
     @GetMapping("/dashboard/business/management")
     public String showManagementPage(Model model, HttpSession session) {
+
+//        model.addAttribute("countAllProducts",productService.countProducts());
+//        model.addAttribute("countProductsHaveRetailPrice",productService.countProductsHaveRetailPrice());
+//        model.addAttribute("totalCustomers", iCustomerService.countTotalCustomers() != null ? iCustomerService.countTotalCustomers() : 0);
+//        model.addAttribute("maleCustomers", iCustomerService.countMaleCustomers() != null ? iCustomerService.countMaleCustomers() : 0);
+//        model.addAttribute("femaleCustomers", iCustomerService.countFemaleCustomers() != null ? iCustomerService.countFemaleCustomers() : 0);
+//        model.addAttribute("countAllSuccessInvoices", invoiceService.countAllSuccessInvoices());
+//        model.addAttribute("countTodaySuccessInvoices", invoiceService.countTodaySuccessInvoices());
+//        model.addAttribute("countThisMonthSuccessInvoices", invoiceService.countThisMonthSuccessInvoices());
         return "dashboard/business-management/business-home";
     }
+
+
     @GetMapping("/dashboard/products/listToChoose")
     public String search1(Model model,
                           @RequestParam(name = "searchProduct", required = false) String searchProduct,

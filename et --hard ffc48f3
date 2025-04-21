@@ -1,0 +1,309 @@
+[33mffc48f3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mhauhihi[m[33m, [m[1;31morigin/hauhihi[m[33m)[m KO DUOC GOP DANG COMMIT TRUOC KHI SUA SERVICE
+[33m9b93281[m du lieu quan ly kinnh daonh that, commit truockhi lam thong bao
+[33m7836201[m giao dien trang quan ly bao cao
+[33mcef12c7[m giao dien trang quan ly kinh daonh , du lieu gia
+[33mb288cfc[m chuyen cac du liệu đếm sang api repontcontroler,
+[33me0bfcb3[m sua lai model log , giao dien log cơ bản , sua lai config kinh doanh
+[33mc4b30c0[m sua lai dung event san co chua test voi enum chua luu tai khoan hien tai dang dang nhap
+[33mf0cf9cf[m sua log
+[33m077cde5[m log ghi lai cap nhat nhung dang bi loi chỉ dùng được 1 vài bảng, chưa lấy auth hiện tại
+[33m65f1a6c[m giao dien admin home dữ liệu giả
+[33m5d8c35b[m keo main voi hauhihi
+[33m84a69de[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #42 from C0624L1-Org/tan-code
+[33m1e018c6[m[33m ([m[1;31morigin/tan-code[m[33m)[m Merge main
+[33mb741169[m merge main
+[33m0aa0764[m sưa tìm kiếm và phân bai a tuann anh
+[33m2fddb16[m sưa giao dien  Quản lý lịch sử mua bán
+[33m5d62097[m Merge main
+[33mc0f5f75[m sưa giao dien,bcdoanhthu
+[33m86959a7[m Resolve merge conflicts in ReportController and sales-report.html
+[33m8073d7b[m tạm commit để pull code main
+[33me28813d[m Merge pull request #41 from C0624L1-Org/tan-code
+[33me3d933a[m Return Bread Crumb
+[33me1e9351[m[33m ([m[1;31morigin/khoa-code[m[33m)[m fix nhap kho
+[33me735dc0[m fix nhập kho
+[33m3dc842b[m merge
+[33m381ee92[m Merge pull request #40 from C0624L1-Org/tuananh
+[33m8fde534[m[33m ([m[1;31morigin/tuananh[m[33m)[m Merge branch 'main' into tuananh
+[33m6528370[m check email and phone supplier
+[33mffe836f[m commit
+[33me44c49b[m Merge pull request #39 from C0624L1-Org/tan-code
+[33m12a7159[m Fix bug Quản lý bán hàng
+[33m6819b67[m Merge remote-tracking branch 'origin/main' into tan-code
+[33md81748a[m Fix bug Quản lý bán hàng
+[33md0b8191[m bo sung bao cao khach hang
+[33m33751ea[m bs
+[33m076dd05[m bs
+[33maf41e81[m bs
+[33m6c24f4f[m Merge pull request #38 from C0624L1-Org/tan-code
+[33mc8b6051[m Merge tan-code in main
+[33m5b6239b[m bs
+[33m7d1198f[m bs
+[33m51f1b92[m merge khoa
+[33m0f656f2[m merge main
+[33m0830342[m Merge main
+[33mec6f0bc[m Fix merge conflict in sales-report.html
+[33mba832e4[m sua giao dien
+[33mceca86b[m sua phantrang
+[33mff49f73[m sua giao dien sup , day bao cao
+[33m1fbb3d8[m sua giao dien co ban cua tran
+[33me7161b9[m Merge pull request #36 from C0624L1-Org/chi-code
+[33m00e16ff[m Cập nhật application.properties
+[33m9b1aea0[m up lên main
+[33mc98da1c[m update sale-report
+[33m2572ba0[m Merge branch 'main' into chi-code
+[33m8e32048[m pull main to checkMerge remote-tracking branch 'origin/main' into chi-code
+[33ma251b92[m Merge branch 'main' of https://github.com/C0624L1-Org/Module5_Phone_Store_Management
+[33m558be77[m fix display wrong dashboard title for Sales Staff role and badge
+[33me094235[m fix thêm mới customer và bỏ qmk
+[33mb45d7a9[m Merge pull request #35 from C0624L1-Org/tan-code
+[33m90f2623[m Fix Update Product and loading product
+[33m6f1e63c[m bs
+[33m216e906[m Merge pull request #34 from C0624L1-Org/tan-code
+[33m8a7af5b[m Update loading avatar employee
+[33md0cc340[m Resolve conflict in ReportController.java
+[33m87422cd[m merge code main
+[33mba67bca[m sua validate
+[33me2c4a39[m Meger main to tan-code
+[33m4ed2af2[m sua tang giao dich
+[33m2264bd7[m cho ve vi tri sua id xuat thanh stt
+[33md6971f2[m sửa gộp cơ bản về đúng vị trí
+[33m9199a49[m Merge main
+[33mbb037d4[m gộp fix application.properties
+[33mae5a0dd[m hau giữ thay đổi vì nó đang bị ghi đè
+[33mcc15ae0[m bs
+[33mdc5c35a[m bs
+[33m8aad611[m bs
+[33m04a6ae3[m Merge pull request #33 from C0624L1-Org/chi-code
+[33md0551ed[m update delete employee function
+[33md3a2198[m merge khoa-code
+[33m91c4f3c[m done spr 3
+[33m7c06201[m Merge main to tan-code
+[33mda22c6a[m Merge pull request #32 from C0624L1-Org/chi-code
+[33mc325c54[m update code from main
+[33mfd755ed[m save code
+[33mfbaf446[m update code for sales management
+[33mc90346e[m tao giao dien cơ bản kinh doanh, sửa phần chọn
+[33md3b6f22[m cs
+[33mdb376c9[m them link
+[33m33181db[m Merge pull request #31 from C0624L1-Org/tuananh
+[33m000175d[m update
+[33m23fbc9c[m Thêm sales-report.html
+[33m57d3f35[m Merge pull request #30 from C0624L1-Org/tan-code
+[33m85e61f1[m Merge Code and Final Quản lý bán hàng
+[33mfef2f62[m Merge Code and Final Quản lý bán hàng
+[33ma6aa813[m Merge pull request #29 from C0624L1-Org/tuananh
+[33m22c3794[m fix
+[33mcd976c6[m them anh va them phan tim kiem chua co gia
+[33m8bd502a[m sua truong hop gia null
+[33mff2e3c0[m fix phan tim kiem va phan chon san pham 6.9.1.1
+[33m53fff05[m save code
+[33m1939f58[m Merge remote-tracking branch 'origin/main' into chi-code
+[33md61ecf6[m merge code a dinh anh
+[33m94ebc9e[m up bao cao doanh thu
+[33m5dd03de[m bs
+[33me1a32b4[m bs
+[33mf5f5a95[m up bao cao doanh thu
+[33m95b6e85[m luutruockhimerge
+[33m4ef8033[m sửa xóa cả hóa đơn và hóa đơn chi tiết khi xóa khách hàng, sửa logic validate thêm mới khách hàng
+[33m792413f[m check
+[33m46f2470[m giao diện chi tiết nhập kho, sửa query tìm sp một phần
+[33m00c9b0a[m fix logic nhap xuat tranh loi nhan san pham
+[33m5865a97[m add business-management page
+[33m017d733[m luu troc khi pull
+[33m448fa31[m Merge pull request #28 from C0624L1-Org/tan-code
+[33m321817d[m Update Quản lý bán hàng + Toast + Security
+[33m5d359b7[m Update Rất nhiều thứ + Quản lý bán hàng
+[33m6c2b6f1[m merge code tuan anh
+[33m26c8287[m Merge pull request #27 from C0624L1-Org/tuananh
+[33ma6bd193[m lich su mua ban
+[33m2819aad[m stock
+[33m8738f00[m Merge branch 'anh'
+[33m9ded21e[m bo sung view
+[33m20eba94[m Merge branch 'anh'
+[33m11ac401[m  done sprint2
+[33m7b51ab0[m noplai
+[33ma53d4e5[m Merge branch 'anh'
+[33m27df1fd[m bs
+[33m6fd872a[m Merge branch 'anh'
+[33m5964727[m sualai
+[33m5d99dc0[m bs
+[33ma348e45[m push code trươc khi merge
+[33mf87eb8e[m merge main
+[33md7b454a[m merge main
+[33me7dd3c2[m  trooi mat tao xuat
+[33md90137e[m sửa chọn sp
+[33m6a0f409[m nhap xuat
+[33m676f88c[m merge main
+[33m15ae6ff[m Merge pull request #26 from C0624L1-Org/tuananh
+[33m592b4ec[m update stock -in
+[33mdc748d4[m update main
+[33md1d7b3b[m change code update
+[33m21bc423[m bs
+[33m4eb573a[m merge mani
+[33m57b1315[m bs
+[33maf7af31[m sua lai supplier
+[33mc3cf916[m up nhap kho
+[33me1bd239[m merge main
+[33m7578dd8[m a
+[33m9382469[m fd
+[33m4484268[m push truoc khi merge
+[33me2d3a75[m day code truoc khi merge
+[33mf059059[m push stockin
+[33mcb43aca[m stock-update
+[33m2b2cb9b[m Resolve merge conflicts between main and anh
+[33m8c606ac[m merge main
+[33m79153d8[m Merge pull request #24 from C0624L1-Org/tan-code
+[33m9785d65[m Merge remote-tracking branch 'origin/main' into tan-code
+[33m90f9fb2[m Merge code
+[33m7c9a7ab[m fd
+[33m2fe2f78[m up to main
+[33m9e12ab6[m up nhập kho
+[33m90c240b[m lay code tu tan-code
+[33m8f6950b[m lay code main
+[33m90f74bd[m lay main ve khoa-code
+[33m3516c5e[m phush code
+[33m64ccc47[m push truoc khi merge
+[33me201b63[m Merge pull request #23 from C0624L1-Org/tan-code
+[33m2941124[m Merge remote-tracking branch 'origin/main' into tan-code
+[33mfd0d69c[m Merge and Upload Quản Lý bán hàng
+[33me500632[m Resolve merge conflict
+[33med5be87[m day code truoc khi merge
+[33mece507e[m Lưu thay đổi trước khi chuyển nhánh
+[33m484bfb1[m day code truoc khi merge
+[33me9ff6ac[m Merge pull request #22 from C0624L1-Org/chi-code
+[33mcf875c6[m edit form for sales
+[33md4f66b0[m save commit
+[33me3de1fb[m commit before pulling main
+[33m9fe362f[m Lưu thay đổi trước khi chuyển nhánh
+[33ma897b3a[m merge code nhap kho len main
+[33m30a2346[m up nhập kho
+[33me782146[m merge main to khoa-code
+[33m2c45a67[m Merge pull request #21 from C0624L1-Org/tuananh
+[33ma11c464[m update stock-in tuananh
+[33m520508b[m bs
+[33m4979cbd[m bsgiaodien
+[33mdde4fcb[m nopba
+[33m1eaf9ca[m merge code main vao khoa-code
+[33m24896ea[m lay code moi nhat
+[33mdb2f683[m Merge remote-tracking branch 'origin/main' into tuananh
+[33mdc46f6a[m stock-in update
+[33mee33a64[m bs
+[33m756f66a[m update stock-in
+[33m4c2a584[m Merge remote-tracking branch 'origin/main' into tuananh
+[33ma5b71b1[m update
+[33mded83cb[m bs
+[33m342b38f[m update
+[33mfbff0f0[m nopbai
+[33m0d3e661[m Cập nhật Supplier: Controller, Repository, Service, Template
+[33mcd14da6[m Khôi phục thay đổi sau git stash pop
+[33m3300511[m Merge pull request #19 from C0624L1-Org/tan-code
+[33md1b1698[m Fix merge main and tan-code
+[33md703101[m Update Phân trang Product
+[33m8343c84[m Merge main vào tan-code
+[33m1a40522[m Merge pull request #18 from C0624L1-Org/chi-test-main
+[33mb5d442b[m fix product search function
+[33m451f2bf[m Merge pull request #17 from C0624L1-Org/tan-code
+[33m643cd17[m Update mMdal Create, Update của Customer
+[33m5bcfb9c[m Merge pull request #16 from C0624L1-Org/tan-code
+[33m95ebde6[m Update Modal phần create, update của Employee và Product, Logout
+[33m77e8684[m bs employee
+[33m50b9b3e[m fix pageable, update, delete and add modal
+[33m18de1d7[m Resolve merge conflict between main and khoa-code
+[33m8459e48[m search với navquery có session của khách hàng
+[33m7cfbf29[m thêm tổng customer vào trang chủ admin
+[33m836f151[m phân trang customer, chưa phân tran search cus
+[33m20a8112[m sửa lại search nhân viên sau khi tìm kiếm sẽ vẫn hiển thị được role
+[33mfbab1cf[m sửa phân trang nhân viên
+[33mfb6ed90[m sua search
+[33m2319963[m sưa edit cus , xóa cus
+[33m8d61723[m save commit
+[33mcbdb1f4[m sưa list emplo với loai tru admin ; sửa tìm kiếm loại trừ admin; thêm mới customer xong , sửa list customer nhưng chưa có phân trang
+[33mad62ff1[m itelj broke
+[33mf5e1ced[m Merge pull request #15 from C0624L1-Org/tan-code
+[33m05006c4[m Update Vaidate Supplier and Hidden Role Admin
+[33m6e08ec8[m Update For All
+[33m52a0bc3[m Update Fragments + Css (đang hoạt động trên admin-home, list employee, update employee)
+[33m651ceaa[m Update Fragments + Css (Đang hoạt động trên admin-home, list Employee và Update employee)
+[33m5d78b40[m ửa delete employee
+[33mcdeafcd[m Cập nhật EmployeeController
+[33m2582608[m Resolve merge conflict giữa main và anh
+[33md491d41[m bs
+[33m87e381d[m Sửa lại list employee định dạng ngày/tháng/năm và tuổi, sửa lại list customer tương tự. Edit Ajax chạy được, Delete chạy được.
+[33m9f51213[m Làm mới cache và cập nhật code
+[33mf3f8827[m update pagination in employee list
+[33mab23f14[m chinh thang hang nut tim kiem va xoa tim kim thang hang cac o input
+[33m1c429d8[m suaphansearch
+[33md23c5e6[m save commit
+[33m0df8571[m update form for sale management, edit Customer
+[33mccbeef3[m Fix delete Customer
+[33mcb37ad9[m Upload Files
+[33mac5290c[m Merge Khoa-code
+[33me346109[m up search supplier
+[33m2f65123[m merge main + resolve conflict
+[33m791bdf8[m merge main and resolve conflict
+[33m6536160[m up list supplier
+[33m2f3bae0[m Lấy lại
+[33m9ce57e9[m Lưu thay đổi trước khi đồng bộ với main
+[33mf596e60[m Overwrite application.properties from main
+[33m078d987[m meg hau to main w1
+[33m8b9abcd[m Update Payment VNPAY(chưa xong còn hóa đơn)
+[33m5ba82f4[m Update VNPAY(chưa xong)
+[33m124484f[m Merge pull request #12 from C0624L1-Org/tuananh
+[33m191f8d9[m Merge branch 'main' into tuananh
+[33m009499b[m push change password
+[33m86402df[m update detail information
+[33m6673fb5[m detail information
+[33m98d3145[m create supplier
+[33m2c688eb[m merge
+[33m218a9ed[m push code
+[33m22afaff[m Resolve conflicts
+[33m2e4e02e[m Merge pull request #4 from C0624L1-Org/chi-code
+[33m8a9128e[m edit data type of product prices, finish update product function
+[33m5aab6d3[m update sql queries for updating product function
+[33m76d5cf0[m save changes
+[33m167ed3b[m update feature
+[33m9287c89[m bosung
+[33m36cf14f[m save changes
+[33me4dd71c[m edit delete employee function
+[33mef183b5[m save changes
+[33maa17523[m commit changes
+[33m0a34a7d[m Merge pull request #11 from C0624L1-Org/tan-code
+[33mfe98445[m Update Img product
+[33m4c85de8[m Upload Image Product
+[33m1389c05[m Merge pull request #10 from C0624L1-Org/tan-code
+[33mff5f004[m merge code a Đình Anh
+[33mfe1b870[m chờ a tân sửa
+[33mcee2149[m sửa nút nhấn thêm sửa xóa customer
+[33m49869ed[m sửa lỗi tìm khách hàng
+[33mc352ca1[m Merge pull request #9 from C0624L1-Org/tan-code
+[33mc8358f1[m Update Security, Navbar, Sidebar, Footer. Update edit Employee
+[33mface799[m Update Security, Navbar, Sidebar, Footer. Update edit Employee
+[33me8b6c30[m Merge pull request #8 from C0624L1-Org/tan-code
+[33m73ab223[m merge a Đình Anh -> Product
+[33m2ce3800[m Merge pull request #7 from C0624L1-Org/tan-code
+[33m27b725f[m resolver Hậu
+[33m04c6d6c[m resolver conflic
+[33m0fbd278[m Move changes from main to khoa-code
+[33mf2bec8a[m testt
+[33m64c7084[m update login and detail infor of 4 role
+[33mcbd7065[m Merge pull request #5 from C0624L1-Org/tan-code
+[33mc1359ef[m Update All
+[33mcbf5cf2[m resolve conflict in chi-code
+[33m4765288[m delete employee
+[33m36f1b7d[m bosung
+[33mae6a83e[m Merge branch 'anh'
+[33m64c7a93[m nopbai
+[33mbc69c4f[m push login and register on main-branch
+[33mb4adc03[m login and register success
+[33m56c8711[m Lưu thay đổi trước khi rebase
+[33md5bb0a9[m Merge pull request #2 from C0624L1-Org/tan-code
+[33mdf4b227[m Merge code branch tuananh, anh. Design UI. Upload edit employee and create files config Cloudinary
+[33md27796f[m Resolve conflicts
+[33maa2e322[m Resolve conflicts
+[33m2b3e055[m Merge pull request #1 from C0624L1-Org/khoa-code
+[33mb56bc2e[m update UI
+[33mf579c71[m add file Employee controller, service and repository
+[33m12a5244[m create table Employee
+[33ma18e381[m test
+[33m548ba8c[m first commit

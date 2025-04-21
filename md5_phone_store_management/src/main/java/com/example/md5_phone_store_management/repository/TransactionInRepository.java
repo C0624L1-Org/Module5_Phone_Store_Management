@@ -17,6 +17,66 @@ import java.util.List;
 @Repository
 public interface TransactionInRepository extends JpaRepository<InventoryTransaction, Integer> {
 
+
+    // Count total number of IN transactions
+    @Query("SELECT COUNT(t) FROM InventoryTransaction t WHERE t.transactionType = 'IN'")
+    Integer countImportQuantity();
+
+    // Count IN transactions in the current month
+    @Query("SELECT COUNT(t) FROM InventoryTransaction t WHERE t.transactionType = 'IN' " +
+            "AND YEAR(t.transactionDate) = YEAR(CURRENT_DATE) " +
+            "AND MONTH(t.transactionDate) = MONTH(CURRENT_DATE)")
+    Integer countThisMonthImportQuantityProducts();
+
+    // Get supplierID from the most recent IN transaction
+    @Query("SELECT t.supplier.supplierID FROM InventoryTransaction t WHERE t.transactionType = 'IN' " +
+            "ORDER BY t.transactionDate DESC LIMIT 1")
+    Integer getLastestImportSupplierId();
+
+    // Get productID from the most recent IN transaction
+    @Query("SELECT t.product.productID FROM InventoryTransaction t WHERE t.transactionType = 'IN' " +
+            "ORDER BY t.transactionDate DESC LIMIT 1")
+    Integer getLastestImportProductId();
+
+
+
+
+
+
+
+
+
+
+    // Đếm số lượng nhà cung cấp không trùng lặp (các giao dịch nhập kho)
+    @Query("SELECT COALESCE(COUNT(DISTINCT it.supplier.supplierID), 0) " +
+            "FROM InventoryTransaction it " +
+            "WHERE it.transactionType = 'IN'")
+    Integer countRegularSupplier();
+
+    // Tìm supplierID của nhà cung cấp có tổng quantity lớn nhất (các giao dịch nhập kho)
+    @Query("SELECT COALESCE((SELECT it.supplier.supplierID " +
+            "FROM InventoryTransaction it " +
+            "WHERE it.transactionType = 'IN' " +
+            "GROUP BY it.supplier.supplierID " +
+            "ORDER BY SUM(it.quantity) DESC " +
+            "LIMIT 1), 0)")
+    Integer getBestSupplierId();
+
+    // Tìm tổng quantity lớn nhất của một nhà cung cấp (các giao dịch nhập kho)
+    @Query("SELECT COALESCE((SELECT SUM(it.quantity) " +
+            "FROM InventoryTransaction it " +
+            "WHERE it.transactionType = 'IN' " +
+            "GROUP BY it.supplier.supplierID " +
+            "ORDER BY SUM(it.quantity) DESC " +
+            "LIMIT 1), 0)")
+    Integer getBestSupplierImportQuantity();
+
+
+
+
+    @Query("SELECT COALESCE(SUM(it.quantity), 0) FROM InventoryTransaction it WHERE it.transactionType = 'IN'")
+    Integer countImportProducts();
+
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO inventoryTransaction (productID, transactionType, quantity, purchasePrice, transactionDate, supplierID, employeeID, totalPrice) " +

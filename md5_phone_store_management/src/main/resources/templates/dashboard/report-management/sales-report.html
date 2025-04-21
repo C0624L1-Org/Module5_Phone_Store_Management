@@ -484,24 +484,50 @@
                 </div>
                 <div class="card-body">
                     <!-- Form nhập liệu -->
-                    <form th:action="@{/sales-report}" method="post" class="search-form row g-3">
-                        <div class="col-md-4">
-                            <label for="startDate" class="form-label"><i class="far fa-calendar-alt me-2"></i>Ngày Bắt Đầu</label>
-                            <input type="date" id="startDate" name="startDate" th:value="${startDate}" class="form-control" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="endDate" class="form-label"><i class="far fa-calendar-alt me-2"></i>Ngày Kết Thúc</label>
-                            <input type="date" id="endDate" name="endDate" th:value="${endDate}" class="form-control" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="productId" class="form-label"><i class="fas fa-barcode me-2"></i>Mã Sản Phẩm</label>
-                            <input type="text" id="productId" name="productId" th:value="${productId}" class="form-control" placeholder="Nhập mã hoặc để trống để xem tất cả">
-                        </div>
-                        <div class="col-md-12 text-center mt-3">
-                            <button type="submit" class="btn btn-primary px-4 btn-submit"><i class="fas fa-search me-2"></i>Tạo Báo Cáo</button>
-                        </div>
-                    </form>
+                    <div class="filter-container">
+                        <form th:action="@{/sales-report}" method="post" class="search-form row g-3 align-items-end" >
 
+                            <div class="col-md-3 col-sm-6">
+                                <label for="paymentMethod" class="form-label">
+                                    <i class="fas fa-credit-card me-2"></i>Phương Thức Thanh Toán
+                                </label>
+                                <select id="paymentMethod" name="paymentMethod" class="form-control form-select">
+                                    <option value="">Tất cả</option>
+                                    <option th:each="pm : ${T(com.example.md5_phone_store_management.model.PaymentMethod).values()}"
+                                            th:value="${pm.name()}" th:text="${pm.getLabel()}"
+                                            th:selected="${param.paymentMethod != null and param.paymentMethod[0] == pm.name()}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <label for="employeeName" class="form-label">
+                                    <i class="fas fa-user me-2"></i>Tên Nhân Viên
+                                </label>
+                                <input type="text" id="employeeName" name="employeeName"
+                                       th:value="${param.employeeName}" class="form-control"
+                                       placeholder="Nhập tên hoặc để trống">
+                            </div>
+
+                            <div class="col-md-2 col-sm-6">
+                                <label for="productName" class="form-label">
+                                    <i class="fas fa-box me-2"></i>Tên Sản Phẩm
+                                </label>
+                                <input type="text" id="productName" name="productName"
+                                       th:value="${param.productName}" class="form-control"
+                                       placeholder="Nhập tên hoặc để trống">
+                            </div>
+
+                            <div class="col-md-4 col-sm-6 d-flex gap-2">
+                                <button class="btn btn-primary w-50" type="submit">
+                                    <i class="fas fa-filter me-2"></i>Tạo báo cáo
+                                </button>
+                                <a class="btn btn-secondary w-50" th:href="@{/sales-report}">
+                                    <i class="fas fa-times me-2"></i>Xóa báo cáo
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                     <!-- Hiển thị thông báo lỗi -->
                     <div th:if="${errorMessage}" class="alert alert-danger mt-3" role="alert">
                         <p th:text="${errorMessage}"></p>
@@ -531,7 +557,7 @@
                         </div>
 
                         <!-- Đồ thị doanh thu theo mã sản phẩm -->
-                        <div class="chart-container" th:classappend="${productId != null and productId != ''} ? 'single-product-chart' : ''">
+                        <div class="chart-container" >
                             <div class="chart-header">
                                 <h3 class="chart-title"><i class="fas fa-chart-bar"></i>Biểu Đồ Doanh Thu Theo Sản Phẩm</h3>
                             </div>

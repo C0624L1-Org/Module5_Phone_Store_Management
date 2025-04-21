@@ -1,16 +1,19 @@
 package com.example.md5_phone_store_management.service;
 
-import com.example.md5_phone_store_management.model.Employee;
-import com.example.md5_phone_store_management.model.Role;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.example.md5_phone_store_management.model.Employee;
+import com.example.md5_phone_store_management.model.Role;
+
 public interface IEmployeeService {
+
+
 
     //Hậu thêm
     Page<Employee> getAllEmployeesExceptAdmin(Pageable pageable);
@@ -27,6 +30,7 @@ public interface IEmployeeService {
     int updateEmployee(Integer employeeID, String fullName, LocalDate dob, String address, String phone, Role role, String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+    boolean existsByPhone(String phone);
     Optional<Employee> findByUsername(String username);
 
     //Delete

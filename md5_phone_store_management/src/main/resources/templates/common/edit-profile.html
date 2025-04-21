@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chỉnh sửa thông tin cá nhân</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/fragments/navbar.css">
+  <link rel="stylesheet" href="/css/fragments/sidebar.css">
+  <link rel="stylesheet" href="/css/fragments/footer.css">
+  <link rel="stylesheet" href="/css/common/toast.css">
+  <link rel="stylesheet" href="/css/common/layout.css">
+
+  <style>
+    .form-section {
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+      overflow: hidden;
+    }
+
+    .form-header {
+      background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
+      color: white;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .avatar-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .avatar-preview {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .form-control, .form-select {
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: #ff9a00;
+      box-shadow: 0 0 0 0.2rem rgba(255, 154, 0, 0.25);
+    }
+
+    .btn-update {
+      background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+    }
+
+    .btn-update:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 154, 0, 0.3);
+    }
+
+    .btn-cancel {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+    }
+
+    .btn-cancel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .custom-file-button {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .custom-file-button input[type=file] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      min-width: 100%;
+      min-height: 100%;
+      font-size: 100px;
+      text-align: right;
+      filter: alpha(opacity=0);
+      opacity: 0;
+      outline: none;
+      background: white;
+      cursor: inherit;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<!-- Hiển thị thông báo -->
+<div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="content-wrapper">
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <!-- Main content area -->
+    <div class="content-container">
+      <div class="container py-4">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/common/profile}">Thông tin cá nhân</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Cập nhật thông tin cá nhân</li>
+          </ol>
+        </nav>
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="form-section mb-4">
+              <div class="form-header">
+                <h3 class="mb-0">
+                  <i class="fas fa-user-edit me-2"></i>
+                  Cập nhật thông tin Cá nhân
+                </h3>
+              </div>
+
+              <div class="p-4">
+                <!-- Avatar -->
+                <div class="avatar-container">
+                  <img th:if="${employee.avatar != null}" th:src="${employee.avatar}"
+                       alt="Avatar" class="avatar-preview mb-3">
+                  <img th:unless="${employee.avatar != null}" src="/img/default-avt.png"
+                       alt="Default Avatar" class="avatar-preview mb-3">
+                  <h4 th:text="${employee.fullName}" class="text-center mb-3"></h4>
+                </div>
+
+                <form th:action="@{/common/update-profile}"
+                      th:object="${employee}" method="post" enctype="multipart/form-data" class="needs-validation"
+                      id="updateEmployeeForm" data-loading-overlay="true" novalidate>
+
+                  <!-- Hidden fields -->
+                  <input type="hidden" th:field="*{employeeID}" />
+                  <input type="hidden" th:field="*{username}" />
+                  <input type="hidden" th:field="*{role}" />
+
+                  <div class="row">
+                    <!-- Họ và tên -->
+                    <div class="col-md-6 mb-3">
+                      <label for="fullName" class="form-label">
+                        <i class="fas fa-user me-2"></i>Họ và tên
+                      </label>
+                      <input type="text" th:field="*{fullName}" class="form-control" id="fullName"
+                             placeholder="Nhập họ và tên">
+                      <div class="invalid-feedback">Vui lòng nhập họ và tên</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                    </div>
+
+                    <!-- Ngày sinh -->
+                    <div class="col-md-6 mb-3">
+                      <label for="dob" class="form-label">
+                        <i class="fas fa-calendar-alt me-2"></i>Ngày sinh
+                      </label>
+                      <input type="date" th:field="*{dob}" class="form-control" id="dob">
+                      <div class="invalid-feedback">Vui lòng chọn ngày sinh</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></div>
+                    </div>
+
+                    <!-- Địa chỉ -->
+                    <div class="col-md-12 mb-3">
+                      <label for="address" class="form-label">
+                        <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ
+                      </label>
+                      <input type="text" th:field="*{address}" class="form-control" id="address"
+                             placeholder="Nhập địa chỉ">
+                      <div class="invalid-feedback">Vui lòng nhập địa chỉ</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+                    </div>
+
+                    <!-- Số điện thoại -->
+                    <div class="col-md-6 mb-3">
+                      <label for="phone" class="form-label">
+                        <i class="fas fa-phone me-2"></i>Số điện thoại
+                      </label>
+                      <input type="text" th:field="*{phone}" class="form-control" id="phone"
+                             placeholder="Nhập số điện thoại">
+                      <div class="invalid-feedback">Vui lòng nhập số điện thoại</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6 mb-3">
+                      <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>Email
+                      </label>
+                      <input type="email" th:field="*{email}" class="form-control" id="email"
+                             placeholder="Nhập email">
+                      <div class="invalid-feedback">Vui lòng nhập email hợp lệ</div>
+                      <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+
+                    <!-- Avatar upload -->
+                    <div class="col-md-6 mb-3">
+                      <label for="avatarFile" class="form-label">
+                        <i class="fas fa-image me-2"></i>Thay đổi Avatar
+                      </label>
+                      <div class="input-group">
+                        <input type="file" id="avatarFile" name="avatarFile" class="form-control"
+                               accept="image/*">
+                        <label class="input-group-text" for="avatarFile">
+                          <i class="fas fa-upload"></i>
+                        </label>
+                      </div>
+                      <div class="form-text">Định dạng: JPG, PNG (Tối đa 10MB)</div>
+                    </div>
+                    
+                    <!-- Checkbox thay đổi mật khẩu -->
+                    <div class="col-md-6 mb-3">
+                      <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" id="changePasswordCheckbox" 
+                               th:checked="${param.changePassword != null || 
+                                           currentPassword != null || 
+                                           newPassword != null || 
+                                           confirmPassword != null}">
+                        <label class="form-check-label" for="changePasswordCheckbox">
+                          <i class="fas fa-key me-2"></i>Thay đổi mật khẩu
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Phần thay đổi mật khẩu (mặc định ẩn) -->
+                  <div id="passwordChangeSection" class="row mt-3" 
+                       th:style="${param.changePassword != null || 
+                                 currentPassword != null || 
+                                 newPassword != null || 
+                                 confirmPassword != null} ? 'display: flex' : 'display: none'">
+                    <div class="col-md-12">
+                      <div class="card mb-3 border-warning">
+                        <div class="card-header bg-warning text-white">
+                          <i class="fas fa-lock me-2"></i>Thay đổi mật khẩu
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <!-- Mật khẩu cũ -->
+                            <div class="col-md-12 mb-3">
+                              <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
+                              <div class="input-group">
+                                <input type="password" name="currentPassword" id="currentPassword" class="form-control" 
+                                       placeholder="Nhập mật khẩu hiện tại" th:value="${currentPassword}">
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="currentPassword">
+                                  <i class="fa fa-eye-slash"></i>
+                                </button>
+                              </div>
+                              <div class="invalid-feedback">Vui lòng nhập mật khẩu hiện tại</div>
+                              <div class="text-danger" th:if="${currentPasswordError != null}" th:text="${currentPasswordError}"></div>
+                            </div>
+                            
+                            <!-- Mật khẩu mới -->
+                            <div class="col-md-6 mb-3">
+                              <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                              <div class="input-group">
+                                <input type="password" name="newPassword" id="newPassword" class="form-control" 
+                                       placeholder="Nhập mật khẩu mới" th:value="${newPassword}">
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="newPassword">
+                                  <i class="fa fa-eye-slash"></i>
+                                </button>
+                              </div>
+                              <div class="invalid-feedback">Vui lòng nhập mật khẩu mới</div>
+                              <div class="text-danger" th:if="${newPasswordError != null}" th:text="${newPasswordError}"></div>
+                            </div>
+                            
+                            <!-- Nhập lại mật khẩu mới -->
+                            <div class="col-md-6 mb-3">
+                              <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                              <div class="input-group">
+                                <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" 
+                                       placeholder="Nhập lại mật khẩu mới" th:value="${confirmPassword}">
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="confirmPassword">
+                                  <i class="fa fa-eye-slash"></i>
+                                </button>
+                              </div>
+                              <div class="invalid-feedback">Vui lòng xác nhận mật khẩu mới</div>
+                              <div class="text-danger" th:if="${confirmPasswordError != null}" th:text="${confirmPasswordError}"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end mt-4 gap-2">
+                    <button type="button" class="btn btn-cancel" data-bs-toggle="modal" data-bs-target="#confirmCancelModal">
+                      <i class="fas fa-times me-2"></i>Hủy bỏ
+                    </button>
+                    <button type="button" class="btn btn-update" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal">
+                      <i class="fas fa-save me-2"></i>Cập nhật
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Xác Nhận Cập Nhật -->
+  <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmUpdateLabel">Xác nhận cập nhật</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn có chắc chắn muốn cập nhật thông tin nhân viên <strong th:text="${employee.fullName}"></strong>?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+          <button type="button" class="btn btn-success" id="confirmUpdate" data-submit-form="updateEmployeeForm">Xác nhận cập nhật</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Xác Nhận Hủy -->
+  <div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmCancelLabel">Xác nhận hủy</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn có chắc chắn muốn hủy cập nhật? Dữ liệu chưa lưu sẽ bị mất.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
+          <a th:href="@{/common/profile}" class="btn btn-danger">Xác nhận hủy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- Nhúng script navbar -->
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+
+<!-- Thêm script xử lý upload avatar -->
+<script src="/js/dashboard/employee-avatar-upload.js"></script>
+
+<!-- Thêm script xử lý loading khi submit form -->
+<script src="/js/common/form-submit-overlay.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Form validation script -->
+<script>
+  // Submit form when confirm update button is clicked
+  document.getElementById("confirmUpdate").addEventListener("click", function () {
+    // Thêm tham số changePassword vào URL nếu checkbox được chọn
+    if (document.getElementById('changePasswordCheckbox').checked) {
+      const form = document.querySelector("form");
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'changePassword';
+      input.value = 'true';
+      form.appendChild(input);
+    }
+    document.querySelector("form").submit();
+  });
+
+  // Hiển thị/ẩn phần thay đổi mật khẩu khi checkbox được nhấp
+  document.getElementById('changePasswordCheckbox').addEventListener('change', function() {
+    const passwordSection = document.getElementById('passwordChangeSection');
+    if (this.checked) {
+      passwordSection.style.display = 'flex';
+      // Đặt required cho các trường mật khẩu
+      document.getElementById('currentPassword').setAttribute('required', '');
+      document.getElementById('newPassword').setAttribute('required', '');
+      document.getElementById('confirmPassword').setAttribute('required', '');
+    } else {
+      passwordSection.style.display = 'none';
+      // Bỏ required cho các trường mật khẩu
+      document.getElementById('currentPassword').removeAttribute('required');
+      document.getElementById('newPassword').removeAttribute('required');
+      document.getElementById('confirmPassword').removeAttribute('required');
+      
+      // Xóa giá trị đã nhập
+      document.getElementById('currentPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('confirmPassword').value = '';
+    }
+  });
+  
+  // Đặt trạng thái required ban đầu dựa trên trạng thái checkbox
+  (function() {
+    const checkbox = document.getElementById('changePasswordCheckbox');
+    if (checkbox.checked) {
+      document.getElementById('currentPassword').setAttribute('required', '');
+      document.getElementById('newPassword').setAttribute('required', '');
+      document.getElementById('confirmPassword').setAttribute('required', '');
+    }
+  })();
+  
+  // Nút hiển thị/ẩn mật khẩu
+  document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      const icon = this.querySelector('i');
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      }
+    });
+  });
+  
+  // Kiểm tra mật khẩu mới và xác nhận mật khẩu có khớp nhau không
+  document.getElementById('confirmPassword').addEventListener('input', function() {
+    const newPassword = document.getElementById('newPassword').value;
+    if (this.value !== newPassword) {
+      this.setCustomValidity('Mật khẩu xác nhận không khớp với mật khẩu mới');
+    } else {
+      this.setCustomValidity('');
+    }
+  });
+  
+  document.getElementById('newPassword').addEventListener('input', function() {
+    const confirmPassword = document.getElementById('confirmPassword');
+    if (confirmPassword.value !== '' && confirmPassword.value !== this.value) {
+      confirmPassword.setCustomValidity('Mật khẩu xác nhận không khớp với mật khẩu mới');
+    } else {
+      confirmPassword.setCustomValidity('');
+    }
+  });
+
+  (function () {
+    'use strict'
+
+    var forms = document.querySelectorAll('.needs-validation')
+
+    // Vòng lặp ngăn chặn submit form khi có lỗi
+    Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+              form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                  event.preventDefault()
+                  event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+              }, false)
+            })
+  })()
+
+  // Image preview
+  document.getElementById('avatarFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        document.querySelector('.avatar-preview').setAttribute('src', event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+</body>
+</html>

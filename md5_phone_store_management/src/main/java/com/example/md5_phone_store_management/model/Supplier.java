@@ -1,11 +1,13 @@
 package com.example.md5_phone_store_management.model;
 
+
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 
 @Entity
 @Table(name = "supplier")
-public class Supplier {
+public class Supplier  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "supplierID")

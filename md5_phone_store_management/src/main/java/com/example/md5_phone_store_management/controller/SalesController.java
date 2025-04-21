@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.example.md5_phone_store_management.service.implement.InvoiceServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -59,6 +60,9 @@ public class SalesController {
 
     @Autowired
     private IInvoiceService iInvoiceService;
+
+    @Autowired
+    private InvoiceServiceImpl invoiceServiceImpl;
 
     @Autowired
     private VNPayService vnPayService;
@@ -126,167 +130,150 @@ public class SalesController {
         return "dashboard/sales/form";
     }
 
-    @PostMapping("/add")
-    public String processPayment(@ModelAttribute("invoice") Invoice invoice,
-                                 @RequestParam("productID") List<Integer> productIDs,
-                                 @RequestParam("quantity") List<Integer> quantities,
-                                 @RequestParam("paymentMethod") String paymentMethodStr,
-                                 @RequestParam(value = "printInvoice", required = false) Boolean printInvoice,
-                                 HttpSession session,
-                                 Model model) {
+
+@PostMapping("/add")
+public String processPayment(@ModelAttribute("invoice") Invoice invoice,
+                             @RequestParam("productID") List<Integer> productIDs,
+                             @RequestParam("quantity") List<Integer> quantities,
+                             @RequestParam("paymentMethod") String paymentMethodStr,
+                             @RequestParam(value = "printInvoice", required = false) Boolean printInvoice,
+                             HttpSession session,
+                             Model model) {
+    try {
+        System.out.println("DEBUG: Đã nhận request thanh toán");
+        System.out.println("DEBUG: Invoice: " + invoice);
+        System.out.println("DEBUG: Customer ID: " + (invoice.getCustomer() != null ? invoice.getCustomer().getCustomerID() : "null"));
+        System.out.println("DEBUG: ProductIDs: " + productIDs);
+        System.out.println("DEBUG: Quantities: " + quantities);
+        System.out.println("DEBUG: Payment Method: " + paymentMethodStr);
+        System.out.println("DEBUG: Print Invoice: " + printInvoice + " (type: " + (printInvoice != null ? printInvoice.getClass().getName() : "null") + ")");
+
+        PaymentMethod paymentMethod;
         try {
-            System.out.println("DEBUG: Đã nhận request thanh toán");
-            System.out.println("DEBUG: Invoice: " + invoice);
-            System.out.println("DEBUG: Customer ID: " + (invoice.getCustomer() != null ? invoice.getCustomer().getCustomerID() : "null"));
-            System.out.println("DEBUG: ProductIDs: " + productIDs);
-            System.out.println("DEBUG: Quantities: " + quantities);
-            System.out.println("DEBUG: Payment Method: " + paymentMethodStr);
-            System.out.println("DEBUG: Print Invoice: " + printInvoice + " (type: " + (printInvoice != null ? printInvoice.getClass().getName() : "null") + ")");
+            paymentMethod = PaymentMethod.valueOf(paymentMethodStr);
+        } catch (IllegalArgumentException e) {
+            System.out.println("DEBUG: Payment method not valid: " + e.getMessage());
+            paymentMethod = PaymentMethod.CASH;
+        }
 
-            PaymentMethod paymentMethod;
-            try {
-                paymentMethod = PaymentMethod.valueOf(paymentMethodStr);
-            } catch (IllegalArgumentException e) {
-                System.out.println("DEBUG: Payment method not valid: " + e.getMessage());
-                paymentMethod = PaymentMethod.CASH;
-            }
+        invoice.setStatus(InvoiceStatus.PROCESSING);
+        invoice.setPaymentMethod(paymentMethod);
 
-            invoice.setStatus(InvoiceStatus.PROCESSING);
-            invoice.setPaymentMethod(paymentMethod);
-            
-            // Gán nhân viên đang đăng nhập cho hóa đơn ngay khi tạo
-            try {
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                if (authentication != null && authentication.isAuthenticated() &&
-                        !"anonymousUser".equals(authentication.getPrincipal())) {
-                    String username = authentication.getName();
-                    System.out.println("Current authenticated user: " + username);
-
-                    // Tìm nhân viên theo username
-                    Optional<Employee> employeeOpt = iEmployeeService.findByUsername(username);
-                    if (employeeOpt.isPresent()) {
-                        invoice.setEmployee(employeeOpt.get());
-                        System.out.println("Assigned employee: " + employeeOpt.get().getFullName());
-                    } else {
-                        System.err.println("Employee not found for username: " + username);
-                    }
+        // Gán nhân viên đang đăng nhập
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated() &&
+                    !"anonymousUser".equals(authentication.getPrincipal())) {
+                String username = authentication.getName();
+                System.out.println("Current authenticated user: " + username);
+                Optional<Employee> employeeOpt = iEmployeeService.findByUsername(username);
+                if (employeeOpt.isPresent()) {
+                    invoice.setEmployee(employeeOpt.get());
+                    System.out.println("Assigned employee: " + employeeOpt.get().getFullName());
                 } else {
-                    System.err.println("No authentication information found");
+                    System.err.println("Employee not found for username: " + username);
                 }
-            } catch (Exception e) {
-                System.err.println("Error assigning employee: " + e.getMessage());
-                e.printStackTrace();
-                // Vẫn tiếp tục xử lý nếu có lỗi khi gán nhân viên
-            }
-
-            // Kiểm tra các danh sách
-            if (productIDs == null || quantities == null || productIDs.size() != quantities.size()) {
-                session.setAttribute("ERROR_MESSAGE", "Danh sách sản phẩm không hợp lệ!");
-                return "redirect:/dashboard/sales/form?error=invalid_data";
-            }
-
-            // Kiểm tra customer
-            if (invoice.getCustomer() == null || invoice.getCustomer().getCustomerID() == null) {
-                session.setAttribute("ERROR_MESSAGE", "Khách hàng không được để trống!");
-                return "redirect:/dashboard/sales/form?error=missing_customer";
-            }
-
-            // Lấy customer từ db
-            Customer customer = iCustomerService.findCustomerById(invoice.getCustomer().getCustomerID());
-            if (customer == null) {
-                session.setAttribute("ERROR_MESSAGE", "Khách hàng không tồn tại!");
-                return "redirect:/dashboard/sales/form?error=customer_not_found";
-            }
-            invoice.setCustomer(customer);
-
-            // Tạo danh sách chi tiết hóa đơn
-            List<InvoiceDetail> invoiceDetails = new ArrayList<>();
-            Long totalAmount = 0L;
-
-            // Đảm bảo danh sách hợp lệ
-            for (int i = 0; i < productIDs.size(); i++) {
-                Integer productId = productIDs.get(i);
-                Integer quantity = quantities.get(i);
-
-                if (productId == null || quantity == null || quantity <= 0) {
-                    continue;
-                }
-
-                Product product = iProductService.getProductById(productId);
-                if (product == null) {
-                    continue;
-                }
-
-                // Không cho phép mua quá số lượng trong kho
-                if (quantity > product.getStockQuantity()) {
-                    session.setAttribute("ERROR_MESSAGE", "Số lượng sản phẩm " + product.getName() + " không đủ!");
-                    return "redirect:/dashboard/sales/form?error=insufficient_stock&product=" + product.getName() +
-                            "&available=" + product.getStockQuantity() + "&requested=" + quantity;
-                }
-
-                // Tạo chi tiết hóa đơn
-                InvoiceDetail detail = new InvoiceDetail();
-                detail.setProduct(product);
-                detail.setQuantity(quantity);
-                detail.setTotalPrice(product.getRetailPrice().multiply(BigDecimal.valueOf(quantity)));
-
-                // Thêm vào danh sách và tính tổng tiền
-                invoiceDetails.add(detail);
-                totalAmount += product.getRetailPrice().multiply(BigDecimal.valueOf(quantity)).longValue();
-            }
-
-            // Kiểm tra xem có chi tiết hóa đơn nào được tạo không
-            if (invoiceDetails.isEmpty()) {
-                session.setAttribute("ERROR_MESSAGE", "Không có sản phẩm nào được chọn!");
-                return "redirect:/dashboard/sales/form?error=no_products";
-            }
-
-            // Đặt danh sách chi tiết và số tiền
-            invoice.setInvoiceDetailList(invoiceDetails);
-            invoice.setAmount(totalAmount);
-
-            // Thiết lập orderInfo cho hóa đơn (khá quan trọng)
-            String orderInfo = "Thanh toán hóa đơn";
-
-            invoice.setOrderInfo(orderInfo);
-
-            // Lưu hóa đơn vào database
-            invoice = iInvoiceService.saveInvoice(invoice);
-
-            // Kiểm tra nếu lưu thất bại
-            if (invoice == null || invoice.getId() == null) {
-                session.setAttribute("ERROR_MESSAGE", "Lỗi khi lưu hóa đơn!");
-                return "redirect:/dashboard/sales/form?error=save_failed";
-            }
-
-            // Cập nhật orderInfo để bao gồm mã hóa đơn
-            orderInfo = "Thanh toán đơn hàng #" + invoice.getId();
-
-            invoice.setOrderInfo(orderInfo);
-
-            // Cập nhật lại hóa đơn với orderInfo đã cập nhật
-            invoice = iInvoiceService.saveInvoice(invoice);
-
-            // Lưu ID hóa đơn và flag in hóa đơn vào session
-            session.setAttribute("invoiceId", invoice.getId());
-            session.setAttribute("orderId", invoice.getId());
-            session.setAttribute("totalAmount", BigDecimal.valueOf(totalAmount));
-            session.setAttribute("printInvoice", printInvoice);
-
-            // Xử lý theo phương thức thanh toán
-            if (paymentMethod == PaymentMethod.VNPAY) {
-                // Chuyển hướng đến trang thanh toán VNPay
-                return "redirect:/api/vnpay/create-direct-payment";
             } else {
-                // Phương thức thanh toán là tiền mặt - hoàn thành thanh toán ngay
-                return processSuccessfulPayment(invoice.getId(), Boolean.TRUE.equals(printInvoice), session);
+                System.err.println("No authentication information found");
             }
         } catch (Exception e) {
+            System.err.println("Error assigning employee: " + e.getMessage());
             e.printStackTrace();
-            session.setAttribute("ERROR_MESSAGE", "Lỗi khi xử lý thanh toán: " + e.getMessage());
-            return "redirect:/dashboard/sales/form?error=system_error";
         }
+
+        // Kiểm tra danh sách
+        if (productIDs == null || quantities == null || productIDs.size() != quantities.size()) {
+            session.setAttribute("ERROR_MESSAGE", "Danh sách sản phẩm không hợp lệ!");
+            return "redirect:/dashboard/sales/form?error=invalid_data";
+        }
+
+        // Kiểm tra customer
+        if (invoice.getCustomer() == null || invoice.getCustomer().getCustomerID() == null) {
+            session.setAttribute("ERROR_MESSAGE", "Khách hàng không được để trống!");
+            return "redirect:/dashboard/sales/form?error=missing_customer";
+        }
+
+        Customer customer = iCustomerService.findCustomerById(invoice.getCustomer().getCustomerID());
+        if (customer == null) {
+            session.setAttribute("ERROR_MESSAGE", "Khách hàng không tồn tại!");
+            return "redirect:/dashboard/sales/form?error=customer_not_found";
+        }
+        invoice.setCustomer(customer);
+
+        // Tạo danh sách chi tiết hóa đơn
+        List<InvoiceDetail> invoiceDetails = new ArrayList<>();
+        Long totalAmount = 0L;
+
+        for (int i = 0; i < productIDs.size(); i++) {
+            Integer productId = productIDs.get(i);
+            Integer quantity = quantities.get(i);
+
+            if (productId == null || quantity == null || quantity <= 0) {
+                continue;
+            }
+
+            Product product = iProductService.getProductById(productId);
+            if (product == null) {
+                continue;
+            }
+
+            if (quantity > product.getStockQuantity()) {
+                session.setAttribute("ERROR_MESSAGE", "Số lượng sản phẩm " + product.getName() + " không đủ!");
+                return "redirect:/dashboard/sales/form?error=insufficient_stock&product=" + product.getName() +
+                        "&available=" + product.getStockQuantity() + "&requested=" + quantity;
+            }
+
+            InvoiceDetail detail = new InvoiceDetail();
+            detail.setProduct(product);
+            detail.setQuantity(quantity);
+            detail.setTotalPrice(product.getRetailPrice().multiply(BigDecimal.valueOf(quantity)));
+
+            invoiceDetails.add(detail);
+            totalAmount += product.getRetailPrice().multiply(BigDecimal.valueOf(quantity)).longValue();
+        }
+
+        if (invoiceDetails.isEmpty()) {
+            session.setAttribute("ERROR_MESSAGE", "Không có sản phẩm nào được chọn!");
+            return "redirect:/dashboard/sales/form?error=no_products";
+        }
+
+        invoice.setInvoiceDetailList(invoiceDetails);
+        invoice.setAmount(totalAmount);
+
+        // Thiết lập orderInfo trước khi lưu
+        String orderInfo = "Thanh toán hóa đơn";
+        invoice.setOrderInfo(orderInfo);
+
+        // Lưu hóa đơn
+        System.out.println("DEBUG: Saving invoice first time");
+        invoice = iInvoiceService.saveInvoice(invoice);
+
+        if (invoice == null || invoice.getId() == null) {
+            session.setAttribute("ERROR_MESSAGE", "Lỗi khi lưu hóa đơn!");
+            return "redirect:/dashboard/sales/form?error=save_failed";
+        }
+
+        // Cập nhật orderInfo với mã hóa đơn
+        invoice.setOrderInfo("Thanh toán đơn hàng #" + invoice.getId());
+
+        // Lưu ID hóa đơn và flag in hóa đơn vào session
+        session.setAttribute("invoiceId", invoice.getId());
+        session.setAttribute("orderId", invoice.getId());
+        session.setAttribute("totalAmount", BigDecimal.valueOf(totalAmount));
+        session.setAttribute("printInvoice", printInvoice);
+
+        // Xử lý theo phương thức thanh toán
+        if (paymentMethod == PaymentMethod.VNPAY) {
+            return "redirect:/api/vnpay/create-direct-payment";
+        } else {
+            return processSuccessfulPayment(invoice.getId(), Boolean.TRUE.equals(printInvoice), session);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        session.setAttribute("ERROR_MESSAGE", "Lỗi khi xử lý thanh toán: " + e.getMessage());
+        return "redirect:/dashboard/sales/form?error=system_error";
     }
+}
 
     /**
      * Xuất hóa đơn sang PDF và tải xuống
@@ -326,25 +313,25 @@ public class SalesController {
         }
     }
 
-    /**
-     * Xử lý thanh toán thành công
-     */
+
+
+    // từ hậu
     private String processSuccessfulPayment(Long invoiceId, boolean printInvoice, HttpSession session) {
         try {
-            System.out.println("Processing successful payment for invoice ID: " + invoiceId);
+            System.out.println("DEBUG: Processing successful payment for invoice ID: " + invoiceId);
             System.out.println("DEBUG: Print Invoice flag value: " + printInvoice + " (primitive boolean)");
 
             // Lấy thông tin hóa đơn
             Invoice invoice = iInvoiceService.findById(invoiceId);
             if (invoice == null) {
-                System.err.println("Invoice not found with ID: " + invoiceId);
+                System.err.println("ERROR: Invoice not found with ID: " + invoiceId);
                 session.setAttribute("ERROR_MESSAGE", "Không tìm thấy hóa đơn!");
                 return "redirect:/dashboard/sales/form?error=invoice_not_found";
             }
 
-            System.out.println("Found invoice: " + invoice);
+            System.out.println("DEBUG: Found invoice: " + invoice);
 
-            // Kiểm tra trạng thái đơn hàng thành thành công
+            // Kiểm tra trạng thái đơn hàng thành công
             invoice.setStatus(InvoiceStatus.SUCCESS);
 
             // Thiết lập ngày thanh toán cho phương thức tiền mặt
@@ -352,7 +339,7 @@ public class SalesController {
                 // Định dạng ngày thanh toán theo cùng định dạng với VNPAY (yyyyMMddHHmmss)
                 String payDate = new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                 invoice.setPayDate(payDate);
-                System.out.println("Set pay date for CASH payment: " + payDate);
+                System.out.println("DEBUG: Set pay date for CASH payment: " + payDate);
 
                 // Đảm bảo orderInfo được thiết lập
                 Customer customer = invoice.getCustomer();
@@ -362,7 +349,7 @@ public class SalesController {
                         orderInfo += " của KH " + customer.getFullName();
                     }
                     invoice.setOrderInfo(orderInfo);
-                    System.out.println("Enforced orderInfo for CASH payment: " + orderInfo);
+                    System.out.println("DEBUG: Enforced orderInfo for CASH payment: " + orderInfo);
                 }
             }
 
@@ -373,55 +360,55 @@ public class SalesController {
                     if (authentication != null && authentication.isAuthenticated() &&
                             !"anonymousUser".equals(authentication.getPrincipal())) {
                         String username = authentication.getName();
-                        System.out.println("Cập nhật Employee cho hóa đơn - Current authenticated user: " + username);
+                        System.out.println("DEBUG: Updating Employee for invoice - Current authenticated user: " + username);
 
                         // Tìm nhân viên theo username
                         Optional<Employee> employeeOpt = iEmployeeService.findByUsername(username);
                         if (employeeOpt.isPresent()) {
                             invoice.setEmployee(employeeOpt.get());
-                            System.out.println("Assigned employee: " + employeeOpt.get().getFullName() + " to invoice ID: " + invoice.getId());
+                            System.out.println("DEBUG: Assigned employee: " + employeeOpt.get().getFullName() + " to invoice ID: " + invoice.getId());
                         } else {
-                            System.err.println("Employee not found for username: " + username);
+                            System.err.println("ERROR: Employee not found for username: " + username);
                         }
                     } else {
-                        System.err.println("No authentication information found");
+                        System.err.println("ERROR: No authentication information found");
                     }
                 } catch (Exception e) {
-                    System.err.println("Error assigning employee: " + e.getMessage());
+                    System.err.println("ERROR: Error assigning employee: " + e.getMessage());
                     e.printStackTrace();
-                    // Vẫn tiếp tục xử lý, không dừng tiến trình
+                    // Continue processing
                 }
             } else {
-                System.out.println("Invoice already has employee assigned: " + invoice.getEmployee().getFullName());
+                System.out.println("DEBUG: Invoice already has employee assigned: " + invoice.getEmployee().getFullName());
             }
 
             // Cập nhật số lượng trong kho
             try {
                 updateProductStock(invoice);
-                System.out.println("Product stock updated successfully");
+                System.out.println("DEBUG: Product stock updated successfully");
             } catch (Exception e) {
-                System.err.println("Error updating product stock: " + e.getMessage());
+                System.err.println("ERROR: Error updating product stock: " + e.getMessage());
                 e.printStackTrace();
-                // Tiếp tục xử lý mặc dù có lỗi
+                // Continue processing
             }
 
             // Cập nhật số lần mua hàng
             try {
                 updateCustomerPurchaseCount(invoice);
-                System.out.println("Customer purchase count updated successfully");
+                System.out.println("DEBUG: Customer purchase count updated successfully");
             } catch (Exception e) {
-                System.err.println("Error updating customer purchase count: " + e.getMessage());
+                System.err.println("ERROR: Error updating customer purchase count: " + e.getMessage());
                 e.printStackTrace();
-                // Tiếp tục xử lý mặc dù có lỗi
+                // Continue processing
             }
 
             // Lưu lại thông tin hóa đơn
             try {
-                invoice = iInvoiceService.saveInvoice(invoice);
-                System.out.println("Invoice saved successfully: " + invoice.getId());
+                invoice = invoiceServiceImpl.updateInvoice(invoice); // Use updateInvoice
+                System.out.println("DEBUG: Invoice updated successfully: " + invoice.getId());
                 session.setAttribute("SUCCESS_MESSAGE", "Thanh toán thành công!");
             } catch (Exception e) {
-                System.err.println("Error saving invoice: " + e.getMessage());
+                System.err.println("ERROR: Error updating invoice: " + e.getMessage());
                 e.printStackTrace();
                 session.setAttribute("ERROR_MESSAGE", "Có lỗi khi lưu hóa đơn: " + e.getMessage());
                 return "redirect:/dashboard/sales/form?error=save_error";
@@ -429,20 +416,20 @@ public class SalesController {
 
             // Kiểm tra nếu cần in hóa đơn
             if (printInvoice) {
-                System.out.println("Auto-downloading invoice PDF");
-                // Redirect đến trang tải PDF trực tiếp thay vì trang xem
+                System.out.println("DEBUG: Auto-downloading invoice PDF");
                 return "redirect:/dashboard/sales/auto-download-pdf/" + invoiceId;
             } else {
-                System.out.println("Redirecting to invoice detail page");
+                System.out.println("DEBUG: Redirecting to invoice detail page");
                 return "redirect:/dashboard/sales/invoice-pdf/" + invoiceId;
             }
         } catch (Exception e) {
-            System.err.println("Error processing successful payment: " + e.getMessage());
+            System.err.println("ERROR: Error processing successful payment: " + e.getMessage());
             e.printStackTrace();
             session.setAttribute("ERROR_MESSAGE", "Lỗi khi xử lý thanh toán: " + e.getMessage());
             return "redirect:/dashboard/sales/form?error=process_error";
         }
     }
+
 
     /**
      * Cập nhật số lần mua hàng của khách hàng
@@ -451,13 +438,12 @@ public class SalesController {
         try {
             Customer customer = invoice.getCustomer();
             if (customer != null) {
-                Customer freshCustomer = iCustomerService.findCustomerById(customer.getCustomerID());
+                Customer freshCustomer = iCustomerService.findCustomerById(invoice.getCustomer().getCustomerID());
                 if (freshCustomer != null) {
                     int newCount = freshCustomer.getPurchaseCount() + 1;
 
                     try {
-                        Integer customerId = freshCustomer.getCustomerID();
-                        iCustomerService.updatePurchaseCount(customerId, newCount);
+                        iCustomerService.updatePurchaseCount(freshCustomer.getCustomerID(), newCount);
                         System.out.println("Đã cập nhật thành công số lượng mua hàng cho khách hàng: " + freshCustomer.getFullName() +
                                 ", số lần mua mới: " + newCount);
                     } catch (Exception e) {

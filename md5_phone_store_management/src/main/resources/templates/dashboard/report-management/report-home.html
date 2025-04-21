@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/fragments/navbar.css">
     <link rel="stylesheet" href="/css/fragments/sidebar.css">
@@ -15,17 +17,52 @@
     <link rel="stylesheet" href="/css/common/toast.css">
     <link rel="stylesheet" href="/css/common/layout.css">
     <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e9ecef 100%);
+        }
+
         .content-wrapper {
             display: flex;
-            min-height: calc(100vh - 56px); /* Trừ chiều cao navbar */
+            min-height: calc(100vh - 70px);
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+        }
+
+        .content-container {
+            flex-grow: 1;
+            padding: 0;
         }
 
         .management-section {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
-            padding: 2rem;
-            margin: 2rem;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            margin: 2rem 1rem;
+            width: calc(100% - 2rem);
+            transition: transform 0.3s ease;
+        }
+
+        .management-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title i {
+            color: #007bff;
+            margin-right: 0.75rem;
         }
 
         .btn-custom {
@@ -33,79 +70,620 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 500;
             color: white;
             text-decoration: none;
-            transition: all 0.3s;
-            margin-bottom: 1rem;
-        }
-
-        .btn-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            color: white;
-            text-decoration: none;
-        }
-
-        .btn-blue {
-            background: linear-gradient(135deg, #0062cc 0%, #007bff 100%);
-        }
-
-        .btn-green {
-            background: linear-gradient(135deg, #1c7430 0%, #28a745 100%);
-        }
-
-        .btn-orange {
-            background: linear-gradient(135deg, #e65c00 0%, #fd7e14 100%);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-custom i {
-            margin-right: 0.5rem;
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            color: white;
+        }
+
+        .btn-blue {
+            background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #28a745 0%, #34c759 100%);
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, #fd7e14 0%, #ff9f43 100%);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #6f42c1 0%, #9370db 100%);
+        }
+
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.4s;
+        }
+
+        .btn-custom:hover::before {
+            left: 100%;
+        }
+
+        .stat-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Split card styles */
+        .split-card {
+            position: relative;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: 180px;
+            transition: transform 0.3s ease;
+        }
+
+        .split-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .split-card .left-side,
+        .split-card .right-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            will-change: clip-path;
+            transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+
+        .split-card .content {
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out 0.25s;
+        }
+
+        .split-card .center-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            z-index: 2;
+            pointer-events: none;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .split-card .center-text i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .split-card:hover .center-text {
+            opacity: 0;
+        }
+
+        .split-card:not(:hover) .center-text {
+            opacity: 1;
+        }
+
+        /* Màu cho split-card Báo cáo bán hàng (đồng điệu với btn-blue) */
+        .split-card.sales .left-side {
+            background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+        }
+
+        .split-card.sales .right-side {
+            background: linear-gradient(135deg, #00aaff 0%, #4dc0ff 100%);
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+
+        .split-card.sales .left-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.sales .left-side:hover ~ .right-side {
+            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+        }
+
+        .split-card.sales .right-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.sales .right-side:hover ~ .left-side {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        }
+
+        .split-card.sales .left-side:hover .content,
+        .split-card.sales .right-side:hover .content {
+            opacity: 1;
+        }
+
+        /* Màu cho split-card Báo cáo khách hàng (đồng điệu với btn-green) */
+        .split-card.customer .left-side {
+            background: linear-gradient(135deg, #28a745 0%, #34c759 100%);
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+        }
+
+        .split-card.customer .right-side {
+            background: linear-gradient(135deg, #34c759 0%, #5cd881 100%);
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+
+        .split-card.customer .left-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.customer .left-side:hover ~ .right-side {
+            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+        }
+
+        .split-card.customer .right-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.customer .right-side:hover ~ .left-side {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        }
+
+        .split-card.customer .left-side:hover .content,
+        .split-card.customer .right-side:hover .content {
+            opacity: 1;
+        }
+
+        /* Card grid for buttons */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Notification Section */
+        .notification-section {
+            margin-top: 2rem;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .notification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .notification-card {
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .notification-card h6 {
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-card p {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .breadcrumb {
+            background: transparent;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb-item a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .management-section {
+                margin: 1rem;
+                padding: 1.5rem;
+                width: calc(100% - 2rem);
+            }
+
+            .card-grid, .stat-card-grid, .notification-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-custom {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .card-grid, .stat-card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
 
+
+
 <div th:replace="~{common/toast}"></div>
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 <div class="content-wrapper">
     <div class="dashboard-container">
-        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
-
-
+                <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
         <!-- Main content area -->
         <div class="content-container flex-grow-1">
-            <div class="container py-4">
+            <div class="container-fluid py-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item active" aria-current="page">Quản lí báo cáo</li>
+                        <li class="breadcrumb-item active" aria-current="page">Quản lý báo cáo</li>
                     </ol>
                 </nav>
                 <div class="management-section">
-                    <h3 class="mb-4">
-                        <i class="fas fa-cogs me-2"></i> Quản lí báo cáo
+                    <h3 class="section-title">
+                        <i class="fas fa-cogs"></i> Quản lý báo cáo
                     </h3>
-                    <a href="/sales-report" class="btn-custom btn-blue">
-                        <i class="fas fa-tags"></i> Báo cáo bán hàng
-                    </a>
-                    <a href="/dashboard/admin/customer/report" class="btn-custom btn-green">
-                        <i class="fas fa-history"></i> Báo Cáo khách hàng
-                    </a>
-<!--                    <a href="/dashboard/admin/customers/list" class="btn-custom btn-orange">-->
-<!--                        <i class="fas fa-users"></i>-->
-<!--                    </a>-->
+
+                    <!-- Stat Cards -->
+                    <div class="stat-card-grid">
+                        <!-- Báo cáo bán hàng -->
+                        <div class="split-card sales">
+                            <div class="center-text">
+                                <i class="fas fa-chart-line"></i>
+                                <h5>Tổng doanh thu: <span id="totalInvoiceRevenue">0 VNĐ</span></h5>
+                                <p>Tổng số đơn: <span id="countAllSuccessInvoices">0 đơn</span></p>
+                            </div>
+                            <div class="left-side">
+                                <div class="content">
+                                    <h4>Hôm nay (<span id="todayDate"></span>)</h4>
+                                    <p>Số đơn: <span id="countTodaySuccessInvoices">0 đơn</span></p>
+                                    <p>Doanh thu: <span id="totalTodayInvoiceRevenue">0 VNĐ</span></p>
+                                </div>
+                            </div>
+                            <div class="right-side">
+                                <div class="content">
+                                    <h4>Tháng này (<span id="thisMonthDate"></span>)</h4>
+                                    <p>Số đơn: <span id="countThisMonthSuccessInvoices">0 đơn</span></p>
+                                    <p>Doanh thu: <span id="totalThisMonthInvoiceRevenue">0 VNĐ</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Báo cáo khách hàng -->
+                        <div class="split-card customer">
+                            <div class="center-text">
+                                <i class="fas fa-users"></i>
+                                <p>Tổng khách hàng: <span id="totalCustomers">0</span></p>
+                            </div>
+                            <div class="left-side">
+                                <div class="content">
+                                    <h5>Khách hàng mới</h5>
+                                    <p id="totalNewCustomers">0</p>
+                                </div>
+                            </div>
+                            <div class="right-side">
+                                <div class="content">
+                                    <h5>Khách hàng thân thiết</h5>
+                                    <p id="loyalCustomers">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card-grid">
+                        <a href="/sales-report" class="btn-custom btn-blue">
+                            <i class="fas fa-chart-line"></i> Báo cáo bán hàng
+                        </a>
+                        <a href="/dashboard/admin/customer/report" class="btn-custom btn-green">
+                            <i class="fas fa-users"></i> Báo cáo khách hàng
+                        </a>
+                    </div>
+
+                    <!-- Notification Section -->
+                    <div class="notification-section">
+                        <h5 class="mb-3"><i class="fas fa-bell"></i> Thông báo mới nhất</h5>
+                        <div class="notification-grid" id="notification-grid">
+                            <!-- Notifications will be populated dynamically -->
+                        </div>
+                    </div>
                 </div>
             </div>
-
-
         </div>
     </div>
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
-<div th:replace="~{fragments/navbar :: navbar-script}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Format number as Vietnamese currency
+    const formatCurrency = (value) => {
+        return value ? Number(value).toLocaleString('vi-VN') + ' VNĐ' : '0 VNĐ';
+    };
+
+    // Format date for today
+    const formatTodayDate = () => {
+        return new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    // Format date for current month
+    const formatThisMonthDate = () => {
+        return new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
+    };
+
+    // Update dashboard data
+    const updateDashboard = async () => {
+        try {
+            const response = await fetch('/api/changelogs/report-home-info?t=' + Date.now());
+            if (!response.ok) {
+                console.error('Error fetching dashboard data:', response.status);
+                return;
+            }
+            const data = await response.json();
+
+            // Update Sales Card
+            document.getElementById('totalInvoiceRevenue').textContent = formatCurrency(data.totalInvoiceRevenue);
+            document.getElementById('countAllSuccessInvoices').textContent = data.countAllSuccessInvoices + ' đơn';
+            document.getElementById('countTodaySuccessInvoices').textContent = data.countTodaySuccessInvoices + ' đơn';
+            document.getElementById('totalTodayInvoiceRevenue').textContent = formatCurrency(data.totalTodayInvoiceRevenue);
+            document.getElementById('countThisMonthSuccessInvoices').textContent = data.countThisMonthSuccessInvoices + ' đơn';
+            document.getElementById('totalThisMonthInvoiceRevenue').textContent = formatCurrency(data.totalThisMonthInvoiceRevenue);
+            document.getElementById('todayDate').textContent = formatTodayDate();
+            document.getElementById('thisMonthDate').textContent = formatThisMonthDate();
+
+            // Update Customer Card
+            document.getElementById('totalCustomers').textContent = data.totalCustomers || 0;
+            document.getElementById('totalNewCustomers').textContent = data.totalNewCustomers || 0;
+            document.getElementById('loyalCustomers').textContent = (data.totalCustomers - data.totalNewCustomers) || 0;
+        } catch (error) {
+            console.error('Error updating dashboard:', error);
+        }
+    };
+
+    // Update notifications (reusing existing logic with minor adjustments)
+    const updateNotifications = async () => {
+        const notificationGrid = document.getElementById('notification-grid');
+
+        const endpoints = [
+            { url: '/api/changelogs/invoice/notification', title: 'Báo cáo bán hàng' },
+            { url: '/api/changelogs/invoice/notification', title: 'Báo cáo khách hàng' }
+        ];
+
+        const createNotificationCard = (title, message, changeCount) => {
+            const card = document.createElement('div');
+            card.className = 'notification-card';
+            card.dataset.endpoint = endpoints.find(e => e.title === title)?.url;
+            card.innerHTML = `
+                <h6>${title}</h6>
+                <p>${message}</p>
+                ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
+            `;
+            return card;
+        };
+
+        for (const endpoint of endpoints) {
+            try {
+                const response = await fetch(`${endpoint.url}?t=${Date.now()}`);
+                console.log(`Response status for ${endpoint.url}:`, response.status);
+                let data = {};
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log(`Raw response for ${endpoint.url}:`, text);
+                    data = text ? JSON.parse(text) : {};
+                } else {
+                    console.error(`HTTP error ${response.status} for ${endpoint.url}`);
+                    const existingCard = Array.from(notificationGrid.children).find(
+                        card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
+                    );
+                    const errorMessage = 'Lỗi khi tải thông báo';
+                    if (existingCard) {
+                        const existingMessage = existingCard.querySelector('p').textContent;
+                        if (existingMessage !== errorMessage) {
+                            existingCard.querySelector('p').textContent = errorMessage;
+                            existingCard.querySelector('.notification-badge')?.remove();
+                        }
+                    } else {
+                        notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
+                    }
+                    continue;
+                }
+
+                // Process ChangeLog data
+                let message = 'Không có cập nhật mới';
+                let changeCount = 0;
+
+                if (data && data.action && data.fieldName) {
+                    if (endpoint.url.includes('invoice') && endpoint.title === 'Báo cáo bán hàng') {
+                        switch (data.action.toUpperCase()) {
+                            case 'INSERT':
+                                if (data.fieldName.toLowerCase() === 'invoice') {
+                                    let amount, totalQuantity = 0;
+                                    if (data.newValue !== 'Invoice created') {
+                                        const amountMatch = data.newValue.match(/amount=([\d.]+)/);
+                                        amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN') + ' VNĐ' : 'N/A';
+                                        if (data.entityId) {
+                                            try {
+                                                const invoiceDetailsResponse = await fetch(`/api/changelogs/invoices/${data.entityId}/details`);
+                                                if (invoiceDetailsResponse.ok) {
+                                                    const invoiceDetail = await invoiceDetailsResponse.json();
+                                                    totalQuantity = invoiceDetail.quantity || 0;
+                                                    console.log(`InvoiceDetail ID ${data.entityId} has quantity: ${totalQuantity}`);
+                                                } else {
+                                                    console.log(`No InvoiceDetail found for ID ${data.entityId}, using quantity: 0`);
+                                                }
+                                            } catch (error) {
+                                                console.error(`Error fetching invoice details for ID ${data.entityId}:`, error);
+                                                console.log(`Error occurred for InvoiceDetail ID ${data.entityId}, using quantity: 0`);
+                                            }
+                                        }
+                                        message = `Hóa đơn mới: ${amount} cho ${totalQuantity} sản phẩm`;
+                                    } else {
+                                        message = `Hóa đơn mới được tạo ${data.newValue}`;
+                                    }
+                                    changeCount = 1;
+                                } else {
+                                    message = 'Không có báo cáo bán hàng mới';
+                                }
+                                break;
+                            default:
+                                message = 'Không có báo cáo bán hàng mới';
+                                break;
+                        }
+                    } else if (endpoint.url.includes('invoice') && endpoint.title === 'Báo cáo khách hàng') {
+                        switch (data.action.toUpperCase()) {
+                            case 'INSERT':
+                                if (data.fieldName.toLowerCase() === 'invoice') {
+                                    let amount, customerName = 'không xác định';
+                                    if (data.newValue !== 'Invoice created') {
+                                        const amountMatch = data.newValue.match(/amount=([\d.]+)/);
+                                        const customerIdMatch = data.newValue.match(/customerId=(\d+)/);
+                                        amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN') + ' VNĐ' : 'N/A';
+                                        if (customerIdMatch) {
+                                            try {
+                                                const customerResponse = await fetch(`/api/changelogs/customers/${customerIdMatch[1]}`);
+                                                if (customerResponse.ok) {
+                                                    const customerData = await customerResponse.json();
+                                                    customerName = customerData.name || 'không xác định';
+                                                }
+                                            } catch (error) {
+                                                console.error(`Error fetching customer data for ID ${customerIdMatch[1]}:`, error);
+                                            }
+                                        }
+                                        message = `Khách hàng ${customerName} đã thanh toán hóa đơn ${amount}`;
+                                    } else {
+                                        message = `Hóa đơn mới được tạo ${data.newValue}`;
+                                    }
+                                    changeCount = 1;
+                                } else {
+                                    message = 'Không có báo cáo khách hàng mới';
+                                }
+                                break;
+                            default:
+                                message = 'Không có báo cáo khách hàng mới';
+                                break;
+                        }
+                    }
+                }
+
+                // Find existing card for this endpoint and title
+                const existingCard = Array.from(notificationGrid.children).find(
+                    card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
+                );
+
+                if (existingCard) {
+                    // Update existing card if message or changeCount differs
+                    const existingMessage = existingCard.querySelector('p').textContent;
+                    const existingBadge = existingCard.querySelector('.notification-badge');
+                    const existingChangeCount = existingBadge ? parseInt(existingBadge.textContent) : 0;
+
+                    if (existingMessage !== message || existingChangeCount !== changeCount) {
+                        existingCard.querySelector('p').textContent = message;
+                        if (changeCount > 0) {
+                            if (existingBadge) {
+                                existingBadge.textContent = changeCount;
+                            } else {
+                                const badge = document.createElement('div');
+                                badge.className = 'notification-badge';
+                                badge.textContent = changeCount;
+                                existingCard.appendChild(badge);
+                            }
+                        } else {
+                            existingBadge?.remove();
+                        }
+                    }
+                } else {
+                    // Append new card if none exists
+                    notificationGrid.appendChild(createNotificationCard(endpoint.title, message, changeCount));
+                }
+
+                console.log(`Parsed data for ${endpoint.url}:`, data);
+                console.log(`Message for ${endpoint.title}:`, message);
+            } catch (error) {
+                console.error(`Error fetching ${endpoint.url}:`, error);
+                const existingCard = Array.from(notificationGrid.children).find(
+                    card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
+                );
+                const errorMessage = 'Lỗi khi tải thông báo';
+                if (existingCard) {
+                    const existingMessage = existingCard.querySelector('p').textContent;
+                    if (existingMessage !== errorMessage) {
+                        existingCard.querySelector('p').textContent = errorMessage;
+                        existingCard.querySelector('.notification-badge')?.remove();
+                    }
+                } else {
+                    notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
+                }
+            }
+        }
+    };
+
+    // Initial call and polling setup
+    document.addEventListener('DOMContentLoaded', () => {
+        updateDashboard();
+        updateNotifications();
+        setInterval(() => {
+            updateDashboard();
+            updateNotifications();
+        }, 3000);
+    });
+</script>
 </body>
 </html>

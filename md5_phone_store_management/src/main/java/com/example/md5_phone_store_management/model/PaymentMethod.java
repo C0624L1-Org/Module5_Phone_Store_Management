@@ -13,4 +13,8 @@ public enum PaymentMethod {
     public String getLabel() {
         return label;
     }
+    @Override
+    public String toString() {
+        return label;
+    }
 } 

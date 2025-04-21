@@ -5,9 +5,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface IInvoiceDetailService {
+
+//    response.put("topBuyingCustomerName", invoiceDetailService.getTopBuyingCustomerName());
+//        response.put("topBuyingCustomerTotalPurchase", invoiceDetailService.getTopBuyingCustomerTotalPurchase());
+//        response.put("topBuyingCustomerTotalPurchaseQuantity", invoiceDetailService.getTopBuyingCustomerTotalPurchaseQuantity());
+
+    String getTopBuyingCustomerName();
+
+    Long getTopBuyingCustomerTotalPurchase();
+
+    Integer getTopBuyingCustomerTotalPurchaseQuantity();
+
+
+    String getTopSellingProductName();
     Page<InvoiceDetail> findAll(Pageable pageable);
 
+    Integer getTopSellingProductNamePurchaseQuantity();
+
+    List<InvoiceDetail> findInvoiceDetailById(Long invoiceId);
 
     Page<InvoiceDetail> sortByCustomerFullName(Pageable pageable);
 

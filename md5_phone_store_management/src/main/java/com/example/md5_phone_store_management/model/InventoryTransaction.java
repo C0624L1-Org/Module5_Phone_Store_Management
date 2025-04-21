@@ -1,6 +1,8 @@
 package com.example.md5_phone_store_management.model;
 
+
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -169,7 +169,12 @@
                             </thead>
                             <tbody>
 
-                            <tr th:each="transaction, Stat : ${inventoryTransactions}"
+                            <tr th:if="${inventoryTransactions == null || inventoryTransactions.isEmpty()}" class="text-center">
+                                <td colspan="10" class="text-center py-4">Không tìm thấy giao dịch xuất kho nào</td>
+                            </tr>
+                            
+                            <tr th:unless="${inventoryTransactions == null || inventoryTransactions.isEmpty()}" 
+                                th:each="transaction, Stat : ${inventoryTransactions}"
                                 data-bs-toggle="collapse"
                                 data-bs-target="#details-[[${transaction?.transactionID ?: Stat.count}]]"
                                 aria-expanded="false"
@@ -214,17 +219,13 @@
                                         </a>
                                     </div>
                                 </td>
-
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(inventoryTransactions)}">
-                                <td colspan="10" class="text-center py-4">Không tìm thấy giao dịch xuất kho nào</td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
 
 
-                    <div th:if="${!#lists.isEmpty(inventoryTransactions)}"
+                    <div th:if="${!(inventoryTransactions == null || inventoryTransactions.isEmpty())}"
                          class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
                         <button id="deleteSelected" class="btn btn-danger" disabled>
                             <i class="fas fa-trash-alt me-2"></i>Xóa đã chọn
