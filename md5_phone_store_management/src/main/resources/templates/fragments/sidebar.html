@@ -53,7 +53,7 @@
             </li>
 
             <!-- Quản lý nhà cung cấp - Thủ kho, Admin -->
-            <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
+            <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff', 'SalesPerson')">
                 <a th:href="@{/dashboard/suppliers}" class="nav-link" th:data-url="@{/dashboard/suppliers}">
                     <i class="fas fa-truck-loading me-2"></i> Quản lý nhà cung cấp
                 </a>
