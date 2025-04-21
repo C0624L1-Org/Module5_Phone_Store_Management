@@ -1,7 +1,8 @@
 package com.example.md5_phone_store_management.repository;
 
-import com.example.md5_phone_store_management.model.Employee;
-import com.example.md5_phone_store_management.model.Role;
+import java.time.LocalDate;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +12,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.Optional;
+import com.example.md5_phone_store_management.model.Employee;
+import com.example.md5_phone_store_management.model.Role;
 
 @Repository
 public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
@@ -53,6 +54,7 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
                        @Param("email") String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+    boolean existsByPhone(String phone);
 
 
     Optional<Employee> findByUsername(String username);

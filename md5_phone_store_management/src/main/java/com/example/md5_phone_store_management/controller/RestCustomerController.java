@@ -22,11 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.md5_phone_store_management.model.Customer;
 import com.example.md5_phone_store_management.model.Product;
-import com.example.md5_phone_store_management.repository.ICustomerRepository;
 import com.example.md5_phone_store_management.service.CustomerService;
 import com.example.md5_phone_store_management.service.ICustomerService;
+import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.IProductService;
+import com.example.md5_phone_store_management.service.ISupplierService;
 import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
+import com.example.md5_phone_store_management.service.implement.SupplierService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -40,13 +42,19 @@ public class RestCustomerController {
     private ICustomerService iCustomerService;
     
     @Autowired
-    private ICustomerRepository customerRepository;
+    private ISupplierService iSupplierService;
 
     @Autowired
     private IProductService iProductService;
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private IEmployeeService iEmployeeService;
+    
+    @Autowired
+    private SupplierService supplierService;
 
     @PostMapping("/dashboard/admin/customers/update")
     public ResponseEntity<Map<String, Object>> updateCustomer(
@@ -67,8 +75,39 @@ public class RestCustomerController {
             return ResponseEntity.badRequest().body(response);
         }
 
-
+        // Lấy thông tin khách hàng cần cập nhật
         Customer customerNeedUpdate = customerService.getCustomerByID(customerID);
+        
+        // Tạo map lỗi
+        Map<String, String> errors = new HashMap<>();
+        
+        // Kiểm tra SDT nếu có thay đổi
+        if (customer.getPhone() != null && !customer.getPhone().isEmpty() 
+                && !customer.getPhone().equals(customerNeedUpdate.getPhone())) {
+            if (iCustomerService.isPhoneExists(customer.getPhone()) || 
+                iEmployeeService.existsByPhone(customer.getPhone()) || 
+                supplierService.existsByPhone(customer.getPhone())) {
+                errors.put("phone", "Số điện thoại đã tồn tại!");
+            }
+        }
+        
+        // Kiểm tra email có thay đổi
+        if (customer.getEmail() != null && !customer.getEmail().isEmpty() 
+                && !customer.getEmail().equals(customerNeedUpdate.getEmail())) {
+            if (iCustomerService.isEmailExists(customer.getEmail()) || 
+                iEmployeeService.existsByEmail(customer.getEmail()) || 
+                supplierService.existsByEmail(customer.getEmail())) {
+                errors.put("email", "Email đã tồn tại!");
+            }
+        }
+        
+        // Nếu có lỗi, trả về lỗi
+        if (!errors.isEmpty()) {
+            response.put("status", "error");
+            response.put("errors", errors);
+            return ResponseEntity.badRequest().body(response);
+        }
+
         BeanUtils.copyProperties(customer, customerNeedUpdate, "customerID");
 
         boolean isUpdated = customerService.updateCustomer(customerNeedUpdate);
@@ -102,6 +141,35 @@ public class RestCustomerController {
             response.put("errors", errors);
             return ResponseEntity.badRequest().body(response);
         }
+        
+        // Tạo map errors để lưu các lỗi
+        Map<String, String> errors = new HashMap<>();
+        
+        // Kiểm tra số điện thoại
+        if (customer.getPhone() != null && !customer.getPhone().isEmpty()) {
+            if (iCustomerService.isPhoneExists(customer.getPhone()) || 
+                iEmployeeService.existsByPhone(customer.getPhone()) || 
+                supplierService.existsByPhone(customer.getPhone())) {
+                errors.put("phone", "Số điện thoại đã tồn tại!");
+            }
+        }
+        
+        // Kiểm tra email
+        if (customer.getEmail() != null && !customer.getEmail().isEmpty()) {
+            if (iCustomerService.isEmailExists(customer.getEmail()) || 
+                iEmployeeService.existsByEmail(customer.getEmail()) || 
+                supplierService.existsByEmail(customer.getEmail())) {
+                errors.put("email", "Email đã tồn tại!");
+            }
+        }
+        
+        // Nếu có lỗi, trả về lỗi
+        if (!errors.isEmpty()) {
+            response.put("status", "error");
+            response.put("errors", errors);
+            return ResponseEntity.badRequest().body(response);
+        }
+        
         customerService.addNewCustomerAjax(customer);
         session.setAttribute("SUCCESS_MESSAGE", "Thêm khách hàng thành công!");
         response.put("status", "success");
@@ -333,7 +401,9 @@ public class RestCustomerController {
         try {
             // Kiểm tra số điện thoại
             if (customer.getPhone() != null && !customer.getPhone().isEmpty()) {
-                if (iCustomerService.isPhoneExists(customer.getPhone())) {
+                if (iCustomerService.isPhoneExists(customer.getPhone()) || 
+                    iEmployeeService.existsByPhone(customer.getPhone()) || 
+                    supplierService.existsByPhone(customer.getPhone())) {
                     response.put("success", false);
                     response.put("message", "Số điện thoại đã tồn tại!");
                     return ResponseEntity.ok(response);
@@ -342,7 +412,9 @@ public class RestCustomerController {
             
             // Kiểm tra email
             if (customer.getEmail() != null && !customer.getEmail().isEmpty()) {
-                if (iCustomerService.isEmailExists(customer.getEmail())) {
+                if (iCustomerService.isEmailExists(customer.getEmail()) || 
+                    iEmployeeService.existsByEmail(customer.getEmail()) || 
+                    supplierService.existsByEmail(customer.getEmail())) {
                     response.put("success", false);
                     response.put("message", "Email đã tồn tại!");
                     return ResponseEntity.ok(response);

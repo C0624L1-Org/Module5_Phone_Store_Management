@@ -1,10 +1,7 @@
 package com.example.md5_phone_store_management.controller;
 
-import com.example.md5_phone_store_management.model.Employee;
-import com.example.md5_phone_store_management.model.Role;
-import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
-import com.example.md5_phone_store_management.service.IEmployeeService;
-import jakarta.validation.Valid;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,13 +10,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.example.md5_phone_store_management.model.Employee;
+import com.example.md5_phone_store_management.model.Role;
+import com.example.md5_phone_store_management.model.dto.EmployeeDTO;
+import com.example.md5_phone_store_management.service.ICustomerService;
+import com.example.md5_phone_store_management.service.IEmployeeService;
+import com.example.md5_phone_store_management.service.implement.SupplierService;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/dashboard")
@@ -30,6 +38,12 @@ public class EmployeeController {
 
     @Autowired
     private GlobalControllerAdvice globalControllerAdvice;
+
+    @Autowired
+    private SupplierService supplierService;
+
+    @Autowired
+    private ICustomerService customerService;
 
     //Read(a Đình Anh)
     @GetMapping("/admin/employees/list")
@@ -95,8 +109,16 @@ public class EmployeeController {
             bindingResult.rejectValue("username", "", "Tài khoản này đã tồn tại!");
         }
 
-        if (iEmployeeService.existsByEmail(employeeDTO.getEmail())) {
+        if (iEmployeeService.existsByEmail(employeeDTO.getEmail()) ||
+                customerService.isEmailExists(employeeDTO.getEmail()) ||
+                supplierService.existsByEmail(employeeDTO.getEmail())) {
             bindingResult.rejectValue("email", "", "Email này đã tồn tại!");
+        }
+
+        if(supplierService.existsByPhone(employeeDTO.getPhone()) ||
+                customerService.isPhoneExists(employeeDTO.getPhone()) ||
+                iEmployeeService.existsByPhone(employeeDTO.getPhone())) {
+            bindingResult.rejectValue("phone", "", "Số điện thoại này đã tồn tại!");
         }
 
         employeeDTO.validate(employeeDTO, bindingResult);
@@ -111,7 +133,7 @@ public class EmployeeController {
         iEmployeeService.addEmployee(employee);
 
         redirectAttributes.addFlashAttribute("messageType", "success");
-        redirectAttributes.addFlashAttribute("message", "Tạo thành công!");
+        redirectAttributes.addFlashAttribute("message", "Thêm mới nhân viên thành công!");
         return "redirect:/dashboard/admin/employees/list";
 
     }
@@ -151,9 +173,20 @@ public class EmployeeController {
             bindingResult.rejectValue("username", "", "Tài khoản này đã tồn tại!");
         }
 
-        if (!employeeToUpdate.getEmail().equals(employeeDTO.getEmail())
-                && iEmployeeService.existsByEmail(employeeDTO.getEmail())) {
+        // Kiểm tra email
+        if (!employeeToUpdate.getEmail().equals(employeeDTO.getEmail()) &&
+                (iEmployeeService.existsByEmail(employeeDTO.getEmail()) ||
+                        customerService.isEmailExists(employeeDTO.getEmail()) ||
+                        supplierService.existsByEmail(employeeDTO.getEmail()))) {
             bindingResult.rejectValue("email", "", "Email này đã tồn tại!");
+        }
+
+        // Kiểm tra phone
+        if (!employeeToUpdate.getPhone().equals(employeeDTO.getPhone()) &&
+                (iEmployeeService.existsByPhone(employeeDTO.getPhone()) ||
+                        customerService.isPhoneExists(employeeDTO.getPhone()) ||
+                        supplierService.existsByPhone(employeeDTO.getPhone()))) {
+            bindingResult.rejectValue("phone", "", "Số điện thoại này đã tồn tại!");
         }
 
         employeeDTO.validate(employeeDTO, bindingResult);

@@ -200,6 +200,13 @@
                 <div style="display: inline; justify-content: space-around">
                     <!--<h4>Biểu đồ thống kê số lượng mua hàng</h4>-->
                     <canvas id="reportCustomerChart" style="width: 100%; height: 400px;"></canvas>
+                    <div class="p-3 bg-light border-top d-flex justify-content-end align-items-center"
+                        id="chart-pagination-container">
+                        <nav aria-label="Chart Pagination">
+                            <ul class="pagination mb-0" id="chart-pagination">
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
             </div>
         </div>
@@ -221,6 +228,10 @@
     const allCustomerPurchaseCount = [];
     console.log(allCustomers);
 
+    // Biến cho phân trang biểu đồ
+    let chartCurrentPage = 1;
+    let chartItemsPerPage = 5;
+    
     for (let i = 0; i < allCustomers.length; i++) {
         allCustomerFullName.push(allCustomers[i].fullName);
         allCustomerPurchaseCount.push(allCustomers[i].purchaseCount);
@@ -390,37 +401,65 @@
             }
         });
 
-        new Chart(document.getElementById('reportCustomerChart'), {
+        updatePurchaseChart(chartCurrentPage);
+    }
+
+    // Hàm cập nhật biểu đồ theo trang
+    function updatePurchaseChart(page) {
+        if (page < 1) {
+            page = 1;
+        }
+        
+        const totalPages = Math.ceil(allCustomerFullName.length / chartItemsPerPage);
+        if (page > totalPages) {
+            page = totalPages;
+        }
+
+        chartCurrentPage = page;
+
+        const startIndex = (page - 1) * chartItemsPerPage;
+        const endIndex = Math.min(startIndex + chartItemsPerPage, allCustomerFullName.length);
+        
+        const pageLabels = allCustomerFullName.slice(startIndex, endIndex);
+        const pageData = allCustomerPurchaseCount.slice(startIndex, endIndex);
+
+        // Xóa biểu đồ cũ nếu có
+        if (window.purchaseReportChart) {
+            window.purchaseReportChart.destroy();
+        }
+
+        // Tạo biểu đồ mới
+        window.purchaseReportChart = new Chart(document.getElementById('reportCustomerChart'), {
             type: 'bar',
             data: {
-                labels: allCustomerFullName,
+                labels: pageLabels,
                 datasets: [{
                     label: 'Số lượng mua hàng',
-                    data: allCustomerPurchaseCount,
+                    data: pageData,
                     backgroundColor: "rgba(0,0,220,0.7)",
                     borderColor: "rgba(0,0,220,0.1)",
                     borderWidth: 1,
-                    barPercentage: 0.6,  // Điều chỉnh độ rộng của cột, giá trị từ 0-1
-                    categoryPercentage: 0.8  // Điều chỉnh khoảng cách giữa các cột, giá trị từ 0-1
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.8
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,  // Cho phép điều chỉnh kích thước không phụ thuộc vào tỷ lệ khung hình
+                maintainAspectRatio: false,
                 scales: {
                     yAxes: [{
                         ticks: {
                             beginAtZero: true,
-                            stepSìze: 1,
-                            precision: 0  // Hiển thị số nguyên trên trục Y
+                            stepSize: 1,
+                            precision: 0
                         },
                         gridLines: {
-                            color: "rgba(0, 0, 0, 0.05)"  // Làm mờ các đường lưới
+                            color: "rgba(0, 0, 0, 0.05)"
                         }
                     }],
                     xAxes: [{
                         gridLines: {
-                            display: false  // Ẩn các đường lưới trục X
+                            display: false
                         }
                     }]
                 },
@@ -447,6 +486,43 @@
                 }
             }
         });
+
+        // Cập nhật nút phân trang cho biểu đồ
+        updateChartPagination();
+    }
+
+    // Tạo nút phân trang cho biểu đồ
+    function updateChartPagination() {
+        const totalPages = Math.ceil(allCustomerFullName.length / chartItemsPerPage);
+        const chartPagination = $("#chart-pagination");
+        chartPagination.empty();
+
+        if (totalPages <= 1) {
+            $("#chart-pagination-container").hide();
+            return;
+        } else {
+            $("#chart-pagination-container").show();
+        }
+
+        let paginationHtml = `
+            <li class="page-item ${chartCurrentPage === 1 ? 'disabled' : ''}">
+                <button class="page-link" onclick="updatePurchaseChart(1);">Trang đầu</button>
+            </li>
+            <li class="page-item ${chartCurrentPage === 1 ? 'disabled' : ''}">
+                <button class="page-link" onclick="updatePurchaseChart(${chartCurrentPage - 1});">&lt;</button>
+            </li>
+            <li class="page-item active">
+                <span class="page-link">${chartCurrentPage} / ${totalPages}</span>
+            </li>
+            <li class="page-item ${chartCurrentPage === totalPages ? 'disabled' : ''}">
+                <button class="page-link" onclick="updatePurchaseChart(${chartCurrentPage + 1});">&gt;</button>
+            </li>
+            <li class="page-item ${chartCurrentPage === totalPages ? 'disabled' : ''}">
+                <button class="page-link" onclick="updatePurchaseChart(${totalPages});">Trang cuối</button>
+            </li>
+        `;
+
+        chartPagination.append(paginationHtml);
     }
 
     displayPage(currentPage);
