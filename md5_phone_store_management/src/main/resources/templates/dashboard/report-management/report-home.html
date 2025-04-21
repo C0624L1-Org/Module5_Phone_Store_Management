@@ -1,689 +1,533 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý báo cáo</title>
+    <title>Báo Cáo khách hàng</title>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/fragments/navbar.css">
     <link rel="stylesheet" href="/css/fragments/sidebar.css">
     <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/pagination.css">
     <link rel="stylesheet" href="/css/common/layout.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f0f2f5 0%, #e9ecef 100%);
-        }
-
-        .content-wrapper {
-            display: flex;
-            min-height: calc(100vh - 70px);
-        }
-
-        .dashboard-container {
-            display: flex;
-            width: 100%;
-        }
-
-        .content-container {
-            flex-grow: 1;
-            padding: 0;
-        }
-
-        .management-section {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 2.5rem;
-            margin: 2rem 1rem;
-            width: calc(100% - 2rem);
-            transition: transform 0.3s ease;
-        }
-
-        .management-section:hover {
-            transform: translateY(-5px);
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .section-title i {
-            color: #007bff;
-            margin-right: 0.75rem;
-        }
-
-        .btn-custom {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 1rem;
-            border-radius: 12px;
-            font-weight: 500;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            margin-bottom: 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-custom i {
-            margin-right: 0.75rem;
-            font-size: 1.2rem;
-        }
-
-        .btn-custom:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            color: white;
-        }
-
-        .btn-blue {
-            background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);
-        }
-
-        .btn-green {
-            background: linear-gradient(135deg, #28a745 0%, #34c759 100%);
-        }
-
-        .btn-orange {
-            background: linear-gradient(135deg, #fd7e14 0%, #ff9f43 100%);
-        }
-
-        .btn-purple {
-            background: linear-gradient(135deg, #6f42c1 0%, #9370db 100%);
-        }
-
-        .btn-custom::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            transition: all 0.4s;
-        }
-
-        .btn-custom:hover::before {
-            left: 100%;
-        }
-
-        .stat-card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Split card styles */
-        .split-card {
-            position: relative;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            height: 180px;
-            transition: transform 0.3s ease;
-        }
-
-        .split-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .split-card .left-side,
-        .split-card .right-side {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            will-change: clip-path;
-            transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1;
-        }
-
-        .split-card .content {
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out 0.25s;
-        }
-
-        .split-card .center-text {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #ffffff;
-            font-size: 1.2rem;
-            font-weight: 600;
-            z-index: 2;
-            pointer-events: none;
-            transition: opacity 0.4s ease-in-out;
-        }
-
-        .split-card .center-text i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .split-card:hover .center-text {
-            opacity: 0;
-        }
-
-        .split-card:not(:hover) .center-text {
-            opacity: 1;
-        }
-
-        /* Màu cho split-card Báo cáo bán hàng (đồng điệu với btn-blue) */
-        .split-card.sales .left-side {
-            background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);
-            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
-        }
-
-        .split-card.sales .right-side {
-            background: linear-gradient(135deg, #00aaff 0%, #4dc0ff 100%);
-            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
-        }
-
-        .split-card.sales .left-side:hover {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        }
-
-        .split-card.sales .left-side:hover ~ .right-side {
-            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
-        }
-
-        .split-card.sales .right-side:hover {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        }
-
-        .split-card.sales .right-side:hover ~ .left-side {
-            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
-        }
-
-        .split-card.sales .left-side:hover .content,
-        .split-card.sales .right-side:hover .content {
-            opacity: 1;
-        }
-
-        /* Màu cho split-card Báo cáo khách hàng (đồng điệu với btn-green) */
-        .split-card.customer .left-side {
-            background: linear-gradient(135deg, #28a745 0%, #34c759 100%);
-            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
-        }
-
-        .split-card.customer .right-side {
-            background: linear-gradient(135deg, #34c759 0%, #5cd881 100%);
-            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
-        }
-
-        .split-card.customer .left-side:hover {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        }
-
-        .split-card.customer .left-side:hover ~ .right-side {
-            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
-        }
-
-        .split-card.customer .right-side:hover {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        }
-
-        .split-card.customer .right-side:hover ~ .left-side {
-            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
-        }
-
-        .split-card.customer .left-side:hover .content,
-        .split-card.customer .right-side:hover .content {
-            opacity: 1;
-        }
-
-        /* Card grid for buttons */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        /* Notification Section */
-        .notification-section {
-            margin-top: 2rem;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        .filter-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
             padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
         }
 
-        .notification-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
+        .form-control:focus, .form-select:focus {
+            border-color: #6c8deb;
+            box-shadow: 0 0 0 0.25rem rgba(108, 141, 235, 0.25);
         }
 
-        .notification-card {
-            padding: 1rem;
-            border-radius: 8px;
-            background: #f8f9fa;
-            position: relative;
-            transition: transform 0.3s ease;
+        .table-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e9ecef;
         }
 
-        .notification-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .notification-card h6 {
-            font-size: 0.95rem;
-            color: #1a1a1a;
-            margin-bottom: 0.5rem;
-        }
-
-        .notification-card p {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin: 0;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background: #dc3545;
+        .table thead th {
+            background-color: #343a40;
             color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .breadcrumb {
-            background: transparent;
-            padding: 0.5rem 0;
-            font-size: 0.9rem;
-        }
-
-        .breadcrumb-item a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .breadcrumb-item.active {
-            color: #1a1a1a;
             font-weight: 500;
+            border-color: #454d55;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            vertical-align: middle;
+            white-space: nowrap;
         }
 
-        @media (max-width: 768px) {
-            .management-section {
-                margin: 1rem;
-                padding: 1.5rem;
-                width: calc(100% - 2rem);
-            }
-
-            .card-grid, .stat-card-grid, .notification-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .btn-custom {
-                padding: 0.75rem;
-                font-size: 0.9rem;
-            }
+        .table th, .table td {
+            vertical-align: middle;
         }
 
-        @media (min-width: 1280px) {
-            .card-grid, .stat-card-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .chart-container canvas {
+            width: 100%;
+            height: auto;
         }
+
+        #genderChart {
+            height: 300px;
+        }
+
+        #purchaseChart {
+            height: 300px;
+        }
+
     </style>
 </head>
 <body>
-
-
-
+<!-- Hiển thị thông báo -->
 <div th:replace="~{common/toast}"></div>
+
+<!-- Nhúng navbar -->
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 <div class="content-wrapper">
     <div class="dashboard-container">
-                <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
-
-        <!-- Main content area -->
-        <div class="content-container flex-grow-1">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="content-container">
             <div class="container-fluid py-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item active" aria-current="page">Quản lý báo cáo</li>
+
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a th:href="@{/report-home}">Quản lí báo cáo</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Báo Cáo khách hàng</li>
+                        </ol>
                     </ol>
                 </nav>
-                <div class="management-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-cogs"></i> Quản lý báo cáo
-                    </h3>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-users me-2 text-primary"></i>
+                        Báo Cáo khách hàng
+                    </h2>
 
-                    <!-- Stat Cards -->
-                    <div class="stat-card-grid">
-                        <!-- Báo cáo bán hàng -->
-                        <div class="split-card sales">
-                            <div class="center-text">
-                                <i class="fas fa-chart-line"></i>
-                                <h5>Tổng doanh thu: <span id="totalInvoiceRevenue">0 VNĐ</span></h5>
-                                <p>Tổng số đơn: <span id="countAllSuccessInvoices">0 đơn</span></p>
-                            </div>
-                            <div class="left-side">
-                                <div class="content">
-                                    <h4>Hôm nay (<span id="todayDate"></span>)</h4>
-                                    <p>Số đơn: <span id="countTodaySuccessInvoices">0 đơn</span></p>
-                                    <p>Doanh thu: <span id="totalTodayInvoiceRevenue">0 VNĐ</span></p>
+                </div>
+                <!-- <div  style="text-align: right;">
+                     <a th:href="@{/dashboard/admin/customers/invoice/list}" class="nav-link text-black">
+                         <i class="fas fa-boxes me-2 text-success"></i>Xem lịch sử mua hàng
+                     </a>
+                 </div>-->
+                <div class="filter-container">
+                    <form th:action="@{/dashboard/admin/customer/report/filler}" method="get"
+                          class="d-flex align-items-center w-100">
+                        <div class="row w-100 g-3">
+                            <div class="col-md-3 col-12">
+                                <label for="gender" class="form-label">Giới tính</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                                    <select class="form-select" id="gender" name="gender">
+                                        <option value="" th:selected="${param.gender == null}">Tất cả</option>
+                                        <option th:each="g : ${T(com.example.md5_phone_store_management.model.Gender).values()}"
+                                                th:value="${g.name()}"
+                                                th:text="${g.getLabel()}"
+                                                th:selected="${param.gender != null and param.gender == g.name()}">
+                                        </option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="right-side">
-                                <div class="content">
-                                    <h4>Tháng này (<span id="thisMonthDate"></span>)</h4>
-                                    <p>Số đơn: <span id="countThisMonthSuccessInvoices">0 đơn</span></p>
-                                    <p>Doanh thu: <span id="totalThisMonthInvoiceRevenue">0 VNĐ</span></p>
+                            <div class="col-md-3 col-12">
+                                <label for="age" class="form-label">Tuổi</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-birthday-cake"></i></span>
+                                    <input type="number" class="form-control" id="age" name="age"
+                                           th:value="${param.age}" placeholder="Tuổi...">
                                 </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <label for="minPurchaseCount" class="form-label">Số lần mua tối thiểu</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-shopping-cart"></i></span>
+                                    <input type="number" class="form-control" id="minPurchaseCount"
+                                           name="minPurchaseCount" th:value="${param.minPurchaseCount}"
+                                           placeholder="Số lần mua...">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1"><i
+                                        class="fas fa-filter me-2"></i>Lọc
+                                </button>
+                                <a th:href="@{/dashboard/admin/customer/report}" class="btn btn-secondary">
+                                    <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                                </a>
                             </div>
                         </div>
+                    </form>
+                </div>
 
-                        <!-- Báo cáo khách hàng -->
-                        <div class="split-card customer">
-                            <div class="center-text">
-                                <i class="fas fa-users"></i>
-                                <p>Tổng khách hàng: <span id="totalCustomers">0</span></p>
-                            </div>
-                            <div class="left-side">
-                                <div class="content">
-                                    <h5>Khách hàng mới</h5>
-                                    <p id="totalNewCustomers">0</p>
-                                </div>
-                            </div>
-                            <div class="right-side">
-                                <div class="content">
-                                    <h5>Khách hàng thân thiết</h5>
-                                    <p id="loyalCustomers">0</p>
-                                </div>
-                            </div>
+
+                <div>
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-bordered mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Họ và tên</th>
+                                    <th>Ngày sinh / Tuổi</th>
+                                    <th>Địa chỉ</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Email</th>
+                                    <th style="text-align: center">Giới tính</th>
+                                    <th style="text-align: center">SLTT</th>
+                                    <th>Hành Động</th>
+                                </tr>
+                                </thead>
+                                <tbody id="customer-table-body">
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-
-                    <!-- Action Buttons -->
-                    <div class="card-grid">
-                        <a href="/sales-report" class="btn-custom btn-blue">
-                            <i class="fas fa-chart-line"></i> Báo cáo bán hàng
-                        </a>
-                        <a href="/dashboard/admin/customer/report" class="btn-custom btn-green">
-                            <i class="fas fa-users"></i> Báo cáo khách hàng
-                        </a>
+                    <div class="p-3 bg-light border-top d-flex justify-content-end align-items-center"
+                         id="pagination-container">
+                        <nav aria-label="Pagination">
+                            <ul class="pagination mb-0" id="pagination">
+                            </ul>
+                        </nav>
                     </div>
-
-                    <!-- Notification Section -->
-                    <div class="notification-section">
-                        <h5 class="mb-3"><i class="fas fa-bell"></i> Thông báo mới nhất</h5>
-                        <div class="notification-grid" id="notification-grid">
-                            <!-- Notifications will be populated dynamically -->
-                        </div>
+                </div>
+                <!--Chart thống kê-->
+                <div style="display: flex; justify-content: space-around;">
+                    <div style="width: 45%; height: 300px; display: flex; flex-direction: column; align-items: center;">
+                        <canvas id="genderChart" style="width: 100%; height: 100%;"></canvas>
+                        <div style="width: 100%; text-align: center;">Biểu đồ giới tính khách hàng</div>
+                    </div>
+                    <div style="width: 50%; height: 300px; display: flex; flex-direction: column; align-items: center;">
+                        <canvas id="newOldCustomerChart" style="width: 100%; height: 100%"></canvas>
+                        <div style="width: 100%; text-align: center;">Biểu đồ khách hàng mới và cũ</div>
+                    </div>
+                    <div style="width: 45%; height: 300px; display: flex; flex-direction: column; align-items: center;">
+                        <canvas id="purchaseChart" style="width: 100%; height: 100%;"></canvas>
+                        <div style="width: 100%; text-align: center;">Biểu đồ số lần mua hàng của khách hàng</div>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <!--Chart báo cáo-->
+                <div style="display: inline; justify-content: space-around">
+                    <!--<h4>Biểu đồ thống kê số lượng mua hàng</h4>-->
+                    <canvas id="reportCustomerChart" style="width: 100%; height: 400px;"></canvas>
+                    <div class="p-3 bg-light border-top d-flex justify-content-end align-items-center"
+                        id="chart-pagination-container">
+                        <nav aria-label="Chart Pagination">
+                            <ul class="pagination mb-0" id="chart-pagination">
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-        <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Format number as Vietnamese currency
-    const formatCurrency = (value) => {
-        return value ? Number(value).toLocaleString('vi-VN') + ' VNĐ' : '0 VNĐ';
-    };
+<div th:replace="~{fragments/navbar :: navbar-script}"></div>
+<script th:inline="javascript">
+    const allCustomers = /*[[${customers}]]*/ [];
+    const itemsPerPage = 5;
+    let currentPage = 1;
+    const allCustomerFullName = [];
+    const allCustomerPurchaseCount = [];
+    console.log(allCustomers);
 
-    // Format date for today
-    const formatTodayDate = () => {
-        return new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    };
+    // Biến cho phân trang biểu đồ
+    let chartCurrentPage = 1;
+    let chartItemsPerPage = 5;
+    
+    for (let i = 0; i < allCustomers.length; i++) {
+        allCustomerFullName.push(allCustomers[i].fullName);
+        allCustomerPurchaseCount.push(allCustomers[i].purchaseCount);
+    }
+    console.log(allCustomerFullName);
 
-    // Format date for current month
-    const formatThisMonthDate = () => {
-        return new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
-    };
-
-    // Update dashboard data
-    const updateDashboard = async () => {
-        try {
-            const response = await fetch('/api/changelogs/report-home-info?t=' + Date.now());
-            if (!response.ok) {
-                console.error('Error fetching dashboard data:', response.status);
-                return;
-            }
-            const data = await response.json();
-
-            // Update Sales Card
-            document.getElementById('totalInvoiceRevenue').textContent = formatCurrency(data.totalInvoiceRevenue);
-            document.getElementById('countAllSuccessInvoices').textContent = data.countAllSuccessInvoices + ' đơn';
-            document.getElementById('countTodaySuccessInvoices').textContent = data.countTodaySuccessInvoices + ' đơn';
-            document.getElementById('totalTodayInvoiceRevenue').textContent = formatCurrency(data.totalTodayInvoiceRevenue);
-            document.getElementById('countThisMonthSuccessInvoices').textContent = data.countThisMonthSuccessInvoices + ' đơn';
-            document.getElementById('totalThisMonthInvoiceRevenue').textContent = formatCurrency(data.totalThisMonthInvoiceRevenue);
-            document.getElementById('todayDate').textContent = formatTodayDate();
-            document.getElementById('thisMonthDate').textContent = formatThisMonthDate();
-
-            // Update Customer Card
-            document.getElementById('totalCustomers').textContent = data.totalCustomers || 0;
-            document.getElementById('totalNewCustomers').textContent = data.totalNewCustomers || 0;
-            document.getElementById('loyalCustomers').textContent = (data.totalCustomers - data.totalNewCustomers) || 0;
-        } catch (error) {
-            console.error('Error updating dashboard:', error);
+    function displayPage(page) {
+        console.log("displayPage() is running");
+        if (page < 1) {
+            page = 1;
         }
-    };
+        const totalPages = Math.ceil(allCustomers.length / itemsPerPage);
+        if (page > totalPages) {
+            page = totalPages;
+        }
 
-    // Update notifications (reusing existing logic with minor adjustments)
-    const updateNotifications = async () => {
-        const notificationGrid = document.getElementById('notification-grid');
+        currentPage = page; // Cập nhật currentPage
 
-        const endpoints = [
-            { url: '/api/changelogs/invoice/notification', title: 'Báo cáo bán hàng' },
-            { url: '/api/changelogs/invoice/notification', title: 'Báo cáo khách hàng' }
-        ];
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageData = allCustomers.slice(startIndex, endIndex);
 
-        const createNotificationCard = (title, message, changeCount) => {
-            const card = document.createElement('div');
-            card.className = 'notification-card';
-            card.dataset.endpoint = endpoints.find(e => e.title === title)?.url;
-            card.innerHTML = `
-                <h6>${title}</h6>
-                <p>${message}</p>
-                ${changeCount ? `<div class="notification-badge">${changeCount}</div>` : ''}
-            `;
-            return card;
-        };
+        const tableBody = $("#customer-table-body");
+        tableBody.empty();
 
-        for (const endpoint of endpoints) {
-            try {
-                const response = await fetch(`${endpoint.url}?t=${Date.now()}`);
-                console.log(`Response status for ${endpoint.url}:`, response.status);
-                let data = {};
-                if (response.ok) {
-                    const text = await response.text();
-                    console.log(`Raw response for ${endpoint.url}:`, text);
-                    data = text ? JSON.parse(text) : {};
-                } else {
-                    console.error(`HTTP error ${response.status} for ${endpoint.url}`);
-                    const existingCard = Array.from(notificationGrid.children).find(
-                        card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
-                    );
-                    const errorMessage = 'Lỗi khi tải thông báo';
-                    if (existingCard) {
-                        const existingMessage = existingCard.querySelector('p').textContent;
-                        if (existingMessage !== errorMessage) {
-                            existingCard.querySelector('p').textContent = errorMessage;
-                            existingCard.querySelector('.notification-badge')?.remove();
-                        }
-                    } else {
-                        notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
-                    }
-                    continue;
-                }
+        if (pageData.length === 0) {
+            tableBody.html('<tr><td colspan="8" class="text-center">Không có dữ liệu.</td></tr>');
+            return;
+        }
 
-                // Process ChangeLog data
-                let message = 'Không có cập nhật mới';
-                let changeCount = 0;
+        pageData.forEach(customer => {
+            const genderBadge = customer.gender.toLowerCase() === 'male' ? '<span class="badge rounded-pill badge-male" style="color: black;">Nam</span>' :
+                customer.gender.toLowerCase() === 'female' ? '<span class="badge rounded-pill badge-female" style="color: darkred;">Nữ</span>' :
+                    '<span class="badge rounded-pill badge-other" style="color: darkgoldenrod;">Khác</span>';
 
-                if (data && data.action && data.fieldName) {
-                    if (endpoint.url.includes('invoice') && endpoint.title === 'Báo cáo bán hàng') {
-                        switch (data.action.toUpperCase()) {
-                            case 'INSERT':
-                                if (data.fieldName.toLowerCase() === 'invoice') {
-                                    let amount, totalQuantity = 0;
-                                    if (data.newValue !== 'Invoice created') {
-                                        const amountMatch = data.newValue.match(/amount=([\d.]+)/);
-                                        amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN') + ' VNĐ' : 'N/A';
-                                        if (data.entityId) {
-                                            try {
-                                                const invoiceDetailsResponse = await fetch(`/api/changelogs/invoices/${data.entityId}/details`);
-                                                if (invoiceDetailsResponse.ok) {
-                                                    const invoiceDetail = await invoiceDetailsResponse.json();
-                                                    totalQuantity = invoiceDetail.quantity || 0;
-                                                    console.log(`InvoiceDetail ID ${data.entityId} has quantity: ${totalQuantity}`);
-                                                } else {
-                                                    console.log(`No InvoiceDetail found for ID ${data.entityId}, using quantity: 0`);
-                                                }
-                                            } catch (error) {
-                                                console.error(`Error fetching invoice details for ID ${data.entityId}:`, error);
-                                                console.log(`Error occurred for InvoiceDetail ID ${data.entityId}, using quantity: 0`);
-                                            }
-                                        }
-                                        message = `Hóa đơn mới: ${amount} cho ${totalQuantity} sản phẩm`;
-                                    } else {
-                                        message = `Hóa đơn mới được tạo ${data.newValue}`;
-                                    }
-                                    changeCount = 1;
-                                } else {
-                                    message = 'Không có báo cáo bán hàng mới';
-                                }
-                                break;
-                            default:
-                                message = 'Không có báo cáo bán hàng mới';
-                                break;
-                        }
-                    } else if (endpoint.url.includes('invoice') && endpoint.title === 'Báo cáo khách hàng') {
-                        switch (data.action.toUpperCase()) {
-                            case 'INSERT':
-                                if (data.fieldName.toLowerCase() === 'invoice') {
-                                    let amount, customerName = 'không xác định';
-                                    if (data.newValue !== 'Invoice created') {
-                                        const amountMatch = data.newValue.match(/amount=([\d.]+)/);
-                                        const customerIdMatch = data.newValue.match(/customerId=(\d+)/);
-                                        amount = amountMatch ? Number(amountMatch[1]).toLocaleString('vi-VN') + ' VNĐ' : 'N/A';
-                                        if (customerIdMatch) {
-                                            try {
-                                                const customerResponse = await fetch(`/api/changelogs/customers/${customerIdMatch[1]}`);
-                                                if (customerResponse.ok) {
-                                                    const customerData = await customerResponse.json();
-                                                    customerName = customerData.name || 'không xác định';
-                                                }
-                                            } catch (error) {
-                                                console.error(`Error fetching customer data for ID ${customerIdMatch[1]}:`, error);
-                                            }
-                                        }
-                                        message = `Khách hàng ${customerName} đã thanh toán hóa đơn ${amount}`;
-                                    } else {
-                                        message = `Hóa đơn mới được tạo ${data.newValue}`;
-                                    }
-                                    changeCount = 1;
-                                } else {
-                                    message = 'Không có báo cáo khách hàng mới';
-                                }
-                                break;
-                            default:
-                                message = 'Không có báo cáo khách hàng mới';
-                                break;
-                        }
-                    }
-                }
+            const row = `<tr>
+                <td>${customer.fullName}</td>
+                <td>${new Date(customer.dob).toLocaleDateString('vi-VN')} (${new Date().getFullYear() - new Date(customer.dob).getFullYear()} tuổi)</td>
+                <td>${customer.address}</td>
+                <td>${customer.phone}</td>
+                <td>${customer.email}</td>
+                <td class="text-center">${genderBadge}</td>
+                <td class="text-center">${customer.purchaseCount}</td>
+                <td>
+                     <a href="/dashboard/admin/customers/${customer.customerID}/invoices" class="btn btn-light btn-action btn-view btn-sm">
+                        <i class="fas fa-eye me-1"></i>Lịch Sử
+                     </a>
+                </td>
+            </tr>`;
+            tableBody.append(row);
+        });
+        createPaginationButtons(); // Cập nhật nút phân trang sau khi chuyển trang
+    }
 
-                // Find existing card for this endpoint and title
-                const existingCard = Array.from(notificationGrid.children).find(
-                    card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
-                );
+    function createPaginationButtons() {
+        const totalPages = Math.ceil(allCustomers.length / itemsPerPage);
+        const pagination = $("#pagination");
+        pagination.empty();
 
-                if (existingCard) {
-                    // Update existing card if message or changeCount differs
-                    const existingMessage = existingCard.querySelector('p').textContent;
-                    const existingBadge = existingCard.querySelector('.notification-badge');
-                    const existingChangeCount = existingBadge ? parseInt(existingBadge.textContent) : 0;
+        if (totalPages <= 1) {
+            $("#pagination-container").hide();
+            return;
+        } else {
+            $("#pagination-container").show();
+        }
 
-                    if (existingMessage !== message || existingChangeCount !== changeCount) {
-                        existingCard.querySelector('p').textContent = message;
-                        if (changeCount > 0) {
-                            if (existingBadge) {
-                                existingBadge.textContent = changeCount;
-                            } else {
-                                const badge = document.createElement('div');
-                                badge.className = 'notification-badge';
-                                badge.textContent = changeCount;
-                                existingCard.appendChild(badge);
-                            }
-                        } else {
-                            existingBadge?.remove();
-                        }
-                    }
-                } else {
-                    // Append new card if none exists
-                    notificationGrid.appendChild(createNotificationCard(endpoint.title, message, changeCount));
-                }
+        let paginationHtml = `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <button class="page-link" onclick="displayPage(1);">Trang đầu</button>
+            </li>
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <button class="page-link" onclick="displayPage(${currentPage - 1});">&lt;</button>
+            </li>
+            <li class="page-item active">
+                <span class="page-link">${currentPage} / ${totalPages}</span>
+            </li>
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <button class="page-link" onclick="displayPage(${currentPage + 1});">&gt;</button>
+            </li>
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <button class="page-link" onclick="displayPage(${totalPages});">Trang cuối</button>
+            </li>
+        `;
 
-                console.log(`Parsed data for ${endpoint.url}:`, data);
-                console.log(`Message for ${endpoint.title}:`, message);
-            } catch (error) {
-                console.error(`Error fetching ${endpoint.url}:`, error);
-                const existingCard = Array.from(notificationGrid.children).find(
-                    card => card.dataset.endpoint === endpoint.url && card.querySelector('h6').textContent === endpoint.title
-                );
-                const errorMessage = 'Lỗi khi tải thông báo';
-                if (existingCard) {
-                    const existingMessage = existingCard.querySelector('p').textContent;
-                    if (existingMessage !== errorMessage) {
-                        existingCard.querySelector('p').textContent = errorMessage;
-                        existingCard.querySelector('.notification-badge')?.remove();
-                    }
-                } else {
-                    notificationGrid.appendChild(createNotificationCard(endpoint.title, errorMessage, 0));
+        pagination.append(paginationHtml);
+    }
+
+    displayPage(currentPage);
+
+    function createCharts() {
+        let maleCount = allCustomers.filter(c => c.gender.toLowerCase() === 'male').length;
+        let femaleCount = allCustomers.filter(c => c.gender.toLowerCase() === 'female').length;
+        let otherCount = allCustomers.filter(c => c.gender.toLowerCase() === 'other').length;
+        let undefinedCount = allCustomers.filter(c => c.gender.toLowerCase() !== 'male' && c.gender.toLowerCase() !== 'female' && c.gender.toLowerCase() !== 'other').length;
+
+        let group1 = allCustomers.filter(c => c.purchaseCount >= 1 && c.purchaseCount <= 4).length;
+        let group2 = allCustomers.filter(c => c.purchaseCount >= 5 && c.purchaseCount <= 10).length;
+        let group3 = allCustomers.filter(c => c.purchaseCount >= 11 && c.purchaseCount <= 15).length;
+        let group4 = allCustomers.filter(c => c.purchaseCount > 15).length;
+        let newCustomers = allCustomers.filter(c => c.purchaseCount === 0).length;
+        let oldCustomers = allCustomers.filter(c => c.purchaseCount > 0).length;
+        new Chart(document.getElementById('genderChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Nam', 'Nữ', 'Khác', 'Không xác định'],
+                datasets: [{
+                    label: 'Tỷ lệ giới tính khách hàng',
+                    data: [maleCount, femaleCount, otherCount, undefinedCount],
+                    backgroundColor: ['#4285F4', '#DB4437', '#F4B400', '#9E9E9E']
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Biểu đồ giới tính khách hàng',
+                    align: 'center'
                 }
             }
-        }
-    };
+        });
 
-    // Initial call and polling setup
-    document.addEventListener('DOMContentLoaded', () => {
-        updateDashboard();
-        updateNotifications();
-        setInterval(() => {
-            updateDashboard();
-            updateNotifications();
-        }, 3000);
-    });
+        new Chart(document.getElementById('purchaseChart'), {
+            type: 'bar',
+            data: {
+                labels: ['1-4', '5-10', '11-15', '>15'],
+                datasets: [{
+                    label: 'Số lượng khách hàng',
+                    data: [group1, group2, group3, group4],
+                    backgroundColor: ['#66BB6A', '#FFA726', '#AB47BC', '#EF5350']
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Biểu đồ số lần mua hàng của khách hàng',
+                    align: 'center'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Số lượng khách hàng'
+                        }
+                    }]
+                }
+            }
+        });
+
+        new Chart(document.getElementById('newOldCustomerChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Khách hàng mới', 'Khách hàng cũ'],
+                datasets: [{
+                    label: 'Khách hàng mới và cũ',
+                    data: [newCustomers, oldCustomers],
+                    backgroundColor: ['#28a745', '#007bff']
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Biểu đồ khách hàng mới và cũ',
+                    align: 'center'
+                }
+            }
+        });
+
+        updatePurchaseChart(chartCurrentPage);
+    }
+
+    // Hàm cập nhật biểu đồ theo trang
+    function updatePurchaseChart(page) {
+        if (page < 1) {
+            page = 1;
+        }
+        
+        const totalPages = Math.ceil(allCustomerFullName.length / chartItemsPerPage);
+        if (page > totalPages) {
+            page = totalPages;
+        }
+
+        chartCurrentPage = page;
+
+        const startIndex = (page - 1) * chartItemsPerPage;
+        const endIndex = Math.min(startIndex + chartItemsPerPage, allCustomerFullName.length);
+        
+        const pageLabels = allCustomerFullName.slice(startIndex, endIndex);
+        const pageData = allCustomerPurchaseCount.slice(startIndex, endIndex);
+
+        // Xóa biểu đồ cũ nếu có
+        if (window.purchaseReportChart) {
+            window.purchaseReportChart.destroy();
+        }
+
+        // Tạo biểu đồ mới
+        window.purchaseReportChart = new Chart(document.getElementById('reportCustomerChart'), {
+            type: 'bar',
+            data: {
+                labels: pageLabels,
+                datasets: [{
+                    label: 'Số lượng mua hàng',
+                    data: pageData,
+                    backgroundColor: "rgba(0,0,220,0.7)",
+                    borderColor: "rgba(0,0,220,0.1)",
+                    borderWidth: 1,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1,
+                            precision: 0
+                        },
+                        gridLines: {
+                            color: "rgba(0, 0, 0, 0.05)"
+                        }
+                    }],
+                    xAxes: [{
+                        gridLines: {
+                            display: false
+                        }
+                    }]
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Thống kê số lượng mua hàng",
+                        font: {
+                            size: 16
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 10
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 10,
+                        top: 10,
+                        bottom: 10
+                    }
+                }
+            }
+        });
+
+        // Cập nhật nút phân trang cho biểu đồ
+        updateChartPagination();
+    }
+
+    // Tạo nút phân trang cho biểu đồ
+    function updateChartPagination() {
+        const totalPages = Math.ceil(allCustomerFullName.length / chartItemsPerPage);
+        const chartPagination = $("#chart-pagination");
+        chartPagination.empty();
+
+        if (totalPages <= 1) {
+            $("#chart-pagination-container").hide();
+            return;
+        } else {
+            $("#chart-pagination-container").show();
+        }
+
+        let paginationHtml = `
+            <li class="page-item ${chartCurrentPage === 1 ? 'disabled' : ''}">
+                <button class="page-link" onclick="updatePurchaseChart(1);">Trang đầu</button>
+            </li>
+            <li class="page-item ${chartCurrentPage === 1 ? 'disabled' : ''}">
+                <button class="page-link" onclick="updatePurchaseChart(${chartCurrentPage - 1});">&lt;</button>
+            </li>
+            <li class="page-item active">
+                <span class="page-link">${chartCurrentPage} / ${totalPages}</span>
+            </li>
+            <li class="page-item ${chartCurrentPage === totalPages ? 'disabled' : ''}">
+                <button class="page-link" onclick="updatePurchaseChart(${chartCurrentPage + 1});">&gt;</button>
+            </li>
+            <li class="page-item ${chartCurrentPage === totalPages ? 'disabled' : ''}">
+                <button class="page-link" onclick="updatePurchaseChart(${totalPages});">Trang cuối</button>
+            </li>
+        `;
+
+        chartPagination.append(paginationHtml);
+    }
+
+    displayPage(currentPage);
+    createPaginationButtons();
+    createCharts();
 </script>
 </body>
 </html>
