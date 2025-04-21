@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h2 {
+            color: #333;
+        }
+        .notification-list {
+            list-style: none;
+            padding: 0;
+        }
+        .notification-item {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .notification-item.unread {
+            font-weight: bold;
+            background-color: #e6f3ff;
+        }
+        .notification-item.read {
+            font-weight: normal;
+            background-color: #f9f9f9;
+        }
+        .notification-item:hover {
+            background-color: #e0e0e0;
+        }
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .pagination button {
+            padding: 8px 16px;
+            border: none;
+            background: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .pagination span {
+            line-height: 32px;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<h2>Thông báo chưa đọc</h2>
+<div>
+    <label for="employeeId">ID Nhân viên:</label>
+    <input type="number" id="employeeId" value="1" min="1">
+    <button onclick="loadNotifications()">Tải thông báo</button>
+</div>
+<div id="error" class="error"></div>
+<ul id="notificationList" class="notification-list"></ul>
+<div class="pagination">
+    <button id="prevPage" onclick="changePage(-1)">Trang trước</button>
+    <span id="pageInfo"></span>
+    <button id="nextPage" onclick="changePage(1)">Trang sau</button>
+</div>
+
+<script>
+    let employeeId = 1; // Mặc định, có thể nhập từ input
+    let currentPage = 0;
+    let totalPages = 0;
+    const pageSize = 10;
+
+    async function loadNotifications() {
+        const errorDiv = document.getElementById('error');
+        errorDiv.textContent = '';
+        employeeId = parseInt(document.getElementById('employeeId').value, 10);
+
+        if (!employeeId || employeeId < 1) {
+            errorDiv.textContent = 'Vui lòng nhập ID nhân viên hợp lệ.';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/notifications/unread/${employeeId}?page=${currentPage}&size=${pageSize}`);
+            if (!response.ok) {
+                throw new Error('Lỗi khi tải thông báo');
+            }
+            const data = await response.json();
+
+            // Cập nhật danh sách thông báo
+            const notificationList = document.getElementById('notificationList');
+            notificationList.innerHTML = '';
+            data.notifications.forEach(notification => {
+                const li = document.createElement('li');
+                li.className = `notification-item ${notification.isRead ? 'read' : 'unread'}`;
+                li.innerHTML = `${notification.message} (${new Date(notification.createdAt).toLocaleString('vi-VN')})`;
+                li.onclick = () => markAsRead(notification.id);
+                notificationList.appendChild(li);
+            });
+
+            // Cập nhật phân trang
+            totalPages = data.totalPages;
+            document.getElementById('pageInfo').textContent = `Trang ${currentPage + 1} / ${totalPages}`;
+            document.getElementById('prevPage').disabled = currentPage === 0;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages - 1;
+        } catch (error) {
+            errorDiv.textContent = error.message;
+        }
+    }
+
+    async function markAsRead(notificationId) {
+        try {
+            const response = await fetch(`/api/notifications/mark-read/${notificationId}/${employeeId}`, {
+                method: 'POST'
+            });
+            if (!response.ok) {
+                throw new Error('Lỗi khi đánh dấu đã đọc');
+            }
+            // Tải lại danh sách để cập nhật giao diện
+            loadNotifications();
+        } catch (error) {
+            document.getElementById('error').textContent = error.message;
+        }
+    }
+
+    function changePage(delta) {
+        currentPage = Math.max(0, Math.min(currentPage + delta, totalPages - 1));
+        loadNotifications();
+    }
+
+    // Tải thông báo lần đầu
+    loadNotifications();
+</script>
+</body>
+</html>

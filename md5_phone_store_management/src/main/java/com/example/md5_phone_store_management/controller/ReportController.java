@@ -2,10 +2,12 @@ package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.model.dto.SaleReportData;
-import com.example.md5_phone_store_management.service.CustomerService;
-import com.example.md5_phone_store_management.service.IInvoiceService;
+import com.example.md5_phone_store_management.service.*;
+import com.example.md5_phone_store_management.service.implement.ChangeLogService;
 import com.example.md5_phone_store_management.service.implement.CustomerServiceImpl;
+import com.example.md5_phone_store_management.service.implement.ProductService;
 import com.example.md5_phone_store_management.service.implement.SaleReportServiceImpl;
+import com.example.md5_phone_store_management.service.implement.SupplierService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,15 @@ public class ReportController {
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     @Autowired
+    private ICustomerService iCustomerService;
+
+    @Autowired
+    private ChangeLogService changeLogService;
+
+    @Autowired
+    private SaleReportServiceImpl salesReportService;
+
+    @Autowired
     private CustomerServiceImpl customerServiceImpl;
 
     @Autowired
@@ -39,9 +50,15 @@ public class ReportController {
     @Autowired
     private CustomerService customerService;
 
+    /* cmt from main
     @GetMapping("/report-home")
     public String showReportHome() {
         return "dashboard/report-management/report-home";
+    }
+    */
+    @GetMapping("/report-home")
+    public String showReportHome(Model model) {
+         return "dashboard/report-management/report-home";
     }
 
     @GetMapping("/dashboard/admin/customer/report")
@@ -124,30 +141,20 @@ public class ReportController {
             @RequestParam(defaultValue = "0") int page, // Thêm tham số page
             Model model) {
         SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
-        List<Product> products =reportData.getProducts();
-        final int PAGE_SIZE = 3;// 3 sản phẩm mỗi trang
+        List<Product> products = reportData.getProducts();
+        final int PAGE_SIZE = 3; // 3 sản phẩm mỗi trang
         model.addAttribute("paymentMethods", PaymentMethod.values());
         model.addAttribute("paymentMethod", paymentMethod);
         model.addAttribute("employeeName", employeeName);
         model.addAttribute("productName", productName);
         model.addAttribute("products", products);
         try {
-
             Map<String, Object> report = saleReportServiceImpl.generateSalesReport(reportData.getFilteredInvoices());
             if (report == null) {
                 model.addAttribute("messageType", "error");
                 model.addAttribute("message", "Không có dữ liệu trong khoảng thời gian này hoặc mã sản phẩm không hợp lệ.");
                 return "dashboard/report-management/sales-report";
             }
-
-            // Nếu có mã sản phẩm, lấy thông tin sản phẩm và gán cho biểu đồ
-        /*    if (parsedProductId != null) {
-                 productName = getProductNameFromReport(parsedProductId, report);
-                if (productName != null) {
-                    model.addAttribute("chartProductName", productName);
-                    model.addAttribute("chartProductId", parsedProductId);
-                }
-            }*/
 
             // Lấy revenueByProduct và phân trang
             Map<Integer, Long> revenueByProduct = (Map<Integer, Long>) report.get("revenueByProduct");
@@ -187,6 +194,7 @@ public class ReportController {
 
         return "dashboard/report-management/sales-report";
     }
+
     // API cho biểu đồ doanh thu theo ngày trong tháng
     @GetMapping("/api/chart/day")
     public ResponseEntity<?> getDailyRevenueChart(
@@ -196,20 +204,19 @@ public class ReportController {
             @RequestParam(value = "employeeName", required = false) String employeeName,
             @RequestParam(value = "productName", required = false) String productName) {
 
-
-        List<Object[]> data ;
+        List<Object[]> data;
         SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
-        List<Invoice> invoices =reportData.getFilteredInvoices();
+        List<Invoice> invoices = reportData.getFilteredInvoices();
 
         if (month != null && year != null) {
-            data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
-                    invoices, month,year);
+            data = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
+                    invoices, month, year);
         } else {
             LocalDate now = LocalDate.now();
             int reportMonth = now.getMonthValue(); // tháng hiện tại
             int reportYear = now.getYear();
-            data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
-                    invoices, reportYear,reportMonth);
+            data = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonthAndYear(
+                    invoices, reportYear, reportMonth);
         }
 
         if (data == null || data.isEmpty()) {
@@ -231,7 +238,6 @@ public class ReportController {
         response.put("invoiceCounts", invoiceCounts);
         response.put("revenueSums", revenueSums);
 
-
         return ResponseEntity.ok(response);
     }
 
@@ -245,10 +251,10 @@ public class ReportController {
 
         List<Object[]> data;
         SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
-        List<Invoice> invoices =reportData.getFilteredInvoices();
+        List<Invoice> invoices = reportData.getFilteredInvoices();
         if (year != null) {
-           data=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonth(
-                  invoices, year);
+            data = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByMonth(
+                    invoices, year);
         } else {
             // Lấy dữ liệu mặc định
             int currentYear = Year.now().getValue(); // Lấy năm hiện tại an toàn
@@ -287,7 +293,7 @@ public class ReportController {
 
         List<Object[]> allYearlyData;
         SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
-        allYearlyData=saleReportServiceImpl.getTotalRevenueAndInvoiceCountByYear(
+        allYearlyData = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByYear(
                 reportData.getFilteredInvoices());
 
         if (allYearlyData == null || allYearlyData.isEmpty()) {

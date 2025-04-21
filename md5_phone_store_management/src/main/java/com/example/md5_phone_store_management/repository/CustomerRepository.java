@@ -1,10 +1,12 @@
 package com.example.md5_phone_store_management.repository;
 
+import java.security.PublicKey;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,6 +28,27 @@ public class CustomerRepository  {
     private static final String SELECT_CUSTOMER_BY_ID = "SELECT * FROM customer WHERE customerID = ?";
     private static final String INSERT_CUSTOMER = "INSERT INTO customer (full_Name, phone, address, email, dob, gender, purchaseCount) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String SELECT_CUSTOMERS_WITH_PURCHASES = "SELECT * FROM customer WHERE purchaseCount > 0 ORDER BY purchaseCount DESC";
+
+
+
+    public List<Customer> findAllById(Iterable<Integer> customerIDs) {
+        if (customerIDs == null || !customerIDs.iterator().hasNext()) {
+            return new ArrayList<>();
+        }
+
+        // Convert Iterable to List for SQL IN clause
+        List<Integer> idList = new ArrayList<>();
+        customerIDs.forEach(idList::add);
+
+        // Create placeholders for the IN clause
+        String placeholders = idList.stream()
+                .map(id -> "?")
+                .collect(Collectors.joining(","));
+        String sql = "SELECT customerID, full_name, phone, address, email, dob, gender, purchaseCount " +
+                "FROM customer WHERE customerID IN (" + placeholders + ")";
+
+        return jdbcTemplate.query(sql, idList.toArray(), new CustomerRowMapper());
+    }
 
     public void deleteCustomer(List<Integer> customerIDs) {
 //        xóa hd ct
@@ -149,12 +172,13 @@ public class CustomerRepository  {
         return jdbcTemplate.queryForObject(SELECT_CUSTOMER_BY_ID, new Object[]{customerID}, new CustomerRowMapper());
     }
 
-    public void save(Customer customer) {
+    public Customer save(Customer customer) {
         if (customer.getCustomerID() != null) {
             updateCustomer(customer); // Cập nhật nếu đã có ID
         } else {
             jdbcTemplate.update(INSERT_CUSTOMER, customer.getFullName(), customer.getPhone(), customer.getAddress(), customer.getEmail(), customer.getDob(), customer.getGender().name(), customer.getPurchaseCount());
         }
+        return customer;
     }
 
     //  ánh xạ kết quả từ ResultSet to obj Customer

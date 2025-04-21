@@ -1,11 +1,11 @@
-/* === SIDEBAR STYLES === */
+
 .sidebar {
     width: 280px;
-    height: calc(100vh - 100px); /* Viewport height minus navbar height */
+    height: calc(100vh - 100px);
     background-color: #333333;
     color: white;
     position: fixed;
-    top: 100px; /* Position right below navbar */
+    top: 100px;
     left: 0;
     z-index: 100;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
@@ -13,7 +13,6 @@
     flex-shrink: 0;
 }
 
-/* In dashboard container */
 .dashboard-container .sidebar {
     position: static;
     height: auto;
@@ -24,20 +23,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-}
-
-/* User info section */
-.user-image-back {
-    padding: 20px 0;
-    text-align: center;
-}
-
-.avatar-user {
-    border: 3px solid white;
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
+    background-color: #333333;
 }
 
 .user-data {
@@ -47,36 +33,99 @@
 .user-data h2 {
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
+    color: white;
 }
 
-/* Navigation menu */
 .sidebar .nav {
     margin-top: 1rem;
+    width: 100%;
 }
 
 .sidebar .nav-item {
     margin-bottom: 0.5rem;
+    width: 100%;
 }
 
 .sidebar .nav-link {
     color: white;
     padding: 0.75rem 1rem;
     border-radius: 6px;
-    transition: background-color 0.2s;
     display: flex;
     align-items: center;
+    width: 100%;
+    text-decoration: none;
+    visibility: visible;
+    opacity: 1;
+    transition: background-color 0.3s ease;
 }
 
 .sidebar .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.sidebar .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
 .sidebar .nav-link i {
     margin-right: 0.75rem;
     width: 20px;
     text-align: center;
+    color: white;
+    visibility: visible;
+    opacity: 1;
+}
+
+.sidebar .nav-link.active {
+    background-color: white;
+    color: #333333;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    width: 100%;
+    text-decoration: none;
+    visibility: visible;
+    opacity: 1;
+}
+
+.sidebar .nav-link.active i {
+    color: #333333;
+    margin-right: 0.75rem;
+    width: 20px;
+    text-align: center;
+    visibility: visible;
+    opacity: 1;
+}
+
+.sidebar ul,
+.sidebar li,
+.sidebar div {
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+    list-style: none;
+}
+
+.sidebar * {
+    border: none;
+    box-shadow: none;
+}
+
+/* Dự phòng cho Tailwind class khi Tailwind không tải */
+.flex {
+    display: flex;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.flex-column {
+    flex-direction: column;
 }

@@ -13,6 +13,12 @@ import com.example.md5_phone_store_management.model.ProductImage;
 
 public interface IProductService {
 
+
+    List<Product> findAllProductsHaveStockQuantityUnderEleven();
+
+    Integer countProductsHaveRetailPrice();
+
+
     public List<Product> findAllByIds(List<Long> ids);
 
     Page<Product> searchProductByNameAndSupplier_NameAndPurchasePriceAndRetailPrice(

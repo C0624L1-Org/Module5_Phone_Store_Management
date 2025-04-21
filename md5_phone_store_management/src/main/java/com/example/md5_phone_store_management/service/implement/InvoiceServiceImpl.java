@@ -1,13 +1,18 @@
 package com.example.md5_phone_store_management.service.implement;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.util.*;
-
-import com.example.md5_phone_store_management.model.*;
-import org.antlr.v4.runtime.misc.Pair;
+import com.example.md5_phone_store_management.event.EntityChangeEvent;
+import com.example.md5_phone_store_management.model.Customer;
+import com.example.md5_phone_store_management.model.Invoice;
+import com.example.md5_phone_store_management.model.InvoiceDetail;
+import com.example.md5_phone_store_management.model.InvoiceStatus;
+import com.example.md5_phone_store_management.repository.IInvoiceDetailRepository;
+import com.example.md5_phone_store_management.repository.IInvoiceRepository;
+import com.example.md5_phone_store_management.repository.InvoiceRepository;
+import com.example.md5_phone_store_management.service.IEmployeeService;
+import com.example.md5_phone_store_management.service.IInvoiceService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +21,11 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.md5_phone_store_management.repository.InvoiceRepository;
-import com.example.md5_phone_store_management.service.IEmployeeService;
-import com.example.md5_phone_store_management.service.IInvoiceService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.List;
 
 @Service
 public class InvoiceServiceImpl implements IInvoiceService {
@@ -27,7 +34,81 @@ public class InvoiceServiceImpl implements IInvoiceService {
     private InvoiceRepository invoiceRepository;
 
     @Autowired
+    private IInvoiceRepository iinvoiceRepository;
+
+    @Autowired
+    private IInvoiceDetailRepository iInvoiceDetailRepository;
+
+    @Autowired
     private IEmployeeService employeeService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Override
+    public String getBestSalesStaffName() {
+        Integer employeeId = iInvoiceDetailRepository.getBestSalesStaffEmployeeId();
+        if (employeeId == null) {
+            return "";
+        }
+        return employeeService.getEmployeeById(employeeId).getFullName();
+    }
+
+    @Override
+    public Integer getBestSalesStaffSellingQuantity() {
+        Integer employeeId = iInvoiceDetailRepository.getBestSalesStaffEmployeeId();
+        return iinvoiceRepository.countBestSalesStaffSellingQuantityWithEmployeeId(employeeId);
+    }
+
+    @Override
+    public Long totalRevenue() {
+        Long revenue = iInvoiceDetailRepository.totalRevenue();
+        return (revenue == null || revenue == 0) ? 0L : revenue;
+    }
+
+    @Override
+    public Long totalTodayInvoiceRevenue() {
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        LocalDateTime startOfDay = today.atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
+        LocalDateTime endOfDay = today.atTime(23, 59, 59, 999999999);
+
+        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startOfDay, endOfDay);
+        System.out.println("Invoice IDs for today (size: " + invoiceIds.size() + "): " + invoiceIds);
+
+        Long total = iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
+        System.out.println("Total revenue for today: " + total);
+        return total != null ? total : 0L;
+    }
+
+    @Override
+    public Long totalThisMonthInvoiceRevenue() {
+        LocalDate now = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        YearMonth thisMonth = YearMonth.from(now);
+        LocalDateTime startDateTime = thisMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
+        LocalDateTime endDateTime = thisMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+
+        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startDateTime, endDateTime);
+        System.out.println("Invoice IDs for month (size: " + invoiceIds.size() + "): " + invoiceIds);
+
+        Long total = iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
+        System.out.println("Total revenue for month: " + total);
+        return total != null ? total : 0L;
+    }
+
+    @Override
+    public Long totalLastMonthInvoiceRevenue() {
+        LocalDate now = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        YearMonth lastMonth = YearMonth.from(now).minusMonths(1); // Lấy tháng trước
+        LocalDateTime startDateTime = lastMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
+        LocalDateTime endDateTime = lastMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+
+        List<Long> invoiceIds = invoiceRepository.findInvoiceIdsByDateRange(startDateTime, endDateTime);
+        System.out.println("Invoice IDs for last month (size: " + invoiceIds.size() + "): " + invoiceIds);
+
+        Long total = iInvoiceDetailRepository.totalRevenueByInvoiceIds(invoiceIds);
+        System.out.println("Total revenue for last month: " + total);
+        return total != null ? total : 0L;
+    }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
@@ -37,18 +118,14 @@ public class InvoiceServiceImpl implements IInvoiceService {
                 throw new IllegalArgumentException("Customer cannot be null");
             }
 
-            // Log thông tin chi tiết trước khi lưu
             System.out.println("Saving invoice: " + invoice);
             if (invoice.getInvoiceDetailList() != null) {
                 System.out.println("Invoice has " + invoice.getInvoiceDetailList().size() + " details");
-
-                // In chi tiết của từng sản phẩm để debug
                 for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
                     System.out.println("  - Detail: " + detail);
                 }
             }
 
-            // Đảm bảo quan hệ hai chiều được thiết lập đúng
             if (invoice.getInvoiceDetailList() != null) {
                 invoice.getInvoiceDetailList().forEach(detail -> {
                     if (detail.getInvoice() == null) {
@@ -57,21 +134,30 @@ public class InvoiceServiceImpl implements IInvoiceService {
                 });
             }
 
+            /* Commented from main
             // Đảm bảo invoice có thời gian tạo
+            */
             if (invoice.getCreatedAt() == null) {
                 invoice.setCreatedAt(LocalDateTime.now());
             }
 
+            /* Commented from main
             // Đảm bảo invoice có trạng thái
+            */
             if (invoice.getStatus() == null) {
                 invoice.setStatus(InvoiceStatus.PROCESSING);
             }
 
-            // Kiểm tra trước khi lưu
             validateInvoice(invoice);
 
             Invoice savedInvoice = invoiceRepository.save(invoice);
             System.out.println("Invoice saved successfully, ID: " + savedInvoice.getId());
+
+            // Generate a unique event ID for debugging
+            String eventId = java.util.UUID.randomUUID().toString();
+            System.out.println("Publishing INSERT_INVOICE event for invoice ID: " + savedInvoice.getId() + ", eventId: " + eventId);
+            eventPublisher.publishEvent(new EntityChangeEvent(this, savedInvoice, "INSERT_INVOICE", null));
+
             return savedInvoice;
         } catch (DataIntegrityViolationException e) {
             System.err.println("Data integrity violation when saving invoice: " + e.getMessage());
@@ -91,15 +177,12 @@ public class InvoiceServiceImpl implements IInvoiceService {
         if (invoice.getCustomer() == null) {
             throw new IllegalArgumentException("Customer cannot be null");
         }
-
         if (invoice.getAmount() == null) {
             System.err.println("Warning: Invoice amount is null");
         }
-
         if (invoice.getPaymentMethod() == null) {
             System.err.println("Warning: Payment method is null");
         }
-
     }
 
     @Override
@@ -142,7 +225,16 @@ public class InvoiceServiceImpl implements IInvoiceService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     public void deleteInvoice(Long id) {
         try {
-            invoiceRepository.deleteById(id);
+            // Find the invoice to capture its state before deletion
+            Invoice existingInvoice = invoiceRepository.findById(id).orElse(null);
+            if (existingInvoice != null) {
+                // Publish event before deletion
+                eventPublisher.publishEvent(new EntityChangeEvent(this, existingInvoice, "DELETE_INVOICE", existingInvoice));
+                invoiceRepository.deleteById(id);
+                System.out.println("Invoice deleted successfully, ID: " + id);
+            } else {
+                throw new RuntimeException("Invoice not found with ID: " + id);
+            }
         } catch (Exception e) {
             System.err.println("Error deleting invoice: " + e.getMessage());
             e.printStackTrace();
@@ -150,7 +242,41 @@ public class InvoiceServiceImpl implements IInvoiceService {
         }
     }
 
-    //sap xep
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+    public Invoice updateInvoice(Invoice updatedInvoice) {
+        try {
+            // Find the existing invoice
+            Invoice existingInvoice = invoiceRepository.findById(updatedInvoice.getId())
+                    .orElseThrow(() -> new RuntimeException("Invoice not found with ID: " + updatedInvoice.getId()));
+
+            // Copy existing state for event
+            Invoice oldInvoice = new Invoice();
+            BeanUtils.copyProperties(existingInvoice, oldInvoice);
+
+            // Update fields (example, adjust based on your needs)
+            existingInvoice.setStatus(updatedInvoice.getStatus());
+            existingInvoice.setAmount(updatedInvoice.getAmount());
+            existingInvoice.setPaymentMethod(updatedInvoice.getPaymentMethod());
+            // Update other fields as needed
+
+            // Validate the updated invoice
+            validateInvoice(existingInvoice);
+
+            // Save the updated invoice
+            Invoice savedInvoice = invoiceRepository.save(existingInvoice);
+
+            // Bỏ event update vì hình như làm gì có logic update hóa đơn
+            // eventPublisher.publishEvent(new EntityChangeEvent(this, savedInvoice, "UPDATE_INVOICE", oldInvoice));
+
+            return savedInvoice;
+        } catch (Exception e) {
+            System.err.println("Error updating invoice: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    // Sorting methods (unchanged, no events needed as they are read-only)
     @Override
     public Page<Invoice> findAllSuccessInvoicesWithTimeAsc(Pageable pageable) {
         return invoiceRepository.findAllSuccessInvoicesWithTimeAsc(pageable);
@@ -206,6 +332,26 @@ public class InvoiceServiceImpl implements IInvoiceService {
         return invoiceRepository.findAllSuccessInvoices(pageable);
     }
 
+    @Override
+    public Integer countAllSuccessInvoices() {
+        return invoiceRepository.countAllSuccessInvoices();
+    }
+
+    @Override
+    public Integer countTodaySuccessInvoices() {
+        LocalDate today = LocalDate.now();
+        return invoiceRepository.countSuccessInvoicesByDate(today);
+    }
+
+    @Override
+    public Integer countThisMonthSuccessInvoices() {
+        LocalDate now = LocalDate.now();
+        YearMonth thisMonth = YearMonth.from(now);
+        LocalDate startOfMonth = thisMonth.atDay(1);
+        LocalDateTime startDateTime = startOfMonth.atStartOfDay();
+        LocalDateTime endDateTime = thisMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+        return invoiceRepository.countSuccessInvoicesBetweenDates(startDateTime, endDateTime);
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -317,68 +463,4 @@ public class InvoiceServiceImpl implements IInvoiceService {
             return null;
         }
     }
-
-   /* public List<Object[]> filterReport(
-            String groupBy, Integer month, Integer year,
-            PaymentMethod paymentMethod, String productName, String employeeName
-    ) {
-        List<Object[]> rawData;
-        Map<Integer, Object[]> fullDataMap = new LinkedHashMap<>();
-
-        LocalDate now = LocalDate.now();
-        groupBy = (groupBy == null) ? "day" : groupBy.toLowerCase();
-
-        // Xử lý giá trị mặc định
-        if (groupBy.equals("day")) {
-            if (month == null || year == null) {
-                month = now.getMonthValue();
-                year = now.getYear();
-            }
-            rawData = invoiceRepository.getDailyRevenueReport(month, year, paymentMethod, employeeName, productName);
-
-            // Bổ sung đủ các ngày trong tháng
-            int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
-            for (int day = 1; day <= daysInMonth; day++) {
-                fullDataMap.put(day, new Object[]{day, 0L, 0});
-            }
-        } else if (groupBy.equals("month")) {
-            if (year == null) year = now.getYear();
-            rawData = invoiceRepository.getMonthlyRevenueReport(year, paymentMethod, employeeName, productName);
-
-            // Bổ sung đủ 12 tháng
-            for (int m = 1; m <= 12; m++) {
-                fullDataMap.put(m, new Object[]{m, 0L, 0});
-            }
-        } else if (groupBy.equals("year")) {
-            rawData = invoiceRepository.getYearlyRevenueReport(paymentMethod, employeeName, productName);
-
-            // Lấy 3 năm gần nhất
-            int currentYear = now.getYear();
-            for (int y = currentYear - 2; y <= currentYear; y++) {
-                fullDataMap.put(y, new Object[]{y, 0L, 0});
-            }
-        } else {
-            // Mặc định là theo ngày hiện tại
-            month = now.getMonthValue();
-            year = now.getYear();
-            rawData = invoiceRepository.getDailyRevenueReport(month, year, paymentMethod, employeeName, productName);
-            int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
-            for (int day = 1; day <= daysInMonth; day++) {
-                fullDataMap.put(day, new Object[]{day, 0L, 0});
-            }
-        }
-
-        // Ghi đè dữ liệu thực vào bản đồ
-        for (Object[] row : rawData) {
-            Integer key = ((Number) row[0]).intValue();
-            fullDataMap.put(key, new Object[]{
-                    key,
-                    ((Number) row[2]).longValue(),     // totalRevenue
-                    ((Number) row[1]).intValue()       // totalInvoice
-            });
-        }
-
-        // Trả về danh sách theo thứ tự chỉ số
-        return new ArrayList<>(fullDataMap.values());
-    }*/
 }

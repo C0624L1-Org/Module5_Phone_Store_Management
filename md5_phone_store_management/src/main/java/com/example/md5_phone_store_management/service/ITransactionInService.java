@@ -10,6 +10,19 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ITransactionInService {
+
+
+    Integer countImportQuantity();
+    Integer countThisMonthImportQuantityProducts();
+    String getRecentImportSupplierName();
+    String getRecentImportProductName();
+
+
+    Integer countRegularSupplier();
+    String getBestSupplierName();
+    Integer getBestSupplierImportQuantity();
+
+    Integer countImportProducts();
     Page<InventoryTransaction> getImportTransactions(Pageable pageable);
     Page<InventoryTransaction> searchImportTransactions(String productName, String supplierName, LocalDate startDate, LocalDate endDate, Pageable pageable);
     void deleteImportTransactions(List<Integer> ids);

@@ -67,6 +67,8 @@ public class SpringSecurity {
                                 "/dashboard/sales/payment-callback",
                                 "/dashboard/sales/invoice-pdf/**",
                                 "/dashboard/sales/download-invoice-pdf/**").permitAll()
+//                        .requestMatchers("/dashboard/admin/customer/report").hasAnyRole("Admin", "SalesPerson") ko được
+                        .requestMatchers("/dashboard/business/management/**").hasAnyRole("Admin", "SalesPerson")
                         .requestMatchers("/dashboard/admin/**").hasAnyRole("Admin", "WarehouseStaff", "SalesPerson")
                         .requestMatchers("/dashboard/sales/create-customer", "/dashboard/business/**").hasAnyRole("Admin", "SalesPerson")
                         .requestMatchers("/api/create-customer").hasAnyRole("Admin", "SalesPerson", "SalesStaff")

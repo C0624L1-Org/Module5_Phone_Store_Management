@@ -1,139 +1,1025 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trang quản lý của Quản trị viên</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển</title>
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="/css/fragments/navbar.css">
-  <link rel="stylesheet" href="/css/fragments/sidebar.css">
-  <link rel="stylesheet" href="/css/fragments/footer.css">
-  <link rel="stylesheet" href="/css/common/toast.css">
-  <link rel="stylesheet" href="/css/common/layout.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <link rel="stylesheet" href="/css/common/layout.css">
+
+    <!-- Inline CSS -->
+    <style>
+        .dash-sales-analytics, .dash-updates-profile {
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center;
+            will-change: transform, opacity, width, flex, background-color;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dash-sales-analytics.hidden, .dash-updates-profile.hidden {
+            width: 0;
+            min-width: 0;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+            flex: 0;
+            overflow: hidden;
+            transform: scale(0.95) translateX(50px);
+        }
+
+        .dash-sales-analytics.expanded, .dash-updates-profile.expanded {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            width: calc(100% - 40px);
+            z-index: 10;
+            opacity: 1;
+            transform: scale(1) translateX(0);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            background-color: white;
+        }
+
+        .dash-content {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
+        }
+
+        .dash-content.fading {
+            opacity: 0;
+            background-color: white;
+        }
+
+        #salesChart {
+            max-height: 300px;
+            width: 100%;
+            transition: height 0.3s ease-in-out;
+        }
+
+        .update-time {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dash-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .dash-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            transition: height 0.4s ease-in-out;
+            z-index: 5;
+        }
+
+        .dash-card:hover .dash-card-overlay {
+            height: 35%;
+        }
+
+        .dash-card-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .dash-card-title {
+            z-index: 15;
+        }
+
+        .dash-card-main, .dash-card-update {
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .dash-card:hover .dash-card-main, .dash-card:hover .dash-card-update {
+            opacity: 0;
+        }
+
+        .dash-card-previous {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            padding-top: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+        }
+
+        .dash-card:hover .dash-card-previous {
+            opacity: 1;
+        }
+
+        .update-columns {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .update-column {
+            flex: 1;
+            min-width: 200px;
+            max-height: 500px;
+            background: #f9fafb;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+
+        .update-column.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .update-column-header {
+            position: sticky;
+            top: 0;
+            background: #e5e7eb;
+            padding: 0.5rem;
+            border-radius: 8px 8px 0 0;
+            z-index: 10;
+        }
+
+        .update-column-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            text-align: center;
+            color: #1f2937;
+        }
+
+        .update-column-content {
+            max-height: 460px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .update-column-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .update-column-content::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        .update-item-expanded {
+            background: white;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+        }
+
+        .update-item-expanded:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        .dash-bottom-section {
+            height: 615px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dash-sales-analytics {
+            max-height: 600px;
+        }
+
+        .dash-updates-profile {
+            max-height: 600px;
+        }
+
+        .update-notification {
+            display: none;
+            background: #fef3c7;
+            color: #b45309;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .update-notification.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body>
-<!-- Hiển thị thông báo -->
+<body class="font-sans bg-gray-100 m-0 p-0">
+<!-- Toast -->
 <div th:replace="~{common/toast}"></div>
 
-<!-- Nhúng navbar -->
+<!-- Navbar -->
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-<div class="content-wrapper">
-  <div class="dashboard-container">
-    <!-- Sidebar -->
-    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+<div class="content-wrapper flex flex-col min-h-screen pt-[90px]">
+    <div class="dashboard-container flex flex-1">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/sidebar :: sidebar}" class="min-w-[250px] bg-white shadow-md"></aside>
 
-    <!-- Main content -->
-    <div class="content-container">
-      <div class="card shadow-sm mb-4">
-        <div class="card-body">
-          <h1 class="mb-4">Trang quản lý của Quản trị viên</h1>
+        <div class="dash-container flex-1 max-w-full mx-auto p-4 md:p-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">Thống kê Admin</li>
+                </ol>
+            </nav>
 
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                  <h3 class="mb-0"><i class="fas fa-users me-2"></i>Thống kê nhân viên</h3>
+            <!-- Top Section: Cards -->
+            <div class="dash-cards-wrapper flex gap-4 flex-wrap md:flex-nowrap mb-4 w-full">
+                <!-- Revenue Card -->
+                <div class="dash-card flex-1 min-w-0 bg-orange-300 text-white rounded-lg shadow-lg p-6 cursor-pointer min-h-[220px]">
+                    <div class="dash-card-overlay bg-orange-400"></div>
+                    <div class="dash-card-content flex flex-col justify-between" onclick="updateChart('revenue')">
+                        <div class="dash-card-title">
+                            <div class="flex justify-center items-center mb-4">
+                                <div class="flex items-center text-xl font-bold border border-white px-4 py-1 rounded-md shadow-sm bg-white bg-opacity-10 backdrop-blur-sm">
+                                    <i class="fas fa-money-bill-wave mr-2"></i> Doanh Thu
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dash-card-main">
+                            <div class="border-t border-white mb-4"></div>
+                            <div class="text-4xl font-bold text-center" id="totalRevenue">0đ</div>
+                        </div>
+                        <div class="dash-card-update flex justify-end items-end mt-4">
+                            <div class="text-xs flex items-center gap-1">
+                                <i class="fas fa-clock text-white"></i>
+                                <span id="revenue-update-time">--:--</span> - <span id="revenue-update-date">--/--/----</span>
+                            </div>
+                        </div>
+                        <div class="dash-card-previous">
+                            <div class="text-sm font-semibold">Tháng trước: <span id="lastMonthRevenue">0đ</span></div>
+                            <div class="text-sm font-semibold">Tháng này: <span id="thisMonthRevenue">0đ</span></div>
+                            <div class="text-xs" id="revenue-change"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                  <div class="list-group">
-                    <div class="list-group-item">
-                      <h4>Tổng số nhân viên: <span class="badge bg-primary" th:text="${countEmployee}"></span></h4>
-                    </div>
-                    <div class="list-group-item">
-                      <h4>Nhân viên bán hàng: <span class="badge bg-success" th:text="${countSalesStaff}"></span></h4>
-                    </div>
-                    <div class="list-group-item">
-                      <h4>Nhân viên kinh doanh: <span class="badge bg-info" th:text="${countBusinessStaff}"></span></h4>
-                    </div>
-                    <div class="list-group-item">
-                      <h4>Nhân viên kho: <span class="badge bg-warning" th:text="${countWarehouseStaff}"></span></h4>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              <div class="card shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
-                  <h3 class="mb-0"><i class="fas fa-building me-2"></i>Thống kê nhà cung cấp</h3>
-                </div>
-                <div class="card-body">
-                  <div class="list-group">
-                    <div class="list-group-item">
-                      <h4>Tổng số nhà cung cấp: <span class="badge bg-success" th:text="${countSuppliers}"></span></h4>
+                <!-- Products Card -->
+                <div class="dash-card flex-1 min-w-0 bg-green-300 text-white rounded-lg shadow-lg p-6 cursor-pointer min-h-[220px]">
+                    <div class="dash-card-overlay bg-green-500"></div>
+                    <div class="dash-card-content flex flex-col justify-between" onclick="updateChart('products')">
+                        <div class="dash-card-title">
+                            <div class="flex justify-center items-center mb-4">
+                                <div class="flex items-center text-xl font-bold border border-white px-4 py-1 rounded-md shadow-sm bg-white bg-opacity-10 backdrop-blur-sm">
+                                    <i class="fas fa-box mr-2"></i> Sản Phẩm
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dash-card-main">
+                            <div class="border-t border-white mb-4"></div>
+                            <div class="text-4xl font-bold text-center" id="countAllProducts">0</div>
+                        </div>
+                        <div class="dash-card-update flex justify-end items-end mt-4">
+                            <div class="text-xs flex items-center gap-1">
+                                <i class="fas fa-clock text-white"></i>
+                                <span id="products-update-time">--:--</span> - <span id="products-update-date">--/--/----</span>
+                            </div>
+                        </div>
+                        <div class="dash-card-previous">
+                            <div class="text-sm font-semibold">Sản phẩm nhập: <span id="countImportProducts">0</span></div>
+                            <div class="text-sm font-semibold">Sản phẩm xuất: <span id="countExportProducts">0</span></div>
+                            <div class="text-sm font-semibold">Sản phẩm bán chạy: <span id="topSellingProductName">N/A</span> với <span id="topSellingProductNamePurchaseQuantity">0</span> lượt bán</div>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
+
+                <!-- Suppliers Card -->
+                <div class="dash-card flex-1 min-w-0 bg-pink-300 text-white rounded-lg shadow-lg p-6 cursor-pointer min-h-[220px]">
+                    <div class="dash-card-overlay bg-pink-400"></div>
+                    <div class="dash-card-content flex flex-col justify-between" onclick="updateChart('suppliers')">
+                        <div class="dash-card-title">
+                            <div class="flex justify-center items-center mb-4">
+                                <div class="flex items-center text-xl font-bold border border-white px-4 py-1 rounded-md shadow-sm bg-white bg-opacity-10 backdrop-blur-sm">
+                                    <i class="fas fa-truck mr-2"></i> Nhà Cung Cấp
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dash-card-main">
+                            <div class="border-t border-white mb-4"></div>
+                            <div class="text-4xl font-bold text-center" id="countSuppliers">0</div>
+                        </div>
+                        <div class="dash-card-update flex justify-end items-end mt-4">
+                            <div class="text-xs flex items-center gap-1">
+                                <i class="fas fa-clock text-white"></i>
+                                <span id="suppliers-update-time">--:--</span> - <span id="suppliers-update-date">--/--/----</span>
+                            </div>
+                        </div>
+                        <div class="dash-card-previous">
+                            <div class="text-sm font-semibold">Nhà cung cấp mới: <span id="newSupplier">0</span></div>
+                            <div class="text-sm font-semibold">Nhà cung cấp thân thiết: <span id="regularSupplier">0</span></div>
+                            <div class="text-sm font-semibold">Nhà cung cấp tốt nhất: <span id="bestSupplierName">N/A</span> với <span id="bestSupplierImportQuantity">0</span> lần nhập</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employees Card -->
+                <div class="dash-card flex-1 min-w-0 bg-cyan-300 text-white rounded-lg shadow-lg p-6 cursor-pointer min-h-[220px]">
+                    <div class="dash-card-overlay bg-cyan-400"></div>
+                    <div class="dash-card-content flex flex-col justify-between" onclick="updateChart('employees')">
+                        <div class="dash-card-title">
+                            <div class="flex justify-center items-center mb-4">
+                                <div class="flex items-center text-xl font-bold border border-white px-4 py-1 rounded-md shadow-sm bg-white bg-opacity-10 backdrop-blur-sm">
+                                    <i class="fas fa-users mr-2"></i> Nhân Viên
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dash-card-main">
+                            <div class="border-t border-white mb-4"></div>
+                            <div class="text-4xl font-bold text-center" id="countAllEmployees">0</div>
+                        </div>
+                        <div class="dash-card-update flex justify-end items-end mt-4">
+                            <div class="text-xs flex items-center gap-1">
+                                <i class="fas fa-clock text-white"></i>
+                                <span id="employees-update-time">--:--</span> - <span id="employees-update-date">--/--/----</span>
+                            </div>
+                        </div>
+                        <div class="dash-card-previous">
+                            <div class="text-sm font-semibold">Nhân viên kho: <span id="countWarehouseStaff">0</span></div>
+                            <div class="text-sm font-semibold">Nhân viên bán hàng: <span id="countSalesStaff">0</span></div>
+                            <div class="text-sm font-semibold">Nhân viên kinh doanh: <span id="countSalesPerson">0</span></div>
+                            <div class="text-sm font-semibold">Nhân viên xuất sắc: <span id="bestSalesStaffName">N/A</span> với <span id="bestSalesStaffSellingQuantity">0</span> đơn</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers Card -->
+                <div class="dash-card flex-1 min-w-0 bg-purple-300 text-white rounded-lg shadow-lg p-6 cursor-pointer min-h-[220px]">
+                    <div class="dash-card-overlay bg-purple-500"></div>
+                    <div class="dash-card-content flex flex-col justify-between" onclick="updateChart('customers')">
+                        <div class="dash-card-title">
+                            <div class="flex justify-center items-center mb-4">
+                                <div class="flex items-center text-xl font-bold border border-white px-4 py-1 rounded-md shadow-sm bg-white bg-opacity-10 backdrop-blur-sm">
+                                    <i class="fas fa-user-friends mr-2"></i> Khách Hàng
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dash-card-main">
+                            <div class="border-t border-white mb-4"></div>
+                            <div class="text-4xl font-bold text-center" id="countAllCustomers">0</div>
+                        </div>
+                        <div class="dash-card-update flex justify-end items-end mt-4">
+                            <div class="text-xs flex items-center gap-1">
+                                <i class="fas fa-clock text-white"></i>
+                                <span id="customers-update-time">--:--</span> - <span id="customers-update-date">--/--/----</span>
+                            </div>
+                        </div>
+                        <div class="dash-card-previous">
+                            <div class="text-sm font-semibold">Khách hàng mới: <span id="countNewCustomers">0</span></div>
+                            <div class="text-sm font-semibold">Khách hàng thân thiết: <span id="countRegularCustomers">0</span></div>
+                            <div class="text-sm font-semibold">Khách hàng ưu tú: <span id="topBuyingCustomerName">N/A</span> với <span id="topBuyingCustomerTotalPurchase">0đ</span> (<span id="topBuyingCustomerTotalPurchaseQuantity">0</span> đơn)</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
-              <div class="card shadow-sm mb-4">
-                <div class="card-header bg-danger text-white">
-                  <h3 class="mb-0"><i class="fas fa-mobile-alt me-2"></i>Thống kê sản phẩm</h3>
-                </div>
-                <div class="card-body">
-                  <div class="list-group">
-                    <div class="list-group-item">
-                      <h4>Tổng số sản phẩm: <span class="badge bg-danger" th:text="${countProducts}"></span></h4>
+
+            <div class="dash-bottom-section flex gap-4 w-full relative flex-wrap">
+                <div class="dash-sales-analytics flex-[7] min-w-[300px] bg-white rounded-lg p-5 shadow-md transition-all">
+                    <div class="dash-content">
+                        <div class="dash-header flex justify-between items-center mb-2">
+                            <h3 id="chart-title" class="text-lg font-semibold">Biểu Đồ - Doanh Thu</h3>
+                            <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
+                                    onclick="toggleExpand('sales')">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-600 mb-5">Để biết thêm chi tiết về cách sử dụng, vui lòng tham khảo giấy phép amCharts.</p>
+                        <div class="dash-chart-controls flex justify-between items-center mb-5">
+                            <div class="dash-zoom flex gap-2">
+                                <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
+                                        onclick="zoomChart('in')">⟐
+                                </button>
+                                <button class="bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
+                                        onclick="zoomChart('out')">⟑
+                                </button>
+                            </div>
+                            <button class="dash-show-all bg-gray-200 border-none px-3 py-1 rounded-md cursor-pointer"
+                                    onclick="resetChart()">Hiển thị tất cả
+                            </button>
+                        </div>
+                        <canvas id="salesChart"></canvas>
                     </div>
-                    <div class="list-group-item">
-                      <h4>Tổng sản phẩm đã bán ra (thống kê): <span class="badge bg-danger" th:text="${totalProductsSold ?: '0'}"></span></h4>
+                </div>
+
+                <div class="dash-updates-profile flex-[3] min-w-[200px] bg-white rounded-lg p-5 shadow-md transition-all">
+                    <div class="dash-content">
+                        <div class="dash-header flex justify-between items-center mb-2">
+                            <div>
+                                <div id="updateNotification" class="update-notification">
+                                    <i class="fas fa-bell mr-1"></i> Đã có cập nhật mới nhất!
+                                </div>
+                                <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>
+                            </div>
+                            <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
+                                    onclick="toggleExpand('updates')">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                        <div id="changeLogsContainer"></div>
                     </div>
-                  </div>
                 </div>
-              </div>
             </div>
-
-
-            <div class="card shadow-sm mb-4">
-              <div class="card-header bg-warning text-white">
-                <h3 class="mb-0"><i class="fas fa-user-friends me-2"></i>Thống kê khách hàng</h3>
-              </div>
-              <div class="card-body">
-                <div class="list-group">
-                  <div class="list-group-item">
-                    <h4>Tổng số khách hàng: <span class="badge bg-warning" th:text="${countCustomer}"></span></h4>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-            <!--Thống kê doanh thu tạm thời comment lại do chưa hoạt động
-            <div class="card shadow-sm mb-4">
-              <div class="card-header bg-info text-white">
-                <h3 class="mb-0"><i class="fas fa-chart-line me-2"></i>Thống kê doanh thu</h3>
-              </div>
-              <div class="card-body">
-                <div class="list-group">
-                  <div class="list-group-item">
-                    <h4>Tổng doanh thu: <span class="badge bg-info" th:text="${#numbers.formatDecimal(totalRevenue ?: 0, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span></h4>
-                  </div>
-                </div>
-              </div>
-            </div>-->
-
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  <!-- Footer -->
-  <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}" class="bg-white shadow-md p-4"></footer>
 </div>
 
-
-
-<!-- Nhúng script navbar -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Format entity name to Vietnamese
+    function formatEntityName(entityName) {
+        const entityMap = {
+            'supplier': 'Nhà Cung Cấp',
+            'product': 'Sản Phẩm',
+            'employee': 'Nhân Viên',
+            'invoice': 'Hóa Đơn',
+            'customer': 'Khách Hàng'
+        };
+        return entityMap[entityName?.toLowerCase()] || 'N/A';
+    }
 
+    // Format action to Vietnamese
+    function formatAction(action) {
+        const actionMap = {
+            'INSERT': 'Thêm mới',
+            'UPDATE': 'Cập nhật',
+            'DELETE': 'Xóa'
+        };
+        return actionMap[action] || 'N/A';
+    }
+
+    // Format relative time
+    function formatRelativeTime(timestamp, isExpanded) {
+        if (!timestamp || isNaN(new Date(timestamp))) {
+            return "vừa xong";
+        }
+        const now = new Date();
+        const logTime = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - logTime) / 1000);
+
+        if (isExpanded) {
+            return logTime.toLocaleString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        if (diffInSeconds < 60) {
+            return "vừa xong";
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes} phút trước`;
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours} giờ trước`;
+        } else if (diffInSeconds < 604800) {
+            const days = Math.floor(diffInSeconds / 86400);
+            return `${days} ngày trước`;
+        } else {
+            return logTime.toLocaleString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    }
+
+    // Format date and time
+    function formatDateTime() {
+        const now = new Date();
+        const time = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
+        const date = now.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'});
+        return {time, date};
+    }
+
+    // Format currency
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(value || 0);
+    }
+
+    // Fetch employee name by ID
+    async function getEmployeeNameById(employeeId) {
+        if (!employeeId) return 'N/A';
+        const url = `/api/changelogs/employee/${employeeId}/name`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                console.error(`Error fetching employee name for ID ${employeeId}: Status ${response.status}`);
+                return 'không xác định';
+            }
+            const data = await response.json();
+            return data.name || 'không xác định';
+        } catch (error) {
+            console.error(`Error fetching employee name for ID ${employeeId}:`, error);
+            return 'không xác định';
+        }
+    }
+
+    // Cache employee names
+    const employeeNameCache = {};
+
+    // State for change logs
+    let cachedChangeLogs = [];
+    let latestUpdateTimestamp = null;
+    let isUpdatesExpanded = false;
+
+    // Render change logs
+    async function renderChangeLogs(logs) {
+        const container = document.getElementById('changeLogsContainer');
+        const updatesProfile = document.querySelector('.dash-updates-profile');
+        const isExpanded = updatesProfile.classList.contains('expanded');
+
+        if (!logs || !Array.isArray(logs) || logs.length === 0) {
+            container.innerHTML = `
+                <div class="update-item">
+                    <div class="content">
+                        <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="update-item">
+                <div class="content">
+                    <p class="text-sm text-gray-500">Đang tải...</p>
+                </div>
+            </div>
+        `;
+
+        const employeeNamePromises = logs.map(async (log) => {
+            if (!log || !log.employeeId) return 'không xác định';
+            if (employeeNameCache[log.employeeId]) {
+                return employeeNameCache[log.employeeId];
+            }
+            const name = await getEmployeeNameById(log.employeeId);
+            employeeNameCache[log.employeeId] = name;
+            return name;
+        });
+
+        const employeeNames = await Promise.all(employeeNamePromises);
+
+        if (isExpanded) {
+            const entities = ['Hóa Đơn', 'Sản Phẩm', 'Nhà Cung Cấp', 'Nhân Viên', 'Khách Hàng'];
+            const logsByEntity = entities.reduce((acc, entity) => {
+                acc[entity] = [];
+                return acc;
+            }, {});
+
+            logs.forEach((log, index) => {
+                const entityText = formatEntityName(log.entityName);
+                if (logsByEntity[entityText]) {
+                    logsByEntity[entityText].push({log, employeeName: employeeNames[index]});
+                }
+            });
+
+            container.innerHTML = `
+                <div class="update-columns">
+                    ${entities.map(entity => `
+                        <div class="update-column" style="transform: translateY(20px);">
+                            <div class="update-column-header">
+                                <h4>${entity}</h4>
+                            </div>
+                            <div class="update-column-content">
+                                ${logsByEntity[entity].length === 0 ? `
+                                    <p class="text-sm text-gray-500">Chưa có cập nhật.</p>
+                                ` : logsByEntity[entity].map(({log, employeeName}) => {
+                const actionText = formatAction(log.action);
+                const valueText = log.action === 'DELETE' ? (log.oldValue || 'N/A') : (log.newValue || 'N/A');
+                return `
+                                        <div class="update-item-expanded">
+                                            <p class="text-xs text-gray-600 flex items-center gap-1 mb-1 leading-none">
+                                                <i class="fas fa-clock relative top-[1px]"></i>
+                                                ${formatRelativeTime(log.timestamp, true)}
+                                            </p>
+                                            <div class="flex items-center gap-2">
+                                                <div class="${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
+                                                </div>
+                                                <p class="text-sm leading-tight">
+                                                    <span class="font-medium">${employeeName} ${actionText.toLowerCase()}</span><br>
+                                                    <span class="text-gray-700">${valueText}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    `;
+            }).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            setTimeout(() => {
+                const columns = container.querySelectorAll('.update-column');
+                columns.forEach((col, index) => {
+                    setTimeout(() => {
+                        col.classList.add('visible');
+                    }, index * 100);
+                });
+            }, 300);
+        } else {
+            const limitedLogs = logs.slice(0, 6);
+            container.innerHTML = limitedLogs.map((log, index) => {
+                if (!log || !log.timestamp || !log.action) {
+                    return '';
+                }
+                const employeeName = employeeNames[index];
+                const actionText = formatAction(log.action);
+                const entityText = formatEntityName(log.entityName);
+                const valueText = log.action === 'DELETE' ? (log.oldValue || 'N/A') : (log.newValue || 'N/A');
+
+                return `
+                    <div class="update-item mb-4 flex items-start gap-2">
+                        <div class="icon ${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between w-full">
+                                <strong class="text-sm">${actionText}</strong>
+                                <span class="text-xs text-gray-600">${formatRelativeTime(log.timestamp, false)}</span>
+                            </div>
+                            <p class="text-sm mt-1">${entityText} tên ${valueText}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    // Fetch dashboard data
+    let previousData = {
+        revenue: 0,
+        products: 0,
+        suppliers: 0,
+        employees: 0,
+        customers: 0
+    };
+
+    async function fetchDashboardData() {
+        try {
+            console.log("Fetching dashboard data...");
+            const [adminDashboardRes, changeLogsRes] = await Promise.all([
+                fetch('/api/changelogs/admin-dashboard-info').catch(e => {
+                    console.error("Admin dashboard fetch failed:", e);
+                    return null;
+                }),
+                fetch('/api/changelogs/notification').catch(e => {
+                    console.error("Change logs fetch failed:", e);
+                    return null;
+                })
+            ]);
+
+            const parseJson = async (res, endpoint) => {
+                if (!res) {
+                    console.warn(`Request failed for ${endpoint}: No response`);
+                    return null;
+                }
+                if (!res.ok) {
+                    console.warn(`Request failed for ${endpoint}: Status ${res.status}`);
+                    return null;
+                }
+                try {
+                    const text = await res.text();
+                    if (!text) {
+                        console.warn(`Empty response for ${endpoint}`);
+                        return null;
+                    }
+                    return JSON.parse(text);
+                } catch (error) {
+                    console.error(`Failed to parse JSON for ${endpoint}:`, error);
+                    return null;
+                }
+            };
+
+            const adminData = (await parseJson(adminDashboardRes, '/api/changelogs/admin-dashboard-info')) ?? {};
+            const changeLogs = (await parseJson(changeLogsRes, '/api/changelogs/notification')) ?? [];
+
+            console.log("Fetched admin dashboard data:", adminData);
+
+            const dateTime = formatDateTime();
+
+            // Revenue
+            const thisMonthRevenue = adminData.thisMonthRevenue ?? 0;
+            const lastMonthRevenue = adminData.lastMonthRevenue ?? 0;
+            document.getElementById('totalRevenue').textContent = formatCurrency(adminData.totalRevenue ?? 0);
+            document.getElementById('lastMonthRevenue').textContent = formatCurrency(lastMonthRevenue);
+            document.getElementById('thisMonthRevenue').textContent = formatCurrency(thisMonthRevenue);
+            const diffRevenue = thisMonthRevenue - lastMonthRevenue;
+            if (thisMonthRevenue === 0 || lastMonthRevenue === 0) {
+                document.getElementById('revenue-change').textContent = diffRevenue > 0
+                    ? `Tăng ${formatCurrency(diffRevenue)}`
+                    : diffRevenue < 0
+                        ? `Giảm ${formatCurrency(Math.abs(diffRevenue))}`
+                        : "Không thay đổi";
+            } else {
+                const percentRevenue = Math.abs((diffRevenue / lastMonthRevenue) * 100).toFixed(2);
+                document.getElementById('revenue-change').textContent = diffRevenue > 0
+                    ? `Tăng ${formatCurrency(diffRevenue)} (${percentRevenue}%)`
+                    : diffRevenue < 0
+                        ? `Giảm ${formatCurrency(Math.abs(diffRevenue))} (${percentRevenue}%)`
+                        : "Không thay đổi";
+            }
+            document.getElementById('revenue-update-time').textContent = dateTime.time;
+            document.getElementById('revenue-update-date').textContent = dateTime.date;
+
+            // Products
+            document.getElementById('countAllProducts').textContent = adminData.countAllProducts ?? 0;
+            document.getElementById('countImportProducts').textContent = adminData.countImportProducts ?? 0;
+            document.getElementById('countExportProducts').textContent = adminData.countExportProducts ?? 0;
+            document.getElementById('topSellingProductName').textContent = adminData.topSellingProductName ?? 'N/A';
+            document.getElementById('topSellingProductNamePurchaseQuantity').textContent = adminData.topSellingProductNamePurchaseQuantity ?? 0;
+            document.getElementById('products-update-time').textContent = dateTime.time;
+            document.getElementById('products-update-date').textContent = dateTime.date;
+
+            // Suppliers
+            document.getElementById('countSuppliers').textContent = adminData.countSuppliers ?? 0;
+            document.getElementById('newSupplier').textContent = adminData.newSupplier ?? 0;
+            document.getElementById('regularSupplier').textContent = adminData.regularSupplier ?? 0;
+            document.getElementById('bestSupplierName').textContent = adminData.bestSupplierName ?? 'N/A';
+            document.getElementById('bestSupplierImportQuantity').textContent = adminData.bestSupplierImportQuantity ?? 0;
+            document.getElementById('suppliers-update-time').textContent = dateTime.time;
+            document.getElementById('suppliers-update-date').textContent = dateTime.date;
+
+            // Employees
+            document.getElementById('countAllEmployees').textContent = adminData.countAllEmployees ?? 0;
+            document.getElementById('countWarehouseStaff').textContent = adminData.countWarehouseStaff ?? 0;
+            document.getElementById('countSalesStaff').textContent = adminData.countSalesStaff ?? 0;
+            document.getElementById('countSalesPerson').textContent = adminData.countSalesPerson ?? 0;
+            document.getElementById('bestSalesStaffName').textContent = adminData.bestSalesStaffName ?? 'N/A';
+            document.getElementById('bestSalesStaffSellingQuantity').textContent = adminData.bestSalesStaffSellingQuantity ?? 0;
+            document.getElementById('employees-update-time').textContent = dateTime.time;
+            document.getElementById('employees-update-date').textContent = dateTime.date;
+
+            // Customers
+            document.getElementById('countAllCustomers').textContent = adminData.countAllCustomers ?? 0;
+            document.getElementById('countNewCustomers').textContent = adminData.countNewCustomers ?? 0;
+            document.getElementById('countRegularCustomers').textContent = adminData.countRegularCustomers ?? 0;
+            document.getElementById('topBuyingCustomerName').textContent = adminData.topBuyingCustomerName ?? 'N/A';
+            document.getElementById('topBuyingCustomerTotalPurchase').textContent = formatCurrency(adminData.topBuyingCustomerTotalPurchase ?? 0);
+            document.getElementById('topBuyingCustomerTotalPurchaseQuantity').textContent = adminData.topBuyingCustomerTotalPurchaseQuantity ?? 0;
+            document.getElementById('customers-update-time').textContent = dateTime.time;
+            document.getElementById('customers-update-date').textContent = dateTime.date;
+
+            previousData = {
+                revenue: thisMonthRevenue,
+                products: adminData.countAllProducts ?? 0,
+                suppliers: adminData.countSuppliers ?? 0,
+                employees: adminData.countAllEmployees ?? 0,
+                customers: adminData.countAllCustomers ?? 0
+            };
+
+            // Handle change logs
+            if (changeLogs.length > 0) {
+                const latestLog = changeLogs[0];
+                const newTimestamp = new Date(latestLog.timestamp).getTime();
+                if (latestUpdateTimestamp === null || newTimestamp > latestUpdateTimestamp) {
+                    latestUpdateTimestamp = newTimestamp;
+                    cachedChangeLogs = changeLogs;
+                    if (isUpdatesExpanded) {
+                        document.getElementById('updateNotification').classList.add('show');
+                    } else {
+                        await renderChangeLogs(changeLogs);
+                    }
+                } else if (!isUpdatesExpanded) {
+                    cachedChangeLogs = changeLogs;
+                    await renderChangeLogs(changeLogs);
+                }
+            } else if (!isUpdatesExpanded) {
+                cachedChangeLogs = changeLogs;
+                await renderChangeLogs(changeLogs);
+            }
+
+            updateChartData('revenue', thisMonthRevenue);
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+            document.getElementById('changeLogsContainer').innerHTML = `
+                <div class="update-item">
+                    <div class="content">
+                        <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // Chart setup
+    let salesChart;
+    const chartData = {
+        revenue: {labels: [], data: [], label: 'Doanh Thu'},
+        products: {labels: [], data: [], label: 'Sản Phẩm'},
+        suppliers: {labels: [], data: [], label: 'Nhà Cung Cấp'},
+        employees: {labels: [], data: [], label: 'Nhân Viên'},
+        customers: {labels: [], data: [], label: 'Khách Hàng'}
+    };
+
+    function initializeChart() {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.revenue.labels,
+                datasets: [{
+                    label: chartData.revenue.label,
+                    data: chartData.revenue.data,
+                    borderColor: '#ff8a65',
+                    backgroundColor: '#ff8a65',
+                    fill: false,
+                    tension: 0.4,
+                    pointBackgroundColor: '#ff8a65',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                scales: {
+                    y: {beginAtZero: true, ticks: {stepSize: 5000000}},
+                    x: {grid: {display: false}}
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {boxWidth: 0, font: {size: 12}}
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 600,
+                    easing: 'easeInOutCubic'
+                }
+            }
+        });
+    }
+
+    function updateChartData(type, newData) {
+        const data = chartData[type];
+        const now = new Date();
+        const label = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
+
+        data.labels.push(label);
+        data.data.push(type === 'revenue' ? (newData || 0) : parseInt(newData || 0, 10));
+
+        if (data.labels.length > 10) {
+            data.labels.shift();
+            data.data.shift();
+        }
+
+        salesChart.data.labels = data.labels;
+        salesChart.data.datasets[0].label = data.label;
+        salesChart.data.datasets[0].data = data.data;
+        salesChart.update();
+
+        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;
+    }
+
+    function updateChart(type) {
+        const data = chartData[type];
+        salesChart.data.labels = data.labels;
+        salesChart.data.datasets[0].label = data.label;
+        salesChart.data.datasets[0].data = data.data;
+        salesChart.update();
+        document.getElementById('chart-title').textContent = `Biểu Đồ - ${data.label}`;
+    }
+
+    function zoomChart(direction) {
+        const yAxis = salesChart.options.scales.y;
+        if (direction === 'in') {
+            yAxis.ticks.stepSize /= 2;
+        } else {
+            yAxis.ticks.stepSize *= 2;
+        }
+        salesChart.update();
+    }
+
+    function resetChart() {
+        salesChart.options.scales.y.ticks.stepSize = 5000000;
+        salesChart.update();
+    }
+
+    function toggleExpand(section) {
+        const salesAnalytics = document.querySelector('.dash-sales-analytics');
+        const updatesProfile = document.querySelector('.dash-updates-profile');
+        const salesContent = salesAnalytics.querySelector('.dash-content');
+        const updatesContent = updatesProfile.querySelector('.dash-content');
+        const salesExpandBtn = salesAnalytics.querySelector('.dash-expand-btn i');
+        const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');
+
+        salesAnalytics.style.pointerEvents = 'none';
+        updatesProfile.style.pointerEvents = 'none';
+
+        salesContent.classList.add('fading');
+        updatesContent.classList.add('fading');
+
+        setTimeout(() => {
+            if (section === 'sales') {
+                if (salesAnalytics.classList.contains('expanded')) {
+                    salesAnalytics.classList.remove('expanded');
+                    setTimeout(() => {
+                        updatesProfile.classList.remove('hidden');
+                        salesContent.classList.remove('fading');
+                        updatesContent.classList.remove('fading');
+                        salesAnalytics.style.pointerEvents = 'auto';
+                        updatesProfile.style.pointerEvents = 'auto';
+                        salesChart.resize();
+                    }, 400);
+                    salesExpandBtn.classList.remove('fa-compress');
+                    salesExpandBtn.classList.add('fa-expand');
+                } else {
+                    salesAnalytics.classList.add('expanded');
+                    updatesProfile.classList.add('hidden');
+                    setTimeout(() => {
+                        salesContent.classList.remove('fading');
+                        updatesContent.classList.remove('fading');
+                        salesAnalytics.style.pointerEvents = 'auto';
+                        updatesProfile.style.pointerEvents = 'auto';
+                        salesChart.resize();
+                    }, 400);
+                    salesExpandBtn.classList.remove('fa-expand');
+                    salesExpandBtn.classList.add('fa-compress');
+                }
+            } else if (section === 'updates') {
+                if (updatesProfile.classList.contains('expanded')) {
+                    updatesProfile.classList.remove('expanded');
+                    isUpdatesExpanded = false;
+                    document.getElementById('updateNotification').classList.remove('show');
+                    setTimeout(() => {
+                        salesAnalytics.classList.remove('hidden');
+                        salesContent.classList.remove('fading');
+                        updatesContent.classList.remove('fading');
+                        salesAnalytics.style.pointerEvents = 'auto';
+                        updatesProfile.style.pointerEvents = 'auto';
+                        renderChangeLogs(cachedChangeLogs);
+                    }, 400);
+                    updatesExpandBtn.classList.remove('fa-compress');
+                    updatesExpandBtn.classList.add('fa-expand');
+                } else {
+                    updatesProfile.classList.add('expanded');
+                    isUpdatesExpanded = true;
+                    setTimeout(() => {
+                        salesAnalytics.classList.add('hidden');
+                        salesContent.classList.remove('fading');
+                        updatesContent.classList.remove('fading');
+                        salesAnalytics.style.pointerEvents = 'auto';
+                        updatesProfile.style.pointerEvents = 'auto';
+                        renderChangeLogs(cachedChangeLogs);
+                    }, 400);
+                    updatesExpandBtn.classList.remove('fa-expand');
+                    updatesExpandBtn.classList.add('fa-compress');
+                }
+            }
+        }, 300);
+    }
+
+    // Initialize chart and fetch data
+    initializeChart();
+    fetchDashboardData();
+    setInterval(fetchDashboardData, 3000);
+
+    // Resize chart on window resize
+    window.addEventListener('resize', () => salesChart.resize());
+</script>
 </body>
 </html>
