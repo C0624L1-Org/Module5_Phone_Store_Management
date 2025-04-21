@@ -377,16 +377,18 @@ public class TransactionInService implements ITransactionInService {
         return inventoryTransactionInRepo.countRegularSupplier();
     }
 
+
     @Override
     public String getBestSupplierName() {
         Integer bestSupplierId = inventoryTransactionInRepo.getBestSupplierId();
         if (bestSupplierId == null || bestSupplierId == 0) {
-            throw new IllegalArgumentException("Không có nhà cung cấp nào được tìm thấy (ID không hợp lệ).");
+            return "Không xác định";
         }
-        Supplier supplier = supplierRepository.findById(bestSupplierId)
-                .orElseThrow(() -> new IllegalArgumentException("Nhà cung cấp với ID " + bestSupplierId + " không tồn tại."));
-        return supplier.getName();
+        return supplierRepository.findById(bestSupplierId)
+                .map(Supplier::getName)
+                .orElse("Không xác định");
     }
+
 
     @Override
     public Integer getBestSupplierImportQuantity() {
