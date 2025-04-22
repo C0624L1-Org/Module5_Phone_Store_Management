@@ -29,7 +29,7 @@ public class SearchNavbarRestController {
         SearchNavbarDTO dto = new SearchNavbarDTO();
         dto.setProductId(product.getProductID());
         dto.setName(product.getName());
-        dto.setSellingPrice(product.getSellingPrice());
+        dto.setRetailPrice(product.getRetailPrice());
         dto.setRetailPrice(product.getRetailPrice());
         dto.setCpu(product.getCPU());
         dto.setStorage(product.getStorage());

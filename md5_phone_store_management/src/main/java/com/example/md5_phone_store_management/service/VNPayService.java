@@ -51,7 +51,7 @@ public class VNPayService {
         vnpParams.put("vnp_IpAddr", "127.0.0.1");
         vnpParams.put("vnp_CreateDate", vnpCreateDate);
 
-        cld.add(Calendar.MINUTE, 2);
+        cld.add(Calendar.MINUTE, 15);
         String vnpExpireDate = formatter.format(cld.getTime());
         vnpParams.put("vnp_ExpireDate", vnpExpireDate);
 

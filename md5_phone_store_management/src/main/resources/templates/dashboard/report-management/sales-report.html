@@ -764,7 +764,7 @@
                                                     <th:block th:with="product=${productDetails[entry.key]}">
                                                         <p><strong>Tên sản phẩm:</strong> <span th:text="${product?.name ?: 'Không tìm thấy'}"></span></p>
                                                         <p><strong>Giá nhập:</strong> <span th:text="${product?.purchasePrice != null ? #numbers.formatDecimal(product.purchasePrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : 'N/A'}"></span></p>
-                                                        <p><strong>Giá bán:</strong> <span th:text="${product?.sellingPrice != null ? #numbers.formatDecimal(product.sellingPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : 'N/A'}"></span></p>
+                                                        <p><strong>Giá bán lẻ:</strong> <span th:text="${product?.retailPrice != null ? #numbers.formatDecimal(product.retailPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : 'N/A'}"></span></p>
                                                     </th:block>
                                                 </div>
                                             </details>
