@@ -226,6 +226,7 @@ public String processPayment(@ModelAttribute("invoice") Invoice invoice,
             InvoiceDetail detail = new InvoiceDetail();
             detail.setProduct(product);
             detail.setQuantity(quantity);
+
             detail.setTotalPrice(product.getRetailPrice().multiply(BigDecimal.valueOf(quantity)));
 
             invoiceDetails.add(detail);

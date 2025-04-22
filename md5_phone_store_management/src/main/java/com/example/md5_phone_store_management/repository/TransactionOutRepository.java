@@ -19,6 +19,8 @@ import java.util.List;
 public interface TransactionOutRepository extends JpaRepository<InventoryTransaction, Integer> {
 
 
+    List<InventoryTransaction> findByEmployeeEmployeeIDAndTransactionType(Integer employeeID, TransactionType transactionType);
+
     @Query("SELECT COUNT(t) FROM InventoryTransaction t WHERE t.transactionType = 'OUT'")
     Integer countExportQuantity();
 

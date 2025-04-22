@@ -1,36 +1,96 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Danh sách Giao dịch Xuất kho</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Nhập/Xuất Kho</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/fragments/navbar.css">
     <link rel="stylesheet" href="/css/fragments/sidebar.css">
     <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/common/toast.css">
-    <link rel="stylesheet" href="/css/common/pagination.css">
     <link rel="stylesheet" href="/css/common/layout.css">
 
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <!-- Inline CSS -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e9ecef 100%);
+        }
+
+        .content-wrapper {
+            display: flex;
+            min-height: calc(100vh - 70px);
+            padding-top: 90px;
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+        }
+
+        .content-container {
+            flex-grow: 1;
+            padding: 0;
+        }
+
+        .management-section {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            margin: 2rem 1rem;
+            width: calc(100% - 2rem);
+            transition: transform 0.3s ease;
+        }
+
+        .management-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title i {
+            color: #007bff;
+            margin-right: 0.75rem;
+        }
+
+        .dash-container {
+            flex: 1;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .chart-container {
-            width: 90%;
-            margin: 30px auto;
+            flex: 7;
+            min-width: 300px;
             padding: 20px;
-            background-color: #f8f9fa;
+            background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             min-height: 500px;
@@ -40,17 +100,17 @@
             width: 100%;
             height: 450px;
             position: relative;
-            margin-top: 20px;
+            margin: 20px 0;
         }
 
         .control-panel {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
-            margin-top: 20px;
             padding: 10px;
             background-color: #e9ecef;
             border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         .chart-buttons {
@@ -62,6 +122,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-left: auto;
         }
 
         canvas {
@@ -69,9 +130,8 @@
             height: 100% !important;
         }
 
-        /* Đổi màu nút chart cho hài hòa với biểu đồ */
         .btn-overview {
-            background-color: #d6eaf8; /* Nhạt hơn rgba(54, 162, 235, 0.7) của nhập kho */
+            background-color: #d6eaf8;
             color: #1e90ff;
             border: 1px solid #1e90ff;
         }
@@ -80,7 +140,7 @@
         }
 
         .btn-import {
-            background-color: #c4e1f5; /* Nhạt hơn rgba(54, 162, 235, 0.7) */
+            background-color: #c4e1f5;
             color: #007bff;
             border: 1px solid #007bff;
         }
@@ -89,7 +149,7 @@
         }
 
         .btn-export {
-            background-color: #fdd8e0; /* Nhạt hơn rgba(255, 99, 132, 0.7) */
+            background-color: #fdd8e0;
             color: #ff4d6a;
             border: 1px solid #ff4d6a;
         }
@@ -97,128 +157,539 @@
             background-color: #f9bdc9;
         }
 
-        /* Ô nhập/xuất dưới cùng */
-        .transaction-boxes {
-            display: flex;
-            justify-content: space-around;
-            margin: 30px auto;
-            width: 90%;
-            gap: 20px;
+        .stat-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .transaction-box {
-            width: 45%;
-            padding: 20px;
+        /* Split card styles */
+        .split-card {
+            position: relative;
+            background: #ffffff;
             border-radius: 12px;
-            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: 180px;
+            transition: transform 0.3s ease;
             cursor: pointer;
-            transition: transform 0.2s;
         }
 
-        .transaction-box:hover {
-            transform: scale(1.05);
+        .split-card:hover {
+            transform: translateY(-5px);
         }
 
-        .transaction-box.import {
-            background-color: #c4e1f5; /* Nhạt hơn màu nhập kho */
-            border: 1px solid #54a0ff;
+        .split-card .left-side,
+        .split-card .right-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            will-change: clip-path;
+            transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
         }
 
-        .transaction-box.export {
-            background-color: #fdd8e0; /* Nhạt hơn màu xuất kho */
-            border: 1px solid #ff6b81;
+        .split-card .content {
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out 0.25s;
+            padding-left: 10px; /* Thêm padding trái cho nội dung */
+            text-align: left; /* Căn trái nội dung */
         }
 
-        .transaction-box h3 {
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-            font-weight: bold;
+        .split-card .center-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            z-index: 2;
+            pointer-events: none;
+            transition: opacity 0.4s ease-in-out;
         }
 
-        .transaction-box p {
-            margin: 5px 0;
-            color: #333;
+        .split-card .center-text i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .split-card:hover .center-text {
+            opacity: 0;
+        }
+
+        .split-card:not(:hover) .center-text {
+            opacity: 1;
+        }
+
+        /* Màu cho split-card Tổng quan (xanh lá nhạt) */
+        .split-card.overview .left-side {
+            background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+        }
+
+        .split-card.overview .right-side {
+            background: linear-gradient(135deg, #81c784 0%, #a5d6a7 100%);
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+
+        .split-card.overview .left-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.overview .left-side:hover ~ .right-side {
+            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+        }
+
+        .split-card.overview .right-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.overview .right-side:hover ~ .left-side {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        }
+
+        .split-card.overview .left-side:hover .content,
+        .split-card.overview .right-side:hover .content {
+            opacity: 1;
+        }
+
+        /* Màu cho split-card Nhập kho */
+        .split-card.import .left-side {
+            background: linear-gradient(135deg, #0288d1 0%, #4fc3f7 100%);
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+        }
+
+        .split-card.import .right-side {
+            background: linear-gradient(135deg, #4fc3f7 0%, #81d4fa 100%);
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+
+        .split-card.import .left-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.import .left-side:hover ~ .right-side {
+            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+        }
+
+        .split-card.import .right-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.import .right-side:hover ~ .left-side {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        }
+
+        .split-card.import .left-side:hover .content,
+        .split-card.import .right-side:hover .content {
+            opacity: 1;
+        }
+
+        /* Màu cho split-card Xuất kho */
+        .split-card.export .left-side {
+            background: linear-gradient(135deg, #e91e63 0%, #f06292 100%);
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+        }
+
+        .split-card.export .right-side {
+            background: linear-gradient(135deg, #f06292 0%, #f8bbd0 100%);
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+
+        .split-card.export .left-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.export .left-side:hover ~ .right-side {
+            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+        }
+
+        .split-card.export .right-side:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .split-card.export .right-side:hover ~ .left-side {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        }
+
+        .split-card.export .left-side:hover .content,
+        .split-card.export .right-side:hover .content {
+            opacity: 1;
+        }
+
+        .dash-updates-profile {
+            flex: 3;
+            min-width: 200px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .dash-updates-profile::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .dash-updates-profile::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        .dash-updates-profile.hidden {
+            width: 0;
+            min-width: 0;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+            flex: 0;
+            overflow: hidden;
+            transform: scale(0.95) translateX(50px);
+        }
+
+        .dash-updates-profile.expanded {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            opacity: 1;
+            transform: scale(1) translateX(0);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            background-color: white;
+        }
+
+        .dash-content {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
+            height: 100%;
+        }
+
+        .dash-content.fading {
+            opacity: 0;
+        }
+
+        .dash-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 15;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .dash-header h3 {
+            margin: 0;
+        }
+
+        .updates-content {
+            max-height: calc(100% - 60px);
+            overflow-y: auto;
+            padding-top: 0.5rem;
+        }
+
+        .update-notification {
+            display: none;
+            background: #fef3c7;
+            color: #b45309;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .update-notification.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .update-columns {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            height: calc(100% - 60px);
+        }
+
+        .update-column {
+            flex: 1;
+            min-width: 200px;
+            max-height: 100%;
+            background: #f9fafb;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+
+        .update-column.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .update-column-header {
+            background: #e5e7eb;
+            padding: 0.5rem;
+            border-radius: 8px 8px 0 0;
+            z-index: 10;
+        }
+
+        .update-column-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            text-align: center;
+            color: #1f2937;
+        }
+
+        .update-column-content {
+            max-height: calc(100% - 40px);
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .update-column-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .update-column-content::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        .update-item-expanded {
+            background: white;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+        }
+
+        .update-item-expanded:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        @media (max-width: 768px) {
+            .management-section {
+                margin: 1rem;
+                padding: 1.5rem;
+                width: calc(100% - 2rem);
+            }
+
+            .stat-card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dash-container {
+                flex-direction: column;
+            }
+
+            .dash-updates-profile {
+                flex: 1;
+                height: auto;
+                max-height: none;
+            }
         }
     </style>
 </head>
-<body>
-<!-- Hiển thị thông báo -->
+<body class="font-sans bg-gray-100 m-0 p-0">
+<!-- Toast -->
 <div th:replace="~{common/toast}"></div>
 
-<!-- Nhúng navbar -->
+<!-- Navbar -->
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-<div class="content-wrapper">
-    <div class="dashboard-container">
+<div class="content-wrapper flex flex-col min-h-screen">
+    <div class="dashboard-container flex flex-1">
         <!-- Sidebar -->
-        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <aside th:replace="~{fragments/sidebar :: sidebar}" class="min-w-[250px] bg-white shadow-md"></aside>
 
-        <!-- Main content -->
-        <div class="content-container">
+        <!-- Main content area -->
+        <div class="content-container flex-grow-1">
             <div class="container-fluid py-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item active" aria-current="page">Quản lý nhập&xuất</li>
+                        <li class="breadcrumb-item active" aria-current="page">Quản Lý Nhập/Xuất Kho</li>
                     </ol>
                 </nav>
-                <div class="transaction-boxes">
-                    <div class="transaction-box import" th:onclick="|window.location.href='@{/dashboard/admin/transactions/listIn}'|">
-                        <h3>Nhập kho</h3>
-                        <p>Nhấn để xem chi tiết giao dịch!</p>
-                    </div>
-                    <div class="transaction-box export" th:onclick="|window.location.href='@{/dashboard/admin/transactions/listOut}'|">
-                        <h3>Xuất kho</h3>
-                        <p>Nhấn để xem chi tiết giao dịch!</p>
+                <div class="management-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-cogs"></i> Quản Lý Nhập/Xuất Kho
+                    </h3>
+
+                    <!-- Chart and Updates Section -->
+                    <div class="dash-container flex-1 max-w-full mx-auto p-4 md:p-8">
+                        <!-- Chart Section -->
+                        <div class="chart-container">
+                            <!-- Transaction Boxes as Split Cards -->
+                            <div class="stat-card-grid">
+                                <!-- Tổng quan -->
+                                <div class="split-card overview" onclick="showChart('overviewChart')">
+                                    <div class="center-text">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <h5>Tổng giao dịch: <span id="totalTransactions">0</span></h5>
+                                        <p>Nhấn để xem chi tiết!</p>
+                                    </div>
+                                    <div class="left-side">
+                                        <div class="content">
+                                            <h4>Hôm nay (<span id="overviewTodayDate"></span>)</h4>
+                                            <p>Số giao dịch: <span id="countTodayTransactions">0</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="right-side">
+                                        <div class="content">
+                                            <h4>Tháng này (<span id="overviewThisMonthDate"></span>)</h4>
+                                            <p>Số giao dịch: <span id="countThisMonthTransactions">0</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Nhập kho -->
+                                <div class="split-card import" th:onclick="|window.location.href='@{/dashboard/admin/transactions/listIn}'|">
+                                    <div class="center-text">
+                                        <i class="fas fa-arrow-down"></i>
+                                        <h5>Tổng giao dịch nhập: <span id="totalImportTransactions">0</span></h5>
+                                        <p>Nhấn để xem chi tiết!</p>
+                                    </div>
+                                    <div class="left-side">
+                                        <div class="content">
+                                            <h4>Hôm nay (<span id="importTodayDate"></span>)</h4>
+                                            <p>Số giao dịch: <span id="countTodayImportTransactions">0</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="right-side">
+                                        <div class="content">
+                                            <h4>Tháng này (<span id="importThisMonthDate"></span>)</h4>
+                                            <p>Số giao dịch: <span id="countThisMonthImportTransactions">0</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Xuất kho -->
+                                <div class="split-card export" th:onclick="|window.location.href='@{/dashboard/admin/transactions/listOut}'|">
+                                    <div class="center-text">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <h5>Tổng giao dịch xuất: <span id="totalExportTransactions">0</span></h5>
+                                        <p>Nhấn để xem chi tiết!</p>
+                                    </div>
+                                    <div class="left-side">
+                                        <div class="content">
+                                            <h4>Hôm nay (<span id="exportTodayDate"></span>)</h4>
+                                            <p>Số giao dịch: <span id="countTodayExportTransactions">0</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="right-side">
+                                        <div class="content">
+                                            <h4>Tháng này (<span id="exportThisMonthDate"></span>)</h4>
+                                            <p>Số giao dịch: <span id="countThisMonthExportTransactions">0</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chart Wrapper -->
+                            <div class="chart-wrapper">
+                                <canvas id="overviewChart"></canvas>
+                                <canvas id="importChart" style="display:none;"></canvas>
+                                <canvas id="exportChart" style="display:none;"></canvas>
+                            </div>
+
+                            <!-- Control Panel -->
+                            <div class="control-panel">
+                                <div class="chart-buttons">
+                                    <button class="btn btn-overview btn-lg" onclick="showChart('overviewChart')">Tổng quan</button>
+                                    <button class="btn btn-import btn-lg" onclick="showChart('importChart')">Chi tiết Nhập kho</button>
+                                    <button class="btn btn-export btn-lg" onclick="showChart('exportChart')">Chi tiết Xuất kho</button>
+                                </div>
+                                <div class="year-selector">
+                                    <button class="btn btn-outline-secondary" onclick="changeYear(-1)"><i class="fas fa-chevron-left"></i></button>
+                                    <span id="currentYear" class="mx-3 fw-bold">2025</span>
+                                    <button class="btn btn-outline-secondary" onclick="changeYear(1)"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Updates Profile Section -->
+                        <div class="dash-updates-profile">
+                            <div class="dash-content">
+                                <div class="dash-header flex justify-between items-center mb-4">
+                                    <div>
+                                        <div id="updateNotification" class="update-notification">
+                                            <i class="fas fa-bell mr-1"></i> Đã có cập nhật mới nhất!
+                                        </div>
+                                        <h3 class="text-lg font-semibold">Cập Nhật Mới Nhất</h3>
+                                    </div>
+                                    <button class="dash-expand-btn text-gray-600 text-base bg-none border-none cursor-pointer"
+                                            onclick="toggleExpand('updates')">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                                <div id="changeLogsContainer" class="updates-content"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="chart-container">
-                    <div class="chart-wrapper">
-                        <canvas id="myChart"></canvas>
-                        <canvas id="importChart" style="display:none;"></canvas>
-                        <canvas id="exportChart" style="display:none;"></canvas>
-                    </div>
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}" class="bg-white shadow-md p-4"></footer>
+</div>
 
-                    <!-- Control Panel -->
-                    <div class="control-panel">
-                        <div class="chart-buttons">
-                            <button class="btn btn-overview btn-lg" onclick="showChart('myChart')">Tổng quan</button>
-                            <button class="btn btn-import btn-lg" onclick="showChart('importChart')">Chi tiết Nhập kho</button>
-                            <button class="btn btn-export btn-lg" onclick="showChart('exportChart')">Chi tiết Xuất kho</button>
-                        </div>
-                        <div class="year-selector">
-                            <button class="btn btn-outline-secondary" onclick="changeYear(-1)"><i class="fas fa-chevron-left"></i></button>
-                            <span id="currentYear" class="mx-3 fw-bold">2025</span>
-                            <button class="btn btn-outline-secondary" onclick="changeYear(1)"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Ô Nhập/Xuất dưới cùng -->
-            </div> <!-- Đóng container-fluid -->
-        </div> <!-- Đóng content-container -->
-    </div> <!-- Đóng dashboard-container -->
-
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
-</div> <!-- Đóng content-wrapper -->
-
-<!-- Nhúng script navbar -->
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <div th:replace="~{fragments/navbar :: navbar-script}"></div>
 
-<!-- Script Chart.js -->
 <script th:inline="javascript">
+    // Chart Data
     const allTransactionsIn = /*[[${inTra}]]*/ [];
     const allTransactionsOut = /*[[${outTra}]]*/ [];
-
     let currentYear = new Date().getFullYear();
-    let myChart, importChart, exportChart;
-    let currentChartId = 'myChart';
+    let overviewChart, importChart, exportChart;
+    let currentChartId = 'overviewChart';
 
     const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
         'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
 
+    // Format date for today
+    const formatTodayDate = () => {
+        return new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    // Format date for current month
+    const formatThisMonthDate = () => {
+        return new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
+    };
+
     function showChart(chartId) {
-        document.getElementById('myChart').style.display = 'none';
+        document.getElementById('overviewChart').style.display = 'none';
         document.getElementById('importChart').style.display = 'none';
         document.getElementById('exportChart').style.display = 'none';
         document.getElementById(chartId).style.display = 'block';
@@ -230,17 +701,17 @@
         const exportData = new Array(12).fill(0);
 
         allTransactionsIn
-            .filter(trans => new Date(trans.transactionDate).getFullYear() === year)
+            .filter(trans => trans && trans.transactionDate && new Date(trans.transactionDate).getFullYear() === year)
             .forEach(trans => {
                 const month = new Date(trans.transactionDate).getMonth();
-                importData[month] += trans.quantity;
+                importData[month] += trans.quantity || 0;
             });
 
         allTransactionsOut
-            .filter(trans => new Date(trans.transactionDate).getFullYear() === year)
+            .filter(trans => trans && trans.transactionDate && new Date(trans.transactionDate).getFullYear() === year)
             .forEach(trans => {
                 const month = new Date(trans.transactionDate).getMonth();
-                exportData[month] += trans.quantity;
+                exportData[month] += trans.quantity || 0;
             });
 
         return { importData, exportData };
@@ -250,105 +721,154 @@
         const { importData, exportData } = filterDataByYear(currentYear);
         document.getElementById('currentYear').textContent = currentYear;
 
-        if (myChart) myChart.destroy();
+        // Calculate transaction counts
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        const countTodayImport = allTransactionsIn.filter(trans => {
+            const date = new Date(trans.transactionDate);
+            return date >= today;
+        }).length;
+
+        const countThisMonthImport = allTransactionsIn.filter(trans => {
+            const date = new Date(trans.transactionDate);
+            return date >= thisMonthStart;
+        }).length;
+
+        const countTodayExport = allTransactionsOut.filter(trans => {
+            const date = new Date(trans.transactionDate);
+            return date >= today;
+        }).length;
+
+        const countThisMonthExport = allTransactionsOut.filter(trans => {
+            const date = new Date(trans.transactionDate);
+            return date >= thisMonthStart;
+        }).length;
+
+        // Update Split Cards
+        // Tổng quan
+        document.getElementById('totalTransactions').textContent = allTransactionsIn.length + allTransactionsOut.length;
+        document.getElementById('countTodayTransactions').textContent = countTodayImport + countTodayExport;
+        document.getElementById('countThisMonthTransactions').textContent = countThisMonthImport + countThisMonthExport;
+        document.getElementById('overviewTodayDate').textContent = formatTodayDate();
+        document.getElementById('overviewThisMonthDate').textContent = formatThisMonthDate();
+
+        // Nhập kho
+        document.getElementById('totalImportTransactions').textContent = allTransactionsIn.length;
+        document.getElementById('countTodayImportTransactions').textContent = countTodayImport;
+        document.getElementById('countThisMonthImportTransactions').textContent = countThisMonthImport;
+        document.getElementById('importTodayDate').textContent = formatTodayDate();
+        document.getElementById('importThisMonthDate').textContent = formatThisMonthDate();
+
+        // Xuất kho
+        document.getElementById('totalExportTransactions').textContent = allTransactionsOut.length;
+        document.getElementById('countTodayExportTransactions').textContent = countTodayExport;
+        document.getElementById('countThisMonthExportTransactions').textContent = countThisMonthExport;
+        document.getElementById('exportTodayDate').textContent = formatTodayDate();
+        document.getElementById('exportThisMonthDate').textContent = formatThisMonthDate();
+
+        if (!document.getElementById('overviewChart').getContext) {
+            console.error('Canvas context not available for overviewChart');
+            return;
+        }
+
+        if (overviewChart) overviewChart.destroy();
         if (importChart) importChart.destroy();
         if (exportChart) exportChart.destroy();
 
-        const ctx = document.getElementById('myChart').getContext('2d');
-        myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: months,
-                datasets: [
-                    { label: 'Nhập kho', data: importData, backgroundColor: 'rgba(54, 162, 235, 0.7)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 2 },
-                    { label: 'Xuất kho', data: exportData, backgroundColor: 'rgba(255, 99, 132, 0.7)', borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2 }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true, title: { display: true, text: 'Số lượng', font: { size: 16, weight: 'bold' } } },
-                    x: { title: { display: true, text: 'Thời gian', font: { size: 16, weight: 'bold' } } }
+        try {
+            const ctx = document.getElementById('overviewChart').getContext('2d');
+            overviewChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        { label: 'Nhập kho', data: importData, backgroundColor: 'rgba(54, 162, 235, 0.7)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 2 },
+                        { label: 'Xuất kho', data: exportData, backgroundColor: 'rgba(255, 99, 132, 0.7)', borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2 }
+                    ]
                 },
-                plugins: {
-                    title: { display: true, text: `So sánh Nhập/Xuất kho năm ${currentYear}`, font: { size: 20, weight: 'bold' } },
-                    legend: { position: 'top' }
-                }
-            }
-        });
-
-        const importCtx = document.getElementById('importChart').getContext('2d');
-        importChart = new Chart(importCtx, {
-            type: 'line',
-            data: {
-                labels: months,
-                datasets: [{
-                    label: 'Nhập kho',
-                    data: importData,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 3,
-                    tension: 0.3,
-                    fill: true,
-                    pointRadius: 6,
-                    pointHoverRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                layout: {
-                    padding: {
-                        top: 70
-                    }
-                },
-                scales: {
-                    y: { beginAtZero: true, title: { display: true, text: 'Số lượng', font: { size: 16, weight: 'bold' } } },
-                    x: { title: { display: true, text: 'Thời gian', font: { size: 16, weight: 'bold' } } }
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: `Chi tiết nhập kho năm ${currentYear}`,
-                        font: { size: 20, weight: 'bold' },
-                        padding: 20
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Số lượng', font: { size: 16, weight: 'bold' } } },
+                        x: { title: { display: true, text: 'Thời gian', font: { size: 16, weight: 'bold' } } }
                     },
-                    legend: { position: 'top' }
+                    plugins: {
+                        title: { display: true, text: `So sánh Nhập/Xuất kho năm ${currentYear}`, font: { size: 20, weight: 'bold' } },
+                        legend: { position: 'top' }
+                    }
                 }
-            }
-        });
+            });
 
-        const exportCtx = document.getElementById('exportChart').getContext('2d');
-        exportChart = new Chart(exportCtx, {
-            type: 'line',
-            data: {
-                labels: months,
-                datasets: [{
-                    label: 'Xuất kho',
-                    data: exportData,
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 3,
-                    tension: 0.3,
-                    fill: true,
-                    pointRadius: 6,
-                    pointHoverRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true, title: { display: true, text: 'Số lượng', font: { size: 16, weight: 'bold' } } },
-                    x: { title: { display: true, text: 'Thời gian', font: { size: 16, weight: 'bold' } } }
+            const importCtx = document.getElementById('importChart').getContext('2d');
+            importChart = new Chart(importCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Nhập kho',
+                        data: importData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
                 },
-                plugins: {
-                    title: { display: true, text: `Chi tiết xuất kho năm ${currentYear}`, font: { size: 20, weight: 'bold' } },
-                    legend: { position: 'top' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: { top: 70 }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Số lượng', font: { size: 16, weight: 'bold' } } },
+                        x: { title: { display: true, text: 'Thời gian', font: { size: 16, weight: 'bold' } } }
+                    },
+                    plugins: {
+                        title: { display: true, text: `Chi tiết nhập kho năm ${currentYear}`, font: { size: 20, weight: 'bold' }, padding: 20 },
+                        legend: { position: 'top' }
+                    }
                 }
-            }
-        });
+            });
+
+            const exportCtx = document.getElementById('exportChart').getContext('2d');
+            exportChart = new Chart(exportCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Xuất kho',
+                        data: exportData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Số lượng', font: { size: 16, weight: 'bold' } } },
+                        x: { title: { display: true, text: 'Thời gian', font: { size: 16, weight: 'bold' } } }
+                    },
+                    plugins: {
+                        title: { display: true, text: `Chi tiết xuất kho năm ${currentYear}`, font: { size: 20, weight: 'bold' } },
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error initializing charts:', error);
+        }
     }
 
     function changeYear(delta) {
@@ -357,14 +877,390 @@
         showChart(currentChartId);
     }
 
+    // Notification and Change Logs
+    function formatEntityName(entityName, fieldName) {
+        if (entityName?.toLowerCase() === 'inventorytransaction') {
+            if (fieldName?.toLowerCase() === 'transactionin') {
+                return 'Nhập Hàng';
+            } else if (fieldName?.toLowerCase() === 'transactionout') {
+                return 'Xuất Hàng';
+            }
+        }
+        const entityMap = {
+            'supplier': 'Nhà Cung Cấp',
+            'product': 'Sản Phẩm',
+            'employee': 'Nhân Viên',
+            'invoice': 'Hóa Đơn',
+            'customer': 'Khách Hàng'
+        };
+        return entityMap[entityName?.toLowerCase()] || 'N/A';
+    }
+
+    function formatAction(action) {
+        const actionMap = {
+            'INSERT': 'Thêm mới',
+            'UPDATE': 'Cập nhật',
+            'DELETE': 'Xóa'
+        };
+        return actionMap[action] || 'N/A';
+    }
+
+    function formatRelativeTime(timestamp, isExpanded) {
+        if (!timestamp || isNaN(new Date(timestamp))) {
+            return "vừa xong";
+        }
+        const now = new Date();
+        const logTime = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - logTime) / 1000);
+
+        if (isExpanded) {
+            return logTime.toLocaleString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        if (diffInSeconds <= 60) {
+            return "vừa xong";
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes} phút trước`;
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours} giờ trước`;
+        } else if (diffInSeconds < 604800) {
+            const days = Math.floor(diffInSeconds / 86400);
+            return `${days} ngày trước`;
+        } else {
+            return logTime.toLocaleString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+    }
+
+    function formatServerTimestamp(timestamp) {
+        if (!timestamp || isNaN(new Date(timestamp))) {
+            return { time: '--:--', date: '--/--/----' };
+        }
+        const date = new Date(timestamp);
+        const time = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return { time, date: dateStr };
+    }
+
+    async function getEmployeeNameById(employeeId) {
+        if (!employeeId) return 'N/A';
+        const url = `/api/changelogs/employee/${employeeId}/name`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                console.error(`Error fetching employee name for ID ${employeeId}: Status ${response.status}`);
+                return 'không xác định';
+            }
+            const data = await response.json();
+            return data.name || 'không xác định';
+        } catch (error) {
+            console.error(`Error fetching employee name for ID ${employeeId}:`, error);
+            return 'không xác định';
+        }
+    }
+
+    const employeeNameCache = {};
+    let cachedChangeLogs = [];
+    let latestUpdateTimestamp = null;
+    let isUpdatesExpanded = false;
+
+    async function renderChangeLogs(logs) {
+        const container = document.getElementById('changeLogsContainer');
+        const updatesProfile = document.querySelector('.dash-updates-profile');
+        const isExpanded = updatesProfile.classList.contains('expanded');
+
+        isUpdatesExpanded = isExpanded;
+        const logsToRender = isExpanded ? cachedChangeLogs : logs;
+
+        // Filter out "Nhà Cung Cấp" updates
+        const filteredLogs = logsToRender.filter(log => {
+            const entityText = formatEntityName(log.entityName, log.fieldName);
+            return entityText !== 'Nhà Cung Cấp';
+        });
+
+        if (!filteredLogs || !Array.isArray(filteredLogs) || filteredLogs.length === 0) {
+            container.innerHTML = `
+                <div class="update-item">
+                    <div class="content">
+                        <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="update-item">
+                <div class="content">
+                    <p class="text-sm text-gray-500">Đang tải...</p>
+                </div>
+            </div>
+        `;
+
+        const employeeNamePromises = filteredLogs.map(async (log) => {
+            if (!log || !log.employeeId) return 'không xác định';
+            if (employeeNameCache[log.employeeId]) {
+                return employeeNameCache[log.employeeId];
+            }
+            const name = await getEmployeeNameById(log.employeeId);
+            employeeNameCache[log.employeeId] = name;
+            return name;
+        });
+
+        const employeeNames = await Promise.all(employeeNamePromises);
+
+        const entities = ['Nhập Hàng', 'Xuất Hàng'];
+        const logsByEntity = entities.reduce((acc, entity) => {
+            acc[entity] = [];
+            return acc;
+        }, {});
+
+        filteredLogs.forEach((log, index) => {
+            const entityText = formatEntityName(log.entityName, log.fieldName);
+            if (logsByEntity[entityText]) {
+                logsByEntity[entityText].push({log, employeeName: employeeNames[index]});
+            }
+        });
+
+        if (isExpanded) {
+            container.innerHTML = `
+                <div class="update-columns">
+                    ${entities.map(entity => `
+                        <div class="update-column" style="transform: translateY(20px);">
+                            <div class="update-column-header">
+                                <h4>${entity}</h4>
+                            </div>
+                            <div class="update-column-content">
+                                ${logsByEntity[entity].length === 0 ? `
+                                    <p class="text-sm text-gray-500">Chưa có cập nhật.</p>
+                                ` : logsByEntity[entity].map(({log, employeeName}) => {
+                const actionText = formatAction(log.action);
+                const valueText = log.action === 'DELETE' ? (log.oldValue || 'N/A') : (log.newValue || 'N/A');
+                return `
+                                        <div class="update-item-expanded">
+                                            <p class="text-xs text-gray-600 flex items-center gap-1 mb-1 leading-none">
+                                                <i class="fas fa-clock relative top-[1px]"></i>
+                                                ${formatRelativeTime(log.timestamp, true)}
+                                            </p>
+                                            <div class="flex items-center gap-2">
+                                                <div class="${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
+                                                </div>
+                                                <p class="text-sm leading-tight">
+                                                    <span class="font-medium">${employeeName} ${actionText.toLowerCase()}</span><br>
+                                                    <span class="text-gray-700">${valueText}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    `;
+            }).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            setTimeout(() => {
+                const columns = container.querySelectorAll('.update-column');
+                columns.forEach((col, index) => {
+                    setTimeout(() => {
+                        col.classList.add('visible');
+                    }, index * 100);
+                });
+            }, 300);
+        } else {
+            container.innerHTML = filteredLogs
+                .filter(log => entities.includes(formatEntityName(log.entityName, log.fieldName)))
+                .map((log, index) => {
+                    if (!log || !log.timestamp || !log.action) {
+                        return '';
+                    }
+                    const employeeName = employeeNames[index];
+                    const actionText = formatAction(log.action);
+                    const entityText = formatEntityName(log.entityName, log.fieldName);
+                    const valueText = log.action === 'DELETE' ? (log.oldValue || 'N/A') : (log.newValue || 'N/A');
+
+                    let displayText = '';
+                    if (log.entityName?.toLowerCase() === 'inventorytransaction') {
+                        const transactionType = log.fieldName?.toLowerCase() === 'transactionin' ? 'Nhập' : 'Xuất';
+                        displayText = `Giao dịch ${transactionType} sản phẩm: ${valueText}`;
+                    } else {
+                        displayText = `${entityText} tên ${valueText}`;
+                    }
+
+                    return `
+                        <div class="update-item mb-4 flex items-start gap-2">
+                            <div class="icon ${log.action === 'INSERT' ? 'bg-blue-400' : log.action === 'UPDATE' ? 'bg-orange-400' : 'bg-red-400'} h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fas ${log.action === 'INSERT' ? 'fa-plus' : log.action === 'UPDATE' ? 'fa-edit' : 'fa-trash'} text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between w-full">
+                                    <strong class="text-sm">${actionText}</strong>
+                                    <span class="text-xs text-gray-600">${formatRelativeTime(log.timestamp, false)}</span>
+                                </div>
+                                <p class="text-sm mt-1">${displayText}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+        }
+    }
+
+    async function fetchWarehouseData() {
+        try {
+            console.log("Fetching warehouse data...");
+            const [changeLogsRes, transactionInRes, transactionOutRes] = await Promise.all([
+                fetch('/api/changelogs/warehouse-staff-home/notification').catch(e => {
+                    console.error("Change logs fetch failed:", e);
+                    return null;
+                }),
+                fetch('/api/transactions/in').catch(e => {
+                    console.error("TransactionIn fetch failed:", e);
+                    return null;
+                }),
+                fetch('/api/transactions/out').catch(e => {
+                    console.error("TransactionOut fetch failed:", e);
+                    return null;
+                })
+            ]);
+
+            const parseJson = async (res, endpoint) => {
+                if (!res) {
+                    console.warn(`Request failed for ${endpoint}: No response`);
+                    return null;
+                }
+                if (!res.ok) {
+                    console.warn(`Request failed for ${endpoint}: Status ${res.status}`);
+                    return null;
+                }
+                try {
+                    const text = await res.text();
+                    if (!text) {
+                        console.warn(`Empty response for ${endpoint}`);
+                        return null;
+                    }
+                    return JSON.parse(text);
+                } catch (error) {
+                    console.error(`Failed to parse JSON for ${endpoint}:`, error);
+                    return null;
+                }
+            };
+
+            const changeLogs = (await parseJson(changeLogsRes, '/api/changelogs/warehouse-staff-home/notification')) ?? [];
+            const transactionsIn = (await parseJson(transactionInRes, '/api/transactions/in')) ?? [];
+            const transactionsOut = (await parseJson(transactionOutRes, '/api/transactions/out')) ?? [];
+
+            console.log("Change logs:", changeLogs);
+            console.log("Transactions In:", transactionsIn);
+            console.log("Transactions Out:", transactionsOut);
+
+            // Check if transaction data has changed
+            const transactionsInChanged = JSON.stringify(transactionsIn) !== JSON.stringify(window.allTransactionsIn);
+            const transactionsOutChanged = JSON.stringify(transactionsOut) !== JSON.stringify(window.allTransactionsOut);
+
+            // Update transaction data
+            window.allTransactionsIn = transactionsIn;
+            window.allTransactionsOut = transactionsOut;
+
+            // Only update charts if transaction data has changed
+            if (transactionsInChanged || transactionsOutChanged) {
+                updateCharts();
+            }
+
+            // Update notifications
+            if (changeLogs.length > 0) {
+                const latestLog = changeLogs[0];
+                const newTimestamp = new Date(latestLog.timestamp).getTime();
+                if (latestUpdateTimestamp === null || newTimestamp > latestUpdateTimestamp) {
+                    latestUpdateTimestamp = newTimestamp;
+                    if (isUpdatesExpanded) {
+                        document.getElementById('updateNotification').classList.add('show');
+                    } else {
+                        cachedChangeLogs = changeLogs;
+                        await renderChangeLogs(changeLogs);
+                    }
+                } else if (!isUpdatesExpanded) {
+                    cachedChangeLogs = changeLogs;
+                    await renderChangeLogs(changeLogs);
+                }
+            } else if (!isUpdatesExpanded) {
+                cachedChangeLogs = changeLogs;
+                await renderChangeLogs(changeLogs);
+            }
+        } catch (error) {
+            console.error('Error fetching warehouse data:', error);
+            document.getElementById('changeLogsContainer').innerHTML = `
+                <div class="update-item">
+                    <div class="content">
+                        <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function toggleExpand(section) {
+        const updatesProfile = document.querySelector('.dash-updates-profile');
+        const updatesContent = updatesProfile.querySelector('.dash-content');
+        const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');
+
+        updatesProfile.style.pointerEvents = 'none';
+        updatesContent.classList.add('fading');
+
+        setTimeout(() => {
+            if (section === 'updates') {
+                if (updatesProfile.classList.contains('expanded')) {
+                    updatesProfile.classList.remove('expanded');
+                    document.getElementById('updateNotification').classList.remove('show');
+                    isUpdatesExpanded = false;
+                    setTimeout(() => {
+                        updatesContent.classList.remove('fading');
+                        updatesProfile.style.pointerEvents = 'auto';
+                        renderChangeLogs(cachedChangeLogs);
+                    }, 400);
+                    updatesExpandBtn.classList.remove('fa-compress');
+                    updatesExpandBtn.classList.add('fa-expand');
+                } else {
+                    updatesProfile.classList.add('expanded');
+                    cachedChangeLogs = cachedChangeLogs.length > 0 ? cachedChangeLogs : [];
+                    setTimeout(() => {
+                        updatesContent.classList.remove('fading');
+                        updatesProfile.style.pointerEvents = 'auto';
+                        renderChangeLogs(cachedChangeLogs);
+                    }, 400);
+                    updatesExpandBtn.classList.remove('fa-expand');
+                    updatesExpandBtn.classList.add('fa-compress');
+                }
+            }
+        }, 300);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        updateCharts();
-        showChart('myChart');
+        console.log('DOM fully loaded, initializing...');
+        fetchWarehouseData();
+        setInterval(fetchWarehouseData, 3000);
+
+        // Set initial height of dash-updates-profile to match chart-container
+        const chartContainer = document.querySelector('.chart-container');
+        const updatesProfile = document.querySelector('.dash-updates-profile');
+        if (chartContainer && updatesProfile) {
+            const chartHeight = chartContainer.offsetHeight;
+            updatesProfile.style.height = `${chartHeight}px`;
+        }
     });
 </script>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
