@@ -20,6 +20,57 @@ import com.example.md5_phone_store_management.model.Employee;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
+    List<Invoice> findByEmployeeEmployeeID(Long employeeID);
+
+    // Đếm số hóa đơn của một nhân viên
+    @Query("SELECT COUNT(i) FROM Invoice i WHERE i.employee.employeeID = :employeeID AND i.status = 'SUCCESS'")
+    Integer countByEmployeeEmployeeID(@Param("employeeID") Long employeeID);
+
+    // Tìm hóa đơn của một nhân viên trong ngày hiện tại
+    @Query("SELECT i FROM Invoice i WHERE i.employee.employeeID = :employeeID " +
+            "AND i.createdAt >= :startOfDay AND i.createdAt < :endOfDay AND i.status = 'SUCCESS'")
+    List<Invoice> findByEmployeeAndToday(@Param("employeeID") Long employeeID,
+                                         @Param("startOfDay") LocalDateTime startOfDay,
+                                         @Param("endOfDay") LocalDateTime endOfDay);
+
+    // Đếm số hóa đơn của một nhân viên trong ngày hiện tại
+    @Query("SELECT COUNT(i) FROM Invoice i WHERE i.employee.employeeID = :employeeID " +
+            "AND i.createdAt >= :startOfDay AND i.createdAt < :endOfDay AND i.status = 'SUCCESS'")
+    Integer countByEmployeeAndToday(@Param("employeeID") Long employeeID,
+                                    @Param("startOfDay") LocalDateTime startOfDay,
+                                    @Param("endOfDay") LocalDateTime endOfDay);
+
+    // Tìm hóa đơn của một nhân viên trong tháng hiện tại
+    @Query("SELECT i FROM Invoice i WHERE i.employee.employeeID = :employeeID " +
+            "AND i.createdAt >= :startOfMonth AND i.createdAt < :endOfMonth AND i.status = 'SUCCESS'")
+    List<Invoice> findByEmployeeAndThisMonth(@Param("employeeID") Long employeeID,
+                                             @Param("startOfMonth") LocalDateTime startOfMonth,
+                                             @Param("endOfMonth") LocalDateTime endOfMonth);
+
+    // Đếm số hóa đơn của một nhân viên trong tháng hiện tại
+    @Query("SELECT COUNT(i) FROM Invoice i WHERE i.employee.employeeID = :employeeID " +
+            "AND i.createdAt >= :startOfMonth AND i.createdAt < :endOfMonth AND i.status = 'SUCCESS'")
+    Integer countByEmployeeAndThisMonth(@Param("employeeID") Long employeeID,
+                                        @Param("startOfMonth") LocalDateTime startOfMonth,
+                                        @Param("endOfMonth") LocalDateTime endOfMonth);
+
+    // Lấy danh sách tổng doanh thu của tất cả nhân viên (dùng cho xếp hạng)
+    @Query("SELECT i.employee.employeeID, SUM(id.totalPrice) " +
+            "FROM Invoice i JOIN i.invoiceDetailList id " +
+            "WHERE i.status = 'SUCCESS' " +
+            "GROUP BY i.employee.employeeID " +
+            "ORDER BY SUM(id.totalPrice) DESC")
+    List<Object[]> findEmployeeRevenueRanking();
+
+
+
+
+
+
+
+
+
+
     @Query("SELECT DISTINCT i.id FROM Invoice i WHERE i.createdAt BETWEEN :startDate AND :endDate")
     List<Long> findInvoiceIdsByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 

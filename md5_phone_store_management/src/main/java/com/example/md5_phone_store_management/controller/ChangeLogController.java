@@ -88,30 +88,18 @@ public class ChangeLogController {
             Employee employee = optionalEmployee.orElseThrow(() ->
                     new RuntimeException("Không tìm thấy tài khoản: " + username));
             Integer employeeID = employee.getEmployeeID();
-//
+
 ////          topcard (Doanh Thu Tổng Của Nhân Viên)
-//            response.put("employeeName", employee.getFullName());
-//            response.put("employeeRank", iInvoiceService.getEmployeeSellingRank());
-//            response.put("employeeTotalOrdersSold", iInvoiceService.getEmployeeTotalOrdersSold(employeeID));
-//            response.put("employeeTotalRevenueSold", iInvoiceService.getEmployeeTotalRevenueSold(employeeID));
-//
-////            Thống Kê Cá Nhân
-//            response.put("employeeOrdersToday", iInvoiceService.getEmployeeOrdersToday(employeeID));
-//            response.put("employeeRevenueToday", iInvoiceService.getEmployeeRevenueToday(employeeID));
-//            response.put("employeeOrdersThisMonth", iInvoiceService.getEmployeeOrdersThisMonth(employeeID));
-//            response.put("employeeRevenueThisMonth", iInvoiceService.getEmployeeRevenueThisMonth(employeeID));
+            response.put("employeeName", employee.getFullName());
+            response.put("employeeRank", iInvoiceService.getEmployeeSellingRank(Long.valueOf(employeeID)));
+            response.put("employeeTotalOrdersSold", iInvoiceService.getEmployeeTotalOrdersSold(Long.valueOf(employeeID)));
+            response.put("employeeTotalRevenueSold", iInvoiceService.getEmployeeTotalRevenueSold(Long.valueOf(employeeID)));
 
-            //          topcard (Doanh Thu Tổng Của Nhân Viên)
-            response.put("employeeName", "Hậu");
-            response.put("employeeRank", 5);
-            response.put("employeeTotalOrdersSold", 123); // giả lập 123 đơn hàng đã bán
-            response.put("employeeTotalRevenueSold", 456000000); // giả lập doanh thu 456 triệu
-
-//          Thống Kê Cá Nhân
-            response.put("employeeOrdersToday", 5); // 5 đơn hôm nay
-            response.put("employeeRevenueToday", 10000000); // doanh thu hôm nay: 10 triệu
-            response.put("employeeOrdersThisMonth", 40); // 40 đơn trong tháng
-            response.put("employeeRevenueThisMonth", 200000000); // doanh thu tháng: 200 triệu
+//            Thống Kê Cá Nhân
+            response.put("employeeOrdersToday", iInvoiceService.getEmployeeOrdersToday(Long.valueOf(employeeID)));
+            response.put("employeeRevenueToday", iInvoiceService.getEmployeeRevenueToday(Long.valueOf(employeeID)));
+            response.put("employeeOrdersThisMonth", iInvoiceService.getEmployeeOrdersThisMonth(Long.valueOf(employeeID)));
+            response.put("employeeRevenueThisMonth", iInvoiceService.getEmployeeRevenueThisMonth(Long.valueOf(employeeID)));
 
 
             session.setAttribute("SUCCESS_MESSAGE", "Tải dữ liệu dashboard thành công cho nhân viên: " + username);
@@ -159,24 +147,6 @@ public class ChangeLogController {
     }
 
 
-//
-//        Tổng số đơn đã bán
-//        Tổng doanh thu đã bán
-//        Số đơn hôm nay
-//        Doanh thu hôm nay
-//        Số đơn tháng này
-//        Doanh thu tháng này
-//
-//        dựa vào id khách hàng hiển thị cá nhân
-
-//        response.put("totalRevenue", iInvoiceService.totalRevenue());
-//        response.put("countAllProducts", productService.countProducts());
-//        response.put("topSellingProductName", invoiceDetailService.getTopSellingProductName());
-//
-//
-////
-//        return response;
-//    }
 
 
     @GetMapping("/customers/{customerId}")
@@ -377,6 +347,28 @@ public class ChangeLogController {
         return response;
     }
 
+//    @GetMapping("/employee/{employeeId}/name")
+//    public ResponseEntity<Map<String, String>> getEmployeeName(@PathVariable Long employeeId) {
+//        System.out.println("Received request for employeeId: " + employeeId);
+//        Map<String, String> response = new HashMap<>();
+//        try {
+//            Employee employee = iEmployeeService.getEmployeeById(Math.toIntExact(employeeId));
+//            if (employee != null) {
+//                response.put("name", employee.getFullName() != null ? employee.getFullName() : "không xác định");
+//                return ResponseEntity.ok(response);
+//            } else {
+//                System.out.println("nhân viên id " + employeeId + " ko tìm thấy.");
+//                response.put("name", "không xác định");
+//                return ResponseEntity.status(404).body(response);
+//            }
+//        } catch (Exception e) {
+//            System.err.println("Error fetching employee with ID " + employeeId + ": " + e.getMessage());
+//            e.printStackTrace();
+//            response.put("name", "không xác định");
+//            return ResponseEntity.status(500).body(response);
+//        }
+//    }
+
     @GetMapping("/employee/{employeeId}/name")
     public ResponseEntity<Map<String, String>> getEmployeeName(@PathVariable Long employeeId) {
         System.out.println("Received request for employeeId: " + employeeId);
@@ -387,15 +379,14 @@ public class ChangeLogController {
                 response.put("name", employee.getFullName() != null ? employee.getFullName() : "không xác định");
                 return ResponseEntity.ok(response);
             } else {
-                System.out.println("nhân viên id " + employeeId + " ko tìm thấy.");
+                System.out.println("Nhân viên id " + employeeId + " không tìm thấy.");
                 response.put("name", "không xác định");
-                return ResponseEntity.status(404).body(response);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
-            System.err.println("Error fetching employee with ID " + employeeId + ": " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Lỗi khi lấy tên nhân viên với ID " + employeeId + ": " + e.getMessage());
             response.put("name", "không xác định");
-            return ResponseEntity.status(500).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

@@ -21,10 +21,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.ZoneId;
+import java.math.BigDecimal;
+import java.time.*;
 import java.util.List;
 
 @Service
@@ -44,6 +42,111 @@ public class InvoiceServiceImpl implements IInvoiceService {
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+
+
+    @Override
+    public Integer getEmployeeSellingRank(Long employeeID) {
+        // Lấy danh sách tổng doanh thu của tất cả nhân viên
+        List<Object[]> revenueRankings = invoiceRepository.findEmployeeRevenueRanking();
+
+        // Tìm vị trí của employeeID trong danh sách
+        for (int i = 0; i < revenueRankings.size(); i++) {
+            Object[] row = revenueRankings.get(i);
+            Long currentEmployeeID = ((Number) row[0]).longValue();
+            if (currentEmployeeID.equals(employeeID)) {
+                return i + 1; // Xếp hạng bắt đầu từ 1
+            }
+        }
+
+        // Nếu không tìm thấy (nhân viên chưa có doanh thu), trả về null hoặc số lớn
+        return null; // Hoặc trả về revenueRankings.size() + 1 tùy yêu cầu
+    }
+
+    @Override
+    public Integer getEmployeeTotalOrdersSold(Long employeeID) {
+        return invoiceRepository.countByEmployeeEmployeeID(employeeID);
+    }
+
+    @Override
+    public BigDecimal getEmployeeTotalRevenueSold(Long employeeID) {
+        List<Invoice> invoices = invoiceRepository.findByEmployeeEmployeeID(employeeID);
+        BigDecimal totalRevenue = BigDecimal.ZERO;
+
+        for (Invoice invoice : invoices) {
+            if (invoice.getStatus().equals(com.example.md5_phone_store_management.model.InvoiceStatus.SUCCESS)) {
+                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                    totalRevenue = totalRevenue.add(detail.getTotalPrice());
+                }
+            }
+        }
+
+        return totalRevenue;
+    }
+
+    @Override
+    public Integer getEmployeeOrdersToday(Long employeeID) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+        return invoiceRepository.countByEmployeeAndToday(employeeID, startOfDay, endOfDay);
+    }
+
+    @Override
+    public BigDecimal getEmployeeRevenueToday(Long employeeID) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+        List<Invoice> invoices = invoiceRepository.findByEmployeeAndToday(employeeID, startOfDay, endOfDay);
+        BigDecimal totalRevenue = BigDecimal.ZERO;
+
+        for (Invoice invoice : invoices) {
+            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                totalRevenue = totalRevenue.add(detail.getTotalPrice());
+            }
+        }
+
+        return totalRevenue;
+    }
+
+    @Override
+    public Integer getEmployeeOrdersThisMonth(Long employeeID) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfMonth = today.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime endOfMonth = today.withDayOfMonth(today.lengthOfMonth()).atTime(LocalTime.MAX);
+
+        return invoiceRepository.countByEmployeeAndThisMonth(employeeID, startOfMonth, endOfMonth);
+    }
+
+    @Override
+    public BigDecimal getEmployeeRevenueThisMonth(Long employeeID) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfMonth = today.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime endOfMonth = today.withDayOfMonth(today.lengthOfMonth()).atTime(LocalTime.MAX);
+
+        List<Invoice> invoices = invoiceRepository.findByEmployeeAndThisMonth(employeeID, startOfMonth, endOfMonth);
+        BigDecimal totalRevenue = BigDecimal.ZERO;
+
+        for (Invoice invoice : invoices) {
+            for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+                totalRevenue = totalRevenue.add(detail.getTotalPrice());
+            }
+        }
+
+        return totalRevenue;
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public String getBestSalesStaffName() {
