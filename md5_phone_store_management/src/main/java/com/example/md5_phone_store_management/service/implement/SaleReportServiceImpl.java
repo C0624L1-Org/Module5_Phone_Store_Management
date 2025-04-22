@@ -212,9 +212,9 @@ public class SaleReportServiceImpl implements ISaleReportService {
                                         : Stream.empty())
                                 .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
                                 .mapToLong(detail -> {
-                                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                                    BigDecimal retailPrice = Optional.ofNullable(detail.getProduct().getRetailPrice()).orElse(BigDecimal.ZERO);
                                     BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
-                                    return sellingPrice.subtract(purchasePrice)
+                                    return retailPrice.subtract(purchasePrice)
                                             .multiply(BigDecimal.valueOf(detail.getQuantity()))
                                             .longValue();
                                 })
@@ -253,9 +253,9 @@ public class SaleReportServiceImpl implements ISaleReportService {
                 })
                 .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
                 .mapToLong(detail -> {
-                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                    BigDecimal retailPrice = Optional.ofNullable(detail.getProduct().getRetailPrice()).orElse(BigDecimal.ZERO);
                     BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
-                    return sellingPrice.subtract(purchasePrice).multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                    return retailPrice.subtract(purchasePrice).multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
                 })
                 .sum();
 
@@ -276,9 +276,9 @@ public class SaleReportServiceImpl implements ISaleReportService {
                 .collect(Collectors.groupingBy(
                         detail -> detail.getProduct().getProductID(),
                         Collectors.mapping(detail -> {
-                            BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                            BigDecimal retailPrice = Optional.ofNullable(detail.getProduct().getRetailPrice()).orElse(BigDecimal.ZERO);
                             BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
-                            return sellingPrice.subtract(purchasePrice).multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
+                            return retailPrice.subtract(purchasePrice).multiply(BigDecimal.valueOf(detail.getQuantity())).longValue();
                         }, Collectors.summingLong(Long::longValue))
                 ));
 
@@ -304,9 +304,9 @@ public class SaleReportServiceImpl implements ISaleReportService {
                         : Stream.empty())
                 .filter(detail -> detail.getProduct() != null && detail.getQuantity() != null)
                 .mapToLong(detail -> {
-                    BigDecimal sellingPrice = Optional.ofNullable(detail.getProduct().getSellingPrice()).orElse(BigDecimal.ZERO);
+                    BigDecimal retailPrice = Optional.ofNullable(detail.getProduct().getRetailPrice()).orElse(BigDecimal.ZERO);
                     BigDecimal purchasePrice = Optional.ofNullable(detail.getProduct().getPurchasePrice()).orElse(BigDecimal.ZERO);
-                    return sellingPrice.subtract(purchasePrice)
+                    return retailPrice.subtract(purchasePrice)
                             .multiply(BigDecimal.valueOf(detail.getQuantity()))
                             .longValue();
                 })

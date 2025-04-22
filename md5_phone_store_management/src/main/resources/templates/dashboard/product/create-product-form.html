@@ -120,6 +120,8 @@
                                       class="needs-validation"
                                       id="createProductForm" data-loading-overlay="true" novalidate>
 
+                                    <input type="hidden" th:field="*{qrCode}" id="qrCode">
+
                                     <div class="row">
                                         <!-- Tên sản phẩm -->
                                         <div class="col-md-12 mb-3">
@@ -241,15 +243,6 @@
                                                    placeholder="0">
                                             <div class="text-danger" th:if="${#fields.hasErrors('stockQuantity')}"
                                                  th:text="${#fields.errors('stockQuantity')[0]}"></div>
-                                        </div>
-
-                                        <!-- Mã QR -->
-                                        <div class="col-md-6 mb-3">
-                                            <label for="qrCode" class="form-label">
-                                                <i class="fas fa-qrcode me-2"></i>Mã QR
-                                            </label>
-                                            <input type="text" class="form-control" th:field="*{qrCode}" id="qrCode"
-                                                   placeholder="Nhập mã QR">
                                         </div>
 
                                         <!-- Nhà cung cấp -->

@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const highlightedName = highlightKeyword(product.name, keyword);
 
             // Định dạng giá tiền
-            const formattedPrice = formatCurrency(product.sellingPrice);
+            const formattedPrice = formatCurrency(product.retailPrice);
 
             // Hiển thị thông tin cấu hình nếu có
             let specsInfo = '';
@@ -344,7 +344,7 @@ setTimeout(() => {
                         <img src="${item.imageUrl}" alt="" style="width:40px; height:40px; margin-right:10px;">
                         <div>
                             <div style="font-weight:bold;">${item.name}</div>
-                            <div style="color:#d82027;">${new Intl.NumberFormat('vi-VN').format(item.sellingPrice)} VND</div>
+                            <div style="color:#d82027;">${new Intl.NumberFormat('vi-VN').format(item.retailPrice)} VND</div>
                         </div>
                     </div>`;
                 });

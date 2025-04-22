@@ -102,7 +102,7 @@ public class ChangeLogController {
             response.put("employeeRevenueThisMonth", iInvoiceService.getEmployeeRevenueThisMonth(Long.valueOf(employeeID)));
 
 
-            session.setAttribute("SUCCESS_MESSAGE", "Tải dữ liệu dashboard thành công cho nhân viên: " + username);
+//            session.setAttribute("SUCCESS_MESSAGE", "Tải dữ liệu dashboard thành công cho nhân viên: " + username);
         } catch (Exception e) {
             e.printStackTrace();
             response.put("error", "Lỗi khi tải dữ liệu dashboard: " + e.getMessage());
