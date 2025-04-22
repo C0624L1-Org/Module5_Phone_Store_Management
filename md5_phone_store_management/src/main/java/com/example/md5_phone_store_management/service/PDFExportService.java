@@ -368,7 +368,7 @@ public class PDFExportService {
                     table.addCell(dataCell);
 
                     // Đơn giá
-                    dataCell = new PdfPCell(new Phrase(formatter.format(detail.getProduct().getSellingPrice()) + " VND", normalFont));
+                    dataCell = new PdfPCell(new Phrase(formatter.format(detail.getProduct().getRetailPrice()) + " VND", normalFont));
                     dataCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                     if ((index - 1) % 2 == 0) {
                         dataCell.setBackgroundColor(grayBg);
