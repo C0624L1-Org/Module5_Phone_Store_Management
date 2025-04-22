@@ -614,10 +614,7 @@
 package com.example.md5_phone_store_management.service.implement;
 
 import com.example.md5_phone_store_management.event.EntityChangeEvent;
-import com.example.md5_phone_store_management.model.Customer;
-import com.example.md5_phone_store_management.model.Invoice;
-import com.example.md5_phone_store_management.model.InvoiceDetail;
-import com.example.md5_phone_store_management.model.InvoiceStatus;
+import com.example.md5_phone_store_management.model.*;
 import com.example.md5_phone_store_management.repository.IInvoiceDetailRepository;
 import com.example.md5_phone_store_management.repository.IInvoiceRepository;
 import com.example.md5_phone_store_management.repository.InvoiceRepository;
@@ -822,6 +819,51 @@ public class InvoiceServiceImpl implements IInvoiceService {
         return total != null ? total : 0L;
     }
 
+//    @Override
+//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+//    public Invoice saveInvoice(Invoice invoice) {
+//        try {
+//            if (invoice.getCustomer() == null) {
+//                throw new IllegalArgumentException("Customer cannot be null");
+//            }
+//            System.out.println("Saving invoice: " + invoice);
+//            if (invoice.getInvoiceDetailList() != null) {
+//                System.out.println("Invoice has " + invoice.getInvoiceDetailList().size() + " details");
+//                for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
+//                    System.out.println("  - Detail: " + detail);
+//                }
+//            }
+//            if (invoice.getInvoiceDetailList() != null) {
+//                invoice.getInvoiceDetailList().forEach(detail -> {
+//                    if (detail.getInvoice() == null) {
+//                        detail.setInvoice(invoice);
+//                    }
+//                });
+//            }
+//            if (invoice.getCreatedAt() == null) {
+//                invoice.setCreatedAt(LocalDateTime.now());
+//            }
+//            if (invoice.getStatus() == null) {
+//                invoice.setStatus(InvoiceStatus.PROCESSING);
+//            }
+//            validateInvoice(invoice);
+//            Invoice savedInvoice = invoiceRepository.save(invoice);
+//            System.out.println("Invoice saved successfully, ID: " + savedInvoice.getId());
+//            String eventId = java.util.UUID.randomUUID().toString();
+//            System.out.println("Publishing INSERT_INVOICE event for invoice ID: " + savedInvoice.getId() + ", eventId: " + eventId);
+//            eventPublisher.publishEvent(new EntityChangeEvent(this, savedInvoice, "INSERT_INVOICE", null));
+//            return savedInvoice;
+//        } catch (DataIntegrityViolationException e) {
+//            System.err.println("Data integrity violation when saving invoice: " + e.getMessage());
+//            e.printStackTrace();
+//            throw e;
+//        } catch (Exception e) {
+//            System.err.println("Error saving invoice: " + e.getMessage());
+//            e.printStackTrace();
+//            throw e;
+//        }
+//    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     public Invoice saveInvoice(Invoice invoice) {
@@ -830,6 +872,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
                 throw new IllegalArgumentException("Customer cannot be null");
             }
             System.out.println("Saving invoice: " + invoice);
+            System.out.println("Invoice status: " + invoice.getStatus()); // Print initial status
             if (invoice.getInvoiceDetailList() != null) {
                 System.out.println("Invoice has " + invoice.getInvoiceDetailList().size() + " details");
                 for (InvoiceDetail detail : invoice.getInvoiceDetailList()) {
@@ -849,12 +892,26 @@ public class InvoiceServiceImpl implements IInvoiceService {
             if (invoice.getStatus() == null) {
                 invoice.setStatus(InvoiceStatus.PROCESSING);
             }
+            System.out.println("Before validateInvoice");
             validateInvoice(invoice);
+            System.out.println("Before saving to repository");
             Invoice savedInvoice = invoiceRepository.save(invoice);
+            System.out.println("After saving to repository");
             System.out.println("Invoice saved successfully, ID: " + savedInvoice.getId());
-            String eventId = java.util.UUID.randomUUID().toString();
-            System.out.println("Publishing INSERT_INVOICE event for invoice ID: " + savedInvoice.getId() + ", eventId: " + eventId);
-            eventPublisher.publishEvent(new EntityChangeEvent(this, savedInvoice, "INSERT_INVOICE", null));
+            System.out.println("trạng thái hóa đơn : " + savedInvoice.getStatus()); // Print status after saving
+
+            // Publish event only if the invoice status is SUCCESS
+            if (savedInvoice.getStatus() == InvoiceStatus.SUCCESS) {
+                String eventId = java.util.UUID.randomUUID().toString();
+                System.out.println("Publishing INSERT_INVOICE event for invoice ID: " + savedInvoice.getId() + ", eventId: " + eventId);
+                eventPublisher.publishEvent(new EntityChangeEvent(this, savedInvoice, "INSERT_INVOICE", null));
+            }
+
+            if (savedInvoice.getPaymentMethod() == PaymentMethod.CASH) {
+                eventPublisher.publishEvent(new EntityChangeEvent(this, savedInvoice, "INSERT_INVOICE", null));
+
+            }
+
             return savedInvoice;
         } catch (DataIntegrityViolationException e) {
             System.err.println("Data integrity violation when saving invoice: " + e.getMessage());
@@ -878,6 +935,11 @@ public class InvoiceServiceImpl implements IInvoiceService {
             System.err.println("Warning: Payment method is null");
         }
     }
+
+
+
+
+
 
     @Override
     @Transactional(readOnly = true)

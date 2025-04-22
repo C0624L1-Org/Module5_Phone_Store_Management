@@ -70,39 +70,39 @@ public class ChangeLogController {
     private IEmployeeRepository employeeRepository;
 
 
-//    @GetMapping("/admin-dashboard-chart")
-//    public Map<String, Object> getManagerDashboardData() {
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("products", productService.findAllProducts());
-//        response.put("invoiceDetails", invoiceDetailService.findAll(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
-//        response.put("customers", iCustomerService.findAllCustomers(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
-//        response.put("suppliers", iSupplierService.getSupplierList());
-//        response.put("employees", iEmployeeService.getAllEmployeesExceptAdmin(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
-//        // Add a timestamp to indicate when data was last updated
-//        response.put("lastUpdated", System.currentTimeMillis());
-//        // Add aggregated data for charting
-//        response.put("totalRevenue", iInvoiceService.totalRevenue());
-//        response.put("thisMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
-//        response.put("lastMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
-//        response.put("countAllProducts", productService.countProducts());
-//        response.put("countImportProducts", transactionInService.countImportProducts());
-//        response.put("countExportProducts", transactionOutService.countExportProducts());
-//        response.put("topSellingProduct", invoiceDetailService.getTopSellingProductName());
-//        response.put("countSuppliers", iSupplierService.countSuppliers());
-//        response.put("newSuppliers", iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
-//        response.put("regularSuppliers", transactionInService.countRegularSupplier());
-//        response.put("bestSupplier", transactionInService.getBestSupplierName());
-//        response.put("countAllEmployees", iEmployeeService.countEmployee());
-//        response.put("countWarehouseStaff", iEmployeeService.countWarehouseStaff());
-//        response.put("countSalesStaff", iEmployeeService.countSalesStaff());
-//        response.put("countSalesPerson", iEmployeeService.countBusinessStaff());
-//        response.put("bestSalesStaff", iEmployeeService.countSalesStaff());
-//        response.put("countAllCustomers", iCustomerService.countTotalCustomers());
-//        response.put("countNewCustomers", iCustomerService.countNewCustomers());
-//        response.put("countRegularCustomers", iCustomerService.countTotalCustomers() - iCustomerService.countNewCustomers());
-//        response.put("topBuyingCustomer", invoiceDetailService.getTopBuyingCustomerName());
-//        return response;
-//    }
+    @GetMapping("/admin-dashboard-chart")
+    public Map<String, Object> getManagerDashboardData() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", productService.findAllProducts());
+        response.put("invoiceDetails", invoiceDetailService.findAll(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
+        response.put("customers", iCustomerService.findAllCustomers(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
+        response.put("suppliers", iSupplierService.getSupplierList());
+        response.put("employees", iEmployeeService.getAllEmployeesExceptAdmin(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
+        // Add a timestamp to indicate when data was last updated
+        response.put("lastUpdated", System.currentTimeMillis());
+        // Add aggregated data for charting
+        response.put("totalRevenue", iInvoiceService.totalRevenue());
+        response.put("thisMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
+        response.put("lastMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
+        response.put("countAllProducts", productService.countProducts());
+        response.put("countImportProducts", transactionInService.countImportProducts());
+        response.put("countExportProducts", transactionOutService.countExportProducts());
+        response.put("topSellingProduct", invoiceDetailService.getTopSellingProductName());
+        response.put("countSuppliers", iSupplierService.countSuppliers());
+        response.put("newSuppliers", iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
+        response.put("regularSuppliers", transactionInService.countRegularSupplier());
+        response.put("bestSupplier", transactionInService.getBestSupplierName());
+        response.put("countAllEmployees", iEmployeeService.countEmployee());
+        response.put("countWarehouseStaff", iEmployeeService.countWarehouseStaff());
+        response.put("countSalesStaff", iEmployeeService.countSalesStaff());
+        response.put("countSalesPerson", iEmployeeService.countBusinessStaff());
+        response.put("bestSalesStaff", iEmployeeService.countSalesStaff());
+        response.put("countAllCustomers", iCustomerService.countTotalCustomers());
+        response.put("countNewCustomers", iCustomerService.countNewCustomers());
+        response.put("countRegularCustomers", iCustomerService.countTotalCustomers() - iCustomerService.countNewCustomers());
+        response.put("topBuyingCustomer", invoiceDetailService.getTopBuyingCustomerName());
+        return response;
+    }
 
 
 
