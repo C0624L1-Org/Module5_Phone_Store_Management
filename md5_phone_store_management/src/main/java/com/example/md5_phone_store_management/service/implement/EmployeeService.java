@@ -25,9 +25,7 @@ import com.example.md5_phone_store_management.service.CloudinaryService;
 import com.example.md5_phone_store_management.service.IEmployeeService;
 import com.example.md5_phone_store_management.service.ITransactionOutService;
 
-/**
- * Dịch vụ quản lý nhân viên.
- */
+
 @Service
 public class EmployeeService implements IEmployeeService {
 
