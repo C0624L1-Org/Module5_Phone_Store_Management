@@ -305,20 +305,21 @@
 
             <!-- Top Section: Cards -->
             <div class="dash-cards-wrapper flex gap-4 flex-wrap md:flex-nowrap mb-4 w-full">
-                <!-- Revenue Card -->
+                <!-- Employee Revenue Card -->
                 <div class="dash-card flex-1 min-w-0 bg-orange-300 text-white rounded-lg shadow-lg p-6 cursor-pointer min-h-[220px]">
                     <div class="dash-card-overlay bg-orange-400"></div>
                     <div class="dash-card-content flex flex-col justify-between">
                         <div class="dash-card-title">
                             <div class="flex justify-center items-center mb-4">
                                 <div class="flex items-center text-xl font-bold border border-white px-4 py-1 rounded-md shadow-sm bg-white bg-opacity-10 backdrop-blur-sm">
-                                    <i class="fas fa-money-bill-wave mr-2"></i> Doanh Thu Hôm Nay
+                                    <i class="fas fa-money-bill-wave mr-2"></i> Tổng Doanh Thu Nhân Viên: <span id="employeeName">N/A</span>
                                 </div>
                             </div>
                         </div>
                         <div class="dash-card-main">
                             <div class="border-t border-white mb-4"></div>
-                            <div class="text-4xl font-bold text-center" id="todayRevenue">0đ</div>
+                            <div class="text-4xl font-bold text-center" id="employeeTotalRevenueSold">0đ</div>
+                            <div class="text-lg text-center mt-2" id="employeeTotalOrdersSold">0 đơn hàng</div>
                         </div>
                         <div class="dash-card-update flex justify-end items-end mt-4">
                             <div class="text-xs flex items-center gap-1">
@@ -327,7 +328,7 @@
                             </div>
                         </div>
                         <div class="dash-card-previous">
-<!--                            <div class="text-sm font-semibold">Tháng này: <span id="thisMonthRevenue">0đ</span></div>-->
+                            <div class="text-sm font-semibold">Xếp hạng bán hàng của bạn thứ: <span id="employeeRank">N/A</span></div>
                         </div>
                     </div>
                 </div>
@@ -369,29 +370,21 @@
                             <h3 class="text-lg font-semibold">Thống Kê Cá Nhân</h3>
                         </div>
                         <div class="personal-stats expanded" id="personalStats">
-                            <div class="stat-item">
-                                <span>Tổng số đơn đã bán</span>
-                                <span id="totalOrdersSold">0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span>Tổng doanh thu đã bán</span>
-                                <span id="totalRevenueGenerated">0đ</span>
-                            </div>
                             <div class="stat-item" id="todayOrdersPersonalItem">
                                 <span>Số đơn hôm nay</span>
-                                <span id="todayOrdersPersonal">0</span>
+                                <span id="employeeOrdersToday">0</span>
                             </div>
                             <div class="stat-item" id="todayRevenuePersonalItem">
                                 <span>Doanh thu hôm nay</span>
-                                <span id="todayRevenuePersonal">0đ</span>
+                                <span id="employeeRevenueToday">0đ</span>
                             </div>
                             <div class="stat-item" id="thisMonthOrdersPersonalItem">
                                 <span>Số đơn tháng này</span>
-                                <span id="thisMonthOrdersPersonal">0</span>
+                                <span id="employeeOrdersThisMonth">0</span>
                             </div>
                             <div class="stat-item" id="thisMonthRevenuePersonalItem">
                                 <span>Doanh thu tháng này</span>
-                                <span id="thisMonthRevenuePersonal">0đ</span>
+                                <span id="employeeRevenueThisMonth">0đ</span>
                             </div>
                         </div>
                     </div>
@@ -429,15 +422,23 @@
 <script>
     // Format entity name to Vietnamese
     function formatEntityName(entityName) {
+        if (!entityName) {
+            console.warn('Entity name is missing or null');
+            return 'N/A';
+        }
         const entityMap = {
             'invoice': 'Hóa Đơn',
             'product': 'Sản Phẩm'
         };
-        return entityMap[entityName?.toLowerCase()] || 'N/A';
+        return entityMap[entityName.toLowerCase()] || 'N/A';
     }
 
     // Format action to Vietnamese
     function formatAction(action) {
+        if (!action) {
+            console.warn('Action is missing or null');
+            return 'N/A';
+        }
         const actionMap = {
             'INSERT': 'Thêm mới',
             'UPDATE': 'Cập nhật',
@@ -449,7 +450,8 @@
     // Format relative time
     function formatRelativeTime(timestamp, isExpanded) {
         if (!timestamp || isNaN(new Date(timestamp))) {
-            return "vừa xong";
+            console.warn('Invalid timestamp:', timestamp);
+            return 'vừa xong';
         }
         const now = new Date();
         const logTime = new Date(timestamp);
@@ -466,7 +468,7 @@
         }
 
         if (diffInSeconds < 60) {
-            return "vừa xong";
+            return 'vừa xong';
         } else if (diffInSeconds < 3600) {
             const minutes = Math.floor(diffInSeconds / 60);
             return `${minutes} phút trước`;
@@ -490,20 +492,23 @@
     // Format date and time
     function formatDateTime() {
         const now = new Date();
-        const time = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
-        const date = now.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'});
-        return {time, date};
+        const time = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        const date = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return { time, date };
     }
 
     // Format currency
     function formatCurrency(value) {
-        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(value || 0);
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value || 0);
     }
 
     // Parse value string into object
     function parseValueString(value) {
         const result = {};
-        if (!value || typeof value !== 'string') return result;
+        if (!value || typeof value !== 'string') {
+            console.warn('Invalid value string for parsing:', value);
+            return result;
+        }
         const pairs = value.split(',').map(pair => pair.trim().split('='));
         pairs.forEach(([key, val]) => {
             if (key && val) result[key.trim()] = val.trim();
@@ -518,7 +523,10 @@
 
     // Fetch employee name by ID
     async function getEmployeeNameById(employeeId) {
-        if (!employeeId) return 'không xác định';
+        if (!employeeId) {
+            console.warn('No employeeId provided');
+            return 'không xác định';
+        }
         if (employeeNameCache[employeeId]) {
             return employeeNameCache[employeeId];
         }
@@ -526,22 +534,31 @@
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                console.error(`Error fetching employee name for ID ${employeeId}: Status ${response.status}`);
+                console.error(`Failed to fetch employee name for ID ${employeeId}: Status ${response.status} ${response.statusText}`);
+                if (response.status === 500) {
+                    return 'Nhân viên không tồn tại';
+                }
                 return 'không xác định';
             }
             const data = await response.json();
-            const name = data.name || 'không xác định';
-            employeeNameCache[employeeId] = name;
-            return name;
+            if (!data || !data.name) {
+                console.warn(`No name returned for employee ID ${employeeId}`);
+                return 'không xác định';
+            }
+            employeeNameCache[employeeId] = data.name;
+            return data.name;
         } catch (error) {
-            console.error(`Error fetching employee name for ID ${employeeId}:`, error);
+            console.error(`Error fetching employee name for ID ${employeeId}:`, error.message);
             return 'không xác định';
         }
     }
 
     // Fetch customer name by ID
     async function getCustomerNameById(customerId) {
-        if (!customerId) return 'không xác định';
+        if (!customerId) {
+            console.warn('No customerId provided');
+            return 'không xác định';
+        }
         if (customerNameCache[customerId]) {
             return customerNameCache[customerId];
         }
@@ -549,22 +566,28 @@
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                console.error(`Error fetching customer name for ID ${customerId}: Status ${response.status}`);
+                console.error(`Failed to fetch customer name for ID ${customerId}: Status ${response.status} ${response.statusText}`);
                 return 'không xác định';
             }
             const data = await response.json();
-            const name = data.name || 'không xác định';
-            customerNameCache[customerId] = name;
-            return name;
+            if (!data || !data.name) {
+                console.warn(`No name returned for customer ID ${customerId}`);
+                return 'không xác định';
+            }
+            customerNameCache[customerId] = data.name;
+            return data.name;
         } catch (error) {
-            console.error(`Error fetching customer name for ID ${customerId}:`, error);
+            console.error(`Error fetching customer name for ID ${customerId}:`, error.message);
             return 'không xác định';
         }
     }
 
     // Fetch product name by ID
     async function getProductNameById(productId) {
-        if (!productId) return 'không xác định';
+        if (!productId) {
+            console.warn('No productId provided');
+            return 'không xác định';
+        }
         if (productNameCache[productId]) {
             return productNameCache[productId];
         }
@@ -572,22 +595,29 @@
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                console.error(`Error fetching product name for ID ${productId}: Status ${response.status}`);
+                console.error(`Failed to fetch product name for ID ${productId}: Status ${response.status} ${response.statusText}`);
                 return 'không xác định';
             }
             const data = await response.json();
-            const name = data.name || 'không xác định';
-            productNameCache[productId] = name;
-            return name;
+            if (!data || !data.name) {
+                console.warn(`No name returned for product ID ${productId}`);
+                return 'không xác định';
+            }
+            productNameCache[productId] = data.name;
+            return data.name;
         } catch (error) {
-            console.error(`Error fetching product name for ID ${productId}:`, error);
+            console.error(`Error fetching product name for ID ${productId}:`, error.message);
             return 'không xác định';
         }
     }
 
     // Format notification text
     async function formatNotificationText(log, isExpanded) {
-        const entity = log.entityName?.toLowerCase();
+        if (!log || !log.entityName) {
+            console.warn('Invalid log object for notification:', log);
+            return 'N/A';
+        }
+        const entity = log.entityName.toLowerCase();
         const value = log.action === 'DELETE' ? log.oldValue : log.newValue;
         const parsed = parseValueString(value);
 
@@ -605,6 +635,7 @@
             const productName = await getProductNameById(productId);
             return isExpanded ? `Sản phẩm ${productName}` : `Sản Phẩm tên: ${productName}`;
         }
+        console.warn(`Unknown entity type: ${entity}`);
         return value || 'N/A';
     }
 
@@ -616,11 +647,27 @@
     // Render change logs
     async function renderChangeLogs(logs) {
         const container = document.getElementById('notifications-list');
+        if (!container) {
+            console.error('Notifications list container not found');
+            return;
+        }
+
         const updatesProfile = document.querySelector('.dash-updates-profile');
+        if (!updatesProfile) {
+            console.error('Updates profile element not found');
+            return;
+        }
+
         const isExpanded = updatesProfile.classList.contains('expanded');
 
         // Filter logs to only include Invoice and Product
-        const filteredLogs = logs.filter(log => ['invoice', 'product'].includes(log.entityName?.toLowerCase()));
+        const filteredLogs = logs.filter(log => {
+            if (!log || !log.entityName) {
+                console.warn('Invalid log object:', log);
+                return false;
+            }
+            return ['invoice', 'product'].includes(log.entityName.toLowerCase());
+        });
 
         if (!filteredLogs || filteredLogs.length === 0) {
             container.innerHTML = `
@@ -628,6 +675,7 @@
                     <p class="text-sm text-gray-500">Chưa có cập nhật nào.</p>
                 </div>
             `;
+            console.log('No valid change logs to render');
             return;
         }
 
@@ -638,13 +686,11 @@
         `;
 
         const employeeNamePromises = filteredLogs.map(async (log) => {
-            if (!log || !log.employeeId) return 'không xác định';
-            if (employeeNameCache[log.employeeId]) {
-                return employeeNameCache[log.employeeId];
+            if (!log || !log.employeeId) {
+                console.warn('No employeeId in log:', log);
+                return 'không xác định';
             }
-            const name = await getEmployeeNameById(log.employeeId);
-            employeeNameCache[log.employeeId] = name;
-            return name;
+            return await getEmployeeNameById(log.employeeId).catch(() => 'Nhân viên không xác định');
         });
 
         const employeeNames = await Promise.all(employeeNamePromises);
@@ -659,11 +705,10 @@
             filteredLogs.forEach((log, index) => {
                 const entityText = formatEntityName(log.entityName);
                 if (logsByEntity[entityText]) {
-                    logsByEntity[entityText].push({log, employeeName: employeeNames[index]});
+                    logsByEntity[entityText].push({ log, employeeName: employeeNames[index] });
                 }
             });
 
-            // Precompute notification items for each entity
             const entityNotifications = await Promise.all(entities.map(async (entity) => {
                 if (logsByEntity[entity].length === 0) {
                     return `
@@ -678,7 +723,7 @@
                     `;
                 }
 
-                const items = await Promise.all(logsByEntity[entity].map(async ({log, employeeName}) => {
+                const items = await Promise.all(logsByEntity[entity].map(async ({ log, employeeName }) => {
                     const actionText = formatAction(log.action);
                     const valueText = await formatNotificationText(log, true);
                     return `
@@ -726,10 +771,12 @@
                     }, index * 100);
                 });
             }, 300);
+            console.log('Rendered expanded change logs');
         } else {
             const limitedLogs = filteredLogs.slice(0, 4);
             const items = await Promise.all(limitedLogs.map(async (log, index) => {
                 if (!log || !log.timestamp || !log.action) {
+                    console.warn('Invalid log for non-expanded rendering:', log);
                     return '';
                 }
                 const employeeName = employeeNames[index];
@@ -753,19 +800,25 @@
             }));
 
             container.innerHTML = items.join('');
+            console.log('Rendered non-expanded change logs');
         }
     }
 
     // Fetch dashboard data
     async function fetchDashboardData() {
+        console.log('Fetching dashboard data...');
         try {
-            const [adminDashboardRes, changeLogsRes] = await Promise.all([
-                fetch('/api/changelogs/admin-dashboard-info').catch(e => {
-                    console.error("Admin dashboard fetch failed:", e);
+            const [salesStaffRes, productRes, changeLogsRes] = await Promise.all([
+                fetch('/api/changelogs/sales-staff-home-info').catch(e => {
+                    console.error('Sales staff fetch failed:', e.message);
+                    return null;
+                }),
+                fetch('/api/changelogs/sales-staff-home-for-product').catch(e => {
+                    console.error('Product info fetch failed:', e.message);
                     return null;
                 }),
                 fetch('/api/changelogs/notification').catch(e => {
-                    console.error("Change logs fetch failed:", e);
+                    console.error('Change logs fetch failed:', e.message);
                     return null;
                 })
             ]);
@@ -776,7 +829,7 @@
                     return null;
                 }
                 if (!res.ok) {
-                    console.warn(`Request failed for ${endpoint}: Status ${res.status}`);
+                    console.error(`Request failed for ${endpoint}: Status ${res.status} ${res.statusText}`);
                     return null;
                 }
                 try {
@@ -787,65 +840,95 @@
                     }
                     return JSON.parse(text);
                 } catch (error) {
-                    console.error(`Failed to parse JSON for ${endpoint}:`, error);
+                    console.error(`Failed to parse JSON for ${endpoint}:`, error.message);
                     return null;
                 }
             };
 
-            const adminData = (await parseJson(adminDashboardRes, '/api/changelogs/admin-dashboard-info')) ?? {};
+            const salesData = (await parseJson(salesStaffRes, '/api/changelogs/sales-staff-home-info')) ?? {};
+            const productData = (await parseJson(productRes, '/api/changelogs/sales-staff-home-for-product')) ?? {};
             const changeLogs = (await parseJson(changeLogsRes, '/api/changelogs/notification')) ?? [];
+
+            console.log('API data received:', { salesData, productData, changeLogs });
 
             const dateTime = formatDateTime();
 
-            // Revenue Card
-            document.getElementById('todayRevenue').textContent = formatCurrency(adminData.todayRevenue ?? 0);
-            document.getElementById('todayOrders').textContent = adminData.todayOrders ?? 0;
-            document.getElementById('thisMonthRevenue').textContent = formatCurrency(adminData.thisMonthRevenue ?? 0);
-            document.getElementById('revenue-update-time').textContent = dateTime.time;
-            document.getElementById('revenue-update-date').textContent = dateTime.date;
+            // Update DOM elements with validation
+            const updateElement = (id, value) => {
+                const element = document.getElementById(id);
+                if (!element) {
+                    console.error(`DOM element with ID ${id} not found`);
+                    return;
+                }
+                element.textContent = value;
+            };
+
+            // Employee Revenue Card
+            updateElement('employeeName', salesData.employeeName ?? 'N/A');
+            updateElement('employeeTotalRevenueSold', formatCurrency(salesData.employeeTotalRevenueSold ?? 0));
+            updateElement('employeeTotalOrdersSold', `${salesData.employeeTotalOrdersSold ?? 0} đơn hàng`);
+            updateElement('employeeRank', salesData.employeeRank ?? 'N/A');
+            updateElement('revenue-update-time', dateTime.time);
+            updateElement('revenue-update-date', dateTime.date);
 
             // Products Card
-            document.getElementById('countAllProducts').textContent = adminData.countAllProducts ?? 0;
-            document.getElementById('topSellingProductName').textContent = adminData.topSellingProductName ?? 'N/A';
-            document.getElementById('products-update-time').textContent = dateTime.time;
-            document.getElementById('products-update-date').textContent = dateTime.date;
+            updateElement('countAllProducts', productData.countProduct ?? 0);
+            updateElement('topSellingProductName', productData.bestSaleProduct ?? 'N/A');
+            updateElement('products-update-time', dateTime.time);
+            updateElement('products-update-date', dateTime.date);
 
             // Personal Statistics
-            const personalData = adminData.personalStats ?? {};
-            document.getElementById('totalOrdersSold').textContent = personalData.totalOrdersSold ?? 0;
-            document.getElementById('totalRevenueGenerated').textContent = formatCurrency(personalData.totalRevenueGenerated ?? 0);
-            document.getElementById('todayOrdersPersonal').textContent = personalData.todayOrders ?? 0;
-            document.getElementById('todayRevenuePersonal').textContent = formatCurrency(personalData.todayRevenue ?? 0);
-            document.getElementById('thisMonthOrdersPersonal').textContent = personalData.thisMonthOrders ?? 0;
-            document.getElementById('thisMonthRevenuePersonal').textContent = formatCurrency(personalData.thisMonthRevenue ?? 0);
+            updateElement('employeeOrdersToday', salesData.employeeOrdersToday ?? 0);
+            updateElement('employeeRevenueToday', formatCurrency(salesData.employeeRevenueToday ?? 0));
+            updateElement('employeeOrdersThisMonth', salesData.employeeOrdersThisMonth ?? 0);
+            updateElement('employeeRevenueThisMonth', formatCurrency(salesData.employeeRevenueThisMonth ?? 0));
 
             // Handle change logs
             if (changeLogs.length > 0) {
-                const latestLog = changeLogs[0];
-                const newTimestamp = new Date(latestLog.timestamp).getTime();
-                if (latestUpdateTimestamp === null || newTimestamp > latestUpdateTimestamp) {
-                    latestUpdateTimestamp = newTimestamp;
-                    cachedChangeLogs = changeLogs;
-                    if (isUpdatesExpanded) {
-                        document.getElementById('updateNotification').classList.add('show');
-                    } else {
+                if (!changeLogs[0] || !changeLogs[0].timestamp) {
+                    console.warn('Invalid change log data:', changeLogs);
+                } else {
+                    const latestLog = changeLogs[0];
+                    const newTimestamp = new Date(latestLog.timestamp).getTime();
+                    if (latestUpdateTimestamp === null || newTimestamp > latestUpdateTimestamp) {
+                        console.log('New change logs detected, updating...');
+                        latestUpdateTimestamp = newTimestamp;
+                        cachedChangeLogs = changeLogs;
+                        if (isUpdatesExpanded) {
+                            const updateNotification = document.getElementById('updateNotification');
+                            if (updateNotification) {
+                                updateNotification.classList.add('show');
+                            } else {
+                                console.error('Update notification element not found');
+                            }
+                        } else {
+                            await renderChangeLogs(changeLogs);
+                        }
+                    } else if (!isUpdatesExpanded && JSON.stringify(cachedChangeLogs) !== JSON.stringify(changeLogs)) {
+                        console.log('Change logs updated, re-rendering...');
+                        cachedChangeLogs = changeLogs;
                         await renderChangeLogs(changeLogs);
                     }
-                } else if (!isUpdatesExpanded) {
-                    cachedChangeLogs = changeLogs;
-                    await renderChangeLogs(changeLogs);
                 }
-            } else if (!isUpdatesExpanded) {
-                cachedChangeLogs = changeLogs;
-                await renderChangeLogs(changeLogs);
+            } else if (cachedChangeLogs.length > 0) {
+                console.log('No new logs, clearing notifications...');
+                cachedChangeLogs = [];
+                await renderChangeLogs([]);
             }
+
+            console.log('Dashboard data fetch completed');
         } catch (error) {
-            console.error('Error fetching dashboard data:', error);
-            document.getElementById('notifications-list').innerHTML = `
-                <div class="notification-item">
-                    <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
-                </div>
-            `;
+            console.error('Critical error in fetchDashboardData:', error.message);
+            const notificationsList = document.getElementById('notifications-list');
+            if (notificationsList) {
+                notificationsList.innerHTML = `
+                    <div class="notification-item">
+                        <p class="text-sm text-gray-500">Lỗi khi tải cập nhật: ${error.message}</p>
+                    </div>
+                `;
+            } else {
+                console.error('Notifications list element not found for error display');
+            }
         }
     }
 
@@ -853,9 +936,26 @@
     function toggleExpand(section) {
         const salesAnalytics = document.querySelector('.dash-sales-analytics');
         const updatesProfile = document.querySelector('.dash-updates-profile');
+        if (!salesAnalytics || !updatesProfile) {
+            console.error('Missing dashboard sections:', {
+                salesAnalytics: !!salesAnalytics,
+                updatesProfile: !!updatesProfile
+            });
+            return;
+        }
+
         const salesContent = salesAnalytics.querySelector('.dash-content');
         const updatesContent = updatesProfile.querySelector('.dash-content');
         const updatesExpandBtn = updatesProfile.querySelector('.dash-expand-btn i');
+
+        if (!salesContent || !updatesContent || !updatesExpandBtn) {
+            console.error('Missing dashboard section elements:', {
+                salesContent: !!salesContent,
+                updatesContent: !!updatesContent,
+                updatesExpandBtn: !!updatesExpandBtn
+            });
+            return;
+        }
 
         salesAnalytics.style.pointerEvents = 'none';
         updatesProfile.style.pointerEvents = 'none';
@@ -868,7 +968,12 @@
                 if (updatesProfile.classList.contains('expanded')) {
                     updatesProfile.classList.remove('expanded');
                     isUpdatesExpanded = false;
-                    document.getElementById('updateNotification').classList.remove('show');
+                    const updateNotification = document.getElementById('updateNotification');
+                    if (updateNotification) {
+                        updateNotification.classList.remove('show');
+                    } else {
+                        console.error('Update notification element not found');
+                    }
                     setTimeout(() => {
                         salesAnalytics.classList.remove('hidden');
                         salesContent.classList.remove('fading');
@@ -894,12 +999,28 @@
                     updatesExpandBtn.classList.add('fa-compress');
                 }
             }
+            console.log(`Toggled section: ${section}`);
         }, 300);
     }
 
     // Initialize and fetch data
-    fetchDashboardData();
-    setInterval(fetchDashboardData, 3000);
+    try {
+        fetchDashboardData();
+        setInterval(fetchDashboardData, 3000);
+        console.log('Dashboard initialization completed');
+    } catch (error) {
+        console.error('Error during dashboard initialization:', error.message);
+        const notificationsList = document.getElementById('notifications-list');
+        if (notificationsList) {
+            notificationsList.innerHTML = `
+                <div class="notification-item">
+                    <p class="text-sm text-gray-500">Lỗi khi khởi tạo dashboard: ${error.message}</p>
+                </div>
+            `;
+        } else {
+            console.error('Notifications list element not found for initialization error');
+        }
+    }
 </script>
 </body>
 </html>

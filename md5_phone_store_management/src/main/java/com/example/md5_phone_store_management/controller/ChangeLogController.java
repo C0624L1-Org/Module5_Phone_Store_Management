@@ -69,73 +69,57 @@ public class ChangeLogController {
     @Autowired
     private IEmployeeRepository employeeRepository;
 
+    @GetMapping("/sales-staff-home-for-product")
+    public Map<String, Object> getProductInfo() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("countProduct", productService.countProducts());
+        response.put("bestSaleProduct", invoiceDetailService.getTopSellingProductName());
+        return response;
+    }
+
+
     @GetMapping("/sales-staff-home-info")
     public Map<String, Object> getSaleStaffDashboardData(HttpSession session,
                                                          @AuthenticationPrincipal UserDetails userDetails) {
         Map<String, Object> response = new HashMap<>();
-
         try {
-            // Get the authenticated employee's username
             String username = userDetails.getUsername();
             Optional<Employee> optionalEmployee = employeeRepository.findByUsername(username);
             Employee employee = optionalEmployee.orElseThrow(() ->
                     new RuntimeException("Không tìm thấy tài khoản: " + username));
+            Integer employeeID = employee.getEmployeeID();
+//
+////          topcard (Doanh Thu Tổng Của Nhân Viên)
+//            response.put("employeeName", employee.getFullName());
+//            response.put("employeeRank", iInvoiceService.getEmployeeSellingRank());
+//            response.put("employeeTotalOrdersSold", iInvoiceService.getEmployeeTotalOrdersSold(employeeID));
+//            response.put("employeeTotalRevenueSold", iInvoiceService.getEmployeeTotalRevenueSold(employeeID));
+//
+////            Thống Kê Cá Nhân
+//            response.put("employeeOrdersToday", iInvoiceService.getEmployeeOrdersToday(employeeID));
+//            response.put("employeeRevenueToday", iInvoiceService.getEmployeeRevenueToday(employeeID));
+//            response.put("employeeOrdersThisMonth", iInvoiceService.getEmployeeOrdersThisMonth(employeeID));
+//            response.put("employeeRevenueThisMonth", iInvoiceService.getEmployeeRevenueThisMonth(employeeID));
 
-            Integer employeeID = employee.getEmployeeID(); // Use getEmployeeID() instead of getId()
+            //          topcard (Doanh Thu Tổng Của Nhân Viên)
+            response.put("employeeName", "Hậu");
+            response.put("employeeRank", 5);
+            response.put("employeeTotalOrdersSold", 123); // giả lập 123 đơn hàng đã bán
+            response.put("employeeTotalRevenueSold", 456000000); // giả lập doanh thu 456 triệu
 
-            // Fetch all OUT transactions for the employee
-            List<InventoryTransaction> employeeTransactions = transactionOutService.getAllOutTransactionsByEmployee(employeeID);
+//          Thống Kê Cá Nhân
+            response.put("employeeOrdersToday", 5); // 5 đơn hôm nay
+            response.put("employeeRevenueToday", 10000000); // doanh thu hôm nay: 10 triệu
+            response.put("employeeOrdersThisMonth", 40); // 40 đơn trong tháng
+            response.put("employeeRevenueThisMonth", 200000000); // doanh thu tháng: 200 triệu
 
-            // Calculate total orders and revenue
-            long totalOrdersSold = employeeTransactions.size();
-            BigDecimal totalRevenueSold = employeeTransactions.stream()
-                    .map(InventoryTransaction::getTotalPrice)
-                    .filter(totalPrice -> totalPrice != null)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            // Define date ranges for today and this month
-            LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
-            LocalDateTime endOfToday = LocalDate.now().atTime(LocalTime.MAX);
-            LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-            LocalDateTime endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()).atTime(LocalTime.MAX);
-
-            // Filter transactions for today
-            List<InventoryTransaction> transactionsToday = employeeTransactions.stream()
-                    .filter(t -> !t.getTransactionDate().isBefore(startOfToday) && !t.getTransactionDate().isAfter(endOfToday))
-                    .toList();
-            long ordersToday = transactionsToday.size();
-            BigDecimal revenueToday = transactionsToday.stream()
-                    .map(InventoryTransaction::getTotalPrice)
-                    .filter(totalPrice -> totalPrice != null)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            // Filter transactions for this month
-            List<InventoryTransaction> transactionsThisMonth = employeeTransactions.stream()
-                    .filter(t -> !t.getTransactionDate().isBefore(startOfMonth) && !t.getTransactionDate().isAfter(endOfMonth))
-                    .toList();
-            long ordersThisMonth = transactionsThisMonth.size();
-            BigDecimal revenueThisMonth = transactionsThisMonth.stream()
-                    .map(InventoryTransaction::getTotalPrice)
-                    .filter(totalPrice -> totalPrice != null)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            // Populate response map
-            response.put("totalOrdersSold", totalOrdersSold);
-            response.put("totalRevenueSold", totalRevenueSold);
-            response.put("ordersToday", ordersToday);
-            response.put("revenueToday", revenueToday);
-            response.put("ordersThisMonth", ordersThisMonth);
-            response.put("revenueThisMonth", revenueThisMonth);
-
-            // Add success message to session
             session.setAttribute("SUCCESS_MESSAGE", "Tải dữ liệu dashboard thành công cho nhân viên: " + username);
-
         } catch (Exception e) {
             e.printStackTrace();
             response.put("error", "Lỗi khi tải dữ liệu dashboard: " + e.getMessage());
             session.setAttribute("ERROR_MESSAGE", "Lỗi khi tải dữ liệu dashboard: " + e.getMessage());
         }
-
         return response;
     }
 
