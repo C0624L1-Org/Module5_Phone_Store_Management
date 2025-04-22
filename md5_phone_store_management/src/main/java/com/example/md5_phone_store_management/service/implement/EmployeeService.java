@@ -209,17 +209,14 @@
 //    }
 //}
 
-
 package com.example.md5_phone_store_management.service.implement;
 
-import com.example.md5_phone_store_management.common.EncryptPasswordUtils;
-import com.example.md5_phone_store_management.event.EntityChangeEvent;
-import com.example.md5_phone_store_management.model.Employee;
-import com.example.md5_phone_store_management.model.Role;
-import com.example.md5_phone_store_management.repository.IEmployeeRepository;
-import com.example.md5_phone_store_management.service.CloudinaryService;
-import com.example.md5_phone_store_management.service.IEmployeeService;
-import com.example.md5_phone_store_management.service.ITransactionOutService;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -230,15 +227,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.example.md5_phone_store_management.common.EncryptPasswordUtils;
+import com.example.md5_phone_store_management.event.EntityChangeEvent;
+import com.example.md5_phone_store_management.model.Employee;
+import com.example.md5_phone_store_management.model.Role;
+import com.example.md5_phone_store_management.repository.IEmployeeRepository;
+import com.example.md5_phone_store_management.service.CloudinaryService;
+import com.example.md5_phone_store_management.service.IEmployeeService;
+import com.example.md5_phone_store_management.service.ITransactionOutService;
 
-/**
- * Dịch vụ quản lý nhân viên.
- */
+
 @Service
 public class EmployeeService implements IEmployeeService {
 
@@ -409,6 +407,11 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public boolean existsByEmail(String email) {
         return iEmployeeRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByPhone(String phone) {
+        return iEmployeeRepository.existsByPhone(phone);
     }
 
     @Override

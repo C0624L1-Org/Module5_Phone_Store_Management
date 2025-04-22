@@ -179,17 +179,16 @@
             <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="confirmModalLabel">Xác nhận thay đổi</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel">Xác nhận cập nhật</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                         </div>
                         <div class="modal-body">
-                            Bạn có chắc chắn muốn thay đổi thông tin nhà cung cấp
-                            <strong th:text="${supplierDTO.name}"></strong> không?
+                            <p>Bạn có chắc chắn muốn cập nhật thông tin nhà cung cấp <strong th:text="${supplierDTO.name}"></strong>?</p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="button" class="btn btn-success" id="confirmUpdate">Xác nhận</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="button" class="btn btn-success" id="confirmUpdate">Xác nhận cập nhật</button>
                         </div>
                     </div>
                 </div>
@@ -199,17 +198,16 @@
             <div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <div class="modal-header bg-warning text-white">
+                        <div class="modal-header">
                             <h5 class="modal-title" id="confirmCancelModalLabel">Xác nhận hủy</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                         </div>
                         <div class="modal-body">
-                            Bạn có chắc chắn muốn hủy cập nhật thông tin nhà cung cấp không?
-                            Mọi thay đổi sẽ không được lưu lại.
+                            <p>Bạn có chắc chắn muốn hủy cập nhật thông tin nhà cung cấp? Dữ liệu chưa lưu sẽ bị mất.</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục chỉnh sửa</button>
-                            <a th:href="@{/dashboard/suppliers}" class="btn btn-danger">Hủy cập nhật</a>
+                            <a th:href="@{/dashboard/suppliers}" class="btn btn-danger">Xác nhận hủy</a>
                         </div>
                     </div>
                 </div>
