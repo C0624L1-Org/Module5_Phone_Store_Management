@@ -591,6 +591,31 @@
     }
 
     // Format notification text
+    // async function formatNotificationText(log, isExpanded) {
+    //     const entity = log.entityName?.toLowerCase();
+    //     const value = log.action === 'DELETE' ? log.oldValue : log.newValue;
+    //     const parsed = parseValueString(value);
+    //
+    //     if (entity === 'invoice') {
+    //         const amount = parsed.amount ? parseFloat(parsed.amount) : 0;
+    //         const customerId = parsed.customerId || 'N/A';
+    //         const customerName = await getCustomerNameById(customerId);
+    //         if (isExpanded) {
+    //             return `Khách Hàng: ${customerName}, thanh toán hóa đơn: ${formatCurrency(amount)}`;
+    //         } else {
+    //             return `Hóa đơn mới của ${customerName} tổng tiền: ${formatCurrency(amount)}`;
+    //         }
+    //     } else if (entity === 'product') {
+    //         const productId = parsed.productID || 'N/A';
+    //         const productName = await getProductNameById(productId);
+    //         return isExpanded ? `Sản phẩm ${productName}` : `Sản Phẩm tên: ${productName}`;
+    //     } else if (entity === 'customer') {
+    //         const customerId = parsed.customerId || 'N/A';
+    //         const customerName = await getCustomerNameById(customerId);
+    //         return isExpanded ? `Khách Hàng: ${customerName}` : `Khách Hàng tên: ${customerName}`;
+    //     }
+    //     return value || 'N/A';
+    // }
     async function formatNotificationText(log, isExpanded) {
         const entity = log.entityName?.toLowerCase();
         const value = log.action === 'DELETE' ? log.oldValue : log.newValue;
@@ -611,7 +636,11 @@
             return isExpanded ? `Sản phẩm ${productName}` : `Sản Phẩm tên: ${productName}`;
         } else if (entity === 'customer') {
             const customerId = parsed.customerId || 'N/A';
-            const customerName = await getCustomerNameById(customerId);
+            let customerName = await getCustomerNameById(customerId);
+            // If customerName is 'không xác định', use parsed name from new_value or old_value
+            if (customerName === 'không xác định' && value) {
+                customerName = parsed.name || value; // Use parsed.name or raw value as fallback
+            }
             return isExpanded ? `Khách Hàng: ${customerName}` : `Khách Hàng tên: ${customerName}`;
         }
         return value || 'N/A';
@@ -875,12 +904,130 @@
         }
     }
 
-    // Fetch dashboard data
+
+    // async function fetchDashboardData() {
+    //     try {
+    //         const [adminDashboardRes, businessDashboardRes, changeLogsRes] = await Promise.all([
+    //             fetch('/api/changelogs/admin-dashboard-info').catch(e => {
+    //                 console.error("Admin dashboard fetch failed:", e);
+    //                 return null;
+    //             }),
+    //             fetch('/api/changelogs/business-home-info?t=' + Date.now()).catch(e => {
+    //                 console.error("Business dashboard fetch failed:", e);
+    //                 return null;
+    //             }),
+    //             fetch('/api/changelogs/notification').catch(e => {
+    //                 console.error("Change logs fetch failed:", e);
+    //                 return null;
+    //             })
+    //         ]);
+    //
+    //         const parseJson = async (res, endpoint) => {
+    //             if (!res) {
+    //                 console.warn(`Request failed for ${endpoint}: No response`);
+    //                 return null;
+    //             }
+    //             if (!res.ok) {
+    //                 console.warn(`Request failed for ${endpoint}: Status ${res.status}`);
+    //                 return null;
+    //             }
+    //             try {
+    //                 const text = await res.text();
+    //                 if (!text) {
+    //                     console.warn(`Empty response for ${endpoint}`);
+    //                     return null;
+    //                 }
+    //                 return JSON.parse(text);
+    //             } catch (error) {
+    //                 console.error(`Failed to parse JSON for ${endpoint}:`, error);
+    //                 return null;
+    //             }
+    //         };
+    //
+    //         const adminData = (await parseJson(adminDashboardRes, '/api/changelogs/admin-dashboard-info')) ?? {};
+    //         const businessData = (await parseJson(businessDashboardRes, '/api/changelogs/business-home-info')) ?? {};
+    //         const changeLogs = (await parseJson(changeLogsRes, '/api/changelogs/notification')) ?? [];
+    //
+    //         const dateTime = formatDateTime();
+    //
+    //         // Update chart data based on requirements
+    //         chartData = {
+    //             // Products (from admin-dashboard-info)
+    //             countAllProducts: adminData.countAllProducts ?? 0,
+    //             countImportProducts: adminData.countImportProducts ?? 0,
+    //             countExportProducts: adminData.countExportProducts ?? 0,
+    //             topSellingProductName: adminData.topSellingProductName ?? 'N/A',
+    //             topSellingProductNamePurchaseQuantity: adminData.topSellingProductNamePurchaseQuantity ?? 0,
+    //
+    //             // Orders (from business-home-info)
+    //             totalOrders: businessData.countAllSuccessInvoices ?? 0,
+    //             todayOrders: businessData.countTodaySuccessInvoices ?? 0,
+    //             thisMonthOrders: businessData.countThisMonthSuccessInvoices ?? 0,
+    //
+    //             // Customers
+    //             countAllCustomers: adminData.countAllCustomers ?? 0, // Top card from admin
+    //             countMaleCustomers: businessData.maleCustomers ?? 0, // Chart from business
+    //             countFemaleCustomers: businessData.femaleCustomers ?? 0, // Chart from business
+    //             countOtherCustomers: (businessData.totalCustomers - (businessData.maleCustomers ?? 0) - (businessData.femaleCustomers ?? 0)) ?? 0, // Chart from business
+    //             countNewCustomers: adminData.countNewCustomers ?? 0, // Chart from admin
+    //             countRegularCustomers: adminData.countRegularCustomers ?? 0, // Chart from admin
+    //             topBuyingCustomerName: adminData.topBuyingCustomerName ?? 'N/A', // Chart from admin
+    //             topBuyingCustomerTotalPurchase: adminData.topBuyingCustomerTotalPurchase ?? 0 // Chart from admin
+    //         };
+    //
+    //         // Products Card (admin-dashboard-info)
+    //         document.getElementById('countAllProducts').textContent = chartData.countAllProducts;
+    //         document.getElementById('products-update-time').textContent = dateTime.time;
+    //         document.getElementById('products-update-date').textContent = dateTime.date;
+    //
+    //         // Orders Card (business-home-info)
+    //         document.getElementById('totalOrders').textContent = chartData.totalOrders;
+    //         document.getElementById('orders-update-time').textContent = dateTime.time;
+    //         document.getElementById('orders-update-date').textContent = dateTime.date;
+    //
+    //         // Customers Card (admin-dashboard-info)
+    //         document.getElementById('countAllCustomers').textContent = chartData.countAllCustomers;
+    //         document.getElementById('customers-update-time').textContent = dateTime.time;
+    //         document.getElementById('customers-update-date').textContent = dateTime.date;
+    //
+    //         // Handle change logs (same as original)
+    //         if (changeLogs.length > 0) {
+    //             const latestLog = changeLogs[0];
+    //             const newTimestamp = new Date(latestLog.timestamp).getTime();
+    //             if (latestUpdateTimestamp === null || newTimestamp > latestUpdateTimestamp) {
+    //                 latestUpdateTimestamp = newTimestamp;
+    //                 cachedChangeLogs = changeLogs;
+    //                 if (isUpdatesExpanded) {
+    //                     document.getElementById('updateNotification').classList.add('show');
+    //                 } else {
+    //                     await renderChangeLogs(changeLogs);
+    //                 }
+    //             } else if (!isUpdatesExpanded) {
+    //                 cachedChangeLogs = changeLogs;
+    //                 await renderChangeLogs(changeLogs);
+    //             }
+    //         } else if (!isUpdatesExpanded) {
+    //             cachedChangeLogs = changeLogs;
+    //             await renderChangeLogs(changeLogs);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching dashboard data:', error);
+    //         document.getElementById('notifications-list').innerHTML = `
+    //         <div class="notification-item">
+    //             <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+    //         </div>
+    //     `;
+    //     }
+    // }
     async function fetchDashboardData() {
         try {
-            const [adminDashboardRes, changeLogsRes] = await Promise.all([
+            const [adminDashboardRes, businessDashboardRes, changeLogsRes] = await Promise.all([
                 fetch('/api/changelogs/admin-dashboard-info').catch(e => {
                     console.error("Admin dashboard fetch failed:", e);
+                    return null;
+                }),
+                fetch('/api/changelogs/business-home-info?t=' + Date.now()).catch(e => {
+                    console.error("Business dashboard fetch failed:", e);
                     return null;
                 }),
                 fetch('/api/changelogs/notification').catch(e => {
@@ -912,41 +1059,47 @@
             };
 
             const adminData = (await parseJson(adminDashboardRes, '/api/changelogs/admin-dashboard-info')) ?? {};
+            const businessData = (await parseJson(businessDashboardRes, '/api/changelogs/business-home-info')) ?? {};
             const changeLogs = (await parseJson(changeLogsRes, '/api/changelogs/notification')) ?? [];
 
             const dateTime = formatDateTime();
 
-            // Update chart data
+            // Update chart data based on requirements
             chartData = {
+                // Products (from admin-dashboard-info)
                 countAllProducts: adminData.countAllProducts ?? 0,
                 countImportProducts: adminData.countImportProducts ?? 0,
                 countExportProducts: adminData.countExportProducts ?? 0,
                 topSellingProductName: adminData.topSellingProductName ?? 'N/A',
                 topSellingProductNamePurchaseQuantity: adminData.topSellingProductNamePurchaseQuantity ?? 0,
-                totalOrders: adminData.totalOrders ?? 0,
-                todayOrders: adminData.todayOrders ?? 0,
-                thisMonthOrders: adminData.thisMonthOrders ?? 0,
-                countAllCustomers: adminData.countAllCustomers ?? 0,
-                countMaleCustomers: adminData.countMaleCustomers ?? 0,
-                countFemaleCustomers: adminData.countFemaleCustomers ?? 0,
-                countOtherCustomers: adminData.countOtherCustomers ?? 0,
-                countNewCustomers: adminData.countNewCustomers ?? 0,
-                countRegularCustomers: adminData.countRegularCustomers ?? 0,
-                topBuyingCustomerName: adminData.topBuyingCustomerName ?? 'N/A',
-                topBuyingCustomerTotalPurchase: adminData.topBuyingCustomerTotalPurchase ?? 0
+
+                // Orders (from business-home-info)
+                totalOrders: businessData.countAllSuccessInvoices ?? 0,
+                todayOrders: businessData.countTodaySuccessInvoices ?? 0,
+                thisMonthOrders: businessData.countThisMonthSuccessInvoices ?? 0,
+
+                // Customers
+                countAllCustomers: adminData.countAllCustomers ?? 0, // Top card from admin
+                countMaleCustomers: businessData.maleCustomers ?? 0, // Chart from business
+                countFemaleCustomers: businessData.femaleCustomers ?? 0, // Chart from business
+                countOtherCustomers: (businessData.totalCustomers - (businessData.maleCustomers ?? 0) - (businessData.femaleCustomers ?? 0)) ?? 0, // Chart from business
+                countNewCustomers: adminData.countNewCustomers ?? 0, // Chart from admin
+                countRegularCustomers: adminData.countRegularCustomers ?? 0, // Chart from admin
+                topBuyingCustomerName: adminData.topBuyingCustomerName ?? 'N/A', // Chart from admin
+                topBuyingCustomerTotalPurchase: adminData.topBuyingCustomerTotalPurchase ?? 0 // Chart from admin
             };
 
-            // Products Card
+            // Products Card (admin-dashboard-info)
             document.getElementById('countAllProducts').textContent = chartData.countAllProducts;
             document.getElementById('products-update-time').textContent = dateTime.time;
             document.getElementById('products-update-date').textContent = dateTime.date;
 
-            // Orders Card
+            // Orders Card (business-home-info)
             document.getElementById('totalOrders').textContent = chartData.totalOrders;
             document.getElementById('orders-update-time').textContent = dateTime.time;
             document.getElementById('orders-update-date').textContent = dateTime.date;
 
-            // Customers Card
+            // Customers Card (admin-dashboard-info)
             document.getElementById('countAllCustomers').textContent = chartData.countAllCustomers;
             document.getElementById('customers-update-time').textContent = dateTime.time;
             document.getElementById('customers-update-date').textContent = dateTime.date;
@@ -963,23 +1116,28 @@
                     } else {
                         await renderChangeLogs(changeLogs);
                     }
-                } else if (!isUpdatesExpanded) {
+                }
+                // Only re-render if not expanded and logs have changed
+                else if (!isUpdatesExpanded && JSON.stringify(cachedChangeLogs) !== JSON.stringify(changeLogs)) {
                     cachedChangeLogs = changeLogs;
                     await renderChangeLogs(changeLogs);
                 }
-            } else if (!isUpdatesExpanded) {
-                cachedChangeLogs = changeLogs;
-                await renderChangeLogs(changeLogs);
+            } else if (cachedChangeLogs.length > 0) {
+                // If no new logs but we have cached logs, clear notifications
+                cachedChangeLogs = [];
+                await renderChangeLogs([]);
             }
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
             document.getElementById('notifications-list').innerHTML = `
-                <div class="notification-item">
-                    <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
-                </div>
-            `;
+            <div class="notification-item">
+                <p class="text-sm text-gray-500">Lỗi khi tải cập nhật.</p>
+            </div>
+        `;
         }
     }
+
+
 
     // Toggle expand for sections
     function toggleExpand(section) {
