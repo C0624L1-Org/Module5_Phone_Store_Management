@@ -12,9 +12,15 @@ import com.example.md5_phone_store_management.model.Invoice;
 
 public interface IInvoiceService {
 
+    Integer getEmployeeSellingRank(Long employeeID);
+    Integer getEmployeeTotalOrdersSold(Long employeeID);
+    BigDecimal getEmployeeTotalRevenueSold(Long employeeID);
+    Integer getEmployeeOrdersToday(Long employeeID);
+    BigDecimal getEmployeeRevenueToday(Long employeeID);
+    Integer getEmployeeOrdersThisMonth(Long employeeID);
+    BigDecimal getEmployeeRevenueThisMonth(Long employeeID);
 
-//    response.put("bestSalesStaffName", iInvoiceService.getBestSalesStaffName());
-//        response.put("bestSalesStaffSellingQuantity", iInvoiceService.getBestSalesStaffSellingQuantity());
+
     String getBestSalesStaffName();
     Integer getBestSalesStaffSellingQuantity();
 

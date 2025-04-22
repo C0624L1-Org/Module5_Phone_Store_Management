@@ -19,16 +19,54 @@ import com.example.md5_phone_store_management.model.InvoiceDetail;
 
 @Repository
 public interface IInvoiceDetailRepository extends JpaRepository<InvoiceDetail, Integer> {
+// ko cso tt succsec
+//    @Query("SELECT COALESCE(SUM(id.totalPrice), 0) " +
+//            "FROM InvoiceDetail id " +
+//            "WHERE id.invoice.customer.customerID = :customerId")
+//    Long getTopBuyingCustomerTotalPurchaseByTopBuyingCustomerId(@Param("customerId") Long customerId);
+//
+//
+//    @Query("SELECT COALESCE((SELECT id.invoice.customer.customerID " +
+//            "FROM InvoiceDetail id " +
+//            "WHERE id.invoice.customer.customerID IS NOT NULL " +
+//            "GROUP BY id.invoice.customer.customerID " +
+//            "ORDER BY SUM(id.totalPrice) DESC " +
+//            "LIMIT 1), 0)")
+//    Long getTopBuyingCustomerId();
+//
+//    @Query("SELECT id.invoice.employee.employeeID " +
+//            "FROM InvoiceDetail id " +
+//            "WHERE id.invoice.employee.employeeID IS NOT NULL " +
+//            "GROUP BY id.invoice.employee.employeeID " +
+//            "ORDER BY SUM(id.quantity) DESC " +
+//            "LIMIT 1")
+//    Integer getBestSalesStaffEmployeeId();
+//
+//    @Query("SELECT COALESCE(SUM(id.quantity), 0) " +
+//            "FROM InvoiceDetail id " +
+//            "WHERE id.product.productID = :productId")
+//    Integer findTopSellingProductNamePurchaseQuantityByProductId(@Param("productId") Long productId);
+//
+//    @Query("SELECT COALESCE((SELECT id.product.productID " +
+//            "FROM InvoiceDetail id " +
+//            "GROUP BY id.product.productID " +
+//            "ORDER BY COUNT(id.product.productID) DESC " +
+//            "LIMIT 1), 0)")
+//    Long getTopSellingProductId();
+//
+//
+//    @Query("SELECT COALESCE(SUM(id.totalPrice), 0) FROM InvoiceDetail id WHERE id.invoice.id IN :invoiceIds")
+//    Long totalRevenueByInvoiceIds(@Param("invoiceIds") List<Long> invoiceIds);
+
 
     @Query("SELECT COALESCE(SUM(id.totalPrice), 0) " +
             "FROM InvoiceDetail id " +
-            "WHERE id.invoice.customer.customerID = :customerId")
+            "WHERE id.invoice.customer.customerID = :customerId AND id.invoice.status = 'SUCCESS'")
     Long getTopBuyingCustomerTotalPurchaseByTopBuyingCustomerId(@Param("customerId") Long customerId);
-
 
     @Query("SELECT COALESCE((SELECT id.invoice.customer.customerID " +
             "FROM InvoiceDetail id " +
-            "WHERE id.invoice.customer.customerID IS NOT NULL " +
+            "WHERE id.invoice.customer.customerID IS NOT NULL AND id.invoice.status = 'SUCCESS' " +
             "GROUP BY id.invoice.customer.customerID " +
             "ORDER BY SUM(id.totalPrice) DESC " +
             "LIMIT 1), 0)")
@@ -36,7 +74,7 @@ public interface IInvoiceDetailRepository extends JpaRepository<InvoiceDetail, I
 
     @Query("SELECT id.invoice.employee.employeeID " +
             "FROM InvoiceDetail id " +
-            "WHERE id.invoice.employee.employeeID IS NOT NULL " +
+            "WHERE id.invoice.employee.employeeID IS NOT NULL AND id.invoice.status = 'SUCCESS' " +
             "GROUP BY id.invoice.employee.employeeID " +
             "ORDER BY SUM(id.quantity) DESC " +
             "LIMIT 1")
@@ -54,9 +92,21 @@ public interface IInvoiceDetailRepository extends JpaRepository<InvoiceDetail, I
             "LIMIT 1), 0)")
     Long getTopSellingProductId();
 
-
-    @Query("SELECT COALESCE(SUM(id.totalPrice), 0) FROM InvoiceDetail id WHERE id.invoice.id IN :invoiceIds")
+    @Query("SELECT COALESCE(SUM(id.totalPrice), 0) FROM InvoiceDetail id WHERE id.invoice.id IN :invoiceIds AND id.invoice.status = 'SUCCESS'")
     Long totalRevenueByInvoiceIds(@Param("invoiceIds") List<Long> invoiceIds);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Query("SELECT SUM(i.totalPrice) FROM InvoiceDetail i")

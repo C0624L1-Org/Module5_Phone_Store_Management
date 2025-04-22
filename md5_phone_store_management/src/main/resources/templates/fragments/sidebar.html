@@ -10,7 +10,8 @@
     <div class="sidebar-content">
         <div style="padding: 20px 20px 15px 20px; text-align: center;" class="user-image-back flex justify-center">
             <div style="position: relative; width: 80px; height: 80px;">
-                <canvas id="radiating-circles" width="120" height="120" style="display: none; position: absolute; top: -20px; left: -20px; z-index: 1;"></canvas>
+                <canvas id="radiating-circles" width="120" height="120"
+                        style="display: none; position: absolute; top: -20px; left: -20px; z-index: 1;"></canvas>
                 <a href="http://localhost:8080/common/profile" style="position: relative; z-index: 2;">
                     <img
                             src="/img/dashboard/find_user.png"
@@ -31,23 +32,28 @@
         <ul class="nav flex-column mt-3" id="sidebarMenu">
             <!-- Dashboard Riêng của từng Role -->
             <li class="nav-item">
-                <a th:href="@{/dashboard/admin}" class="nav-link" sec:authorize="hasRole('Admin')" th:data-url="@{/dashboard/admin}">
+                <a th:href="@{/dashboard/admin}" class="nav-link" sec:authorize="hasRole('Admin')"
+                   th:data-url="@{/dashboard/admin}">
                     <i class="fas fa-desktop me-2"></i> Thống kê
                 </a>
-                <a th:href="@{/dashboard/sales-staff}" class="nav-link" sec:authorize="hasRole('SalesStaff')" th:data-url="@{/dashboard/sales-staff}">
+                <a th:href="@{/dashboard/sales-staff}" class="nav-link" sec:authorize="hasRole('SalesStaff')"
+                   th:data-url="@{/dashboard/sales-staff}">
                     <i class="fas fa-desktop me-2"></i> Thống kê
                 </a>
-                <a th:href="@{/dashboard/sales-person}" class="nav-link" sec:authorize="hasRole('SalesPerson')" th:data-url="@{/dashboard/sales-person}">
+                <a th:href="@{/dashboard/sales-person}" class="nav-link" sec:authorize="hasRole('SalesPerson')"
+                   th:data-url="@{/dashboard/sales-person}">
                     <i class="fas fa-desktop me-2"></i> Thống kê
                 </a>
-                <a th:href="@{/dashboard/warehouse-staff}" class="nav-link" sec:authorize="hasRole('WarehouseStaff')" th:data-url="@{/dashboard/warehouse-staff}">
+                <a th:href="@{/dashboard/warehouse-staff}" class="nav-link" sec:authorize="hasRole('WarehouseStaff')"
+                   th:data-url="@{/dashboard/warehouse-staff}">
                     <i class="fas fa-desktop me-2"></i> Thống kê
                 </a>
             </li>
 
             <!-- Quản lý nhân viên - Admin -->
             <li class="nav-item" sec:authorize="hasRole('Admin')">
-                <a th:href="@{/dashboard/admin/employees/list}" class="nav-link" th:data-url="@{/dashboard/admin/employees/list}">
+                <a th:href="@{/dashboard/admin/employees/list}" class="nav-link"
+                   th:data-url="@{/dashboard/admin/employees/list}">
                     <i class="fas fa-users me-2"></i> Quản lý nhân viên
                 </a>
             </li>
@@ -75,14 +81,16 @@
 
             <!-- Quản lý xuất nhập kho - Thủ kho, Admin -->
             <li class="nav-item" sec:authorize="hasAnyRole('Admin','WarehouseStaff')">
-                <a th:href="@{/dashboard/warehouse/inventory}" class="nav-link" th:data-url="@{/dashboard/warehouse/inventory}">
+                <a th:href="@{/dashboard/warehouse/inventory}" class="nav-link"
+                   th:data-url="@{/dashboard/warehouse/inventory}">
                     <i class="fas fa-warehouse me-2"></i> Quản lý xuất nhập kho
                 </a>
             </li>
 
             <!-- Quản lý kinh doanh - Thủ kho, Nhân viên kinh doanh, Admin -->
             <li class="nav-item" sec:authorize="hasAnyRole('Admin', 'SalesPerson')">
-                <a th:href="@{/dashboard/business/management}" class="nav-link" th:data-url="@{/dashboard/business/management}">
+                <a th:href="@{/dashboard/business/management}" class="nav-link"
+                   th:data-url="@{/dashboard/business/management}">
                     <i class="fas fa-chart-line me-2"></i> Quản lý kinh doanh
                 </a>
             </li>
@@ -98,7 +106,7 @@
 
     <!-- JavaScript for sidebar functionality -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Lấy current path từ window.location.pathname
             const currentPath = window.location.pathname;
 
@@ -141,10 +149,11 @@
             }
 
             // Kiểm tra đường dẫn để chạy hiệu ứng
-            if (currentPath === '/common/profile') {
+            if (currentPath === '/common/profile' || currentPath === '/common/edit-profile') {
                 console.log('Path matched, showing canvas and starting effect');
                 canvas.style.display = 'block'; // Hiển thị canvas
                 drawCircles(); // Chạy hiệu ứng
+
             } else {
                 console.log('Path does not match, hiding canvas');
                 canvas.style.display = 'none'; // Ẩn canvas
@@ -161,10 +170,10 @@
                         '/dashboard/warehouse-staff'
                     ],
                     subMenus: [
-                        { url: '/dashboard/admin', label: 'Thống kê (Admin)' },
-                        { url: '/dashboard/sales-staff', label: 'Thống kê (Sales Staff)' },
-                        { url: '/dashboard/sales-person', label: 'Thống kê (Sales Person)' },
-                        { url: '/dashboard/warehouse-staff', label: 'Thống kê (Warehouse Staff)' }
+                        {url: '/dashboard/admin', label: 'Thống kê (Admin)'},
+                        {url: '/dashboard/sales-staff', label: 'Thống kê (Sales Staff)'},
+                        {url: '/dashboard/sales-person', label: 'Thống kê (Sales Person)'},
+                        {url: '/dashboard/warehouse-staff', label: 'Thống kê (Warehouse Staff)'}
                     ]
                 },
                 {
@@ -172,10 +181,10 @@
                     url: '/dashboard/admin/employees/list',
                     label: 'Quản lý nhân viên',
                     subMenus: [
-                        { url: '/dashboard/admin/employees/list', label: 'Danh sách nhân viên' },
-                        { url: '/dashboard/admin/employees/create', label: 'Thêm mới nhân viên' },
-                        { url: '/dashboard/admin/employees/edit', label: 'Sửa nhân viên' },
-                        { url: '/dashboard/admin/employees/search', label: 'Tìm nhân viên' }
+                        {url: '/dashboard/admin/employees/list', label: 'Danh sách nhân viên'},
+                        {url: '/dashboard/admin/employees/create', label: 'Thêm mới nhân viên'},
+                        {url: '/dashboard/admin/employees/edit', label: 'Sửa nhân viên'},
+                        {url: '/dashboard/admin/employees/search', label: 'Tìm nhân viên'}
                     ]
                 },
                 {
@@ -183,9 +192,9 @@
                     url: '/dashboard/suppliers',
                     label: 'Quản lý nhà cung cấp',
                     subMenus: [
-                        { url: '/dashboard/suppliers', label: 'Danh sách nhà cung cấp' },
-                        { url: '/dashboard/suppliers/create', label: 'Thêm mới nhà cung cấp' },
-                        { url: '/dashboard/update-supplierForm', label: 'Cập nhật nhà cung cấp' }
+                        {url: '/dashboard/suppliers', label: 'Danh sách nhà cung cấp'},
+                        {url: '/dashboard/suppliers/create', label: 'Thêm mới nhà cung cấp'},
+                        {url: '/dashboard/update-supplierForm', label: 'Cập nhật nhà cung cấp'}
                     ]
                 },
                 {
@@ -193,10 +202,10 @@
                     url: '/dashboard/products/list',
                     label: 'Quản lý sản phẩm',
                     subMenus: [
-                        { url: '/dashboard/products/detail', label: 'Danh sách sản phẩm' },
-                        { url: '/dashboard/products/list', label: 'Danh sách sản phẩm' },
-                        { url: '/dashboard/products/create-form', label: 'Thêm mới sản phẩm' },
-                        { url: '/dashboard/products/update-form', label: 'Cập nhật sản phẩm' }
+                        {url: '/dashboard/products/detail', label: 'Danh sách sản phẩm'},
+                        {url: '/dashboard/products/list', label: 'Danh sách sản phẩm'},
+                        {url: '/dashboard/products/create-form', label: 'Thêm mới sản phẩm'},
+                        {url: '/dashboard/products/update-form', label: 'Cập nhật sản phẩm'}
                     ]
                 },
                 {
@@ -204,46 +213,52 @@
                     url: '/dashboard/sales/form',
                     label: 'Quản lý bán hàng',
                     subMenus: [
-                        { url: '/dashboard/sales/form', label: 'Tạo đơn bán hàng' }
+                        {url: '/dashboard/sales/form', label: 'Tạo đơn bán hàng'}
                     ]
                 },
                 {
                     id: 'warehouse',
                     url: '/dashboard/warehouse/inventory',
                     subMenus: [
-                        { url: '/dashboard/admin/transactions/listIn', label: 'Quản lý Nhập Kho' },
-                        { url: '/dashboard/admin/transactions/new/in', label: 'Thêm mới Nhập Kho' },
-                        { url: '/dashboard/admin/transactions/In/edit', label: 'Cập nhật Nhập Kho' },
-                        { url: '/dashboard/admin/transactions/view', label: 'Chi tiết Nhập Kho' },
-                        { url: '/dashboard/admin/transactions/listOut', label: 'Quản lý Xuất Kho' },
-                        { url: '/dashboard/admin/transactions/new/out', label: 'Thêm mới Xuất Kho' },
-                        { url: '/dashboard/admin/transactions/choose/out/product/add', label: 'Chọn SP để thêm mới Xuất Kho' },
-                        { url: '/dashboard/admin/transactions/Out/edit', label: 'Sửa Xuất Kho' },
-                        { url: '/dashboard/admin/transactions/choose/out/product/edit', label: 'Chọn SP để sửa Xuất Kho' },
-                        { url: '/dashboard/admin/transactions/Out/bill', label: 'Hóa đơn Xuất Kho' }
+                        {url: '/dashboard/admin/transactions/listIn', label: 'Quản lý Nhập Kho'},
+                        {url: '/dashboard/admin/transactions/new/in', label: 'Thêm mới Nhập Kho'},
+                        {url: '/dashboard/admin/transactions/In/edit', label: 'Cập nhật Nhập Kho'},
+                        {url: '/dashboard/admin/transactions/view', label: 'Chi tiết Nhập Kho'},
+                        {url: '/dashboard/admin/transactions/listOut', label: 'Quản lý Xuất Kho'},
+                        {url: '/dashboard/admin/transactions/new/out', label: 'Thêm mới Xuất Kho'},
+                        {
+                            url: '/dashboard/admin/transactions/choose/out/product/add',
+                            label: 'Chọn SP để thêm mới Xuất Kho'
+                        },
+                        {url: '/dashboard/admin/transactions/Out/edit', label: 'Sửa Xuất Kho'},
+                        {
+                            url: '/dashboard/admin/transactions/choose/out/product/edit',
+                            label: 'Chọn SP để sửa Xuất Kho'
+                        },
+                        {url: '/dashboard/admin/transactions/Out/bill', label: 'Hóa đơn Xuất Kho'}
                     ]
                 },
                 {
                     id: 'business',
                     url: '/dashboard/business/management',
                     subMenus: [
-                        { url: '/dashboard/products/listToChoose', label: 'Quản lý Giá Bán Lẻ' },
-                        { url: '/dashboard/products/update-form-retail-price', label: 'Trang thêm/sửa giá bán lẻ' },
-                        { url: '/dashboard/business/transaction', label: 'Quản lý Lịch Sử Mua Bán' },
-                        { url: '/dashboard/admin/customers/list', label: 'Quản lý Khách Hàng' },
-                        { url: '/dashboard/admin/customers/add', label: 'Thêm mới khách hàng' },
-                        { url: '/dashboard/admin/customers/showEdit', label: 'Sửa khách hàng' },
-                        { url: '/dashboard/admin/customers/search', label: 'Tìm kiếm khách hàng' },
-                        { url: '/dashboard/admin/customers', label: 'Hóa đơn khách hàng' },
-                        { url: '/dashboard/sales/invoice-pdf', label: 'Chi tiết Hóa đơn khách hàng' }
+                        {url: '/dashboard/products/listToChoose', label: 'Quản lý Giá Bán Lẻ'},
+                        {url: '/dashboard/products/update-form-retail-price', label: 'Trang thêm/sửa giá bán lẻ'},
+                        {url: '/dashboard/business/transaction', label: 'Quản lý Lịch Sử Mua Bán'},
+                        {url: '/dashboard/admin/customers/list', label: 'Quản lý Khách Hàng'},
+                        {url: '/dashboard/admin/customers/add', label: 'Thêm mới khách hàng'},
+                        {url: '/dashboard/admin/customers/showEdit', label: 'Sửa khách hàng'},
+                        {url: '/dashboard/admin/customers/search', label: 'Tìm kiếm khách hàng'},
+                        {url: '/dashboard/admin/customers', label: 'Hóa đơn khách hàng'},
+                        {url: '/dashboard/sales/invoice-pdf', label: 'Chi tiết Hóa đơn khách hàng'}
                     ]
                 },
                 {
                     id: 'reports',
                     url: '/report-home',
                     subMenus: [
-                        { url: '/sales-report', label: 'Báo Cáo Bán Hàng' },
-                        { url: '/dashboard/admin/customer/report', label: 'Báo Cáo Khách Hàng' }
+                        {url: '/sales-report', label: 'Báo Cáo Bán Hàng'},
+                        {url: '/dashboard/admin/customer/report', label: 'Báo Cáo Khách Hàng'}
                     ]
                 }
             ];
