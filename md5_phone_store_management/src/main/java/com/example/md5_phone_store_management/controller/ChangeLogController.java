@@ -1,19 +1,31 @@
 package com.example.md5_phone_store_management.controller;
 
 import com.example.md5_phone_store_management.model.*;
+import com.example.md5_phone_store_management.repository.IEmployeeRepository;
 import com.example.md5_phone_store_management.repository.InvoiceDetailRepository;
 import com.example.md5_phone_store_management.service.*;
 import com.example.md5_phone_store_management.service.implement.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import com.example.md5_phone_store_management.service.implement.CustomUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +66,115 @@ public class ChangeLogController {
     private TransactionInService transactionInService;
 
 
+    @Autowired
+    private IEmployeeRepository employeeRepository;
+
     @GetMapping("/sales-staff-home-info")
-    public Map<String, Object> getSaleStaffDashboardData() {
+    public Map<String, Object> getSaleStaffDashboardData(HttpSession session,
+                                                         @AuthenticationPrincipal UserDetails userDetails) {
         Map<String, Object> response = new HashMap<>();
+
+        try {
+            // Get the authenticated employee's username
+            String username = userDetails.getUsername();
+            Optional<Employee> optionalEmployee = employeeRepository.findByUsername(username);
+            Employee employee = optionalEmployee.orElseThrow(() ->
+                    new RuntimeException("Không tìm thấy tài khoản: " + username));
+
+            Integer employeeID = employee.getEmployeeID(); // Use getEmployeeID() instead of getId()
+
+            // Fetch all OUT transactions for the employee
+            List<InventoryTransaction> employeeTransactions = transactionOutService.getAllOutTransactionsByEmployee(employeeID);
+
+            // Calculate total orders and revenue
+            long totalOrdersSold = employeeTransactions.size();
+            BigDecimal totalRevenueSold = employeeTransactions.stream()
+                    .map(InventoryTransaction::getTotalPrice)
+                    .filter(totalPrice -> totalPrice != null)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            // Define date ranges for today and this month
+            LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+            LocalDateTime endOfToday = LocalDate.now().atTime(LocalTime.MAX);
+            LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+            LocalDateTime endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()).atTime(LocalTime.MAX);
+
+            // Filter transactions for today
+            List<InventoryTransaction> transactionsToday = employeeTransactions.stream()
+                    .filter(t -> !t.getTransactionDate().isBefore(startOfToday) && !t.getTransactionDate().isAfter(endOfToday))
+                    .toList();
+            long ordersToday = transactionsToday.size();
+            BigDecimal revenueToday = transactionsToday.stream()
+                    .map(InventoryTransaction::getTotalPrice)
+                    .filter(totalPrice -> totalPrice != null)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            // Filter transactions for this month
+            List<InventoryTransaction> transactionsThisMonth = employeeTransactions.stream()
+                    .filter(t -> !t.getTransactionDate().isBefore(startOfMonth) && !t.getTransactionDate().isAfter(endOfMonth))
+                    .toList();
+            long ordersThisMonth = transactionsThisMonth.size();
+            BigDecimal revenueThisMonth = transactionsThisMonth.stream()
+                    .map(InventoryTransaction::getTotalPrice)
+                    .filter(totalPrice -> totalPrice != null)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            // Populate response map
+            response.put("totalOrdersSold", totalOrdersSold);
+            response.put("totalRevenueSold", totalRevenueSold);
+            response.put("ordersToday", ordersToday);
+            response.put("revenueToday", revenueToday);
+            response.put("ordersThisMonth", ordersThisMonth);
+            response.put("revenueThisMonth", revenueThisMonth);
+
+            // Add success message to session
+            session.setAttribute("SUCCESS_MESSAGE", "Tải dữ liệu dashboard thành công cho nhân viên: " + username);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("error", "Lỗi khi tải dữ liệu dashboard: " + e.getMessage());
+            session.setAttribute("ERROR_MESSAGE", "Lỗi khi tải dữ liệu dashboard: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+
+    @GetMapping("/admin-dashboard-chart")
+    public Map<String, Object> getWarehouse1StaffDashboardData() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", productService.findAllProducts());
+        response.put("invoiceDetails", invoiceDetailService.findAll(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
+        response.put("customers", iCustomerService.findAllCustomers(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
+        response.put("suppliers", iSupplierService.getSupplierList());
+        response.put("employees", iEmployeeService.getAllEmployeesExceptAdmin(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
+        // Add a timestamp to indicate when data was last updated
+        response.put("lastUpdated", System.currentTimeMillis());
+        // Add aggregated data for charting
+        response.put("totalRevenue", iInvoiceService.totalRevenue());
+        response.put("thisMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
+        response.put("lastMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
+        response.put("countAllProducts", productService.countProducts());
+        response.put("countImportProducts", transactionInService.countImportProducts());
+        response.put("countExportProducts", transactionOutService.countExportProducts());
+        response.put("topSellingProduct", invoiceDetailService.getTopSellingProductName());
+        response.put("countSuppliers", iSupplierService.countSuppliers());
+        response.put("newSuppliers", iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
+        response.put("regularSuppliers", transactionInService.countRegularSupplier());
+        response.put("bestSupplier", transactionInService.getBestSupplierName());
+        response.put("countAllEmployees", iEmployeeService.countEmployee());
+        response.put("countWarehouseStaff", iEmployeeService.countWarehouseStaff());
+        response.put("countSalesStaff", iEmployeeService.countSalesStaff());
+        response.put("countSalesPerson", iEmployeeService.countBusinessStaff());
+        response.put("bestSalesStaff", iEmployeeService.countSalesStaff());
+        response.put("countAllCustomers", iCustomerService.countTotalCustomers());
+        response.put("countNewCustomers", iCustomerService.countNewCustomers());
+        response.put("countRegularCustomers", iCustomerService.countTotalCustomers() - iCustomerService.countNewCustomers());
+        response.put("topBuyingCustomer", invoiceDetailService.getTopBuyingCustomerName());
+        return response;
+    }
+
+
 //
 //        Tổng số đơn đã bán
 //        Tổng doanh thu đã bán
@@ -67,15 +185,14 @@ public class ChangeLogController {
 //
 //        dựa vào id khách hàng hiển thị cá nhân
 
-
-        response.put("totalRevenue", iInvoiceService.totalRevenue());
-        response.put("countAllProducts", productService.countProducts());
-        response.put("topSellingProductName", invoiceDetailService.getTopSellingProductName());
-
-
+//        response.put("totalRevenue", iInvoiceService.totalRevenue());
+//        response.put("countAllProducts", productService.countProducts());
+//        response.put("topSellingProductName", invoiceDetailService.getTopSellingProductName());
 //
-        return response;
-    }
+//
+////
+//        return response;
+//    }
 
 
     @GetMapping("/customers/{customerId}")
@@ -130,7 +247,6 @@ public class ChangeLogController {
     }
 
 
-
     @GetMapping("/lastUpdate/time/transactionin")
     public LocalDateTime getLastTransactionInUpdateTime() {
         return changeLogService.getLastUpdateTimeWithEntityNameAndFieldName("inventorytransaction", "transactionin");
@@ -146,7 +262,6 @@ public class ChangeLogController {
     public LocalDateTime getLastSupplierUpdateTime() {
         return changeLogService.getLastUpdateTime("supplier");
     }
-
 
 
     @GetMapping("/warehouse-staff-home/out-of-stock-warning")
@@ -194,18 +309,16 @@ public class ChangeLogController {
         response.put("thisMonthExportQuantity", transactionOutService.countThisMonthExportQuantityProducts());
         response.put("recentExportSupplierName", transactionOutService.getRecentExportSupplierName());
         response.put("recentExportProductName", transactionOutService.getRecentExportProductName());
-        
+
 ////        Nhà cung cấp
         response.put("countSuppliers", iSupplierService.countSuppliers());
-        response.put("regularSupplier",transactionInService.countRegularSupplier());
-        response.put("newSupplier",iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
-        response.put("bestSupplierName",transactionInService.getBestSupplierName());
-        response.put("bestSupplierImportQuantity",transactionInService.getBestSupplierImportQuantity());
+        response.put("regularSupplier", transactionInService.countRegularSupplier());
+        response.put("newSupplier", iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
+        response.put("bestSupplierName", transactionInService.getBestSupplierName());
+        response.put("bestSupplierImportQuantity", transactionInService.getBestSupplierImportQuantity());
 //
         return response;
     }
-
-
 
 
     @GetMapping("/admin-dashboard-info")
@@ -213,8 +326,8 @@ public class ChangeLogController {
         Map<String, Object> response = new HashMap<>();
 //        Doanh thu
         response.put("totalRevenue", iInvoiceService.totalRevenue());
-        response.put("lastMonthRevenue",  iInvoiceService.totalLastMonthInvoiceRevenue());
-        response.put("thisMonthRevenue",  iInvoiceService.totalThisMonthInvoiceRevenue());
+        response.put("lastMonthRevenue", iInvoiceService.totalLastMonthInvoiceRevenue());
+        response.put("thisMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
 
 //        Sản phẩm
         response.put("countAllProducts", productService.countProducts());
@@ -225,10 +338,10 @@ public class ChangeLogController {
 //
 ////        Nhà cung cấp
         response.put("countSuppliers", iSupplierService.countSuppliers());
-        response.put("regularSupplier",transactionInService.countRegularSupplier());
-        response.put("newSupplier",iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
-        response.put("bestSupplierName",transactionInService.getBestSupplierName());
-        response.put("bestSupplierImportQuantity",transactionInService.getBestSupplierImportQuantity());
+        response.put("regularSupplier", transactionInService.countRegularSupplier());
+        response.put("newSupplier", iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
+        response.put("bestSupplierName", transactionInService.getBestSupplierName());
+        response.put("bestSupplierImportQuantity", transactionInService.getBestSupplierImportQuantity());
 //
 ////        nhân viên
         response.put("countAllEmployees", iEmployeeService.countEmployee());
@@ -249,10 +362,6 @@ public class ChangeLogController {
 
         return response;
     }
-
-
-
-
 
 
     @GetMapping("/business-home-info")
@@ -307,12 +416,6 @@ public class ChangeLogController {
     }
 
 
-
-
-
-
-
-
     @GetMapping("/invoices/{invoiceId}/details")
     public ResponseEntity<Object> getInvoiceDetails(@PathVariable Long invoiceId) {
         try {
@@ -337,14 +440,6 @@ public class ChangeLogController {
     }
 
 
-
-
-
-
-
-
-
-
     @GetMapping("/product/notification")
     public ResponseEntity<ChangeLog> getAllProductChangeLogs() {
         ChangeLog changeLog = changeLogService.getLatestEntityChanges("product");
@@ -357,8 +452,6 @@ public class ChangeLogController {
         ChangeLog changeLog = changeLogService.getLatestEntityChanges("invoice");
         return ResponseEntity.ok(changeLog != null ? changeLog : new ChangeLog());
     }
-
-    
 
 
     //    thông báo chỉ lấy cái mới nhất thôi tại ít thời gian quá
@@ -426,7 +519,7 @@ public class ChangeLogController {
 
     @GetMapping("/lastUpdate/time/total-revenue")
     public LocalDateTime getLastRevenueUpdateTime() {
-        System.out.println("ĐÂY "+changeLogService.getLastUpdateTime("invoice"));
+        System.out.println("ĐÂY " + changeLogService.getLastUpdateTime("invoice"));
         return changeLogService.getLastUpdateTime("invoice");
 
     }

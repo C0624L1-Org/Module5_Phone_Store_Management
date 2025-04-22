@@ -216,7 +216,16 @@ public class TransactionOutService implements ITransactionOutService {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
+
+
+
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+
+    public List<InventoryTransaction> getAllOutTransactionsByEmployee(Integer employeeID) {
+        return transactionOutRepository.findByEmployeeEmployeeIDAndTransactionType(employeeID, TransactionType.OUT);
+    }
+
 
     @Override
     public Integer countExportQuantity() {
@@ -232,21 +241,21 @@ public class TransactionOutService implements ITransactionOutService {
     public String getRecentExportSupplierName() {
         Integer SupplierID = transactionOutRepository.getLastestExportSupplierId();
         if (SupplierID == null || SupplierID == 0) {
-            throw new IllegalArgumentException("Không có nhà cung cấp nào được tìm thấy (ID không hợp lệ).");
+            return "Không xác định";
         }
-        Supplier supplier = supplierRepository.findById(SupplierID)
-                .orElseThrow(() -> new IllegalArgumentException("Nhà cung cấp với ID " + SupplierID + " không tồn tại."));
-        return supplier.getName();
+        return supplierRepository.findById(SupplierID)
+                .map(Supplier::getName)
+                .orElse("Không xác định");
     }
 
     @Override
     public String getRecentExportProductName() {
         Integer productID = transactionOutRepository.getLastestExportProductId();
         if (productID == null || productID == 0) {
-            throw new IllegalArgumentException("Không có sản phẩm nào được tìm thấy (ID không hợp lệ).");
+            return "Không xác định";
         }
         Product product = productRepository.findByProductID(productID);
-        return product.getName();
+        return product != null && product.getName() != null ? product.getName() : "Không xác định";
     }
 
     @Override
