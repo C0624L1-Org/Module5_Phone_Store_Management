@@ -69,6 +69,45 @@ public class ChangeLogController {
     @Autowired
     private IEmployeeRepository employeeRepository;
 
+
+//    @GetMapping("/admin-dashboard-chart")
+//    public Map<String, Object> getManagerDashboardData() {
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("products", productService.findAllProducts());
+//        response.put("invoiceDetails", invoiceDetailService.findAll(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
+//        response.put("customers", iCustomerService.findAllCustomers(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
+//        response.put("suppliers", iSupplierService.getSupplierList());
+//        response.put("employees", iEmployeeService.getAllEmployeesExceptAdmin(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
+//        // Add a timestamp to indicate when data was last updated
+//        response.put("lastUpdated", System.currentTimeMillis());
+//        // Add aggregated data for charting
+//        response.put("totalRevenue", iInvoiceService.totalRevenue());
+//        response.put("thisMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
+//        response.put("lastMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
+//        response.put("countAllProducts", productService.countProducts());
+//        response.put("countImportProducts", transactionInService.countImportProducts());
+//        response.put("countExportProducts", transactionOutService.countExportProducts());
+//        response.put("topSellingProduct", invoiceDetailService.getTopSellingProductName());
+//        response.put("countSuppliers", iSupplierService.countSuppliers());
+//        response.put("newSuppliers", iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
+//        response.put("regularSuppliers", transactionInService.countRegularSupplier());
+//        response.put("bestSupplier", transactionInService.getBestSupplierName());
+//        response.put("countAllEmployees", iEmployeeService.countEmployee());
+//        response.put("countWarehouseStaff", iEmployeeService.countWarehouseStaff());
+//        response.put("countSalesStaff", iEmployeeService.countSalesStaff());
+//        response.put("countSalesPerson", iEmployeeService.countBusinessStaff());
+//        response.put("bestSalesStaff", iEmployeeService.countSalesStaff());
+//        response.put("countAllCustomers", iCustomerService.countTotalCustomers());
+//        response.put("countNewCustomers", iCustomerService.countNewCustomers());
+//        response.put("countRegularCustomers", iCustomerService.countTotalCustomers() - iCustomerService.countNewCustomers());
+//        response.put("topBuyingCustomer", invoiceDetailService.getTopBuyingCustomerName());
+//        return response;
+//    }
+
+
+
+
+
     @GetMapping("/sales-staff-home-for-product")
     public Map<String, Object> getProductInfo() {
         Map<String, Object> response = new HashMap<>();
@@ -79,7 +118,7 @@ public class ChangeLogController {
 
 
     @GetMapping("/sales-staff-home-info")
-    public Map<String, Object> getSaleStaffDashboardData(HttpSession session,
+    public Map<String, Object> getSaleStaffDashboardData(
                                                          @AuthenticationPrincipal UserDetails userDetails) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -102,50 +141,12 @@ public class ChangeLogController {
             response.put("employeeRevenueThisMonth", iInvoiceService.getEmployeeRevenueThisMonth(Long.valueOf(employeeID)));
 
 
-            session.setAttribute("SUCCESS_MESSAGE", "Tải dữ liệu dashboard thành công cho nhân viên: " + username);
         } catch (Exception e) {
             e.printStackTrace();
             response.put("error", "Lỗi khi tải dữ liệu dashboard: " + e.getMessage());
-            session.setAttribute("ERROR_MESSAGE", "Lỗi khi tải dữ liệu dashboard: " + e.getMessage());
         }
         return response;
     }
-
-
-    @GetMapping("/admin-dashboard-chart")
-    public Map<String, Object> getWarehouse1StaffDashboardData() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("products", productService.findAllProducts());
-        response.put("invoiceDetails", invoiceDetailService.findAll(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
-        response.put("customers", iCustomerService.findAllCustomers(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
-        response.put("suppliers", iSupplierService.getSupplierList());
-        response.put("employees", iEmployeeService.getAllEmployeesExceptAdmin(PageRequest.of(0, Integer.MAX_VALUE)).getContent());
-        // Add a timestamp to indicate when data was last updated
-        response.put("lastUpdated", System.currentTimeMillis());
-        // Add aggregated data for charting
-        response.put("totalRevenue", iInvoiceService.totalRevenue());
-        response.put("thisMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
-        response.put("lastMonthRevenue", iInvoiceService.totalThisMonthInvoiceRevenue());
-        response.put("countAllProducts", productService.countProducts());
-        response.put("countImportProducts", transactionInService.countImportProducts());
-        response.put("countExportProducts", transactionOutService.countExportProducts());
-        response.put("topSellingProduct", invoiceDetailService.getTopSellingProductName());
-        response.put("countSuppliers", iSupplierService.countSuppliers());
-        response.put("newSuppliers", iSupplierService.countSuppliers() - transactionInService.countRegularSupplier());
-        response.put("regularSuppliers", transactionInService.countRegularSupplier());
-        response.put("bestSupplier", transactionInService.getBestSupplierName());
-        response.put("countAllEmployees", iEmployeeService.countEmployee());
-        response.put("countWarehouseStaff", iEmployeeService.countWarehouseStaff());
-        response.put("countSalesStaff", iEmployeeService.countSalesStaff());
-        response.put("countSalesPerson", iEmployeeService.countBusinessStaff());
-        response.put("bestSalesStaff", iEmployeeService.countSalesStaff());
-        response.put("countAllCustomers", iCustomerService.countTotalCustomers());
-        response.put("countNewCustomers", iCustomerService.countNewCustomers());
-        response.put("countRegularCustomers", iCustomerService.countTotalCustomers() - iCustomerService.countNewCustomers());
-        response.put("topBuyingCustomer", invoiceDetailService.getTopBuyingCustomerName());
-        return response;
-    }
-
 
 
 
@@ -347,27 +348,6 @@ public class ChangeLogController {
         return response;
     }
 
-//    @GetMapping("/employee/{employeeId}/name")
-//    public ResponseEntity<Map<String, String>> getEmployeeName(@PathVariable Long employeeId) {
-//        System.out.println("Received request for employeeId: " + employeeId);
-//        Map<String, String> response = new HashMap<>();
-//        try {
-//            Employee employee = iEmployeeService.getEmployeeById(Math.toIntExact(employeeId));
-//            if (employee != null) {
-//                response.put("name", employee.getFullName() != null ? employee.getFullName() : "không xác định");
-//                return ResponseEntity.ok(response);
-//            } else {
-//                System.out.println("nhân viên id " + employeeId + " ko tìm thấy.");
-//                response.put("name", "không xác định");
-//                return ResponseEntity.status(404).body(response);
-//            }
-//        } catch (Exception e) {
-//            System.err.println("Error fetching employee with ID " + employeeId + ": " + e.getMessage());
-//            e.printStackTrace();
-//            response.put("name", "không xác định");
-//            return ResponseEntity.status(500).body(response);
-//        }
-//    }
 
     @GetMapping("/employee/{employeeId}/name")
     public ResponseEntity<Map<String, String>> getEmployeeName(@PathVariable Long employeeId) {
