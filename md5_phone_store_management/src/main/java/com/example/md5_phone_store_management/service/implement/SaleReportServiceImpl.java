@@ -191,8 +191,7 @@ public class SaleReportServiceImpl implements ISaleReportService {
 
         return monthlyStats;
     }
-
-    public List<Object[]> getTotalRevenueAndInvoiceCountByYear(List<Invoice> invoices) {
+    public List<Object[]> getTotalProfitAndInvoiceCountByYear(List<Invoice> invoices) { // Đổi tên phương thức
         if (invoices == null || invoices.isEmpty()) {
             return new ArrayList<>();
         }
@@ -202,8 +201,8 @@ public class SaleReportServiceImpl implements ISaleReportService {
                 .filter(invoice -> invoice.getCreatedAt() != null)
                 .collect(Collectors.groupingBy(invoice -> invoice.getCreatedAt().getYear()));
 
-        // Tính lợi nhuận gộp (doanh thu thực) theo năm
-        Map<Integer, Long> revenueByYear = invoicesGroupedByYear.entrySet().stream()
+        // Tính lợi nhuận gộp (lợi nhuận) theo năm
+        Map<Integer, Long> profitByYear = invoicesGroupedByYear.entrySet().stream() // Đổi tên biến
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> entry.getValue().stream()
@@ -221,16 +220,21 @@ public class SaleReportServiceImpl implements ISaleReportService {
                                 .sum()
                 ));
 
-        // Đếm số lượng hóa đơn theo năm
-        Map<Integer, Long> countByYear = calculateGroupedProfit(invoicesGroupedByYear);
+        // Đếm số lượng hóa đơn theo năm (FIXED)
+        Map<Integer, Long> invoiceCountByYear = invoicesGroupedByYear.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> (long) entry.getValue().size() // Đếm số lượng hóa đơn trong mỗi nhóm
+                ));
+
         // Gom dữ liệu ra list kết quả
         List<Object[]> result = new ArrayList<>();
-        Set<Integer> years = new TreeSet<>(revenueByYear.keySet()); // Sắp xếp theo năm tăng dần
+        Set<Integer> years = new TreeSet<>(profitByYear.keySet()); // Lấy năm từ map lợi nhuận (hoặc map số lượng hóa đơn)
 
         for (Integer year : years) {
-            long totalRevenue = revenueByYear.getOrDefault(year, 0L);
-            long count = countByYear.getOrDefault(year, 0L);
-            result.add(new Object[]{year, count, totalRevenue});
+            long totalProfit = profitByYear.getOrDefault(year, 0L); // Lấy lợi nhuận
+            long invoiceCount = invoiceCountByYear.getOrDefault(year, 0L); // Lấy số lượng hóa đơn
+            result.add(new Object[]{year, invoiceCount, totalProfit}); // Trả về đúng: [Năm, Số lượng hóa đơn, Tổng lợi nhuận]
         }
 
         return result;

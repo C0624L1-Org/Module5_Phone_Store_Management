@@ -293,8 +293,12 @@ public class ReportController {
 
         List<Object[]> allYearlyData;
         SaleReportData reportData = saleReportServiceImpl.generateSalesReport(paymentMethod, employeeName, productName);
-        allYearlyData = saleReportServiceImpl.getTotalRevenueAndInvoiceCountByYear(
+        allYearlyData = saleReportServiceImpl. getTotalProfitAndInvoiceCountByYear(
                 reportData.getFilteredInvoices());
+        System.out.println("Year|countInvoices|total payment");
+        for (Object[] row : allYearlyData) {
+            System.out.println(row[0]+"|"+row[1]+"|"+row[2]);
+        }
 
         if (allYearlyData == null || allYearlyData.isEmpty()) {
             return ResponseEntity.ok(Collections.emptyMap());
